@@ -101,10 +101,10 @@ class GameScene extends Phaser.Scene {
         this.player.setBounce(0); // Sem quicar
         
         // Ajusta a hitbox (área de colisão)
-        // Sprite é 32x32, reduzimos a largura em ~20% (32 → 26)
-        this.player.body.setSize(26, 32);
+        // Sprite é 32x32, mas o personagem tem apenas 14px de largura
+        this.player.body.setSize(14, 32);
         // Centraliza a hitbox menor dentro do sprite
-        this.player.body.setOffset(3, 0); // (32-26)/2 = 3
+        this.player.body.setOffset(9, 0); // (32-14)/2 = 9
         
         // ===== ANIMAÇÕES =====
         this.createAnimations();

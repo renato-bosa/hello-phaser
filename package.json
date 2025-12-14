@@ -1,0 +1,9 @@
+{
+  "name": "rock-hero-platformer",
+  "version": "1.0.0",
+  "description": "Jogo de plataforma com Phaser 3",
+  "scripts": {
+    "start": "npx serve -p 8080"
+  }
+}
+

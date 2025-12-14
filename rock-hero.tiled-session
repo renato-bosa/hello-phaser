@@ -1,0 +1,59 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "dev-resources/map.tmx",
+    "expandedProjectPaths": [
+        "dev-resources",
+        "."
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "#grass": {
+            "scaleInEditor": 1
+        },
+        "dev-resources/map.tmx": {
+            "scale": 0.85796875,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 317.02786377708975,
+                "y": 175.9970861409579
+            }
+        },
+        "dev-resources/map.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map.tmx#bricks": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "dev-resources/map.tmx#grass": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "dev-resources/map.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Github/hello-phaser/assets",
+    "last.imagePath": "C:/Github/hello-phaser/assets/spritesheets",
+    "map.height": 11,
+    "map.lastUsedExportFilter": "Arquivos de mapa JSON (*.tmj *.json)",
+    "map.lastUsedFormat": "tmx",
+    "map.width": 20,
+    "openFiles": [
+        "dev-resources/map.tmx"
+    ],
+    "project": "rock-hero.tiled-project",
+    "property.type": "string",
+    "recentFiles": [
+        "dev-resources/map.tmx"
+    ],
+    "tileset.embedInMap": true
+}

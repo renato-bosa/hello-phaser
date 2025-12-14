@@ -31,7 +31,7 @@ const config = {
             // Gravidade puxando para baixo
             gravity: { y: 800 },
             // Debug: true mostra as hitboxes (útil para desenvolvimento)
-            debug: true
+            debug: false
         }
     },
     

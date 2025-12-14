@@ -92,6 +92,10 @@ class GameScene extends Phaser.Scene {
         // ===== BANDEIRA (OBJETIVO) =====
         this.goal = this.physics.add.staticSprite(goalPosition.x, goalPosition.y, 'green-flag');
         
+        // Ajusta a hitbox da bandeira (pode ajustar os valores conforme necessário)
+        this.goal.body.setSize(14, 28);  // Largura menor, altura um pouco menor
+        this.goal.body.setOffset(9, 4); // Centraliza: (32-14)/2 = 9, 4px do topo
+        
         // ===== HERÓI =====
         // Cria o sprite do herói com física
         this.player = this.physics.add.sprite(playerSpawn.x, playerSpawn.y, 'hero-idle');
@@ -102,9 +106,9 @@ class GameScene extends Phaser.Scene {
         
         // Ajusta a hitbox (área de colisão)
         // Sprite é 32x32, mas o personagem tem apenas 14px de largura
-        this.player.body.setSize(14, 32);
+        this.player.body.setSize(14, 30);
         // Centraliza a hitbox menor dentro do sprite
-        this.player.body.setOffset(9, 0); // (32-14)/2 = 9
+        this.player.body.setOffset(9, 2); // (32-14)/2 = 9
         
         // ===== ANIMAÇÕES =====
         this.createAnimations();
@@ -131,6 +135,10 @@ class GameScene extends Phaser.Scene {
         
         // Flag para o pulo variável
         this.isJumping = false;
+        
+        // Variáveis para aceleração de caminhada
+        this.currentSpeed = 160;    // Velocidade atual
+        this.lastDirection = 0;     // -1 = esquerda, 0 = parado, 1 = direita
     }
 
     /**
@@ -149,7 +157,7 @@ class GameScene extends Phaser.Scene {
         this.anims.create({
             key: 'walk',
             frames: this.anims.generateFrameNumbers('hero-walk', { start: 0, end: 3 }),
-            frameRate: 10,
+            frameRate: 14,
             repeat: -1
         });
         
@@ -160,7 +168,7 @@ class GameScene extends Phaser.Scene {
     /**
      * UPDATE - Roda a cada frame (lógica do jogo)
      */
-    update() {
+    update(time, delta) {
         // Se já ganhou, não processa mais controles
         if (this.hasWon) return;
         
@@ -168,21 +176,36 @@ class GameScene extends Phaser.Scene {
         const onGround = player.body.blocked.down; // Está no chão?
         
         // Velocidade de movimento
-        const SPEED = 160;
-        const JUMP_FORCE = -400;        // Força inicial do pulo (aumentei um pouco)
+        const MIN_SPEED = 160;           // Velocidade inicial
+        const MAX_SPEED = 260;           // Velocidade máxima (com embalo)
+        const ACCELERATION = 200;        // Quão rápido pega embalo (pixels/s²)
+        const JUMP_FORCE = -480;         // Força do pulo (+20% para compensar gravidade maior)
         const JUMP_CUT_MULTIPLIER = 0.4; // Quanto da velocidade mantém ao soltar (40%)
+        const FALL_GRAVITY_MULT = 0.5;   // Gravidade extra na descida (1 + 0.5 = 1.5x)
         
-        // ===== MOVIMENTO HORIZONTAL =====
+        // Tempo do frame em segundos
+        const dt = delta / 1000;
+        
+        // ===== MOVIMENTO HORIZONTAL COM ACELERAÇÃO =====
+        let direction = 0; // -1 = esquerda, 0 = parado, 1 = direita
+        
         if (this.cursors.left.isDown) {
-            player.setVelocityX(-SPEED);
-            player.setFlipX(true); // Vira o sprite para a esquerda
-            
-            if (onGround) {
-                player.anims.play('walk', true);
-            }
+            direction = -1;
         } else if (this.cursors.right.isDown) {
-            player.setVelocityX(SPEED);
-            player.setFlipX(false); // Sprite para a direita
+            direction = 1;
+        }
+        
+        // Reseta velocidade se mudou de direção ou parou
+        if (direction !== this.lastDirection) {
+            this.currentSpeed = MIN_SPEED;
+        }
+        this.lastDirection = direction;
+        
+        if (direction !== 0) {
+            // Aumenta velocidade gradualmente até o máximo (embalo)
+            this.currentSpeed = Math.min(this.currentSpeed + ACCELERATION * dt, MAX_SPEED);
+            player.setVelocityX(direction * this.currentSpeed);
+            player.setFlipX(direction < 0);
             
             if (onGround) {
                 player.anims.play('walk', true);
@@ -219,6 +242,13 @@ class GameScene extends Phaser.Scene {
         if (!jumpHeld && this.isJumping && player.body.velocity.y < 0) {
             player.setVelocityY(player.body.velocity.y * JUMP_CUT_MULTIPLIER);
             this.isJumping = false;
+        }
+        
+        // ===== GRAVIDADE AUMENTADA NA DESCIDA (1.5x) =====
+        if (!onGround && player.body.velocity.y > 0) {
+            // Aplica gravidade extra quando está caindo
+            const extraGravity = this.physics.world.gravity.y * FALL_GRAVITY_MULT * (delta / 1000);
+            player.setVelocityY(player.body.velocity.y + extraGravity);
         }
         
         // ===== ANIMAÇÃO NO AR =====

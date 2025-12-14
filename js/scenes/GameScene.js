@@ -7,24 +7,42 @@
  * - update(): Roda a cada frame (60x por segundo) - lógica do jogo
  */
 
+// Lista de mapas do jogo (fases)
+const LEVELS = [
+    { key: 'map1', file: 'assets/map.json', name: 'Fase 1' },
+    { key: 'map2', file: 'assets/map-2--expansion and speed.json', name: 'Fase 2' }
+];
+
 class GameScene extends Phaser.Scene {
     constructor() {
         // Nome único da cena
         super({ key: 'GameScene' });
+    }
+    
+    // Inicializa dados da cena (chamado antes do preload)
+    init(data) {
+        // Nível atual (pode vir de outra cena ou começa em 0)
+        this.currentLevel = data.level !== undefined ? data.level : 0;
     }
 
     /**
      * PRELOAD - Carrega todos os assets antes do jogo começar
      */
     preload() {
-        // Carrega o mapa do Tiled (formato JSON)
-        this.load.tilemapTiledJSON('map', 'assets/map.json');
+        // Carrega todos os mapas do jogo
+        LEVELS.forEach(level => {
+            this.load.tilemapTiledJSON(level.key, level.file);
+        });
         
         // Carrega os tilesets (imagens dos tiles)
         this.load.image('grass', 'assets/spritesheets/grass.png');
         this.load.image('bricks', 'assets/spritesheets/bricks.png');
         this.load.image('abstract-background', 'assets/spritesheets/abstract-background.png');
+        this.load.image('black', 'assets/spritesheets/black.png');
         this.load.image('green-flag', 'assets/spritesheets/green-flag.png');
+        this.load.image('yellow-flag', 'assets/spritesheets/yellow-flag.png');
+        this.load.image('lava', 'assets/spritesheets/lava.png');
+        this.load.image('lava-roxa', 'assets/spritesheets/lava-roxa.png');
         
         // Carrega os spritesheets do herói
         // frameWidth e frameHeight: tamanho de cada frame individual
@@ -49,20 +67,34 @@ class GameScene extends Phaser.Scene {
      */
     create() {
         // ===== MAPA =====
+        // Pega a configuração do nível atual
+        const levelConfig = LEVELS[this.currentLevel];
+        
+        // Mostra o nome da fase brevemente
+        this.showLevelName(levelConfig.name);
+        
         // Cria o tilemap a partir do JSON carregado
-        const map = this.make.tilemap({ key: 'map' });
+        const map = this.make.tilemap({ key: levelConfig.key });
         
         // Conecta as imagens aos tilesets do mapa
         // O primeiro parâmetro é o nome do tileset no Tiled
         // O segundo é a key da imagem carregada no preload
         const tilesetGrass = map.addTilesetImage('grass', 'grass');
         const tilesetBricks = map.addTilesetImage('bricks', 'bricks');
-        const tilesetBg = map.addTilesetImage('abstract-background', 'abstract-background');
+        const tilesetLava = map.addTilesetImage('lava', 'lava');
+        const tilesetLavaRoxa = map.addTilesetImage('lava-roxa', 'lava-roxa');
         
-        // Cria as camadas do mapa
-        // O nome deve ser igual ao nome da camada no Tiled
-        const bgLayer = map.createLayer('bg', [tilesetBg]);
-        const solidsLayer = map.createLayer('solids', [tilesetGrass, tilesetBricks]);
+        // Tenta carregar ambos os tilesets de fundo (cada mapa usa um diferente)
+        const tilesetAbstractBg = map.addTilesetImage('abstract-background', 'abstract-background');
+        const tilesetBlackBg = map.addTilesetImage('black', 'black');
+        
+        // Cria as camadas do mapa (usa os tilesets disponíveis)
+        const bgTilesets = [tilesetAbstractBg, tilesetBlackBg].filter(t => t !== null);
+        const bgLayer = map.createLayer('bg', bgTilesets);
+        
+        // Tilesets da camada de sólidos (incluindo lava)
+        const solidTilesets = [tilesetGrass, tilesetBricks, tilesetLava, tilesetLavaRoxa].filter(t => t !== null);
+        const solidsLayer = map.createLayer('solids', solidTilesets);
         
         // Ativa colisão nos tiles que têm a propriedade 'collider' = true
         solidsLayer.setCollisionByProperty({ collider: true });
@@ -70,11 +102,12 @@ class GameScene extends Phaser.Scene {
         // Guarda referência para usar no update
         this.solidsLayer = solidsLayer;
         
-        // ===== OBJETOS DO MAPA (spawn, goal) =====
+        // ===== OBJETOS DO MAPA (spawn, goal, checkpoints) =====
         const objectsLayer = map.getObjectLayer('objects');
         
         let playerSpawn = { x: 100, y: 100 }; // Posição padrão
         let goalPosition = { x: 500, y: 100 };
+        const checkpoints = []; // Lista de checkpoints
         
         // Procura os objetos no mapa
         objectsLayer.objects.forEach(obj => {
@@ -87,21 +120,29 @@ class GameScene extends Phaser.Scene {
             } else if (type === 'goal') {
                 goalPosition = { x: obj.x + 16, y: obj.y - 16 };
             }
+            
+            // Checkpoint = bandeira amarela (gid 11)
+            if (obj.gid === 11) {
+                checkpoints.push({ x: obj.x + 16, y: obj.y - 16 });
+            }
         });
+        
+        // ===== CHECKPOINT - Guarda posições para depois =====
+        this.checkpointPositions = checkpoints;
+        this.currentCheckpoint = playerSpawn; // Começa no spawn
         
         // ===== BANDEIRA (OBJETIVO) =====
         this.goal = this.physics.add.staticSprite(goalPosition.x, goalPosition.y, 'green-flag');
         
         // Ajusta a hitbox da bandeira (pode ajustar os valores conforme necessário)
         this.goal.body.setSize(14, 28);  // Largura menor, altura um pouco menor
-        this.goal.body.setOffset(9, 4); // Centraliza: (32-14)/2 = 9, 4px do topo
+        this.goal.body.setOffset(10, 4); // Centraliza: (32-14)/2 = 9, 4px do topo
         
         // ===== HERÓI =====
         // Cria o sprite do herói com física
         this.player = this.physics.add.sprite(playerSpawn.x, playerSpawn.y, 'hero-idle');
         
         // Configura o corpo físico do herói
-        this.player.setCollideWorldBounds(true); // Não sai da tela
         this.player.setBounce(0); // Sem quicar
         
         // Ajusta a hitbox (área de colisão)
@@ -118,10 +159,41 @@ class GameScene extends Phaser.Scene {
         
         // ===== COLISÕES =====
         // Herói colide com a camada de sólidos
-        this.physics.add.collider(this.player, solidsLayer);
+        this.physics.add.collider(this.player, solidsLayer, this.handleTileCollision, null, this);
         
         // Herói toca a bandeira = vitória!
         this.physics.add.overlap(this.player, this.goal, this.reachGoal, null, this);
+        
+        // ===== CHECKPOINTS (BANDEIRA AMARELA) =====
+        this.checkpoints = [];
+        this.checkpointPositions.forEach(cp => {
+            const flag = this.physics.add.staticSprite(cp.x, cp.y, 'yellow-flag');
+            flag.checkpointPos = cp;
+            flag.activated = false;
+            this.checkpoints.push(flag);
+            
+            // Quando o jogador toca o checkpoint
+            this.physics.add.overlap(this.player, flag, () => {
+                if (!flag.activated) {
+                    flag.activated = true;
+                    flag.setTint(0x00ff00); // Fica verde quando ativado
+                    this.currentCheckpoint = flag.checkpointPos;
+                    this.showCheckpointMessage();
+                }
+            });
+        });
+        
+        // ===== CÂMERA E LIMITES DO MUNDO =====
+        // Define os limites do mundo físico (jogador não sai do mapa)
+        this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+        this.player.setCollideWorldBounds(true);
+        
+        // Define os limites da câmera (não mostra além do mapa)
+        this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+        
+        // Câmera segue o jogador suavemente
+        // Os valores 0.1, 0.1 controlam a suavidade (lerp) - menor = mais suave
+        this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
         
         // ===== CONTROLES =====
         // Cria os cursores (setas do teclado)
@@ -139,6 +211,9 @@ class GameScene extends Phaser.Scene {
         // Variáveis para aceleração de caminhada
         this.currentSpeed = 160;    // Velocidade atual
         this.lastDirection = 0;     // -1 = esquerda, 0 = parado, 1 = direita
+        
+        // Flag para evitar múltiplos respawns
+        this.isRespawning = false;
     }
 
     /**
@@ -267,6 +342,28 @@ class GameScene extends Phaser.Scene {
     }
 
     /**
+     * Mostra o nome da fase no início
+     */
+    showLevelName(name) {
+        const text = this.add.text(this.cameras.main.centerX, 50, name, {
+            fontSize: '24px',
+            fontFamily: 'Arial',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 3
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(100);
+        
+        // Fade out após 2 segundos
+        this.tweens.add({
+            targets: text,
+            alpha: 0,
+            duration: 500,
+            delay: 1500,
+            onComplete: () => text.destroy()
+        });
+    }
+
+    /**
      * Chamado quando o herói toca a bandeira
      */
     reachGoal() {
@@ -278,33 +375,124 @@ class GameScene extends Phaser.Scene {
         this.player.setVelocity(0, 0);
         this.player.anims.play('idle', true);
         
-        // Mostra mensagem de vitória
+        // Verifica se há próxima fase
+        const nextLevel = this.currentLevel + 1;
+        const hasNextLevel = nextLevel < LEVELS.length;
+        
+        // Mostra mensagem
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
         
-        // Fundo semi-transparente
-        const overlay = this.add.rectangle(centerX, centerY, 640, 352, 0x000000, 0.7);
+        // Fundo semi-transparente (fixo na câmera)
+        const overlay = this.add.rectangle(centerX, centerY, 640, 352, 0x000000, 0.7)
+            .setScrollFactor(0).setDepth(101);
         
-        // Texto de vitória
-        const winText = this.add.text(centerX, centerY - 30, '🎉 VOCÊ VENCEU! 🎉', {
-            fontSize: '32px',
+        if (hasNextLevel) {
+            // Ainda há fases!
+            const winText = this.add.text(centerX, centerY - 30, '✅ FASE COMPLETA!', {
+                fontSize: '32px',
+                fontFamily: 'Arial',
+                color: '#00ff00',
+                stroke: '#000000',
+                strokeThickness: 4
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
+            
+            const nextText = this.add.text(centerX, centerY + 30, 'Pressione ESPAÇO para a próxima fase', {
+                fontSize: '16px',
+                fontFamily: 'Arial',
+                color: '#ffffff'
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
+            
+            // Aguarda espaço para próxima fase
+            this.input.keyboard.once('keydown-SPACE', () => {
+                this.scene.restart({ level: nextLevel });
+            });
+        } else {
+            // Última fase - vitória total!
+            const winText = this.add.text(centerX, centerY - 30, '🎉 VOCÊ ZEROU O JOGO! 🎉', {
+                fontSize: '28px',
+                fontFamily: 'Arial',
+                color: '#ffff00',
+                stroke: '#000000',
+                strokeThickness: 4
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
+            
+            const restartText = this.add.text(centerX, centerY + 30, 'Pressione ESPAÇO para jogar novamente', {
+                fontSize: '16px',
+                fontFamily: 'Arial',
+                color: '#ffffff'
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
+            
+            // Aguarda espaço para reiniciar do começo
+            this.input.keyboard.once('keydown-SPACE', () => {
+                this.scene.restart({ level: 0 });
+            });
+        }
+    }
+
+    /**
+     * Chamado quando o herói colide com um tile
+     */
+    handleTileCollision(player, tile) {
+        // Verifica se o tile tem a propriedade 'jump_back_to_checkpoint'
+        if (tile.properties && tile.properties.jump_back_to_checkpoint) {
+            this.respawnAtCheckpoint();
+        }
+    }
+
+    /**
+     * Mostra mensagem de checkpoint ativado
+     */
+    showCheckpointMessage() {
+        const text = this.add.text(this.cameras.main.centerX, 80, '🚩 CHECKPOINT!', {
+            fontSize: '20px',
             fontFamily: 'Arial',
-            color: '#00ff00',
+            color: '#ffff00',
             stroke: '#000000',
-            strokeThickness: 4
-        }).setOrigin(0.5);
+            strokeThickness: 3
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(100);
         
-        // Instrução para reiniciar
-        const restartText = this.add.text(centerX, centerY + 30, 'Pressione ESPAÇO para jogar novamente', {
-            fontSize: '16px',
-            fontFamily: 'Arial',
-            color: '#ffffff'
-        }).setOrigin(0.5);
+        // Fade out após 1 segundo
+        this.tweens.add({
+            targets: text,
+            alpha: 0,
+            y: 60,
+            duration: 500,
+            delay: 800,
+            onComplete: () => text.destroy()
+        });
+    }
+
+    /**
+     * Teleporta o jogador de volta ao checkpoint
+     */
+    respawnAtCheckpoint() {
+        // Evita múltiplos respawns
+        if (this.isRespawning) return;
+        this.isRespawning = true;
         
-        // Aguarda espaço para reiniciar
-        this.input.keyboard.once('keydown-SPACE', () => {
-            this.hasWon = false;
-            this.scene.restart();
+        // Para o jogador
+        this.player.setVelocity(0, 0);
+        
+        // Efeito de "morte" - pisca e fica transparente
+        this.tweens.add({
+            targets: this.player,
+            alpha: 0,
+            duration: 200,
+            onComplete: () => {
+                // Teleporta para o checkpoint
+                this.player.setPosition(this.currentCheckpoint.x, this.currentCheckpoint.y);
+                
+                // Volta a aparecer
+                this.tweens.add({
+                    targets: this.player,
+                    alpha: 1,
+                    duration: 200,
+                    onComplete: () => {
+                        this.isRespawning = false;
+                    }
+                });
+            }
         });
     }
 }

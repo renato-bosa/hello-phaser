@@ -4,6 +4,7 @@
         "width": 2
     },
     "activeFile": "dev-resources/map.tmx",
+    "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
         "."
@@ -51,7 +52,7 @@
         "dev-resources/map.tmx"
     ],
     "project": "rock-hero.tiled-project",
-    "property.type": "string",
+    "property.type": "bool",
     "recentFiles": [
         "dev-resources/map.tmx"
     ],

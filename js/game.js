@@ -30,6 +30,8 @@ const config = {
         arcade: {
             // Gravidade puxando para baixo
             gravity: { y: 800 },
+            // FPS da física (120 = melhor detecção de colisão, evita tunneling)
+            fps: 120,
             // Debug: true mostra as hitboxes (útil para desenvolvimento)
             debug: false
         }

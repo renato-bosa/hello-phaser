@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="90" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="6">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="90" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="10">
  <editorsettings>
   <export target="../assets/map-2--expansion and speed.json" format="json"/>
  </editorsettings>
@@ -75,6 +75,12 @@
     <property name="jump_back_to_checkpoint" type="bool" value="true"/>
    </properties>
   </tile>
+ </tileset>
+ <tileset firstgid="16" name="trampoline-thick" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/trampoline-thick.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="17" name="yellow-star-animated" tilewidth="32" tileheight="32" tilecount="9" columns="3">
+  <image source="../assets/spritesheets/yellow-star-animated.png" width="96" height="96"/>
  </tileset>
  <layer id="5" name="bg" width="90" height="30" tintcolor="#000000">
   <data encoding="csv">
@@ -156,5 +162,9 @@
    </properties>
   </object>
   <object id="5" gid="11" x="1472" y="384" width="32" height="32"/>
+  <object id="6" gid="16" x="192" y="768" width="32" height="32"/>
+  <object id="7" gid="16" x="224" y="768" width="32" height="32"/>
+  <object id="8" gid="17" x="160" y="192" width="32" height="32"/>
+  <object id="9" gid="16" x="864" y="800" width="32" height="32"/>
  </objectgroup>
 </map>

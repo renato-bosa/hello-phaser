@@ -14,19 +14,22 @@ const LEVELS = [
         file: 'assets/map.json', 
         name: 'Fase 1',
         // Configurações opcionais (usa valores padrão se não definido)
-        zoom: 1.0          // Zoom da câmera (1.0 = normal, 0.75 = mais longe)
+        zoom: 1.0,          // Zoom da câmera (1.0 = normal, 0.75 = mais longe)
+        roundPixels: true   // true = pixels nítidos, false = suavizado
     },
     { 
         key: 'map2', 
         file: 'assets/map-2--expansion and speed.json', 
         name: 'Fase 2',
-        zoom: 0.75         // Câmera mais afastada para ver mais do mapa
+        zoom: 0.9,         // Câmera mais afastada para ver mais do mapa
+        roundPixels: false  // Suaviza para evitar artefatos com zoom fracionário
     }
 ];
 
 // Valores padrão para propriedades de fase
 const LEVEL_DEFAULTS = {
     zoom: 1.0,
+    roundPixels: true,
     gravity: 800,
     playerSpeed: { min: 160, max: 260 },
     jumpForce: -480
@@ -64,6 +67,13 @@ class GameScene extends Phaser.Scene {
         this.load.image('lava', 'assets/spritesheets/lava.png');
         this.load.image('lava-roxa', 'assets/spritesheets/lava-roxa.png');
         this.load.image('lava-roxa-animated', 'assets/spritesheets/lava-roxa-animated.png');
+        this.load.image('trampoline', 'assets/spritesheets/trampoline-thick.png');
+        
+        // Carrega spritesheet da estrela (3x3 = 9 frames de 32x32)
+        this.load.spritesheet('star', 'assets/spritesheets/yellow-star-animated.png', {
+            frameWidth: 32,
+            frameHeight: 32
+        });
         
         // Carrega os spritesheets do herói
         // frameWidth e frameHeight: tamanho de cada frame individual
@@ -97,19 +107,23 @@ class GameScene extends Phaser.Scene {
         // Cria o tilemap a partir do JSON carregado
         const map = this.make.tilemap({ key: levelConfig.key });
         
-        // Conecta as imagens aos tilesets do mapa
-        // O primeiro parâmetro é o nome do tileset no Tiled
-        // O segundo é a key da imagem carregada no preload
-        const tilesetGrass = map.addTilesetImage('grass', 'grass');
-        const tilesetGrassBarrier = map.addTilesetImage('grass-with-barrier', 'grass-with-barrier');
-        const tilesetBricks = map.addTilesetImage('bricks', 'bricks');
-        const tilesetLava = map.addTilesetImage('lava', 'lava');
-        const tilesetLavaRoxa = map.addTilesetImage('lava-roxa', 'lava-roxa');
-        const tilesetLavaRoxaAnim = map.addTilesetImage('lava-roxa-animated', 'lava-roxa-animated');
+        // Helper: só adiciona tileset se existir no mapa (evita warnings)
+        const addTileset = (name, imageKey) => {
+            const exists = map.tilesets.some(ts => ts.name === name);
+            return exists ? map.addTilesetImage(name, imageKey || name) : null;
+        };
         
-        // Tenta carregar ambos os tilesets de fundo (cada mapa usa um diferente)
-        const tilesetAbstractBg = map.addTilesetImage('abstract-background', 'abstract-background');
-        const tilesetBlackBg = map.addTilesetImage('black', 'black');
+        // Conecta as imagens aos tilesets do mapa (só os que existem)
+        const tilesetGrass = addTileset('grass');
+        const tilesetGrassBarrier = addTileset('grass-with-barrier');
+        const tilesetBricks = addTileset('bricks');
+        const tilesetLava = addTileset('lava');
+        const tilesetLavaRoxa = addTileset('lava-roxa');
+        const tilesetLavaRoxaAnim = addTileset('lava-roxa-animated');
+        
+        // Tilesets de fundo (cada mapa pode usar um diferente)
+        const tilesetAbstractBg = addTileset('abstract-background');
+        const tilesetBlackBg = addTileset('black');
         
         // Cria as camadas do mapa (usa os tilesets disponíveis)
         const bgTilesets = [tilesetAbstractBg, tilesetBlackBg].filter(t => t !== null);
@@ -142,6 +156,9 @@ class GameScene extends Phaser.Scene {
         let goalPosition = { x: 500, y: 100 };
         const checkpoints = []; // Lista de checkpoints
         
+        const trampolines = []; // Lista de trampolins
+        const stars = []; // Lista de estrelas
+        
         // Procura os objetos no mapa
         objectsLayer.objects.forEach(obj => {
             // Pega a propriedade 'type' que definimos no Tiled
@@ -157,6 +174,16 @@ class GameScene extends Phaser.Scene {
             // Checkpoint = bandeira amarela (gid 11)
             if (obj.gid === 11) {
                 checkpoints.push({ x: obj.x + 16, y: obj.y - 16 });
+            }
+            
+            // Trampolim (gid 16)
+            if (obj.gid === 16) {
+                trampolines.push({ x: obj.x + 16, y: obj.y - 16 });
+            }
+            
+            // Estrela (gid 17 a 25, pois o tileset tem 9 frames)
+            if (obj.gid >= 17 && obj.gid <= 25) {
+                stars.push({ x: obj.x + 16, y: obj.y - 16 });
             }
         });
         
@@ -177,6 +204,7 @@ class GameScene extends Phaser.Scene {
         
         // Configura o corpo físico do herói
         this.player.setBounce(0); // Sem quicar
+        this.player.body.setMaxVelocity(400, 1000); // Limita velocidade (X, Y) para evitar tunneling
         
         // Ajusta a hitbox (área de colisão)
         // Sprite é 32x32, mas o personagem tem apenas 14px de largura
@@ -216,6 +244,41 @@ class GameScene extends Phaser.Scene {
             });
         });
         
+        // ===== TRAMPOLINS (SUPER-PULO) =====
+        this.trampolines = this.physics.add.staticGroup();
+        trampolines.forEach(t => {
+            // Cria sprite estático manualmente para controlar hitbox
+            const trampoline = this.physics.add.staticSprite(t.x, t.y, 'trampoline');
+            // Ajusta hitbox do trampolim (largura, altura)
+            trampoline.body.setSize(32, 5);     // Mais largo, bem fino
+            trampoline.body.setOffset(0, 27);   // Posiciona na parte de cima
+            // Adiciona ao grupo depois de configurar
+            this.trampolines.add(trampoline);
+        });
+        
+        // Colisão com trampolim = super pulo
+        this.physics.add.collider(this.player, this.trampolines, this.handleTrampolineCollision, null, this);
+        
+        // ===== ESTRELAS (COLECIONÁVEIS) =====
+        this.stars = this.physics.add.group();
+        stars.forEach(s => {
+            const star = this.stars.create(s.x, s.y, 'star');
+            star.body.allowGravity = false; // Estrela flutua
+            star.anims.play('star-spin', true);
+        });
+        
+        // Coleta de estrelas
+        this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
+        
+        // Contador de estrelas coletadas
+        this.starsCollected = 0;
+        this.totalStars = stars.length;
+        
+        // Cria HUD de estrelas (só se houver estrelas no mapa)
+        if (this.totalStars > 0) {
+            this.createStarHUD();
+        }
+        
         // ===== CÂMERA E LIMITES DO MUNDO =====
         // Define os limites do mundo físico (jogador não sai do mapa)
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -231,6 +294,20 @@ class GameScene extends Phaser.Scene {
         // Aplica zoom customizado da fase (ou padrão)
         const zoom = levelConfig.zoom ?? LEVEL_DEFAULTS.zoom;
         this.cameras.main.setZoom(zoom);
+        
+        // Configura renderização de pixels (suaviza quando zoom < 1)
+        const roundPixels = levelConfig.roundPixels ?? LEVEL_DEFAULTS.roundPixels;
+        this.cameras.main.setRoundPixels(roundPixels);
+        
+        // Muda o filtro das texturas baseado na configuração da fase
+        // NEAREST = pixels nítidos (padrão), LINEAR = suavizado (bom para zoom < 1)
+        const filterMode = roundPixels 
+            ? Phaser.Textures.FilterMode.NEAREST 
+            : Phaser.Textures.FilterMode.LINEAR;
+        
+        this.textures.get('hero-idle').setFilter(filterMode);
+        this.textures.get('hero-walk').setFilter(filterMode);
+        this.textures.get('hero-jump').setFilter(filterMode);
         
         // ===== CONTROLES =====
         // Cria os cursores (setas do teclado)
@@ -251,30 +328,49 @@ class GameScene extends Phaser.Scene {
         
         // Flag para evitar múltiplos respawns
         this.isRespawning = false;
+        
+        // ===== GAME FEEL: Coyote Time & Jump Buffer =====
+        this.coyoteTime = 0;        // Tempo restante de "coyote time"
+        this.jumpBufferTime = 0;    // Tempo restante de "jump buffer"
+        this.wasOnGround = false;   // Estava no chão no frame anterior?
     }
 
     /**
-     * Cria todas as animações do herói
+     * Cria todas as animações do herói (só se não existirem)
      */
     createAnimations() {
         // Animação: Parado (idle)
-        this.anims.create({
-            key: 'idle',
-            frames: this.anims.generateFrameNumbers('hero-idle', { start: 0, end: 3 }),
-            frameRate: 6,
-            repeat: -1 // Loop infinito
-        });
+        if (!this.anims.exists('idle')) {
+            this.anims.create({
+                key: 'idle',
+                frames: this.anims.generateFrameNumbers('hero-idle', { start: 0, end: 3 }),
+                frameRate: 6,
+                repeat: -1 // Loop infinito
+            });
+        }
         
         // Animação: Andando
-        this.anims.create({
-            key: 'walk',
-            frames: this.anims.generateFrameNumbers('hero-walk', { start: 0, end: 3 }),
-            frameRate: 14,
-            repeat: -1
-        });
+        if (!this.anims.exists('walk')) {
+            this.anims.create({
+                key: 'walk',
+                frames: this.anims.generateFrameNumbers('hero-walk', { start: 0, end: 3 }),
+                frameRate: 14,
+                repeat: -1
+            });
+        }
         
         // Pulo: não usa animação, troca frame manualmente baseado na velocidade
         // Frame 1 = subindo, Frame 2 = descendo
+        
+        // Animação: Estrela girando
+        if (!this.anims.exists('star-spin')) {
+            this.anims.create({
+                key: 'star-spin',
+                frames: this.anims.generateFrameNumbers('star', { start: 0, end: 8 }),
+                frameRate: 12,
+                repeat: -1
+            });
+        }
     }
 
     /**
@@ -370,15 +466,43 @@ class GameScene extends Phaser.Scene {
         // isDown = true enquanto o botão está segurado
         const jumpHeld = this.cursors.up.isDown || this.spaceKey.isDown;
         
+        // ===== COYOTE TIME (permite pular logo após sair da plataforma) =====
+        const COYOTE_DURATION = 100; // ms de tolerância após sair da plataforma
+        
+        if (onGround) {
+            this.coyoteTime = COYOTE_DURATION; // Reseta quando no chão
+        } else {
+            this.coyoteTime -= delta; // Diminui quando no ar
+        }
+        
+        const canCoyoteJump = this.coyoteTime > 0;
+        
+        // ===== JUMP BUFFER (registra pulo antes de chegar no chão) =====
+        const JUMP_BUFFER_DURATION = 100; // ms de tolerância antes de tocar o chão
+        
+        if (jumpJustPressed) {
+            this.jumpBufferTime = JUMP_BUFFER_DURATION; // Registra tentativa de pulo
+        } else {
+            this.jumpBufferTime -= delta; // Diminui com o tempo
+        }
+        
+        const hasBufferedJump = this.jumpBufferTime > 0;
+        
         // Reseta a flag quando tocar no chão
         if (onGround) {
             this.isJumping = false;
         }
         
-        // Inicia o pulo APENAS se acabou de apertar (não se está segurando)
-        if (jumpJustPressed && onGround) {
+        // Inicia o pulo se:
+        // - Acabou de apertar E (está no chão OU tem coyote time)
+        // - OU está no chão E tem pulo no buffer
+        const shouldJump = (jumpJustPressed && canCoyoteJump) || (onGround && hasBufferedJump);
+        
+        if (shouldJump && !this.isJumping) {
             player.setVelocityY(JUMP_FORCE);
             this.isJumping = true;
+            this.coyoteTime = 0;      // Consome o coyote time
+            this.jumpBufferTime = 0;  // Consome o buffer
         }
         
         // Se soltou o botão enquanto está subindo, corta a velocidade
@@ -506,6 +630,89 @@ class GameScene extends Phaser.Scene {
         // Verifica se o tile tem a propriedade 'jump_back_to_checkpoint'
         if (tile.properties && tile.properties.jump_back_to_checkpoint) {
             this.respawnAtCheckpoint();
+        }
+    }
+    
+    /**
+     * Chamado quando o herói colide com trampolim
+     */
+    handleTrampolineCollision(player, trampoline) {
+        // Só aplica super-pulo se estiver caindo ou parado em cima
+        // E se não acabou de pular (evita loop infinito)
+        if (player.body.velocity.y >= 0 && !trampoline.justBounced) {
+            const SUPER_JUMP_FORCE = -990; // Super pulo (dobro da altura)
+            player.setVelocityY(SUPER_JUMP_FORCE);
+            this.isJumping = true;
+            
+            // Flag para evitar múltiplos pulos
+            trampoline.justBounced = true;
+            this.time.delayedCall(200, () => {
+                trampoline.justBounced = false;
+            });
+            
+            // Efeito visual no trampolim
+            this.tweens.add({
+                targets: trampoline,
+                scaleY: 0.6,
+                duration: 80,
+                yoyo: true,
+                ease: 'Power2'
+            });
+        }
+    }
+    
+    /**
+     * Chamado quando o herói coleta uma estrela
+     */
+    collectStar(player, star) {
+        // Remove a estrela do jogo
+        star.disableBody(true, true);
+        
+        // Incrementa contador
+        this.starsCollected++;
+        
+        // Atualiza HUD
+        this.updateStarHUD();
+        
+        // Efeito visual de coleta
+        this.tweens.add({
+            targets: this.starHUD,
+            scale: 1.3,
+            duration: 100,
+            yoyo: true,
+            ease: 'Power2'
+        });
+    }
+    
+    /**
+     * Cria o HUD de estrelas no canto da tela
+     */
+    createStarHUD() {
+        // Container para o HUD (fixo na tela)
+        this.starHUD = this.add.container(50, 30).setScrollFactor(0).setDepth(100);
+        
+        // Ícone da estrela
+        const starIcon = this.add.sprite(0, 0, 'star', 0);
+        starIcon.setScale(1.2);
+        
+        // Texto do contador
+        this.starText = this.add.text(24, 0, '0', {
+            fontSize: '20px',
+            fontFamily: 'Arial',
+            color: '#ffff00',
+            stroke: '#000000',
+            strokeThickness: 3
+        }).setOrigin(0, 0.5);
+        
+        this.starHUD.add([starIcon, this.starText]);
+    }
+    
+    /**
+     * Atualiza o contador de estrelas no HUD
+     */
+    updateStarHUD() {
+        if (this.starText) {
+            this.starText.setText(`${this.starsCollected}`);
         }
     }
 

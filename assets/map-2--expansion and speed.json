@@ -137,6 +137,54 @@
                  "width":32,
                  "x":1472,
                  "y":384
+                }, 
+                {
+                 "gid":16,
+                 "height":32,
+                 "id":6,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":192,
+                 "y":768
+                }, 
+                {
+                 "gid":16,
+                 "height":32,
+                 "id":7,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":224,
+                 "y":768
+                }, 
+                {
+                 "gid":17,
+                 "height":32,
+                 "id":8,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":160,
+                 "y":192
+                }, 
+                {
+                 "gid":16,
+                 "height":32,
+                 "id":9,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":864,
+                 "y":800
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -145,7 +193,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":6,
+ "nextobjectid":10,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -375,6 +423,32 @@
                          "value":true
                         }]
                 }],
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":16,
+         "image":"spritesheets\/trampoline-thick.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"trampoline-thick",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":3,
+         "firstgid":17,
+         "image":"spritesheets\/yellow-star-animated.png",
+         "imageheight":96,
+         "imagewidth":96,
+         "margin":0,
+         "name":"yellow-star-animated",
+         "spacing":0,
+         "tilecount":9,
+         "tileheight":32,
          "tilewidth":32
         }],
  "tilewidth":32,

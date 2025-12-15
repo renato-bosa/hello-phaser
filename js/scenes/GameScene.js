@@ -464,34 +464,59 @@ class GameScene extends Phaser.Scene {
     }
 
     /**
-     * Teleporta o jogador de volta ao checkpoint
+     * Arremessa o jogador de volta ao checkpoint
      */
     respawnAtCheckpoint() {
         // Evita múltiplos respawns
         if (this.isRespawning) return;
         this.isRespawning = true;
         
-        // Para o jogador
-        this.player.setVelocity(0, 0);
+        // Desativa a física temporariamente para o tween controlar a posição
+        this.player.body.enable = false;
         
-        // Efeito de "morte" - pisca e fica transparente
+        // Posição atual e destino
+        const startX = this.player.x;
+        const startY = this.player.y;
+        const endX = this.currentCheckpoint.x;
+        const endY = this.currentCheckpoint.y;
+        
+        // Altura do arco (quanto maior, mais alto o arremesso)
+        const arcHeight = 150;
+        
+        // Duração do voo (baseado na distância)
+        const distance = Phaser.Math.Distance.Between(startX, startY, endX, endY);
+        const duration = Math.max(400, Math.min(800, distance * 0.8));
+        
+        // Faz o jogador piscar/brilhar durante o voo
+        this.player.setTint(0xff6666);
+        
+        // Animação de arremesso em arco
         this.tweens.add({
             targets: this.player,
-            alpha: 0,
-            duration: 200,
-            onComplete: () => {
-                // Teleporta para o checkpoint
-                this.player.setPosition(this.currentCheckpoint.x, this.currentCheckpoint.y);
+            x: endX,
+            y: endY,
+            duration: duration,
+            ease: 'Sine.easeInOut',
+            onUpdate: (tween) => {
+                // Calcula a posição no arco (parábola)
+                const progress = tween.progress;
+                // Fórmula do arco: sobe no início, desce no final
+                const arc = Math.sin(progress * Math.PI) * arcHeight;
                 
-                // Volta a aparecer
-                this.tweens.add({
-                    targets: this.player,
-                    alpha: 1,
-                    duration: 200,
-                    onComplete: () => {
-                        this.isRespawning = false;
-                    }
-                });
+                // Ajusta Y para criar o arco (subtrai porque Y cresce para baixo)
+                const linearY = Phaser.Math.Linear(startY, endY, progress);
+                this.player.y = linearY - arc;
+                
+                // Gira o sprite durante o voo
+                this.player.angle = progress * 360;
+            },
+            onComplete: () => {
+                // Restaura o jogador
+                this.player.angle = 0;
+                this.player.clearTint();
+                this.player.body.enable = true;
+                this.player.setVelocity(0, 0);
+                this.isRespawning = false;
             }
         });
     }

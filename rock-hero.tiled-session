@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map.tmx",
+    "activeFile": "dev-resources/map-2--expansion and speed.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         ".",
@@ -21,12 +21,15 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.25,
-            "selectedLayer": 0,
+            "scale": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 1656,
-                "y": 820
+                "x": 2083.5,
+                "y": 171
             }
+        },
+        "dev-resources/map-2--expansion and speed.tmx#abstract-blue": {
+            "scaleInDock": 1
         },
         "dev-resources/map-2--expansion and speed.tmx#black": {
             "scaleInDock": 1,
@@ -55,19 +58,28 @@
         "dev-resources/map-2--expansion and speed.tmx#still-hero (2)": {
             "scaleInDock": 1
         },
+        "dev-resources/map-2--expansion and speed.tmx#trampoline-thick": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-2--expansion and speed.tmx#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-2--expansion and speed.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
         "dev-resources/map.tmx": {
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.85796875,
-            "selectedLayer": 1,
+            "scale": 0.5,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 317.02786377708975,
-                "y": 175.9970861409579
+                "x": 350,
+                "y": 311
             }
+        },
+        "dev-resources/map.tmx#abstract-blue": {
+            "scaleInDock": 1
         },
         "dev-resources/map.tmx#black": {
             "scaleInDock": 1,
@@ -104,7 +116,6 @@
     "map.lastUsedFormat": "tmx",
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map.tmx",
         "dev-resources/map-2--expansion and speed.tmx"
     ],
     "project": "rock-hero.tiled-project",

@@ -68,6 +68,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('lava-roxa', 'assets/spritesheets/lava-roxa.png');
         this.load.image('lava-roxa-animated', 'assets/spritesheets/lava-roxa-animated.png');
         this.load.image('trampoline', 'assets/spritesheets/trampoline-thick.png');
+        this.load.image('abstract-blue', 'assets/spritesheets/abstract-blue.png');
         
         // Carrega spritesheet da estrela (3x3 = 9 frames de 32x32)
         this.load.spritesheet('star', 'assets/spritesheets/yellow-star-animated.png', {
@@ -107,10 +108,28 @@ class GameScene extends Phaser.Scene {
         // Cria o tilemap a partir do JSON carregado
         const map = this.make.tilemap({ key: levelConfig.key });
         
-        // Helper: só adiciona tileset se existir no mapa (evita warnings)
+        // Helper: adiciona todos os tilesets com o nome (lida com duplicatas no Tiled)
         const addTileset = (name, imageKey) => {
-            const exists = map.tilesets.some(ts => ts.name === name);
-            return exists ? map.addTilesetImage(name, imageKey || name) : null;
+            const matchingTilesets = map.tilesets.filter(ts => ts.name === name);
+            if (matchingTilesets.length === 0) return null;
+            
+            // Adiciona cada instância do tileset (pode haver duplicatas)
+            const added = [];
+            matchingTilesets.forEach((ts, index) => {
+                // Para duplicatas, usa o firstgid como diferenciador
+                const result = map.addTilesetImage(name, imageKey || name, undefined, undefined, undefined, undefined, ts.firstgid);
+                if (result) added.push(result);
+            });
+            
+            return added.length > 0 ? added[0] : null; // Retorna o primeiro para compatibilidade
+        };
+        
+        // Helper alternativo: adiciona todos e retorna array
+        const addAllTilesets = (name, imageKey) => {
+            const matchingTilesets = map.tilesets.filter(ts => ts.name === name);
+            return matchingTilesets.map(ts => 
+                map.addTilesetImage(name, imageKey || name, undefined, undefined, undefined, undefined, ts.firstgid)
+            ).filter(t => t !== null);
         };
         
         // Conecta as imagens aos tilesets do mapa (só os que existem)
@@ -124,9 +143,10 @@ class GameScene extends Phaser.Scene {
         // Tilesets de fundo (cada mapa pode usar um diferente)
         const tilesetAbstractBg = addTileset('abstract-background');
         const tilesetBlackBg = addTileset('black');
+        const tilesetsAbstractBlue = addAllTilesets('abstract-blue'); // Pode ter múltiplos
         
         // Cria as camadas do mapa (usa os tilesets disponíveis)
-        const bgTilesets = [tilesetAbstractBg, tilesetBlackBg].filter(t => t !== null);
+        const bgTilesets = [tilesetAbstractBg, tilesetBlackBg, ...tilesetsAbstractBlue].filter(t => t !== null);
         const bgLayer = map.createLayer('bg', bgTilesets);
         
         // Tilesets da camada de sólidos (incluindo lava e novos tiles)
@@ -683,7 +703,7 @@ class GameScene extends Phaser.Scene {
             ease: 'Power2'
         });
     }
-    
+
     /**
      * Cria o HUD de estrelas no canto da tela
      */

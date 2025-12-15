@@ -7,11 +7,30 @@
  * - update(): Roda a cada frame (60x por segundo) - lógica do jogo
  */
 
-// Lista de mapas do jogo (fases)
+// Lista de mapas do jogo (fases) com configurações customizáveis
 const LEVELS = [
-    { key: 'map1', file: 'assets/map.json', name: 'Fase 1' },
-    { key: 'map2', file: 'assets/map-2--expansion and speed.json', name: 'Fase 2' }
+    { 
+        key: 'map1', 
+        file: 'assets/map.json', 
+        name: 'Fase 1',
+        // Configurações opcionais (usa valores padrão se não definido)
+        zoom: 1.0          // Zoom da câmera (1.0 = normal, 0.75 = mais longe)
+    },
+    { 
+        key: 'map2', 
+        file: 'assets/map-2--expansion and speed.json', 
+        name: 'Fase 2',
+        zoom: 0.75         // Câmera mais afastada para ver mais do mapa
+    }
 ];
+
+// Valores padrão para propriedades de fase
+const LEVEL_DEFAULTS = {
+    zoom: 1.0,
+    gravity: 800,
+    playerSpeed: { min: 160, max: 260 },
+    jumpForce: -480
+};
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -36,6 +55,7 @@ class GameScene extends Phaser.Scene {
         
         // Carrega os tilesets (imagens dos tiles)
         this.load.image('grass', 'assets/spritesheets/grass.png');
+        this.load.image('grass-with-barrier', 'assets/spritesheets/grass-with-barrier.png');
         this.load.image('bricks', 'assets/spritesheets/bricks.png');
         this.load.image('abstract-background', 'assets/spritesheets/abstract-background.png');
         this.load.image('black', 'assets/spritesheets/black.png');
@@ -43,6 +63,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('yellow-flag', 'assets/spritesheets/yellow-flag.png');
         this.load.image('lava', 'assets/spritesheets/lava.png');
         this.load.image('lava-roxa', 'assets/spritesheets/lava-roxa.png');
+        this.load.image('lava-roxa-animated', 'assets/spritesheets/lava-roxa-animated.png');
         
         // Carrega os spritesheets do herói
         // frameWidth e frameHeight: tamanho de cada frame individual
@@ -80,9 +101,11 @@ class GameScene extends Phaser.Scene {
         // O primeiro parâmetro é o nome do tileset no Tiled
         // O segundo é a key da imagem carregada no preload
         const tilesetGrass = map.addTilesetImage('grass', 'grass');
+        const tilesetGrassBarrier = map.addTilesetImage('grass-with-barrier', 'grass-with-barrier');
         const tilesetBricks = map.addTilesetImage('bricks', 'bricks');
         const tilesetLava = map.addTilesetImage('lava', 'lava');
         const tilesetLavaRoxa = map.addTilesetImage('lava-roxa', 'lava-roxa');
+        const tilesetLavaRoxaAnim = map.addTilesetImage('lava-roxa-animated', 'lava-roxa-animated');
         
         // Tenta carregar ambos os tilesets de fundo (cada mapa usa um diferente)
         const tilesetAbstractBg = map.addTilesetImage('abstract-background', 'abstract-background');
@@ -92,8 +115,15 @@ class GameScene extends Phaser.Scene {
         const bgTilesets = [tilesetAbstractBg, tilesetBlackBg].filter(t => t !== null);
         const bgLayer = map.createLayer('bg', bgTilesets);
         
-        // Tilesets da camada de sólidos (incluindo lava)
-        const solidTilesets = [tilesetGrass, tilesetBricks, tilesetLava, tilesetLavaRoxa].filter(t => t !== null);
+        // Tilesets da camada de sólidos (incluindo lava e novos tiles)
+        const solidTilesets = [
+            tilesetGrass, 
+            tilesetGrassBarrier,
+            tilesetBricks, 
+            tilesetLava, 
+            tilesetLavaRoxa,
+            tilesetLavaRoxaAnim
+        ].filter(t => t !== null);
         const solidsLayer = map.createLayer('solids', solidTilesets);
         
         // Ativa colisão nos tiles que têm a propriedade 'collider' = true
@@ -101,6 +131,9 @@ class GameScene extends Phaser.Scene {
         
         // Guarda referência para usar no update
         this.solidsLayer = solidsLayer;
+        
+        // ===== ANIMAÇÃO DE TILES (Phaser não suporta nativamente) =====
+        this.setupTileAnimations(solidsLayer, tilesetLavaRoxaAnim);
         
         // ===== OBJETOS DO MAPA (spawn, goal, checkpoints) =====
         const objectsLayer = map.getObjectLayer('objects');
@@ -195,6 +228,10 @@ class GameScene extends Phaser.Scene {
         // Os valores 0.1, 0.1 controlam a suavidade (lerp) - menor = mais suave
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
         
+        // Aplica zoom customizado da fase (ou padrão)
+        const zoom = levelConfig.zoom ?? LEVEL_DEFAULTS.zoom;
+        this.cameras.main.setZoom(zoom);
+        
         // ===== CONTROLES =====
         // Cria os cursores (setas do teclado)
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -238,6 +275,38 @@ class GameScene extends Phaser.Scene {
         
         // Pulo: não usa animação, troca frame manualmente baseado na velocidade
         // Frame 1 = subindo, Frame 2 = descendo
+    }
+
+    /**
+     * Configura animação de tiles (Phaser não suporta nativamente do Tiled)
+     */
+    setupTileAnimations(layer, tileset) {
+        // Se o tileset não existe neste mapa, sai
+        if (!tileset) return;
+        
+        const firstGid = tileset.firstgid;
+        const frameCount = 4; // Número de frames da animação
+        const frameDuration = 200; // ms por frame
+        
+        let currentFrame = 0;
+        
+        // Timer que troca os frames periodicamente
+        this.time.addEvent({
+            delay: frameDuration,
+            loop: true,
+            callback: () => {
+                // Próximo frame (loop de 0 a 3)
+                currentFrame = (currentFrame + 1) % frameCount;
+                
+                // Percorre todos os tiles da camada
+                layer.forEachTile(tile => {
+                    if (tile.index >= firstGid && tile.index < firstGid + frameCount) {
+                        // Este tile é do tileset animado - troca o frame
+                        tile.index = firstGid + currentFrame;
+                    }
+                });
+            }
+        });
     }
 
     /**

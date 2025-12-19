@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Phaser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 60px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: floatTitle 3s ease-in-out infinite;
+        }
+
+        @keyframes floatTitle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.2rem;
+            text-align: center;
+            margin-top: -40px;
+            margin-bottom: 50px;
+        }
+
+        .games-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1000px;
+        }
+
+        .game-card {
+            background: linear-gradient(145deg, #ffffff10, #ffffff05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px;
+            width: 320px;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .game-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 60px rgba(255, 255, 255, 0.1);
+        }
+
+        .game-icon {
+            width: 100%;
+            height: 180px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rock-hero .game-icon {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 8px 30px rgba(231, 76, 60, 0.4);
+        }
+
+        .pinguim .game-icon {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            box-shadow: 0 8px 30px rgba(52, 152, 219, 0.4);
+        }
+
+        .game-icon::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .game-card:hover .game-icon::after {
+            opacity: 1;
+        }
+
+        .game-title {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .game-description {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .play-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .game-card:hover .play-hint {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .play-hint svg {
+            transition: transform 0.3s;
+        }
+
+        .game-card:hover .play-hint svg {
+            transform: translateX(4px);
+        }
+
+        footer {
+            margin-top: 60px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+        }
+
+        /* Decorative elements */
+        .bg-decoration {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .bg-decoration.one {
+            background: #e74c3c;
+            top: -100px;
+            right: -100px;
+        }
+
+        .bg-decoration.two {
+            background: #3498db;
+            bottom: -100px;
+            left: -100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration one"></div>
+    <div class="bg-decoration two"></div>
+
+    <h1>🎮 Hello Phaser</h1>
+    <p class="subtitle">Estes são alguns experimentos com Phaser 3</p>
+
+    <div class="games-container">
+        <a href="rock-hero/index.html" class="game-card rock-hero">
+            <div class="game-icon">🎸</div>
+            <h2 class="game-title">Rock Hero</h2>
+            <p class="game-description">
+                Aventura de plataforma com um herói roqueiro! 
+                Pule, colete estrelas e evite a lava.
+            </p>
+            <div class="play-hint">
+                <span>Jogar</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </div>
+        </a>
+
+        <a href="a aventura do pinguim perdido/index.html" class="game-card pinguim">
+            <div class="game-icon">🐧</div>
+            <h2 class="game-title">A Aventura do Pinguim Perdido</h2>
+            <p class="game-description">
+                Ajude o pinguim a encontrar seu caminho! 
+                Explore cenários desenhados à mão.
+            </p>
+            <div class="play-hint">
+                <span>Jogar</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </div>
+        </a>
+    </div>
+
+    <footer>
+        Feito com ❤️ usando Phaser 3
+    </footer>
+</body>
+</html>
+

@@ -1,8 +1,8 @@
 {
-    "activeFile": "a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx",
+    "activeFile": "a aventura do pinguim perdido/mapa 2/fase 2 - teste.tmx",
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "fileStates": {
         "a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx": {
@@ -15,16 +15,29 @@
         },
         "a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx#pinguim": {
             "scaleInDock": 1
+        },
+        "a aventura do pinguim perdido/mapa 2/fase 2 - teste.tmx": {
+            "scale": 0.33,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 525.7575757575758,
+                "y": 315.1515151515151
+            }
+        },
+        "a aventura do pinguim perdido/mapa 2/fase 2 - teste.tmx#pinguim": {
+            "scaleInDock": 1
         }
     },
-    "last.exportedFilePath": "C:/Github/hello-phaser/a aventura do pinguim perdido/mapa 1",
+    "last.exportedFilePath": "C:/Github/hello-phaser/a aventura do pinguim perdido/mapa 2",
     "last.imagePath": "C:/Github/hello-phaser/a aventura do pinguim perdido/mapa 1",
     "map.lastUsedExportFilter": "Arquivos de mapa JSON (*.tmj *.json)",
+    "map.lastUsedFormat": "tmx",
     "openFiles": [
-        "a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx"
+        "a aventura do pinguim perdido/mapa 2/fase 2 - teste.tmx"
     ],
     "project": "",
     "recentFiles": [
+        "a aventura do pinguim perdido/mapa 2/fase 2 - teste.tmx",
         "a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx",
         "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx",
         "dev-resources/map-2--expansion and speed.tmx",

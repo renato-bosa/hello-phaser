@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="64" tileheight="64" infinite="0" nextlayerid="4" nextobjectid="17">
  <editorsettings>
-  <export target="fase 1 - teste2.json" format="json"/>
+  <export target="fase 1 - teste3.json" format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="pinguim" tilewidth="64" tileheight="64" tilecount="1" columns="1">
   <image source="../sprites/pinguim.png" width="64" height="64"/>
@@ -50,8 +50,6 @@
    <ellipse/>
   </object>
   <object id="9" name="player_spawn" gid="1" x="1183.15" y="559.273" width="64" height="64"/>
-  <object id="10" name="bola" gid="2" x="946.667" y="542" width="84" height="84"/>
-  <object id="11" name="bola" gid="2" x="652" y="536.667" width="84" height="84"/>
   <object id="15" name="foca" gid="4" x="844" y="620" width="128" height="128"/>
   <object id="16" name="foca" gid="4" x="552" y="622" width="128" height="128"/>
  </objectgroup>

@@ -9,16 +9,19 @@ class GameScene extends Phaser.Scene {
         {
             key: 'fase1',
             folder: 'mapa 1',
-            mapFile: 'fase 1 - teste2.json',
+            mapFile: 'fase 1 - teste3.json',
             bgFile: 'fase 1 - sem bola.png',
-            zoom: 1.5
+            zoom: 1.5,
+            canFly: false  // Só pula no chão
         },
         {
             key: 'fase2',
             folder: 'mapa 2',
             mapFile: 'fase 2 - teste.json',
             bgFile: 'fase 2.png',
-            zoom: 1.5
+            zoom: 1.5,
+            canFly: false  // Só pula no chão
+            // canFly: true  // Para fases de água/nado - permite pular no ar
         }
     ];
 
@@ -43,7 +46,7 @@ class GameScene extends Phaser.Scene {
         
         // Carrega o sprite do pinguim (só precisa carregar uma vez)
         if (!this.textures.exists('pinguim')) {
-            this.load.image('pinguim', 'mapa 1/pinguim.png');
+            this.load.image('pinguim', 'sprites/pinguim.png');
         }
         
         // Carrega sprites adicionais
@@ -53,11 +56,19 @@ class GameScene extends Phaser.Scene {
                 frameHeight: 64
             });
         }
+        
+        // Carrega sprite da foca (128x128 - 2x2 blocos)
+        if (!this.textures.exists('foca')) {
+            this.load.image('foca', 'sprites/foca.png');
+        }
     }
 
     create() {
         const level = GameScene.LEVELS[this.currentLevel];
         const levelKey = level.key;
+        
+        // === LIMPA DADOS DA FASE ANTERIOR ===
+        this.cleanupPreviousLevel();
         
         // Carrega os dados do mapa
         const mapData = this.cache.json.get(`mapData_${levelKey}`);
@@ -127,6 +138,7 @@ class GameScene extends Phaser.Scene {
         // === PERSONAGEM (PINGUIM) ===
         this.spawnX = spawnX;
         this.spawnY = spawnY;
+        this.isRespawning = false; // Flag para evitar múltiplos respawns
         
         this.player = this.matter.add.image(spawnX, spawnY, 'pinguim');
         this.player.setCircle(25);
@@ -134,10 +146,73 @@ class GameScene extends Phaser.Scene {
         this.player.setFriction(0.5);
         this.player.setFixedRotation();
 
+        // === DETECÇÃO DE COLISÃO COM PROJÉTEIS E INIMIGOS ===
+        this.matter.world.on('collisionstart', (event) => {
+            event.pairs.forEach((pair) => {
+                const bodyA = pair.bodyA;
+                const bodyB = pair.bodyB;
+                
+                const playerBody = this.player.body;
+                const isPlayerInvolved = bodyA === playerBody || bodyB === playerBody;
+                
+                if (isPlayerInvolved) {
+                    const otherBody = bodyA === playerBody ? bodyB : bodyA;
+                    
+                    // Verifica se é uma bola (pelo label)
+                    if (otherBody.label === 'bola') {
+                        this.onPlayerHit();
+                    }
+                    
+                    // Verifica se pisou na cabeça de um inimigo
+                    if (otherBody.label === 'enemy_head') {
+                        // Só conta como "pisar" se o jogador está caindo
+                        if (this.player.body.velocity.y > 0) {
+                            const enemy = this.enemies?.find(e => e.headBody === otherBody);
+                            if (enemy) this.onEnemyStomp(enemy);
+                        }
+                    }
+                    
+                    // Verifica se encostou no corpo do inimigo
+                    if (otherBody.label === 'enemy_body') {
+                        const enemy = this.enemies?.find(e => e.bodyBody === otherBody);
+                        if (enemy && enemy.alive) {
+                            this.onPlayerHit();
+                        }
+                    }
+                }
+            });
+        });
+
         // === CONTROLES ===
         this.cursors = this.input.keyboard.createCursorKeys();
         this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.jumpCooldown = 0;
+        this.isOnGround = false;
+        this.canFly = level.canFly || false; // Modo nado/voo
+        this.groundContacts = 0; // Contador de contatos com o chão
+
+        // Detecta quando toca o chão
+        this.matter.world.on('collisionstart', (event) => {
+            event.pairs.forEach((pair) => {
+                if (this.isPlayerTouchingGround(pair)) {
+                    this.groundContacts++;
+                    this.isOnGround = true;
+                }
+            });
+        });
+
+        // Detecta quando sai do chão
+        this.matter.world.on('collisionend', (event) => {
+            event.pairs.forEach((pair) => {
+                if (this.isPlayerTouchingGround(pair)) {
+                    this.groundContacts--;
+                    if (this.groundContacts <= 0) {
+                        this.groundContacts = 0;
+                        this.isOnGround = false;
+                    }
+                }
+            });
+        });
 
         // === CÂMERA ===
         const cameraZoom = level.zoom || 1;
@@ -220,6 +295,43 @@ class GameScene extends Phaser.Scene {
         }
         
         console.log(`Grid ${gridSize}x${gridSize} criado (${Math.ceil(this.mapWidth / gridSize)} x ${Math.ceil(this.mapHeight / gridSize)} células)`);
+    }
+
+    // Limpa dados da fase anterior (inimigos, projéteis, etc)
+    cleanupPreviousLevel() {
+        // Limpa inimigos e suas bolas
+        if (this.enemies) {
+            this.enemies.forEach(enemy => {
+                // Remove bolas do inimigo
+                if (enemy.balls) {
+                    enemy.balls.forEach(ball => {
+                        if (ball.sprite) ball.sprite.destroy();
+                        if (ball.body) this.matter.world.remove(ball.body);
+                    });
+                }
+                // Remove hitboxes do inimigo
+                if (enemy.headBody) this.matter.world.remove(enemy.headBody);
+                if (enemy.bodyBody) this.matter.world.remove(enemy.bodyBody);
+            });
+            this.enemies = [];
+        }
+        
+        // Limpa projéteis avulsos
+        if (this.projectiles) {
+            this.projectiles.forEach(proj => {
+                if (proj.sprite) proj.sprite.destroy();
+                if (proj.body) this.matter.world.remove(proj.body);
+            });
+            this.projectiles = [];
+        }
+        
+        // Limpa sprites de objetos
+        if (this.objectSprites) {
+            this.objectSprites.forEach(sprite => {
+                if (sprite) sprite.destroy();
+            });
+            this.objectSprites = [];
+        }
     }
 
     // Verifica se o gid corresponde ao tileset do pinguim
@@ -310,12 +422,23 @@ class GameScene extends Phaser.Scene {
         const hitboxConfigs = {
             'bola': {
                 shape: 'circle',
-                scale: 0.5,  // 50% do tamanho do sprite
-                static: true
+                scale: 0.5,       // 50% do tamanho do sprite
+                static: true,     // Hitbox estático (só para colisão)
+                projectile: true, // Movimento manual (sem física)
+                speed: 2,         // Velocidade de movimento
+                respawn: true     // Respawna quando sai da tela
             },
-            // Adicione outros tipos aqui conforme necessário:
-            // 'moeda': { shape: 'circle', scale: 0.4, static: true },
-            // 'inimigo': { shape: 'circle', scale: 0.6, static: false },
+            'foca': {
+                enemy: true,           // É um inimigo
+                oscillate: true,       // Move para cima e para baixo
+                oscillateSpeed: 0.5,   // Velocidade da oscilação
+                oscillateRange: 30,    // Amplitude do movimento (pixels)
+                stompable: true,       // Pode ser pisado na cabeça
+                shootsBalls: true,     // Lança bolas
+                shootInterval: 2500,   // Intervalo base entre lançamentos (ms)
+                shootVariation: 0.1,   // Variação aleatória (10%)
+                stunDuration: 1500     // Tempo atordoada após pisão (ms)
+            },
         };
         
         // Verifica se existe configuração para este objeto
@@ -324,31 +447,442 @@ class GameScene extends Phaser.Scene {
         if (!config) return null; // Sem hitbox automático para este tipo
         
         const size = Math.min(obj.width, obj.height);
+        let body = null;
+        
+        // === INIMIGOS (como a foca) ===
+        if (config.enemy) {
+            this.createEnemy(obj, centerX, centerY, config);
+            return null; // Inimigo cria seus próprios hitboxes
+        }
         
         if (config.shape === 'circle') {
             const radius = (size * config.scale) / 2;
-            const body = this.matter.add.circle(centerX, centerY, radius, {
-                isStatic: config.static,
+            body = this.matter.add.circle(centerX, centerY, radius, {
+                isStatic: true, // Sempre estático - movimento será manual
+                isSensor: config.projectile || false, // Projéteis são sensores (não empurram)
                 friction: 0.8,
                 restitution: 0.1,
                 label: obj.name || 'auto_hitbox'
             });
-            console.log(`    ↳ Hitbox circular automático: raio=${Math.round(radius)}px`);
-            return body;
+            console.log(`    ↳ Hitbox circular: raio=${Math.round(radius)}px`);
         } else if (config.shape === 'rectangle') {
             const w = obj.width * config.scale;
             const h = obj.height * config.scale;
-            const body = this.matter.add.rectangle(centerX, centerY, w, h, {
+            body = this.matter.add.rectangle(centerX, centerY, w, h, {
                 isStatic: config.static,
-                friction: 0.8,
-                restitution: 0.1,
+                friction: 0.01,
+                frictionAir: 0,
+                restitution: 0.8,
                 label: obj.name || 'auto_hitbox'
             });
-            console.log(`    ↳ Hitbox retangular automático: ${Math.round(w)}x${Math.round(h)}px`);
-            return body;
+            console.log(`    ↳ Hitbox retangular: ${Math.round(w)}x${Math.round(h)}px, static=${config.static}`);
         }
         
-        return null;
+        // Se é um projétil, armazena para controle (será lançado depois)
+        if (body && config.projectile) {
+            if (!this.projectiles) this.projectiles = [];
+            
+            const projectile = {
+                body: body,
+                sprite: this.objectSprites[this.objectSprites.length - 1], // Último sprite criado
+                spawnX: centerX,
+                spawnY: centerY,
+                speed: config.speed || 3,
+                respawn: config.respawn || false,
+                launched: false // Será lançado no primeiro update
+            };
+            
+            this.projectiles.push(projectile);
+        }
+        
+        return body;
+    }
+
+    // Lança um projétil em direção ao jogador (calcula direção)
+    launchProjectile(projectile) {
+        if (!this.player) return;
+        
+        // Calcula direção para o jogador
+        const dx = this.player.x - projectile.sprite.x;
+        const dy = this.player.y - projectile.sprite.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Armazena velocidade normalizada
+        projectile.vx = (dx / distance) * projectile.speed;
+        projectile.vy = (dy / distance) * projectile.speed;
+    }
+
+    // Respawna projétil na posição original
+    respawnProjectile(projectile) {
+        projectile.waiting = true;
+        
+        // Volta para posição inicial
+        projectile.sprite.x = projectile.spawnX;
+        projectile.sprite.y = projectile.spawnY;
+        
+        // Move hitbox junto
+        this.matter.body.setPosition(projectile.body, {
+            x: projectile.spawnX,
+            y: projectile.spawnY
+        });
+        
+        // Delay antes de relançar
+        this.time.delayedCall(1000, () => {
+            projectile.waiting = false;
+            projectile.launched = false;
+        });
+    }
+
+    // Cria um inimigo com hitboxes e comportamentos especiais
+    createEnemy(obj, centerX, centerY, config) {
+        if (!this.enemies) this.enemies = [];
+        
+        const sprite = this.objectSprites[this.objectSprites.length - 1];
+        
+        // Dimensões do inimigo
+        const width = obj.width;
+        const height = obj.height;
+        
+        // Hitbox da cabeça (pisável) - parte superior
+        const headHeight = height * 0.3;
+        const headY = centerY - (height / 2) + (headHeight / 2);
+        const headBody = this.matter.add.rectangle(centerX, headY, width * 0.8, headHeight, {
+            isStatic: true,
+            isSensor: true,
+            label: 'enemy_head'
+        });
+        
+        // Hitbox do corpo (dano) - parte inferior e laterais
+        const bodyHeight = height * 0.7;
+        const bodyY = centerY + (height / 2) - (bodyHeight / 2);
+        const bodyBody = this.matter.add.rectangle(centerX, bodyY, width * 0.9, bodyHeight, {
+            isStatic: true,
+            isSensor: true,
+            label: 'enemy_body'
+        });
+        
+        const enemy = {
+            sprite: sprite,
+            headBody: headBody,
+            bodyBody: bodyBody,
+            spawnX: centerX,
+            spawnY: centerY,
+            config: config,
+            phase: Math.random() * Math.PI * 2, // Fase inicial aleatória
+            alive: true,
+            stunned: false,
+            stunnedUntil: 0,
+            lastShot: 0,
+            balls: [] // Bolas lançadas por este inimigo
+        };
+        
+        this.enemies.push(enemy);
+        
+        console.log(`    ↳ Inimigo criado: cabeça pisável + corpo com dano${config.shootsBalls ? ' + lança bolas' : ''}`);
+    }
+
+    // Atualiza todos os inimigos
+    updateEnemies() {
+        if (!this.enemies) return;
+        
+        const time = this.time.now / 1000; // Tempo em segundos
+        const now = this.time.now;
+        
+        this.enemies.forEach(enemy => {
+            if (!enemy.alive) return;
+            
+            // Verifica se saiu do atordoamento
+            if (enemy.stunned && now > enemy.stunnedUntil) {
+                enemy.stunned = false;
+                enemy.sprite.setTint(0xffffff); // Remove tint
+                enemy.lastShot = now; // Aguarda antes de lançar novamente
+                enemy.nextShotInterval = 500; // Espera 0.5s após recuperar
+            }
+            
+            // Movimento de oscilação vertical (mais lento se atordoado)
+            if (enemy.config.oscillate) {
+                const speed = enemy.stunned ? enemy.config.oscillateSpeed * 0.3 : enemy.config.oscillateSpeed;
+                const offset = Math.sin(time * speed + enemy.phase) * enemy.config.oscillateRange;
+                const newY = enemy.spawnY + offset;
+                
+                // Move sprite
+                enemy.sprite.y = newY;
+                
+                // Move hitboxes junto
+                const headOffset = -(enemy.sprite.displayHeight / 2) + (enemy.sprite.displayHeight * 0.15);
+                const bodyOffset = (enemy.sprite.displayHeight / 2) - (enemy.sprite.displayHeight * 0.35);
+                
+                this.matter.body.setPosition(enemy.headBody, { 
+                    x: enemy.sprite.x, 
+                    y: newY + headOffset 
+                });
+                this.matter.body.setPosition(enemy.bodyBody, { 
+                    x: enemy.sprite.x, 
+                    y: newY + bodyOffset 
+                });
+            }
+            
+            // Lança bolas periodicamente (se não estiver atordoado)
+            if (enemy.config.shootsBalls && !enemy.stunned) {
+                // Calcula intervalo com variação aleatória
+                const baseInterval = enemy.config.shootInterval;
+                const variation = enemy.config.shootVariation || 0;
+                const randomFactor = 1 + (Math.random() * 2 - 1) * variation; // Entre (1-var) e (1+var)
+                const interval = enemy.nextShotInterval || baseInterval;
+                
+                if (now - enemy.lastShot > interval) {
+                    this.enemyShootBall(enemy);
+                    enemy.lastShot = now;
+                    // Calcula próximo intervalo com variação
+                    enemy.nextShotInterval = baseInterval * randomFactor;
+                }
+            }
+            
+            // Atualiza bolas lançadas por este inimigo
+            this.updateEnemyBalls(enemy);
+        });
+    }
+
+    // Inimigo lança uma bola
+    enemyShootBall(enemy) {
+        if (!this.player) return;
+        
+        // Posição de lançamento (um pouco acima da foca)
+        const startX = enemy.sprite.x;
+        const startY = enemy.sprite.y - enemy.sprite.displayHeight * 0.3;
+        
+        // Cria sprite da bola
+        const ball = this.add.sprite(startX, startY, 'bola', 0);
+        
+        // Animação da bola
+        const animKey = 'bola_anim';
+        if (!this.anims.exists(animKey)) {
+            this.anims.create({
+                key: animKey,
+                frames: this.anims.generateFrameNumbers('bola', { start: 0, end: 1 }),
+                frameRate: 8,
+                repeat: -1
+            });
+        }
+        ball.play(animKey);
+        
+        // Calcula direção para o jogador
+        const dx = this.player.x - startX;
+        const dy = this.player.y - startY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        const speed = 2.5;
+        const ballData = {
+            sprite: ball,
+            vx: (dx / distance) * speed,
+            vy: (dy / distance) * speed,
+            body: this.matter.add.circle(startX, startY, 20, {
+                isStatic: true,
+                isSensor: true,
+                label: 'bola'
+            })
+        };
+        
+        enemy.balls.push(ballData);
+    }
+
+    // Atualiza bolas de um inimigo
+    updateEnemyBalls(enemy) {
+        const margin = 100;
+        
+        for (let i = enemy.balls.length - 1; i >= 0; i--) {
+            const ball = enemy.balls[i];
+            
+            // Move a bola
+            ball.sprite.x += ball.vx;
+            ball.sprite.y += ball.vy;
+            ball.sprite.rotation += 0.15;
+            
+            // Move hitbox junto
+            this.matter.body.setPosition(ball.body, {
+                x: ball.sprite.x,
+                y: ball.sprite.y
+            });
+            
+            // Remove se saiu da tela
+            const outOfBounds = 
+                ball.sprite.x < -margin || 
+                ball.sprite.x > this.mapWidth + margin || 
+                ball.sprite.y < -margin || 
+                ball.sprite.y > this.mapHeight + margin;
+            
+            if (outOfBounds) {
+                ball.sprite.destroy();
+                this.matter.world.remove(ball.body);
+                enemy.balls.splice(i, 1);
+            }
+        }
+    }
+
+    // Jogador pisou na cabeça de um inimigo
+    onEnemyStomp(enemy) {
+        if (!enemy.alive || enemy.stunned) return;
+        
+        // Atordoa o inimigo
+        enemy.stunned = true;
+        enemy.stunnedUntil = this.time.now + (enemy.config.stunDuration || 1500);
+        
+        // Efeito visual - esmaga temporariamente
+        enemy.sprite.setTint(0xffff00); // Fica amarelo
+        
+        this.tweens.add({
+            targets: enemy.sprite,
+            scaleY: 0.6,
+            duration: 100,
+            ease: 'Power2',
+            yoyo: true,
+            onComplete: () => {
+                // Volta ao normal após o "squash"
+                enemy.sprite.scaleY = 1;
+            }
+        });
+        
+        // Pequeno pulo ao pisar
+        this.player.setVelocityY(-8);
+        
+        console.log('Inimigo atordoado!');
+    }
+
+    // Verifica se a colisão é do jogador com uma superfície abaixo dele
+    isPlayerTouchingGround(pair) {
+        const playerBody = this.player?.body;
+        if (!playerBody) return false;
+
+        const bodyA = pair.bodyA;
+        const bodyB = pair.bodyB;
+
+        // Verifica se o jogador está envolvido
+        const isPlayerInvolved = bodyA === playerBody || bodyB === playerBody;
+        if (!isPlayerInvolved) return false;
+
+        const otherBody = bodyA === playerBody ? bodyB : bodyA;
+
+        // Ignora sensores (como projéteis)
+        if (otherBody.isSensor) return false;
+        
+        // Ignora bolas
+        if (otherBody.label === 'bola') return false;
+
+        // Verifica se a colisão é por baixo do jogador
+        // O jogador está "no chão" se o ponto de contato está abaixo do centro dele
+        const playerCenterY = playerBody.position.y;
+        const contactY = pair.collision.supports[0]?.y || otherBody.position.y;
+        
+        return contactY > playerCenterY;
+    }
+
+    // Jogador foi atingido por um projétil
+    onPlayerHit() {
+        if (this.isRespawning) return; // Evita múltiplos hits
+        
+        this.isRespawning = true;
+        
+        // Desativa controles temporariamente
+        this.player.setStatic(true);
+        
+        // Efeito visual - pisca vermelho
+        this.player.setTint(0xff0000);
+        
+        // Calcula arco de arremesso para o spawn
+        const startX = this.player.x;
+        const startY = this.player.y;
+        const endX = this.spawnX;
+        const endY = this.spawnY;
+        
+        // Altura do arco (quanto mais longe, mais alto)
+        const distance = Math.abs(endX - startX);
+        const arcHeight = Math.min(150, distance * 0.3);
+        
+        // Animação de arremesso em arco
+        const duration = 800;
+        
+        this.tweens.add({
+            targets: this.player,
+            x: endX,
+            y: endY,
+            duration: duration,
+            ease: 'Sine.easeInOut',
+            onUpdate: (tween) => {
+                // Calcula posição Y com arco parabólico
+                const progress = tween.progress;
+                const arcOffset = Math.sin(progress * Math.PI) * arcHeight;
+                this.player.y = Phaser.Math.Linear(startY, endY, progress) - arcOffset;
+                
+                // Gira o jogador durante o arremesso
+                this.player.rotation += 0.2;
+            },
+            onComplete: () => {
+                // Restaura jogador
+                this.player.rotation = 0;
+                this.player.setStatic(false);
+                this.player.setTint(0xffffff); // Remove tint vermelho
+                
+                // Pequena invencibilidade após respawn
+                this.time.delayedCall(500, () => {
+                    this.isRespawning = false;
+                });
+                
+                // Pisca o jogador para indicar invencibilidade
+                this.tweens.add({
+                    targets: this.player,
+                    alpha: 0.3,
+                    duration: 100,
+                    yoyo: true,
+                    repeat: 4
+                });
+            }
+        });
+    }
+
+    // Atualiza todos os projéteis (movimento manual)
+    updateProjectiles() {
+        if (!this.projectiles || !this.player) return;
+        
+        const margin = 50;
+        
+        this.projectiles.forEach(proj => {
+            if (proj.waiting) return;
+            
+            // Lança se ainda não foi lançado
+            if (!proj.launched) {
+                this.launchProjectile(proj);
+                proj.launched = true;
+            }
+            
+            // Move sprite manualmente (sem física)
+            if (proj.sprite && proj.vx !== undefined) {
+                proj.sprite.x += proj.vx;
+                proj.sprite.y += proj.vy;
+                proj.sprite.rotation += 0.15; // Gira enquanto voa
+                
+                // Move hitbox junto com sprite
+                this.matter.body.setPosition(proj.body, {
+                    x: proj.sprite.x,
+                    y: proj.sprite.y
+                });
+            }
+            
+            // Respawna se saiu da tela
+            if (proj.respawn && proj.sprite) {
+                const x = proj.sprite.x;
+                const y = proj.sprite.y;
+                
+                const outOfBounds = 
+                    x < -margin || 
+                    x > this.mapWidth + margin || 
+                    y < -margin || 
+                    y > this.mapHeight + margin;
+                
+                if (outOfBounds) {
+                    this.respawnProjectile(proj);
+                }
+            }
+        });
     }
 
     createPolygonBody(x, y, polygonPoints, name) {
@@ -442,13 +976,20 @@ class GameScene extends Phaser.Scene {
             this.player.setVelocityX(this.player.body.velocity.x * 0.9);
         }
 
-        // Pulo
+        // Pulo - só funciona no chão (exceto em fases com canFly)
         this.jumpCooldown -= delta;
         
-        if (Phaser.Input.Keyboard.JustDown(this.spaceKey) && this.jumpCooldown <= 0) {
+        const canJump = this.canFly || this.isOnGround;
+        
+        if (Phaser.Input.Keyboard.JustDown(this.spaceKey) && canJump && this.jumpCooldown <= 0) {
             this.player.setVelocityY(-jumpForce);
-            this.jumpCooldown = 500;
+            this.jumpCooldown = this.canFly ? 200 : 100; // Cooldown menor no modo nado
+            this.isOnGround = false; // Sai do chão ao pular
         }
+
+        // === ATUALIZA PROJÉTEIS E INIMIGOS ===
+        this.updateProjectiles();
+        this.updateEnemies();
 
         // Limita velocidade de queda
         if (this.player.body.velocity.y > 15) {

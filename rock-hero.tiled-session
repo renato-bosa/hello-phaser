@@ -5,6 +5,9 @@
         "."
     ],
     "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
         "a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx": {
             "scale": 1,
             "selectedLayer": 2,
@@ -16,8 +19,12 @@
         "a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx#bola": {
             "scaleInDock": 1
         },
+        "a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx#foca": {
+            "scaleInEditor": 1
+        },
         "a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx#pinguim": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "a aventura do pinguim perdido/mapa 2/fase 2 - teste.tmx": {
             "scale": 0.33,
@@ -48,7 +55,7 @@
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
-        "height": 64,
-        "width": 64
+        "height": 128,
+        "width": 128
     }
 }

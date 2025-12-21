@@ -61,6 +61,14 @@ class GameScene extends Phaser.Scene {
         if (!this.textures.exists('foca')) {
             this.load.image('foca', 'sprites/foca.png');
         }
+        
+        // Carrega sprite da plataforma/parede
+        if (!this.textures.exists('plataforma')) {
+            this.load.spritesheet('plataforma', 'sprites/plataforma.png', {
+                frameWidth: 64,
+                frameHeight: 64
+            });
+        }
     }
 
     create() {
@@ -119,12 +127,29 @@ class GameScene extends Phaser.Scene {
                     spawnY = obj.y - obj.height / 2;
                     console.log(`  - Spawn encontrado: (${Math.round(spawnX)}, ${Math.round(spawnY)})`);
                 } else if (obj.gid && !isPlayerSpawn) {
-                    // Objeto com sprite (como as bolas)
-                    this.createObjectSprite(obj, mapData.tilesets);
-                    console.log(`  - Sprite: ${name} (gid: ${obj.gid})`);
+                    // Verifica se o tile tem propriedade "parede"
+                    const tileProps = this.getTileProperties(obj.gid, mapData.tilesets);
+                    
+                    if (tileProps?.type === 'parede') {
+                        // Cria sprite visual e hitbox sólido para parede
+                        this.createWall(obj, mapData.tilesets);
+                        console.log(`  - Parede: ${obj.width}x${obj.height}`);
+                    } else {
+                        // Objeto com sprite normal (focas, etc)
+                        this.createObjectSprite(obj, mapData.tilesets);
+                        console.log(`  - Sprite: ${name} (gid: ${obj.gid})`);
+                    }
                 } else if (obj.polygon) {
-                    this.createPolygonBody(obj.x, obj.y, obj.polygon, name);
-                    console.log(`  - Polígono: ${name}`);
+                    // Verifica se o polígono tem type "parede"
+                    const objType = obj.type?.toLowerCase() || this.getObjectProperty(obj, 'type')?.toLowerCase();
+                    
+                    if (objType === 'parede') {
+                        this.createPolygonWall(obj.x, obj.y, obj.polygon, name);
+                        console.log(`  - Polígono Parede: ${name}`);
+                    } else {
+                        this.createPolygonBody(obj.x, obj.y, obj.polygon, name);
+                        console.log(`  - Polígono: ${name}`);
+                    }
                 } else if (obj.ellipse) {
                     this.createEllipseBody(obj.x, obj.y, obj.width, obj.height, name);
                     console.log(`  - Elipse: ${name} (${obj.width}x${obj.height})`);
@@ -190,6 +215,13 @@ class GameScene extends Phaser.Scene {
         this.isOnGround = false;
         this.canFly = level.canFly || false; // Modo nado/voo
         this.groundContacts = 0; // Contador de contatos com o chão
+        
+        // === COYOTE TIME & JUMP BUFFER ===
+        this.coyoteTime = 0;           // Tempo restante de "coyote time"
+        this.coyoteDuration = 100;     // Duração do coyote time (ms)
+        this.jumpBufferTime = 0;       // Tempo restante do buffer de pulo
+        this.jumpBufferDuration = 150; // Duração do buffer (ms)
+        this.wasOnGround = false;      // Se estava no chão no frame anterior
 
         // Detecta quando toca o chão
         this.matter.world.on('collisionstart', (event) => {
@@ -197,6 +229,12 @@ class GameScene extends Phaser.Scene {
                 if (this.isPlayerTouchingGround(pair)) {
                     this.groundContacts++;
                     this.isOnGround = true;
+                    
+                    // Jump Buffer: se apertou pulo antes de pousar, pula agora
+                    if (this.jumpBufferTime > 0) {
+                        this.executeJump();
+                        this.jumpBufferTime = 0;
+                    }
                 }
             });
         });
@@ -209,6 +247,11 @@ class GameScene extends Phaser.Scene {
                     if (this.groundContacts <= 0) {
                         this.groundContacts = 0;
                         this.isOnGround = false;
+                        
+                        // Inicia Coyote Time ao sair do chão
+                        if (this.wasOnGround) {
+                            this.coyoteTime = this.coyoteDuration;
+                        }
                     }
                 }
             });
@@ -297,6 +340,158 @@ class GameScene extends Phaser.Scene {
         console.log(`Grid ${gridSize}x${gridSize} criado (${Math.ceil(this.mapWidth / gridSize)} x ${Math.ceil(this.mapHeight / gridSize)} células)`);
     }
 
+    // Obtém uma propriedade customizada de um objeto do Tiled
+    getObjectProperty(obj, propName) {
+        if (!obj.properties) return null;
+        const prop = obj.properties.find(p => p.name === propName);
+        return prop ? prop.value : null;
+    }
+
+    // Cria um polígono que funciona como parede (bloqueia bolas)
+    createPolygonWall(x, y, polygonPoints, name) {
+        // Cria o corpo do polígono normalmente
+        const body = this.createPolygonBody(x, y, polygonPoints, name);
+        
+        if (body) {
+            // Marca como parede para detecção de colisão com bolas
+            body.label = 'parede_polygon';
+            
+            // Calcula bounds do polígono para verificação de colisão
+            const absolutePoints = polygonPoints.map(p => ({ x: x + p.x, y: y + p.y }));
+            const minX = Math.min(...absolutePoints.map(p => p.x));
+            const maxX = Math.max(...absolutePoints.map(p => p.x));
+            const minY = Math.min(...absolutePoints.map(p => p.y));
+            const maxY = Math.max(...absolutePoints.map(p => p.y));
+            
+            // Adiciona à lista de paredes para verificação de colisão com bolas
+            if (!this.walls) this.walls = [];
+            this.walls.push({
+                body: body,
+                isPolygon: true,
+                x: (minX + maxX) / 2,
+                y: (minY + maxY) / 2,
+                width: maxX - minX,
+                height: maxY - minY
+            });
+            
+            console.log(`    ↳ Polígono parede: ${Math.round(maxX - minX)}x${Math.round(maxY - minY)}px`);
+        }
+        
+        return body;
+    }
+
+    // Obtém propriedades de um tile pelo gid
+    getTileProperties(gid, tilesets) {
+        if (!gid || !tilesets) return null;
+        
+        // Remove flags de flip do gid (bits 29, 30, 31)
+        const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+        const FLIPPED_VERTICALLY_FLAG = 0x40000000;
+        const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
+        const realGid = gid & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+        
+        // Encontra o tileset correto
+        for (let i = tilesets.length - 1; i >= 0; i--) {
+            const tileset = tilesets[i];
+            if (realGid >= tileset.firstgid) {
+                const localId = realGid - tileset.firstgid;
+                
+                // Procura propriedades do tile
+                if (tileset.tiles) {
+                    const tileData = tileset.tiles.find(t => t.id === localId);
+                    if (tileData && tileData.properties) {
+                        const props = {};
+                        tileData.properties.forEach(p => {
+                            props[p.name] = p.value;
+                        });
+                        return props;
+                    }
+                }
+                break;
+            }
+        }
+        return null;
+    }
+
+    // Cria uma parede com sprite visual e hitbox sólido
+    createWall(obj, tilesets) {
+        if (!this.walls) this.walls = [];
+        
+        // Remove flags de flip do gid
+        const FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+        const FLIPPED_VERTICALLY_FLAG = 0x40000000;
+        const FLIPPED_DIAGONALLY_FLAG = 0x20000000;
+        const realGid = obj.gid & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+        const isFlippedH = (obj.gid & FLIPPED_HORIZONTALLY_FLAG) !== 0;
+        const isFlippedV = (obj.gid & FLIPPED_VERTICALLY_FLAG) !== 0;
+        
+        // Encontra o tileset
+        let tileset = null;
+        let localId = realGid;
+        for (let i = tilesets.length - 1; i >= 0; i--) {
+            if (realGid >= tilesets[i].firstgid) {
+                tileset = tilesets[i];
+                localId = realGid - tileset.firstgid;
+                break;
+            }
+        }
+        
+        if (!tileset) return null;
+        
+        const tilesetName = tileset.name.toLowerCase();
+        const centerX = obj.x + obj.width / 2;
+        const centerY = obj.y - obj.height / 2;
+        
+        // Cria sprite visual
+        let sprite = null;
+        if (this.textures.exists(tilesetName)) {
+            sprite = this.add.sprite(centerX, centerY, tilesetName, localId);
+            sprite.setFlipX(isFlippedH);
+            sprite.setFlipY(isFlippedV);
+            if (obj.width !== tileset.tilewidth || obj.height !== tileset.tileheight) {
+                sprite.setDisplaySize(obj.width, obj.height);
+            }
+        }
+        
+        // Sensor para destruir bolas (tamanho total)
+        const sensorBody = this.matter.add.rectangle(centerX, centerY, obj.width * 0.6, obj.height, {
+            isStatic: true,
+            isSensor: true,
+            label: 'parede_sensor'
+        });
+        
+        // Corpo sólido para bloquear jogador (sem atrito)
+        const solidBody = this.matter.add.rectangle(centerX, centerY, obj.width * 0.4, obj.height * 0.9, {
+            isStatic: true,
+            label: 'parede',
+            friction: 0,
+            frictionStatic: 0,
+            restitution: 0,
+            chamfer: { radius: 5 } // Bordas arredondadas para deslizar melhor
+        });
+        
+        this.walls.push({
+            sprite: sprite,
+            sensorBody: sensorBody,
+            solidBody: solidBody,
+            x: centerX,
+            y: centerY,
+            width: obj.width * 0.6,
+            height: obj.height
+        });
+        
+        console.log(`    ↳ Parede criada: ${obj.width}x${obj.height}px`);
+    }
+
+    // Executa o pulo
+    executeJump() {
+        const jumpForce = 10;
+        this.player.setVelocityY(-jumpForce);
+        this.jumpCooldown = this.canFly ? 200 : 100;
+        this.isOnGround = false;
+        this.coyoteTime = 0; // Cancela coyote time ao pular
+    }
+
     // Limpa dados da fase anterior (inimigos, projéteis, etc)
     cleanupPreviousLevel() {
         // Limpa inimigos e suas bolas
@@ -331,6 +526,16 @@ class GameScene extends Phaser.Scene {
                 if (sprite) sprite.destroy();
             });
             this.objectSprites = [];
+        }
+        
+        // Limpa paredes
+        if (this.walls) {
+            this.walls.forEach(wall => {
+                if (wall.sprite) wall.sprite.destroy();
+                if (wall.sensorBody) this.matter.world.remove(wall.sensorBody);
+                if (wall.solidBody) this.matter.world.remove(wall.solidBody);
+            });
+            this.walls = [];
         }
     }
 
@@ -543,22 +748,22 @@ class GameScene extends Phaser.Scene {
         const width = obj.width;
         const height = obj.height;
         
-        // Hitbox da cabeça (pisável) - parte superior
-        const headHeight = height * 0.3;
-        const headY = centerY - (height / 2) + (headHeight / 2);
-        const headBody = this.matter.add.rectangle(centerX, headY, width * 0.8, headHeight, {
-            isStatic: true,
-            isSensor: true,
-            label: 'enemy_head'
-        });
-        
-        // Hitbox do corpo (dano) - parte inferior e laterais
-        const bodyHeight = height * 0.7;
+        // Hitbox do corpo (dano) - parte inferior (30% menor)
+        const bodyHeight = height * 0.49; // 70% * 0.7 = 49%
         const bodyY = centerY + (height / 2) - (bodyHeight / 2);
         const bodyBody = this.matter.add.rectangle(centerX, bodyY, width * 0.9, bodyHeight, {
             isStatic: true,
             isSensor: true,
             label: 'enemy_body'
+        });
+        
+        // Hitbox da cabeça (pisável) - posicionado acima do corpo
+        const headHeight = height * 0.3;
+        const headY = bodyY - (bodyHeight / 2) - (headHeight / 2);
+        const headBody = this.matter.add.rectangle(centerX, headY, width * 0.8, headHeight, {
+            isStatic: true,
+            isSensor: true,
+            label: 'enemy_head'
         });
         
         const enemy = {
@@ -599,6 +804,36 @@ class GameScene extends Phaser.Scene {
                 enemy.nextShotInterval = 500; // Espera 0.5s após recuperar
             }
             
+            // Foca olha para o jogador (sprite desenhado olhando para direita)
+            if (this.player && !enemy.isFlipping) {
+                const shouldFlip = this.player.x < enemy.sprite.x;
+                
+                // Só anima se mudou de direção
+                if (enemy.sprite.flipX !== shouldFlip) {
+                    enemy.isFlipping = true;
+                    
+                    // Animação de giro: achata → inverte → expande
+                    this.tweens.add({
+                        targets: enemy.sprite,
+                        scaleX: 0,
+                        duration: 80,
+                        ease: 'Sine.easeIn',
+                        onComplete: () => {
+                            enemy.sprite.setFlipX(shouldFlip);
+                            this.tweens.add({
+                                targets: enemy.sprite,
+                                scaleX: 1,
+                                duration: 80,
+                                ease: 'Sine.easeOut',
+                                onComplete: () => {
+                                    enemy.isFlipping = false;
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+            
             // Movimento de oscilação vertical (mais lento se atordoado)
             if (enemy.config.oscillate) {
                 const speed = enemy.stunned ? enemy.config.oscillateSpeed * 0.3 : enemy.config.oscillateSpeed;
@@ -609,31 +844,43 @@ class GameScene extends Phaser.Scene {
                 enemy.sprite.y = newY;
                 
                 // Move hitboxes junto
-                const headOffset = -(enemy.sprite.displayHeight / 2) + (enemy.sprite.displayHeight * 0.15);
-                const bodyOffset = (enemy.sprite.displayHeight / 2) - (enemy.sprite.displayHeight * 0.35);
+                const h = enemy.sprite.displayHeight;
+                const bodyHeight = h * 0.49;
+                const headHeight = h * 0.3;
+                const bodyOffset = (h / 2) - (bodyHeight / 2);
+                const headOffset = bodyOffset - (bodyHeight / 2) - (headHeight / 2);
                 
-                this.matter.body.setPosition(enemy.headBody, { 
-                    x: enemy.sprite.x, 
-                    y: newY + headOffset 
-                });
                 this.matter.body.setPosition(enemy.bodyBody, { 
                     x: enemy.sprite.x, 
                     y: newY + bodyOffset 
+                });
+                this.matter.body.setPosition(enemy.headBody, { 
+                    x: enemy.sprite.x, 
+                    y: newY + headOffset 
                 });
             }
             
             // Lança bolas periodicamente (se não estiver atordoado)
             if (enemy.config.shootsBalls && !enemy.stunned) {
-                // Calcula intervalo com variação aleatória
                 const baseInterval = enemy.config.shootInterval;
                 const variation = enemy.config.shootVariation || 0;
-                const randomFactor = 1 + (Math.random() * 2 - 1) * variation; // Entre (1-var) e (1+var)
+                const randomFactor = 1 + (Math.random() * 2 - 1) * variation;
                 const interval = enemy.nextShotInterval || baseInterval;
+                const warningTime = 250; // Tempo de aviso antes do lançamento
                 
-                if (now - enemy.lastShot > interval) {
+                const timeSinceShot = now - enemy.lastShot;
+                
+                // Mostra aviso 250ms antes do lançamento
+                if (timeSinceShot > interval - warningTime && !enemy.showingWarning) {
+                    this.showShootWarning(enemy);
+                    enemy.showingWarning = true;
+                }
+                
+                // Lança a bola
+                if (timeSinceShot > interval) {
                     this.enemyShootBall(enemy);
                     enemy.lastShot = now;
-                    // Calcula próximo intervalo com variação
+                    enemy.showingWarning = false;
                     enemy.nextShotInterval = baseInterval * randomFactor;
                 }
             }
@@ -641,6 +888,34 @@ class GameScene extends Phaser.Scene {
             // Atualiza bolas lançadas por este inimigo
             this.updateEnemyBalls(enemy);
         });
+    }
+
+    // Mostra aviso visual antes de lançar bola
+    showShootWarning(enemy) {
+        // Pisca a foca 4x com tint amarelo
+        let flashCount = 0;
+        const flashInterval = 60; // ms entre cada flash
+        
+        const flash = () => {
+            if (flashCount >= 4) {
+                enemy.sprite.setTint(0xffffff); // Volta ao normal
+                return;
+            }
+            
+            // Alterna entre amarelo claro e normal
+            if (flashCount % 2 === 0) {
+                enemy.sprite.setTint(0xffff88); // Amarelo claro
+                enemy.sprite.setAlpha(0.7);
+            } else {
+                enemy.sprite.setTint(0xffffff); // Normal
+                enemy.sprite.setAlpha(1);
+            }
+            
+            flashCount++;
+            this.time.delayedCall(flashInterval, flash);
+        };
+        
+        flash();
     }
 
     // Inimigo lança uma bola
@@ -704,6 +979,12 @@ class GameScene extends Phaser.Scene {
                 y: ball.sprite.y
             });
             
+            // Verifica colisão com paredes
+            if (this.checkBallWallCollision(ball)) {
+                this.destroyBall(ball, enemy, i);
+                continue;
+            }
+            
             // Remove se saiu da tela
             const outOfBounds = 
                 ball.sprite.x < -margin || 
@@ -719,6 +1000,44 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    // Verifica colisão de bola com paredes
+    checkBallWallCollision(ball) {
+        if (!this.walls) return false;
+        
+        const ballRadius = 20;
+        
+        for (const wall of this.walls) {
+            // Colisão retângulo vs círculo
+            const dx = Math.abs(ball.sprite.x - wall.x);
+            const dy = Math.abs(ball.sprite.y - wall.y);
+            
+            if (dx < wall.width / 2 + ballRadius && dy < wall.height / 2 + ballRadius) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Destrói uma bola com efeito visual
+    destroyBall(ball, enemy, index) {
+        // Efeito de esmagamento
+        this.tweens.add({
+            targets: ball.sprite,
+            scaleX: 1.5,
+            scaleY: 0.3,
+            alpha: 0,
+            duration: 150,
+            ease: 'Power2',
+            onComplete: () => {
+                ball.sprite.destroy();
+                this.matter.world.remove(ball.body);
+            }
+        });
+        
+        // Remove da lista imediatamente para evitar colisões duplicadas
+        enemy.balls.splice(index, 1);
+    }
+
     // Jogador pisou na cabeça de um inimigo
     onEnemyStomp(enemy) {
         if (!enemy.alive || enemy.stunned) return;
@@ -728,7 +1047,7 @@ class GameScene extends Phaser.Scene {
         enemy.stunnedUntil = this.time.now + (enemy.config.stunDuration || 1500);
         
         // Efeito visual - esmaga temporariamente
-        enemy.sprite.setTint(0xffff00); // Fica amarelo
+        enemy.sprite.setTint(0xffa500); // Fica laranja
         
         this.tweens.add({
             targets: enemy.sprite,
@@ -786,7 +1105,7 @@ class GameScene extends Phaser.Scene {
         this.player.setStatic(true);
         
         // Efeito visual - pisca vermelho
-        this.player.setTint(0xff0000);
+        this.player.setTint(0xffa500); // Fica laranja
         
         // Calcula arco de arremesso para o spawn
         const startX = this.player.x;
@@ -963,7 +1282,6 @@ class GameScene extends Phaser.Scene {
         if (!this.player || !this.player.body) return;
 
         const speed = 5;
-        const jumpForce = 10;
 
         // Movimento horizontal
         if (this.cursors.left.isDown) {
@@ -976,16 +1294,26 @@ class GameScene extends Phaser.Scene {
             this.player.setVelocityX(this.player.body.velocity.x * 0.9);
         }
 
-        // Pulo - só funciona no chão (exceto em fases com canFly)
+        // === PULO COM COYOTE TIME E JUMP BUFFER ===
         this.jumpCooldown -= delta;
+        this.coyoteTime -= delta;
+        this.jumpBufferTime -= delta;
         
-        const canJump = this.canFly || this.isOnGround;
+        // Coyote Time: pode pular por um tempinho após sair do chão
+        const canJumpCoyote = this.isOnGround || this.coyoteTime > 0;
+        const canJump = this.canFly || canJumpCoyote;
         
-        if (Phaser.Input.Keyboard.JustDown(this.spaceKey) && canJump && this.jumpCooldown <= 0) {
-            this.player.setVelocityY(-jumpForce);
-            this.jumpCooldown = this.canFly ? 200 : 100; // Cooldown menor no modo nado
-            this.isOnGround = false; // Sai do chão ao pular
+        if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
+            if (canJump && this.jumpCooldown <= 0) {
+                this.executeJump();
+            } else {
+                // Jump Buffer: registra tentativa de pulo para executar ao pousar
+                this.jumpBufferTime = this.jumpBufferDuration;
+            }
         }
+        
+        // Atualiza estado anterior
+        this.wasOnGround = this.isOnGround;
 
         // === ATUALIZA PROJÉTEIS E INIMIGOS ===
         this.updateProjectiles();
@@ -1022,7 +1350,7 @@ class GameScene extends Phaser.Scene {
             // Mostra mensagem de vitória
             this.add.text(
                 this.cameras.main.centerX, 
-                this.cameras.main.centerY, 
+                this.cameras.main.centerY - 30, 
                 '🎉 PARABÉNS!\nVocê completou o jogo!', 
                 {
                     fontSize: '48px',
@@ -1033,9 +1361,28 @@ class GameScene extends Phaser.Scene {
                 }
             ).setOrigin(0.5).setScrollFactor(0);
             
+            // Instrução para reiniciar
+            this.add.text(
+                this.cameras.main.centerX, 
+                this.cameras.main.centerY + 80, 
+                'Pressione R para jogar novamente', 
+                {
+                    fontSize: '24px',
+                    fill: '#ffffff',
+                    stroke: '#000000',
+                    strokeThickness: 4,
+                    align: 'center'
+                }
+            ).setOrigin(0.5).setScrollFactor(0);
+            
             // Para o jogador
             this.player.setVelocity(0, 0);
             this.player.setStatic(true);
+            
+            // Permite reiniciar do início
+            this.input.keyboard.once('keydown-R', () => {
+                this.scene.restart({ level: 0 });
+            });
         }
     }
 }

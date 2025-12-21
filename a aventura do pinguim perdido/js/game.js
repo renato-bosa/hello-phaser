@@ -15,7 +15,7 @@ const config = {
         default: 'matter',
         matter: {
             gravity: { y: 1 },
-            debug: true // Ativado para ver os polígonos de colisão
+            debug: false // Ativado para ver os polígonos de colisão
         }
     },
     scene: [GameScene]

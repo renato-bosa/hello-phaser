@@ -30,10 +30,10 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":11,
          "id":1,
-         "name":"Camada de Blocos 1",
+         "name":"blocos",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":20,
          "x":0,
          "y":0
@@ -225,6 +225,12 @@
                          "x":-224.667,
                          "y":-11.3333
                         }],
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"parede"
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -323,6 +329,18 @@
                  "width":128,
                  "x":552,
                  "y":622
+                }, 
+                {
+                 "gid":1073741831,
+                 "height":64,
+                 "id":17,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":1094,
+                 "y":573
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -331,7 +349,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":17,
+ "nextobjectid":18,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -375,6 +393,56 @@
          "tilecount":1,
          "tileheight":128,
          "tilewidth":128
+        }, 
+        {
+         "columns":2,
+         "firstgid":5,
+         "image":"..\/sprites\/plataforma.png",
+         "imageheight":128,
+         "imagewidth":128,
+         "margin":0,
+         "name":"plataforma",
+         "spacing":0,
+         "tilecount":4,
+         "tileheight":64,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"parede"
+                        }]
+                }, 
+                {
+                 "id":1,
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"parede"
+                        }]
+                }, 
+                {
+                 "id":2,
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"parede"
+                        }]
+                }, 
+                {
+                 "id":3,
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"parede"
+                        }]
+                }],
+         "tilewidth":64
         }],
  "tilewidth":64,
  "type":"map",

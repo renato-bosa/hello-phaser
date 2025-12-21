@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="64" tileheight="64" infinite="0" nextlayerid="4" nextobjectid="17">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="64" tileheight="64" infinite="0" nextlayerid="4" nextobjectid="18">
  <editorsettings>
   <export target="fase 1 - teste3.json" format="json"/>
  </editorsettings>
@@ -12,10 +12,33 @@
  <tileset firstgid="4" name="foca" tilewidth="128" tileheight="128" tilecount="1" columns="1">
   <image source="../sprites/foca.png" width="128" height="128"/>
  </tileset>
+ <tileset firstgid="5" name="plataforma" tilewidth="64" tileheight="64" tilecount="4" columns="2">
+  <image source="../sprites/plataforma.png" width="128" height="128"/>
+  <tile id="0">
+   <properties>
+    <property name="type" value="parede"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="type" value="parede"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="type" value="parede"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="type" value="parede"/>
+   </properties>
+  </tile>
+ </tileset>
  <imagelayer id="2" name="bg" offsetx="0" offsety="150">
   <image source="fase 1 - sem bola.png" width="1280" height="548"/>
  </imagelayer>
- <layer id="1" name="Camada de Blocos 1" width="20" height="11" visible="0">
+ <layer id="1" name="blocos" width="20" height="11">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -41,6 +64,9 @@
    <polygon points="0,0 -2.66667,54 164,56.6667 162.667,-10.6667"/>
   </object>
   <object id="6" x="348.167" y="631.333">
+   <properties>
+    <property name="type" value="parede"/>
+   </properties>
    <polygon points="0,0 4,-38.6667 -17.3333,-42.6667 -14,-64.6667 -38,-68 -34,-94.6667 -57.3333,-105.333 -61.3333,-141.333 -88.6667,-146 -82.6667,-181.333 -110,-192.667 -114.667,-206.667 -133,-219.667 -129.667,-247.5 -136.667,-260 -144,-276 -180.667,-284 -188.667,-260.667 -194.667,-153.333 -207.333,-154.667 -227.333,-60 -224.667,-11.3333"/>
   </object>
   <object id="7" x="129" y="618">
@@ -52,5 +78,6 @@
   <object id="9" name="player_spawn" gid="1" x="1183.15" y="559.273" width="64" height="64"/>
   <object id="15" name="foca" gid="4" x="844" y="620" width="128" height="128"/>
   <object id="16" name="foca" gid="4" x="552" y="622" width="128" height="128"/>
+  <object id="17" gid="1073741831" x="1094" y="573" width="64" height="64"/>
  </objectgroup>
 </map>

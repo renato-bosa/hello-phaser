@@ -26,6 +26,9 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "a aventura do pinguim perdido/mapa 1/fase 1 - teste2.tmx#plataforma": {
+            "scaleInEditor": 1
+        },
         "a aventura do pinguim perdido/mapa 2/fase 2 - teste.tmx": {
             "scale": 0.33,
             "selectedLayer": 2,
@@ -55,7 +58,7 @@
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
-        "height": 128,
-        "width": 128
+        "height": 64,
+        "width": 64
     }
 }

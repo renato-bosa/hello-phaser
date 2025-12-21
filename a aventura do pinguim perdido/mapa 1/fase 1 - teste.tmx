@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="64" tileheight="64" infinite="0" nextlayerid="4" nextobjectid="10">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="11" tilewidth="64" tileheight="64" infinite="0" nextlayerid="4" nextobjectid="14">
  <editorsettings>
-  <export target="fase 1 - teste.json" format="json"/>
+  <export target="fase 1 - teste2.json" format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="pinguim" tilewidth="64" tileheight="64" tilecount="1" columns="1">
   <image source="pinguim.png" width="64" height="64"/>
  </tileset>
+ <tileset firstgid="2" name="bola" tilewidth="64" tileheight="64" tilecount="2" columns="1">
+  <image source="../sprites/bola.png" width="64" height="128"/>
+ </tileset>
  <imagelayer id="2" name="bg" offsetx="0" offsety="150">
-  <image source="fase 1.png" width="1280" height="548"/>
+  <image source="fase 1 - sem bola.png" width="1280" height="548"/>
  </imagelayer>
  <layer id="1" name="Camada de Blocos 1" width="20" height="11" visible="0">
   <data encoding="csv">
@@ -29,13 +32,13 @@
    <polygon points="0,0 0,64 -320,64 -320,0"/>
   </object>
   <object id="2" x="888.667" y="505.333">
-   <polygon points="0,0 -33.3333,32 -32,114.667 59.3333,106.667 63.3333,54.6667 125.333,16 131.333,-26.6667 83.3333,-39.3333 38.6667,0.666667"/>
+   <polygon points="0,0 -33.3333,32 -32,114.667 59.3333,106.667 63.3333,54.6667 67.9997,32 72.6663,9.3333 59.3333,-3.99997 38.6667,0.666667"/>
   </object>
   <object id="3" x="848.667" y="552">
    <polygon points="0,0 4,70.6667 -161.333,55.3333 -146,11.3333 -35.3333,-5.33333"/>
   </object>
   <object id="4" x="711.333" y="528.667">
-   <polygon points="0,0 -67.3333,32 -70.6667,88 -153.333,78.6667 -164,14 -124.667,-35.3333 -70,-41.3333 -13.3333,-65.3333 16.6667,-54.6667 12.6667,-26.6667"/>
+   <polygon points="-58.6667,13.3333 -67.3333,32 -70.6667,88 -153.333,78.6667 -164,14 -124.667,-35.3333 -70,-41.3333 -54,-34.6666 -48.6666,-18 -53.3333,-2.6667"/>
   </object>
   <object id="5" x="380" y="566">
    <polygon points="0,0 -2.66667,54 164,56.6667 162.667,-10.6667"/>
@@ -50,5 +53,7 @@
    <ellipse/>
   </object>
   <object id="9" name="player_spawn" gid="1" x="1183.15" y="559.273" width="64" height="64"/>
+  <object id="10" name="bola" gid="2" x="946.667" y="542" width="84" height="84"/>
+  <object id="11" name="bola" gid="2" x="652" y="536.667" width="84" height="84"/>
  </objectgroup>
 </map>

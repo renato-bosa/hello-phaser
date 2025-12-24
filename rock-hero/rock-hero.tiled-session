@@ -3,12 +3,13 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx",
+    "activeFile": "",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
         "."
     ],
+    "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
         "": {
             "scaleInDock": 1,
@@ -117,7 +118,7 @@
         }
     },
     "frame.defaultDuration": 200,
-    "last.exportedFilePath": "C:/Github/hello-phaser/assets",
+    "last.exportedFilePath": "C:/Github/hello-phaser/rock-hero/assets",
     "last.imagePath": "C:/Github/hello-phaser/assets/spritesheets",
     "map.height": 11,
     "map.lastUsedExportFilter": "Arquivos de mapa JSON (*.tmj *.json)",
@@ -126,7 +127,6 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",

@@ -4,7 +4,7 @@
   <export format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="pinguim" tilewidth="64" tileheight="64" tilecount="1" columns="1">
-  <image source="../mapa 1/pinguim.png" width="64" height="64"/>
+  <image source="../sprites/pinguim.png" width="64" height="64"/>
  </tileset>
  <imagelayer id="2" name="bg" offsetx="-10" offsety="0">
   <image source="fase 2.png" width="1052" height="704"/>

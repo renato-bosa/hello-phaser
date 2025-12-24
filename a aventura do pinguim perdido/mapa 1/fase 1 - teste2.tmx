@@ -76,7 +76,7 @@
    <ellipse/>
   </object>
   <object id="9" name="player_spawn" gid="1" x="1183.15" y="559.273" width="64" height="64"/>
-  <object id="15" name="foca" gid="4" x="844" y="620" width="128" height="128"/>
+  <object id="15" name="foca" gid="4" x="854" y="622" width="128" height="128"/>
   <object id="16" name="foca" gid="4" x="552" y="622" width="128" height="128"/>
   <object id="17" gid="1073741831" x="1094" y="573" width="64" height="64"/>
  </objectgroup>

@@ -336,6 +336,16 @@ class GameScene extends Phaser.Scene {
         // Adiciona tecla de espaço separadamente para o pulo
         this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         
+        // Referência aos controles virtuais (mobile)
+        this.virtualControls = window.virtualControls || {
+            left: false,
+            right: false,
+            jump: false,
+            jumpHeld: false,
+            jumpJustPressed: false,
+            restart: false
+        };
+        
         // Flag para controlar se já ganhou
         this.hasWon = false;
         
@@ -429,8 +439,15 @@ class GameScene extends Phaser.Scene {
      * UPDATE - Roda a cada frame (lógica do jogo)
      */
     update(time, delta) {
-        // Se já ganhou, não processa mais controles
-        if (this.hasWon) return;
+        // Se já ganhou, verifica apenas input para continuar
+        if (this.hasWon) {
+            // Suporte mobile: botão de pulo avança para próxima fase
+            if (this.virtualControls.jumpJustPressed) {
+                this.virtualControls.jumpJustPressed = false;
+                this.scene.restart({ level: this.nextLevelOnContinue });
+            }
+            return;
+        }
         
         const player = this.player;
         const onGround = player.body.blocked.down; // Está no chão?
@@ -449,9 +466,13 @@ class GameScene extends Phaser.Scene {
         // ===== MOVIMENTO HORIZONTAL COM ACELERAÇÃO =====
         let direction = 0; // -1 = esquerda, 0 = parado, 1 = direita
         
-        if (this.cursors.left.isDown) {
+        // Movimento (teclado + touch)
+        const moveLeft = this.cursors.left.isDown || this.virtualControls.left;
+        const moveRight = this.cursors.right.isDown || this.virtualControls.right;
+        
+        if (moveLeft) {
             direction = -1;
-        } else if (this.cursors.right.isDown) {
+        } else if (moveRight) {
             direction = 1;
         }
         
@@ -482,9 +503,21 @@ class GameScene extends Phaser.Scene {
         // ===== PULO VARIÁVEL (estilo Super Mario World) =====
         // JustDown = true apenas no frame que apertou (não enquanto segura)
         const jumpJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up) || 
-                                Phaser.Input.Keyboard.JustDown(this.spaceKey);
+                                Phaser.Input.Keyboard.JustDown(this.spaceKey) ||
+                                this.virtualControls.jumpJustPressed;
         // isDown = true enquanto o botão está segurado
-        const jumpHeld = this.cursors.up.isDown || this.spaceKey.isDown;
+        const jumpHeld = this.cursors.up.isDown || this.spaceKey.isDown || this.virtualControls.jumpHeld;
+        
+        // Reseta o flag de "just pressed" do touch após processar
+        if (this.virtualControls.jumpJustPressed) {
+            this.virtualControls.jumpJustPressed = false;
+        }
+        
+        // Restart via controle virtual (mobile)
+        if (this.virtualControls.restart) {
+            this.virtualControls.restart = false;
+            this.scene.restart({ level: this.currentLevel });
+        }
         
         // ===== COYOTE TIME (permite pular logo após sair da plataforma) =====
         const COYOTE_DURATION = 100; // ms de tolerância após sair da plataforma
@@ -600,6 +633,17 @@ class GameScene extends Phaser.Scene {
         const overlay = this.add.rectangle(centerX, centerY, 640, 352, 0x000000, 0.7)
             .setScrollFactor(0).setDepth(101);
         
+        // Guarda o próximo nível para uso no update (suporte mobile)
+        this.nextLevelOnContinue = hasNextLevel ? nextLevel : 0;
+        
+        // Detecta se é dispositivo touch
+        const isMobile = window.virtualControls && (
+            ('ontouchstart' in window) ||
+            (navigator.maxTouchPoints > 0) ||
+            window.location.search.includes('mobile=true')
+        );
+        const continueText = isMobile ? 'Toque no botão de PULO para continuar' : 'Pressione ESPAÇO para continuar';
+        
         if (hasNextLevel) {
             // Ainda há fases!
             const winText = this.add.text(centerX, centerY - 30, '✅ FASE COMPLETA!', {
@@ -610,7 +654,7 @@ class GameScene extends Phaser.Scene {
                 strokeThickness: 4
             }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
             
-            const nextText = this.add.text(centerX, centerY + 30, 'Pressione ESPAÇO para a próxima fase', {
+            const nextText = this.add.text(centerX, centerY + 30, continueText, {
                 fontSize: '16px',
                 fontFamily: 'Arial',
                 color: '#ffffff'
@@ -630,7 +674,7 @@ class GameScene extends Phaser.Scene {
                 strokeThickness: 4
             }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
             
-            const restartText = this.add.text(centerX, centerY + 30, 'Pressione ESPAÇO para jogar novamente', {
+            const restartText = this.add.text(centerX, centerY + 30, continueText, {
                 fontSize: '16px',
                 fontFamily: 'Arial',
                 color: '#ffffff'

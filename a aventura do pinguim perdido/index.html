@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>A Aventura do Pinguim Perdido</title>
     <style>
         * {
@@ -17,8 +17,10 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            touch-action: none; /* Previne gestos do navegador */
         }
         #game-container {
+            position: relative;
             max-width: 100vw;
             max-height: 100vh;
         }
@@ -27,20 +29,275 @@
             border-radius: 8px;
             box-shadow: 0 0 20px rgba(74, 144, 217, 0.3);
         }
+
+        /* === CONTROLES MOBILE === */
+        #mobile-controls {
+            display: none; /* Escondido por padrão, JS mostra em dispositivos touch */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Container não bloqueia eventos */
+            z-index: 1000;
+        }
+
+        .mobile-btn {
+            position: absolute;
+            pointer-events: auto; /* Botões capturam eventos */
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.1s, transform 0.1s;
+        }
+
+        .mobile-btn:active,
+        .mobile-btn.active {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(0.95);
+        }
+
+        .mobile-btn svg {
+            width: 50%;
+            height: 50%;
+            fill: rgba(255, 255, 255, 0.7);
+        }
+
+        /* D-Pad (esquerda) */
+        #dpad-container {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+        }
+
+        #btn-left, #btn-right {
+            width: 70px;
+            height: 70px;
+        }
+
+        #btn-left {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #btn-right {
+            position: absolute;
+            left: 90px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Botão de pulo (direita) */
+        #btn-jump {
+            bottom: 30px;
+            right: 20px;
+            width: 90px;
+            height: 90px;
+        }
+
+        /* Botão de reiniciar (canto superior direito) */
+        #btn-restart {
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: sans-serif;
+        }
+
+        /* Ajustes para telas muito pequenas */
+        @media (max-width: 480px) {
+            #btn-left, #btn-right {
+                width: 55px;
+                height: 55px;
+            }
+            #btn-right {
+                left: 70px;
+            }
+            #btn-jump {
+                width: 70px;
+                height: 70px;
+            }
+            #btn-restart {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="game-container"></div>
+
+    <!-- Controles Mobile (HTML sobreposto ao canvas) -->
+    <div id="mobile-controls">
+        <!-- D-Pad: Esquerda e Direita -->
+        <div id="dpad-container">
+            <div id="btn-left" class="mobile-btn" data-control="left">
+                <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+            </div>
+            <div id="btn-right" class="mobile-btn" data-control="right">
+                <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+            </div>
+        </div>
+
+        <!-- Botão de Pulo -->
+        <div id="btn-jump" class="mobile-btn" data-control="jump">
+            <svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>
+        </div>
+
+        <!-- Botão de Reiniciar -->
+        <div id="btn-restart" class="mobile-btn" data-control="restart">R</div>
+    </div>
     
     <!-- Phaser 3 via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
     
-    <!-- Rex Virtual Joystick Plugin -->
-    <script src="https://raw.githack.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js"></script>
-    
     <!-- Game Scripts -->
     <script src="js/scenes/GameScene.js"></script>
     <script src="js/game.js"></script>
+
+    <!-- Mobile Controls Script -->
+    <script>
+        // Estado global dos controles virtuais (acessível pelo Phaser)
+        window.virtualControls = {
+            left: false,
+            right: false,
+            jump: false,
+            jumpJustPressed: false,
+            restart: false
+        };
+
+        // Detecta dispositivo touch
+        function isTouchDevice() {
+            return (
+                ('ontouchstart' in window) ||
+                (navigator.maxTouchPoints > 0) ||
+                window.location.search.includes('mobile=true')
+            );
+        }
+
+        // Inicializa controles mobile
+        function initMobileControls() {
+            if (!isTouchDevice()) {
+                console.log('Dispositivo não-touch. Use ?mobile=true na URL para forçar controles mobile.');
+                return;
+            }
+
+            console.log('Dispositivo touch detectado. Ativando controles mobile...');
+            
+            const mobileControls = document.getElementById('mobile-controls');
+            mobileControls.style.display = 'block';
+
+            // Referências aos botões
+            const buttons = {
+                left: document.getElementById('btn-left'),
+                right: document.getElementById('btn-right'),
+                jump: document.getElementById('btn-jump'),
+                restart: document.getElementById('btn-restart')
+            };
+
+            // Rastreamento de toques ativos por botão
+            const activeTouches = new Map();
+
+            // Função para ativar controle
+            function activateControl(control, element) {
+                if (control === 'jump') {
+                    window.virtualControls.jump = true;
+                    window.virtualControls.jumpJustPressed = true;
+                } else if (control === 'restart') {
+                    window.virtualControls.restart = true;
+                } else {
+                    window.virtualControls[control] = true;
+                }
+                element.classList.add('active');
+            }
+
+            // Função para desativar controle
+            function deactivateControl(control, element) {
+                if (control === 'jump') {
+                    window.virtualControls.jump = false;
+                } else if (control === 'restart') {
+                    window.virtualControls.restart = false;
+                } else {
+                    window.virtualControls[control] = false;
+                }
+                element.classList.remove('active');
+            }
+
+            // Configura eventos para cada botão
+            Object.entries(buttons).forEach(([control, element]) => {
+                // Touch Start
+                element.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    // Registra todos os toques neste elemento
+                    for (let touch of e.changedTouches) {
+                        activeTouches.set(touch.identifier, { control, element });
+                    }
+                    activateControl(control, element);
+                }, { passive: false });
+
+                // Touch End
+                element.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    for (let touch of e.changedTouches) {
+                        activeTouches.delete(touch.identifier);
+                    }
+                    // Só desativa se não houver mais toques neste botão
+                    let stillTouching = false;
+                    activeTouches.forEach((data) => {
+                        if (data.control === control) stillTouching = true;
+                    });
+                    if (!stillTouching) {
+                        deactivateControl(control, element);
+                    }
+                }, { passive: false });
+
+                // Touch Cancel
+                element.addEventListener('touchcancel', (e) => {
+                    e.preventDefault();
+                    for (let touch of e.changedTouches) {
+                        activeTouches.delete(touch.identifier);
+                    }
+                    deactivateControl(control, element);
+                }, { passive: false });
+
+                // Também suporta mouse (para testes em desktop com ?mobile=true)
+                element.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    activateControl(control, element);
+                });
+
+                element.addEventListener('mouseup', (e) => {
+                    e.preventDefault();
+                    deactivateControl(control, element);
+                });
+
+                element.addEventListener('mouseleave', (e) => {
+                    deactivateControl(control, element);
+                });
+            });
+
+            // Previne comportamentos indesejados
+            document.addEventListener('touchmove', (e) => {
+                if (e.target.classList.contains('mobile-btn')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        }
+
+        // Inicializa quando a página carregar
+        window.addEventListener('DOMContentLoaded', initMobileControls);
+    </script>
 </body>
 </html>
-

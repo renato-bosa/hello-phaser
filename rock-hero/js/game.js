@@ -37,15 +37,6 @@ const config = {
         }
     },
     
-    // Plugin do joystick virtual para controles mobile
-    plugins: {
-        global: [{
-            key: 'rexVirtualJoystick',
-            plugin: rexvirtualjoystickplugin,
-            start: true
-        }]
-    },
-    
     // Cenas do jogo (por enquanto só temos uma)
     scene: [GameScene]
 };

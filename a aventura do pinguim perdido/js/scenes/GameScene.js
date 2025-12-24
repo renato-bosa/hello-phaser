@@ -216,6 +216,15 @@ class GameScene extends Phaser.Scene {
         this.canFly = level.canFly || false; // Modo nado/voo
         this.groundContacts = 0; // Contador de contatos com o chão
         
+        // Referência aos controles virtuais (mobile)
+        this.virtualControls = window.virtualControls || {
+            left: false,
+            right: false,
+            jump: false,
+            jumpJustPressed: false,
+            restart: false
+        };
+        
         // === COYOTE TIME & JUMP BUFFER ===
         this.coyoteTime = 0;           // Tempo restante de "coyote time"
         this.coyoteDuration = 100;     // Duração do coyote time (ms)
@@ -267,19 +276,7 @@ class GameScene extends Phaser.Scene {
 
         // === UI ===
         const levelName = `Fase ${this.currentLevel + 1}`;
-        
-        // Detecta se é dispositivo touch
-        this.isTouchDevice = this.sys.game.device.input.touch || 
-                            ('ontouchstart' in window) || 
-                            (navigator.maxTouchPoints > 0) ||
-                            window.location.search.includes('mobile=true');
-        
-        // Texto diferente para mobile vs desktop
-        const controlsText = this.isTouchDevice 
-            ? `${levelName}` 
-            : `${levelName} | Setas: Mover | Espaço: Pular | R: Reiniciar`;
-        
-        this.uiText = this.add.text(16, 16, controlsText, {
+        this.add.text(16, 16, `${levelName} | Setas: Mover | Espaço: Pular | R: Reiniciar`, {
             fontSize: '18px',
             fill: '#ffffff',
             stroke: '#000000',
@@ -287,11 +284,8 @@ class GameScene extends Phaser.Scene {
         }).setScrollFactor(0);
 
         // Tecla R para reiniciar
-        this.gameCompleted = false;
         this.input.keyboard.on('keydown-R', () => {
-            // Se o jogo foi completado, volta ao início; senão reinicia a fase atual
-            const targetLevel = this.gameCompleted ? 0 : this.currentLevel;
-            this.scene.restart({ level: targetLevel });
+            this.scene.restart({ level: this.currentLevel });
         });
 
         // Debug: mostrar posição do mouse ao clicar
@@ -303,159 +297,6 @@ class GameScene extends Phaser.Scene {
         if (this.matter.config.debug) {
             this.createDebugGrid(64);
         }
-
-        // Controles mobile (touch)
-        this.createMobileControls();
-    }
-
-    createMobileControls() {
-        // Inicializa estado dos controles virtuais
-        this.virtualControls = {
-            left: false,
-            right: false,
-            jump: false,
-            jumpJustPressed: false
-        };
-        
-        if (!this.isTouchDevice) {
-            console.log('Dispositivo não-touch detectado, controles mobile desativados.');
-            console.log('Dica: Adicione ?mobile=true na URL para forçar os controles mobile.');
-            return;
-        }
-        
-        console.log('Dispositivo touch detectado, criando controles mobile...');
-        
-        // === CÂMERA DE UI (sem zoom, cobre toda a tela) ===
-        this.uiCamera = this.cameras.add(0, 0, this.scale.width, this.scale.height);
-        this.uiCamera.setScroll(0, 0);
-        this.uiCamera.setName('uiCamera');
-        
-        // Faz a câmera de UI ignorar TUDO que já existe na cena
-        // Assim ela só renderizará os elementos de UI que criarmos depois
-        const existingObjects = [...this.children.list];
-        existingObjects.forEach(obj => {
-            this.uiCamera.ignore(obj);
-        });
-        
-        // Array para armazenar todos os elementos de UI mobile
-        this.mobileUIElements = [];
-        
-        // Pega dimensões da tela
-        const screenWidth = this.scale.width;
-        const screenHeight = this.scale.height;
-        
-        // Configurações de tamanho e posição
-        const joystickRadius = 60;
-        const buttonRadius = 55;
-        const padding = 30;
-        
-        // Posições na tela
-        const joystickX = padding + joystickRadius + 20;
-        const joystickY = screenHeight - padding - joystickRadius - 20;
-        const jumpX = screenWidth - padding - buttonRadius - 20;
-        const jumpY = screenHeight - padding - buttonRadius - 20;
-        
-        // === JOYSTICK VIRTUAL ===
-        // Base do joystick (círculo maior, semi-transparente)
-        this.joystickBase = this.add.circle(joystickX, joystickY, joystickRadius, 0x000000, 0.4)
-            .setDepth(10000);
-        this.mobileUIElements.push(this.joystickBase);
-        
-        // Thumb do joystick (círculo menor)
-        this.joystickThumb = this.add.circle(joystickX, joystickY, joystickRadius * 0.5, 0xffffff, 0.6)
-            .setDepth(10001);
-        this.mobileUIElements.push(this.joystickThumb);
-        
-        // Cria o plugin do joystick
-        this.joyStick = this.plugins.get('rexVirtualJoystick').add(this, {
-            x: joystickX,
-            y: joystickY,
-            radius: joystickRadius,
-            base: this.joystickBase,
-            thumb: this.joystickThumb,
-            enable: true
-        });
-        
-        // Atualiza estado baseado no joystick
-        this.joyStick.on('update', () => {
-            const cursorKeys = this.joyStick.createCursorKeys();
-            this.virtualControls.left = cursorKeys.left.isDown;
-            this.virtualControls.right = cursorKeys.right.isDown;
-        });
-        
-        // === BOTÃO DE PULO ===
-        this.jumpButton = this.add.circle(jumpX, jumpY, buttonRadius, 0x000000, 0.4)
-            .setDepth(10000)
-            .setInteractive();
-        this.mobileUIElements.push(this.jumpButton);
-        
-        // Seta do botão de pulo (aponta para cima)
-        this.jumpArrow = this.add.graphics()
-            .setDepth(10001);
-        this.jumpArrow.fillStyle(0xffffff, 0.7);
-        const arrowSize = 22;
-        this.jumpArrow.fillTriangle(
-            jumpX, jumpY - arrowSize,
-            jumpX - arrowSize, jumpY + arrowSize * 0.5,
-            jumpX + arrowSize, jumpY + arrowSize * 0.5
-        );
-        this.mobileUIElements.push(this.jumpArrow);
-        
-        // Eventos do botão de pulo
-        this.jumpButton.on('pointerdown', () => {
-            this.virtualControls.jump = true;
-            this.virtualControls.jumpJustPressed = true;
-            this.jumpButton.setFillStyle(0x444444, 0.6);
-        });
-        
-        this.jumpButton.on('pointerup', () => {
-            this.virtualControls.jump = false;
-            this.jumpButton.setFillStyle(0x000000, 0.4);
-        });
-        
-        this.jumpButton.on('pointerout', () => {
-            this.virtualControls.jump = false;
-            this.jumpButton.setFillStyle(0x000000, 0.4);
-        });
-        
-        // === BOTÃO DE REINICIAR (pequeno, no canto superior direito) ===
-        const restartX = screenWidth - 40;
-        const restartY = 40;
-        
-        this.restartButton = this.add.circle(restartX, restartY, 25, 0x000000, 0.4)
-            .setDepth(10000)
-            .setInteractive();
-        this.mobileUIElements.push(this.restartButton);
-        
-        // Ícone "R" no botão
-        this.restartText = this.add.text(restartX, restartY, 'R', {
-            fontSize: '20px',
-            fill: '#ffffff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5).setDepth(10001);
-        this.mobileUIElements.push(this.restartText);
-        
-        this.restartButton.on('pointerdown', () => {
-            this.restartButton.setFillStyle(0x444444, 0.6);
-            // Se o jogo foi completado, volta ao início; senão reinicia a fase atual
-            const targetLevel = this.gameCompleted ? 0 : this.currentLevel;
-            this.scene.restart({ level: targetLevel });
-        });
-        
-        // === CONFIGURA AS CÂMERAS ===
-        // Faz a câmera principal ignorar os elementos de UI mobile
-        this.cameras.main.ignore(this.mobileUIElements);
-        
-        console.log(`Controles mobile criados - Joystick: (${joystickX}, ${joystickY}), Pulo: (${jumpX}, ${jumpY})`);
-        console.log(`Câmera de UI criada para controles (sem zoom)`);
-    }
-
-    // Função auxiliar para ignorar objetos na câmera de UI (evita duplicação)
-    ignoreInUICamera(gameObject) {
-        if (this.uiCamera && gameObject) {
-            this.uiCamera.ignore(gameObject);
-        }
-        return gameObject;
     }
 
     createDebugGrid(gridSize) {
@@ -662,31 +503,6 @@ class GameScene extends Phaser.Scene {
 
     // Limpa dados da fase anterior (inimigos, projéteis, etc)
     cleanupPreviousLevel() {
-        // Limpa controles mobile
-        if (this.joyStick) {
-            this.joyStick.destroy();
-            this.joyStick = null;
-        }
-        if (this.mobileUIElements) {
-            this.mobileUIElements.forEach(element => {
-                if (element && element.destroy) element.destroy();
-            });
-            this.mobileUIElements = [];
-        }
-        // Limpa referências individuais
-        this.joystickBase = null;
-        this.joystickThumb = null;
-        this.jumpButton = null;
-        this.jumpArrow = null;
-        this.restartButton = null;
-        this.restartText = null;
-        
-        // Remove câmera de UI
-        if (this.uiCamera) {
-            this.cameras.remove(this.uiCamera);
-            this.uiCamera = null;
-        }
-        
         // Limpa inimigos e suas bolas
         if (this.enemies) {
             this.enemies.forEach(enemy => {
@@ -1119,9 +935,8 @@ class GameScene extends Phaser.Scene {
         const startX = enemy.sprite.x;
         const startY = enemy.sprite.y - enemy.sprite.displayHeight * 0.3;
         
-        // Cria sprite da bola e ignora na câmera de UI
+        // Cria sprite da bola
         const ball = this.add.sprite(startX, startY, 'bola', 0);
-        this.ignoreInUICamera(ball);
         
         // Animação da bola
         const animKey = 'bola_anim';
@@ -1477,7 +1292,7 @@ class GameScene extends Phaser.Scene {
 
         const speed = 5;
 
-        // Movimento horizontal (teclado ou touch)
+        // Movimento horizontal (teclado + touch)
         const moveLeft = this.cursors.left.isDown || this.virtualControls.left;
         const moveRight = this.cursors.right.isDown || this.virtualControls.right;
         
@@ -1500,7 +1315,7 @@ class GameScene extends Phaser.Scene {
         const canJumpCoyote = this.isOnGround || this.coyoteTime > 0;
         const canJump = this.canFly || canJumpCoyote;
         
-        // Pulo (teclado ou touch)
+        // Pulo (teclado + touch)
         const jumpPressed = Phaser.Input.Keyboard.JustDown(this.spaceKey) || this.virtualControls.jumpJustPressed;
         
         // Reseta o flag de "just pressed" do touch após processar
@@ -1515,6 +1330,12 @@ class GameScene extends Phaser.Scene {
                 // Jump Buffer: registra tentativa de pulo para executar ao pousar
                 this.jumpBufferTime = this.jumpBufferDuration;
             }
+        }
+        
+        // Restart via controle virtual (mobile)
+        if (this.virtualControls.restart) {
+            this.virtualControls.restart = false;
+            this.scene.restart({ level: this.currentLevel });
         }
         
         // Atualiza estado anterior
@@ -1553,7 +1374,7 @@ class GameScene extends Phaser.Scene {
             console.log('🎉 Parabéns! Você completou todas as fases!');
             
             // Mostra mensagem de vitória
-            const victoryText = this.add.text(
+            this.add.text(
                 this.cameras.main.centerX, 
                 this.cameras.main.centerY - 30, 
                 '🎉 PARABÉNS!\nVocê completou o jogo!', 
@@ -1565,10 +1386,9 @@ class GameScene extends Phaser.Scene {
                     align: 'center'
                 }
             ).setOrigin(0.5).setScrollFactor(0);
-            this.ignoreInUICamera(victoryText);
             
             // Instrução para reiniciar
-            const restartHint = this.add.text(
+            this.add.text(
                 this.cameras.main.centerX, 
                 this.cameras.main.centerY + 80, 
                 'Pressione R para jogar novamente', 
@@ -1580,14 +1400,15 @@ class GameScene extends Phaser.Scene {
                     align: 'center'
                 }
             ).setOrigin(0.5).setScrollFactor(0);
-            this.ignoreInUICamera(restartHint);
             
             // Para o jogador
             this.player.setVelocity(0, 0);
             this.player.setStatic(true);
             
-            // Marca o jogo como completado (R volta ao início)
-            this.gameCompleted = true;
+            // Permite reiniciar do início
+            this.input.keyboard.once('keydown-R', () => {
+                this.scene.restart({ level: 0 });
+            });
         }
     }
 }

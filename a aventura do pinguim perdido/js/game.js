@@ -18,13 +18,6 @@ const config = {
             debug: false // Ativado para ver os polígonos de colisão
         }
     },
-    plugins: {
-        global: [{
-            key: 'rexVirtualJoystick',
-            plugin: rexvirtualjoystickplugin,
-            start: true
-        }]
-    },
     scene: [GameScene]
 };
 

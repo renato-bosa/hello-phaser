@@ -336,6 +336,14 @@ class GameScene extends Phaser.Scene {
         // Adiciona tecla de espaço separadamente para o pulo
         this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         
+        // Tecla H para ver ranking (durante o jogo)
+        this.hKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.H);
+        this.hKey.on('down', () => {
+            if (!this.hasWon) {
+                this.showRanking();
+            }
+        });
+        
         // Referência aos controles virtuais (mobile)
         this.virtualControls = window.virtualControls || {
             left: false,
@@ -348,6 +356,11 @@ class GameScene extends Phaser.Scene {
         
         // Flag para controlar se já ganhou
         this.hasWon = false;
+        
+        // ===== CRONÔMETRO =====
+        this.levelStartTime = this.time.now;
+        this.elapsedTime = 0;
+        this.createTimerUI();
         
         // Flag para o pulo variável
         this.isJumping = false;
@@ -439,6 +452,11 @@ class GameScene extends Phaser.Scene {
      * UPDATE - Roda a cada frame (lógica do jogo)
      */
     update(time, delta) {
+        // Atualiza cronômetro
+        if (!this.hasWon) {
+            this.updateTimer();
+        }
+        
         // Se já ganhou, verifica apenas input para continuar
         if (this.hasWon) {
             // Suporte mobile: botão de pulo avança para próxima fase
@@ -610,6 +628,185 @@ class GameScene extends Phaser.Scene {
     }
 
     /**
+     * Cria UI do cronômetro
+     */
+    createTimerUI() {
+        // Texto do cronômetro (canto superior direito)
+        this.timerText = this.add.text(this.cameras.main.width - 16, 16, '⏱ 0:00.000', {
+            fontSize: '18px',
+            fontFamily: 'monospace',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 3
+        }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
+        
+        // Mostra recorde da fase (se existir)
+        const bestTime = this.getBestTime(this.currentLevel);
+        if (bestTime !== null) {
+            this.bestTimeText = this.add.text(this.cameras.main.width - 16, 38, `🏆 ${this.formatTime(bestTime)}`, {
+                fontSize: '14px',
+                fontFamily: 'monospace',
+                color: '#ffd700',
+                stroke: '#000000',
+                strokeThickness: 2
+            }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
+        }
+    }
+
+    /**
+     * Atualiza o display do cronômetro
+     */
+    updateTimer() {
+        if (this.hasWon) return;
+        
+        this.elapsedTime = this.time.now - this.levelStartTime;
+        this.timerText.setText(`⏱ ${this.formatTime(this.elapsedTime)}`);
+    }
+
+    /**
+     * Formata tempo em milissegundos para M:SS.mmm
+     */
+    formatTime(ms) {
+        const totalSeconds = ms / 1000;
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = Math.floor(totalSeconds % 60);
+        const millis = Math.floor(ms % 1000);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}.${millis.toString().padStart(3, '0')}`;
+    }
+
+    /**
+     * Obtém o melhor tempo de uma fase do localStorage
+     */
+    getBestTime(level) {
+        const key = `rockHero_bestTime_level${level}`;
+        const stored = localStorage.getItem(key);
+        return stored ? parseFloat(stored) : null;
+    }
+
+    /**
+     * Salva o tempo se for um novo recorde
+     */
+    saveBestTime(level, time) {
+        const key = `rockHero_bestTime_level${level}`;
+        const currentBest = this.getBestTime(level);
+        
+        if (currentBest === null || time < currentBest) {
+            localStorage.setItem(key, time.toString());
+            return true; // É um novo recorde!
+        }
+        return false;
+    }
+
+    /**
+     * Obtém o tempo total (soma de todos os melhores tempos)
+     */
+    getTotalBestTime() {
+        let total = 0;
+        for (let i = 0; i < LEVELS.length; i++) {
+            const best = this.getBestTime(i);
+            if (best !== null) {
+                total += best;
+            } else {
+                return null; // Ainda não completou todas as fases
+            }
+        }
+        return total;
+    }
+
+    /**
+     * Mostra tela de ranking de hi-scores
+     */
+    showRanking() {
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
+        
+        // Fundo semi-transparente
+        const overlay = this.add.rectangle(centerX, centerY, 640, 400, 0x000000, 0.9)
+            .setScrollFactor(0).setDepth(200);
+        
+        // Título
+        const title = this.add.text(centerX, centerY - 160, '🏆 RANKING DE HI-SCORES 🏆', {
+            fontSize: '28px',
+            fontFamily: 'Arial',
+            color: '#ffd700',
+            stroke: '#000000',
+            strokeThickness: 4
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+        
+        // Lista de tempos por fase
+        let yOffset = -100;
+        let hasAnyRecord = false;
+        
+        for (let i = 0; i < LEVELS.length; i++) {
+            const bestTime = this.getBestTime(i);
+            const levelName = LEVELS[i].name || `Fase ${i + 1}`;
+            
+            if (bestTime !== null) {
+                hasAnyRecord = true;
+                const timeText = this.formatTime(bestTime);
+                this.add.text(centerX, centerY + yOffset, `${levelName}: ${timeText}`, {
+                    fontSize: '18px',
+                    fontFamily: 'monospace',
+                    color: '#ffffff',
+                    stroke: '#000000',
+                    strokeThickness: 2
+                }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+                yOffset += 30;
+            } else {
+                this.add.text(centerX, centerY + yOffset, `${levelName}: --:--.---`, {
+                    fontSize: '18px',
+                    fontFamily: 'monospace',
+                    color: '#666666',
+                    stroke: '#000000',
+                    strokeThickness: 2
+                }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+                yOffset += 30;
+            }
+        }
+        
+        // Tempo total
+        const totalBest = this.getTotalBestTime();
+        if (totalBest !== null) {
+            yOffset += 20;
+            this.add.text(centerX, centerY + yOffset, `━━━━━━━━━━━━━━━━━━━━`, {
+                fontSize: '16px',
+                fontFamily: 'monospace',
+                color: '#888888'
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+            yOffset += 30;
+            this.add.text(centerX, centerY + yOffset, `Tempo Total: ${this.formatTime(totalBest)}`, {
+                fontSize: '22px',
+                fontFamily: 'monospace',
+                color: '#00ffff',
+                stroke: '#000000',
+                strokeThickness: 3
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+        }
+        
+        // Instrução para fechar
+        const closeText = this.add.text(centerX, centerY + 150, 'Pressione ESC para fechar', {
+            fontSize: '16px',
+            fontFamily: 'Arial',
+            color: '#aaaaaa'
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+        
+        // Listener para fechar
+        const closeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+        closeKey.once('down', () => {
+            overlay.destroy();
+            title.destroy();
+            closeText.destroy();
+            closeKey.destroy();
+            // Destroi todos os textos de ranking
+            this.children.list.forEach(child => {
+                if (child.depth === 201 && child !== title && child !== closeText) {
+                    child.destroy();
+                }
+            });
+        });
+    }
+
+    /**
      * Chamado quando o herói toca a bandeira
      */
     reachGoal() {
@@ -621,6 +818,11 @@ class GameScene extends Phaser.Scene {
         this.player.setVelocity(0, 0);
         this.player.anims.play('idle', true);
         
+        // Salva o tempo final e verifica se é recorde
+        const finalTime = this.elapsedTime;
+        const isNewRecord = this.saveBestTime(this.currentLevel, finalTime);
+        const bestTime = this.getBestTime(this.currentLevel);
+        
         // Verifica se há próxima fase
         const nextLevel = this.currentLevel + 1;
         const hasNextLevel = nextLevel < LEVELS.length;
@@ -630,7 +832,7 @@ class GameScene extends Phaser.Scene {
         const centerY = this.cameras.main.centerY;
         
         // Fundo semi-transparente (fixo na câmera)
-        const overlay = this.add.rectangle(centerX, centerY, 640, 352, 0x000000, 0.7)
+        const overlay = this.add.rectangle(centerX, centerY, 640, 400, 0x000000, 0.8)
             .setScrollFactor(0).setDepth(101);
         
         // Guarda o próximo nível para uso no update (suporte mobile)
@@ -646,7 +848,7 @@ class GameScene extends Phaser.Scene {
         
         if (hasNextLevel) {
             // Ainda há fases!
-            const winText = this.add.text(centerX, centerY - 30, '✅ FASE COMPLETA!', {
+            const winText = this.add.text(centerX, centerY - 60, '✅ FASE COMPLETA!', {
                 fontSize: '32px',
                 fontFamily: 'Arial',
                 color: '#00ff00',
@@ -654,7 +856,27 @@ class GameScene extends Phaser.Scene {
                 strokeThickness: 4
             }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
             
-            const nextText = this.add.text(centerX, centerY + 30, continueText, {
+            // Tempo atual
+            const timeColor = isNewRecord ? '#ffd700' : '#ffffff';
+            const recordLabel = isNewRecord ? ' 🏆 NOVO RECORDE!' : '';
+            this.add.text(centerX, centerY - 15, `⏱ Tempo: ${this.formatTime(finalTime)}${recordLabel}`, {
+                fontSize: '20px',
+                fontFamily: 'monospace',
+                color: timeColor,
+                stroke: '#000000',
+                strokeThickness: 3
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
+            
+            // Melhor tempo (se não for recorde)
+            if (!isNewRecord && bestTime) {
+                this.add.text(centerX, centerY + 15, `🏆 Recorde: ${this.formatTime(bestTime)}`, {
+                    fontSize: '16px',
+                    fontFamily: 'monospace',
+                    color: '#aaaaaa'
+                }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
+            }
+            
+            const nextText = this.add.text(centerX, centerY + 55, continueText, {
                 fontSize: '16px',
                 fontFamily: 'Arial',
                 color: '#ffffff'
@@ -666,7 +888,7 @@ class GameScene extends Phaser.Scene {
             });
         } else {
             // Última fase - vitória total!
-            const winText = this.add.text(centerX, centerY - 30, '🎉 VOCÊ ZEROU O JOGO! 🎉', {
+            const winText = this.add.text(centerX, centerY - 80, '🎉 VOCÊ ZEROU O JOGO! 🎉', {
                 fontSize: '28px',
                 fontFamily: 'Arial',
                 color: '#ffff00',
@@ -674,15 +896,51 @@ class GameScene extends Phaser.Scene {
                 strokeThickness: 4
             }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
             
-            const restartText = this.add.text(centerX, centerY + 30, continueText, {
+            // Tempo da fase
+            const timeColor = isNewRecord ? '#ffd700' : '#ffffff';
+            const recordLabel = isNewRecord ? ' 🏆 NOVO RECORDE!' : '';
+            this.add.text(centerX, centerY - 35, `⏱ Fase: ${this.formatTime(finalTime)}${recordLabel}`, {
+                fontSize: '18px',
+                fontFamily: 'monospace',
+                color: timeColor,
+                stroke: '#000000',
+                strokeThickness: 2
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
+            
+            // Tempo total (soma dos melhores tempos)
+            const totalBest = this.getTotalBestTime();
+            if (totalBest !== null) {
+                this.add.text(centerX, centerY + 5, `🏅 Tempo Total: ${this.formatTime(totalBest)}`, {
+                    fontSize: '22px',
+                    fontFamily: 'monospace',
+                    color: '#00ffff',
+                    stroke: '#000000',
+                    strokeThickness: 3
+                }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
+            }
+            
+            const restartText = this.add.text(centerX, centerY + 55, continueText, {
                 fontSize: '16px',
                 fontFamily: 'Arial',
                 color: '#ffffff'
             }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
             
+            // Botão para ver ranking
+            const rankingText = this.add.text(centerX, centerY + 85, 'Pressione H para ver o ranking', {
+                fontSize: '14px',
+                fontFamily: 'Arial',
+                color: '#ffd700'
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
+            
             // Aguarda espaço para reiniciar do começo
             this.input.keyboard.once('keydown-SPACE', () => {
                 this.scene.restart({ level: 0 });
+            });
+            
+            // Tecla H para ver ranking
+            const hKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.H);
+            hKey.on('down', () => {
+                this.showRanking();
             });
         }
     }

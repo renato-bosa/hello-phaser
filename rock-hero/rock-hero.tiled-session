@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map-2--expansion and speed.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -30,11 +30,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.5,
+            "scale": 1,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1961,
-                "y": 436
+                "x": 1455,
+                "y": 548.5
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#abstract-blue": {
@@ -95,8 +95,8 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 327.33333333333326,
-                "y": 328
+                "x": 320,
+                "y": 175.3333333333333
             }
         },
         "dev-resources/map.tmx#abstract-blue": {
@@ -143,14 +143,15 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-2--expansion and speed.tmx"
+        "dev-resources/map-2--expansion and speed.tmx",
+        "dev-resources/map.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map.tmx",
         "dev-resources/map-2--expansion and speed.tmx",
-        "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx",
-        "dev-resources/map.tmx"
+        "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx"
     ],
     "tileset.embedInMap": true
 }

@@ -33,7 +33,9 @@ class GameScene extends Phaser.Scene {
         const tilesets = [
             'grass', 'grass-with-barrier', 'bricks', 'abstract-background',
             'black', 'green-flag', 'yellow-flag', 'lava', 'lava-roxa',
-            'lava-roxa-animated', 'trampoline', 'abstract-blue'
+            'lava-roxa-animated', 'trampoline', 'abstract-blue',
+            'starry-sky', 'grass-floating-platform-middle', 'grass-floating-platform-edges',
+            'lava-bubbles-4fps'
         ];
         tilesets.forEach(name => {
             const fileName = name === 'trampoline' ? 'trampoline-thick' : name;
@@ -95,43 +97,61 @@ class GameScene extends Phaser.Scene {
         // Cria tilemap
         const map = this.make.tilemap({ key: levelConfig.key });
 
-        // Helper para adicionar tilesets
-        const addTileset = (name, imageKey) => {
-            const matching = map.tilesets.filter(ts => ts.name === name);
-            if (matching.length === 0) return null;
-            return map.addTilesetImage(name, imageKey || name, undefined, undefined, undefined, undefined, matching[0].firstgid);
-        };
+        // Adiciona TODOS os tilesets do mapa (evita problemas com tilesets duplicados)
+        const allTilesets = [];
+        const addedNames = new Set();
+        
+        map.tilesets.forEach((ts, index) => {
+            // Usa índice para criar nome único quando há duplicatas
+            const uniqueKey = addedNames.has(ts.name) ? `${ts.name}_${index}` : ts.name;
+            addedNames.add(ts.name);
+            
+            // Tenta carregar a imagem com o nome original do tileset
+            const tileset = map.addTilesetImage(ts.name, ts.name, undefined, undefined, undefined, undefined, ts.firstgid);
+            if (tileset) {
+                allTilesets.push(tileset);
+            }
+        });
 
-        const addAllTilesets = (name, imageKey) => {
-            return map.tilesets
-                .filter(ts => ts.name === name)
-                .map(ts => map.addTilesetImage(name, imageKey || name, undefined, undefined, undefined, undefined, ts.firstgid))
-                .filter(t => t !== null);
-        };
-
-        // Tilesets
-        const bgTilesets = [
-            addTileset('abstract-background'),
-            addTileset('black'),
-            ...addAllTilesets('abstract-blue')
-        ].filter(t => t !== null);
-
-        const solidTilesets = [
-            addTileset('grass'),
-            addTileset('grass-with-barrier'),
-            addTileset('bricks'),
-            addTileset('lava'),
-            addTileset('lava-roxa'),
-            addTileset('lava-roxa-animated')
-        ].filter(t => t !== null);
-
-        // Camadas
-        map.createLayer('bg', bgTilesets);
-        this.solidsLayer = map.createLayer('solids', solidTilesets);
+        // Camadas - usa todos os tilesets para garantir renderização correta
+        map.createLayer('bg', allTilesets);
+        
+        // Camada de decoração de background (se existir)
+        const bgDecoLayer = map.getLayer('bg_decoration');
+        if (bgDecoLayer) {
+            this.bgDecorationLayer = map.createLayer('bg_decoration', allTilesets);
+            // Animação das bolhas de lava
+            const lavaBubblesTileset = map.tilesets.find(ts => ts.name === 'lava-bubbles-4fps');
+            if (lavaBubblesTileset) {
+                this.setupLavaBubblesAnimation(this.bgDecorationLayer, lavaBubblesTileset);
+            }
+        }
+        
+        this.solidsLayer = map.createLayer('solids', allTilesets);
         this.solidsLayer.setCollisionByProperty({ collider: true });
+        
+        // Camada de decoração de foreground (se existir)
+        const fgDecoLayer = map.getLayer('fg_decoration');
+        if (fgDecoLayer) {
+            this.fgDecorationLayer = map.createLayer('fg_decoration', allTilesets);
+            this.fgDecorationLayer.setDepth(5); // Acima dos sólidos, mas atrás do jogador
+        }
+        
+        // Adiciona colisão para tiles de plataforma flutuante (sem propriedade collider no tileset)
+        const floatingPlatformMiddle = map.tilesets.find(ts => ts.name === 'grass-floating-platform-middle');
+        const floatingPlatformEdges = map.tilesets.find(ts => ts.name === 'grass-floating-platform-edges');
+        if (floatingPlatformMiddle) {
+            this.solidsLayer.setCollision(floatingPlatformMiddle.firstgid);
+        }
+        if (floatingPlatformEdges) {
+            this.solidsLayer.setCollision(floatingPlatformEdges.firstgid);
+        }
 
         // Animação de tiles
-        this.setupTileAnimations(this.solidsLayer, addTileset('lava-roxa-animated'));
+        const lavaAnimatedTileset = map.tilesets.find(ts => ts.name === 'lava-roxa-animated');
+        if (lavaAnimatedTileset) {
+            this.setupTileAnimations(this.solidsLayer, lavaAnimatedTileset);
+        }
 
         // Objetos do mapa
         this.parseMapObjects(map);
@@ -248,6 +268,26 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    setupLavaBubblesAnimation(layer, tileset) {
+        if (!tileset || !layer) return;
+
+        const firstGid = tileset.firstgid;
+        let currentFrame = 0;
+
+        this.time.addEvent({
+            delay: 250, // 4 fps = 250ms por frame
+            loop: true,
+            callback: () => {
+                currentFrame = (currentFrame + 1) % 4;
+                layer.forEachTile(tile => {
+                    if (tile.index >= firstGid && tile.index < firstGid + 4) {
+                        tile.index = firstGid + currentFrame;
+                    }
+                });
+            }
+        });
+    }
+
     // ==================== JOGADOR ====================
 
     createPlayer() {
@@ -257,6 +297,7 @@ class GameScene extends Phaser.Scene {
         this.player.body.setSize(14, 30);
         this.player.body.setOffset(9, 2);
         this.player.setCollideWorldBounds(true);
+        this.player.setDepth(10); // Acima das camadas de decoração
     }
 
     createAnimations() {

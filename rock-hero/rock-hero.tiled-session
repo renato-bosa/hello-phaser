@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "dev-resources/map-2--expansion and speed.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
@@ -30,11 +30,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 1,
+            "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 2083.5,
-                "y": 171
+                "x": 1961,
+                "y": 436
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#abstract-blue": {
@@ -50,10 +50,19 @@
         "dev-resources/map-2--expansion and speed.tmx#grass": {
             "scaleInDock": 1
         },
+        "dev-resources/map-2--expansion and speed.tmx#grass-floating-platform-edges": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-2--expansion and speed.tmx#grass-floating-platform-middle": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-2--expansion and speed.tmx#green-flag": {
             "scaleInDock": 1
         },
         "dev-resources/map-2--expansion and speed.tmx#lava": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-2--expansion and speed.tmx#lava-bubbles-4fps": {
             "scaleInDock": 1
         },
         "dev-resources/map-2--expansion and speed.tmx#lava-roxa": {
@@ -63,6 +72,9 @@
         "dev-resources/map-2--expansion and speed.tmx#lava-roxa-animated": {
             "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "dev-resources/map-2--expansion and speed.tmx#starry-sky": {
+            "scaleInDock": 1
         },
         "dev-resources/map-2--expansion and speed.tmx#still-hero (2)": {
             "scaleInDock": 1
@@ -80,15 +92,16 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.5,
+            "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 350,
-                "y": 311
+                "x": 327.33333333333326,
+                "y": 328
             }
         },
         "dev-resources/map.tmx#abstract-blue": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "dev-resources/map.tmx#black": {
             "scaleInDock": 1,
@@ -109,6 +122,9 @@
         "dev-resources/map.tmx#green-flag": {
             "scaleInDock": 1
         },
+        "dev-resources/map.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
         "dev-resources/map.tmx#lava-roxa-animated": {
             "scaleInDock": 1,
             "scaleInEditor": 1
@@ -119,7 +135,7 @@
     },
     "frame.defaultDuration": 200,
     "last.exportedFilePath": "C:/Github/hello-phaser/rock-hero/assets",
-    "last.imagePath": "C:/Github/hello-phaser/assets/spritesheets",
+    "last.imagePath": "C:/Github/hello-phaser/rock-hero/assets/spritesheets",
     "map.height": 11,
     "map.lastUsedExportFilter": "Arquivos de mapa JSON (*.tmj *.json)",
     "map.lastUsedFormat": "tmx",
@@ -127,12 +143,13 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
+        "dev-resources/map-2--expansion and speed.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx",
         "dev-resources/map-2--expansion and speed.tmx",
+        "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx",
         "dev-resources/map.tmx"
     ],
     "tileset.embedInMap": true

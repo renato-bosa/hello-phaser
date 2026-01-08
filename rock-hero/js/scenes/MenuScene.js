@@ -198,7 +198,11 @@ class MenuScene extends Phaser.Scene {
         btn.callback = callback;
 
         btn.on('pointerover', () => {
+            const prevIndex = this.selectedIndex;
             this.selectedIndex = this.menuButtons.indexOf(btn);
+            if (this.selectedIndex !== prevIndex) {
+                SoundManager.play('menuNavigate');
+            }
             this.updateButtonStyles();
         });
 
@@ -238,14 +242,22 @@ class MenuScene extends Phaser.Scene {
         // Navegação
         upKey.on('down', () => {
             if (this.currentView === 'menu') {
+                const prevIndex = this.selectedIndex;
                 this.selectedIndex = Math.max(0, this.selectedIndex - 1);
+                if (this.selectedIndex !== prevIndex) {
+                    SoundManager.play('menuNavigate');
+                }
                 this.updateButtonStyles();
             }
         });
 
         downKey.on('down', () => {
             if (this.currentView === 'menu') {
+                const prevIndex = this.selectedIndex;
                 this.selectedIndex = Math.min(this.menuButtons.length - 1, this.selectedIndex + 1);
+                if (this.selectedIndex !== prevIndex) {
+                    SoundManager.play('menuNavigate');
+                }
                 this.updateButtonStyles();
             }
         });
@@ -253,6 +265,7 @@ class MenuScene extends Phaser.Scene {
         // Seleção
         const handleSelect = () => {
             if (this.currentView === 'menu') {
+                SoundManager.play('menuSelect');
                 this.menuButtons[this.selectedIndex].callback();
             }
         };
@@ -262,7 +275,8 @@ class MenuScene extends Phaser.Scene {
 
         // ESC para voltar
         escKey.on('down', () => {
-            if (this.currentView === 'ranking') {
+            if (this.currentView === 'ranking' || this.currentView === 'nameInput') {
+                SoundManager.play('menuBack');
                 this.closeOverlay();
             }
         });

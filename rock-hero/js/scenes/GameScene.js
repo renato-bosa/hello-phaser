@@ -11,7 +11,7 @@ class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
     }
-
+    
     init(data) {
         // Dados do jogador (vindos do menu ou do estado global)
         this.currentLevel = data.level ?? GameData.state.currentLevel ?? 0;
@@ -28,7 +28,7 @@ class GameScene extends Phaser.Scene {
         GameData.LEVELS.forEach(level => {
             this.load.tilemapTiledJSON(level.key, level.file);
         });
-
+        
         // Tilesets
         const tilesets = [
             'grass', 'grass-with-barrier', 'bricks', 'abstract-background',
@@ -137,11 +137,15 @@ class GameScene extends Phaser.Scene {
         };
 
         // Sequência: 3 -> 2 -> 1 -> GO!
+        SoundManager.play('countdownTick');
         animateNumber('3', () => {
+            SoundManager.play('countdownTick');
             animateNumber('2', () => {
+                SoundManager.play('countdownTick');
                 animateNumber('1', () => {
                     // GO! - libera controle imediatamente
                     this.currentView = 'gameplay';
+                    SoundManager.play('countdownGo');
                     this.tweens.add({
                         targets: countdownText,
                         scale: { from: 0, to: 1.5 },
@@ -302,7 +306,7 @@ class GameScene extends Phaser.Scene {
             this.trampolines.add(trampoline);
         });
     }
-
+        
     createStars(positions) {
         this.stars = this.physics.add.group();
         positions.forEach(s => {
@@ -321,7 +325,7 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.setZoom(zoom);
         this.cameras.main.setRoundPixels(roundPixels);
-
+        
         // Filtro de texturas
         const filterMode = roundPixels 
             ? Phaser.Textures.FilterMode.NEAREST 
@@ -392,16 +396,16 @@ class GameScene extends Phaser.Scene {
 
         anims.forEach(anim => {
             if (!this.anims.exists(anim.key)) {
-                this.anims.create({
+            this.anims.create({
                     key: anim.key,
                     frames: this.anims.generateFrameNumbers(anim.texture, { 
                         start: anim.frames[0], 
                         end: anim.frames[1] 
                     }),
                     frameRate: anim.rate,
-                    repeat: -1
-                });
-            }
+                repeat: -1
+            });
+        }
         });
 
         this.player.anims.play('idle', true);
@@ -426,6 +430,7 @@ class GameScene extends Phaser.Scene {
                     flag.activated = true;
                     flag.setTint(0x00ff00);
                     this.currentCheckpoint = flag.checkpointPos;
+                    SoundManager.play('checkpoint');
                     this.showCheckpointMessage();
                 }
             });
@@ -502,10 +507,13 @@ class GameScene extends Phaser.Scene {
         const escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         escKey.on('down', () => {
             if (this.currentView === 'gameplay' && !this.hasWon) {
+                SoundManager.play('menuBack');
                 this.pauseGame();
             } else if (this.currentView === 'paused') {
+                SoundManager.play('menuSelect');
                 this.resumeGame();
             } else if (this.currentView === 'ranking') {
+                SoundManager.play('menuBack');
                 this.closeRanking();
             }
         });
@@ -568,7 +576,7 @@ class GameScene extends Phaser.Scene {
         const BUFFER_DURATION = 100;
 
         const dt = delta / 1000;
-
+        
         // Movimento horizontal
         const moveLeft = this.cursors.left.isDown || this.virtualControls.left;
         const moveRight = this.cursors.right.isDown || this.virtualControls.right;
@@ -578,7 +586,7 @@ class GameScene extends Phaser.Scene {
             this.currentSpeed = MIN_SPEED;
         }
         this.lastDirection = direction;
-
+        
         if (direction !== 0) {
             this.currentSpeed = Math.min(this.currentSpeed + ACCELERATION * dt, MAX_SPEED);
             player.setVelocityX(direction * this.currentSpeed);
@@ -612,30 +620,32 @@ class GameScene extends Phaser.Scene {
         } else {
             this.jumpBufferTime -= delta;
         }
-
+        
         const canCoyoteJump = this.coyoteTime > 0;
         const hasBufferedJump = this.jumpBufferTime > 0;
         const shouldJump = (jumpJustPressed && canCoyoteJump) || (onGround && hasBufferedJump);
-
+        
         if (shouldJump && !this.isJumping) {
             player.setVelocityY(JUMP_FORCE);
             this.isJumping = true;
             this.coyoteTime = 0;
             this.jumpBufferTime = 0;
+            SoundManager.play('jump');
         }
-
-        // Corte de pulo
+        
+        // Corte de pulo (interrompe som também)
         if (!jumpHeld && this.isJumping && player.body.velocity.y < 0) {
             player.setVelocityY(player.body.velocity.y * JUMP_CUT);
             this.isJumping = false;
+            SoundManager.stop('jump');
         }
-
+        
         // Gravidade extra na queda
         if (!onGround && player.body.velocity.y > 0) {
             const extraGravity = this.physics.world.gravity.y * FALL_GRAVITY * dt;
             player.setVelocityY(player.body.velocity.y + extraGravity);
         }
-
+        
         // Animação no ar
         if (!onGround) {
             player.anims.stop();
@@ -655,6 +665,7 @@ class GameScene extends Phaser.Scene {
         if (player.body.velocity.y >= 0 && !trampoline.justBounced) {
             player.setVelocityY(-990);
             this.isJumping = true;
+            SoundManager.play('jumpTrampoline');
 
             trampoline.justBounced = true;
             this.time.delayedCall(200, () => {
@@ -674,6 +685,7 @@ class GameScene extends Phaser.Scene {
     collectStar(player, star) {
         star.disableBody(true, true);
         this.starsCollected++;
+        SoundManager.play('collectStar');
         if (this.starText) {
             this.starText.setText(`${this.starsCollected}/${this.totalStars}`);
         }
@@ -688,6 +700,7 @@ class GameScene extends Phaser.Scene {
     respawnAtCheckpoint() {
         if (this.isRespawning) return;
         this.isRespawning = true;
+        SoundManager.play('damage');
 
         this.player.body.enable = false;
         const startX = this.player.x;
@@ -731,7 +744,7 @@ class GameScene extends Phaser.Scene {
             stroke: '#000000',
             strokeThickness: 3
         }).setOrigin(0.5).setScrollFactor(0).setDepth(100);
-
+        
         this.tweens.add({
             targets: text,
             alpha: 0,
@@ -752,17 +765,23 @@ class GameScene extends Phaser.Scene {
             this.showStarsWarning();
             return;
         }
-
+        
         this.hasWon = true;
         this.currentView = 'victory';
-
+        SoundManager.play('goalReached');
+        
         this.player.setVelocity(0, 0);
         this.player.anims.play('idle', true);
-
+        
         const finalTime = this.elapsedTime;
         
         // Salva o tempo (sempre tenta, retorna info sobre posição)
         const result = GameData.saveRecord(this.currentLevel, finalTime, this.playerName);
+        
+        // Som extra se for novo recorde
+        if (result.isRecord) {
+            this.time.delayedCall(500, () => SoundManager.play('newRecord'));
+        }
 
         this.showVictoryScreen(finalTime, result);
     }
@@ -771,10 +790,11 @@ class GameScene extends Phaser.Scene {
         // Evita mostrar múltiplos avisos
         if (this.starsWarningActive) return;
         this.starsWarningActive = true;
+        SoundManager.play('warning');
 
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
-
+        
         const remaining = this.totalStars - this.starsCollected;
         const starWord = remaining === 1 ? 'estrela' : 'estrelas';
 
@@ -784,9 +804,9 @@ class GameScene extends Phaser.Scene {
         const warningText = this.add.text(centerX, centerY - 50, 
             `⭐ Faltam ${remaining} ${starWord}!`, {
             fontSize: '24px',
-            fontFamily: 'Arial',
-            color: '#ffff00',
-            stroke: '#000000',
+                fontFamily: 'Arial',
+                color: '#ffff00',
+                stroke: '#000000',
             strokeThickness: 3
         }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
 
@@ -913,7 +933,7 @@ class GameScene extends Phaser.Scene {
             });
         }
     }
-
+    
     // ==================== PAUSE ====================
 
     pauseGame() {
@@ -947,8 +967,15 @@ class GameScene extends Phaser.Scene {
             stroke: '#000000', strokeThickness: 3
         }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setInteractive({ useHandCursor: true });
         continueBtn.defaultColor = '#00ff00';
-        continueBtn.on('pointerover', () => { this.pauseSelectedIndex = 0; this.updatePauseStyles(); });
-        continueBtn.on('pointerdown', () => this.resumeGame());
+        continueBtn.on('pointerover', () => { 
+            if (this.pauseSelectedIndex !== 0) SoundManager.play('menuNavigate');
+            this.pauseSelectedIndex = 0; 
+            this.updatePauseStyles(); 
+        });
+        continueBtn.on('pointerdown', () => {
+            SoundManager.play('menuSelect');
+            this.resumeGame();
+        });
         this.pauseButtons.push(continueBtn);
         this.overlayElements.push(continueBtn);
 
@@ -957,8 +984,15 @@ class GameScene extends Phaser.Scene {
             stroke: '#000000', strokeThickness: 3
         }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setInteractive({ useHandCursor: true });
         menuBtn.defaultColor = '#ffd700';
-        menuBtn.on('pointerover', () => { this.pauseSelectedIndex = 1; this.updatePauseStyles(); });
-        menuBtn.on('pointerdown', () => this.goToMenu());
+        menuBtn.on('pointerover', () => { 
+            if (this.pauseSelectedIndex !== 1) SoundManager.play('menuNavigate');
+            this.pauseSelectedIndex = 1; 
+            this.updatePauseStyles(); 
+        });
+        menuBtn.on('pointerdown', () => {
+            SoundManager.play('menuSelect');
+            this.goToMenu();
+        });
         this.pauseButtons.push(menuBtn);
         this.overlayElements.push(menuBtn);
 
@@ -977,20 +1011,29 @@ class GameScene extends Phaser.Scene {
 
         upKey.on('down', () => {
             if (this.currentView === 'paused') {
+                const prevIndex = this.pauseSelectedIndex;
                 this.pauseSelectedIndex = Math.max(0, this.pauseSelectedIndex - 1);
+                if (this.pauseSelectedIndex !== prevIndex) {
+                    SoundManager.play('menuNavigate');
+                }
                 this.updatePauseStyles();
             }
         });
 
         downKey.on('down', () => {
             if (this.currentView === 'paused') {
+                const prevIndex = this.pauseSelectedIndex;
                 this.pauseSelectedIndex = Math.min(this.pauseButtons.length - 1, this.pauseSelectedIndex + 1);
+                if (this.pauseSelectedIndex !== prevIndex) {
+                    SoundManager.play('menuNavigate');
+                }
                 this.updatePauseStyles();
             }
         });
 
         enterKey.on('down', () => {
             if (this.currentView === 'paused') {
+                SoundManager.play('menuSelect');
                 if (this.pauseSelectedIndex === 0) this.resumeGame();
                 else this.goToMenu();
             }

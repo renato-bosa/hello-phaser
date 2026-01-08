@@ -135,7 +135,7 @@ class MenuScene extends Phaser.Scene {
             this.continueBtn = this.createButton(
                 this.centerX, 
                 this.centerY + yOffset, 
-                `▶ CONTINUAR (${levelName})`,
+                `Continuar (${levelName})`,
                 '#00ffff',
                 () => this.continueGame()
             );

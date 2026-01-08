@@ -29,7 +29,7 @@ class GameScene extends Phaser.Scene {
             this.load.tilemapTiledJSON(level.key, level.file);
         });
         
-        // Tilesets
+        // Tilesets (nome no código → nome do arquivo)
         const tilesets = [
             'grass', 'grass-with-barrier', 'bricks', 'abstract-background',
             'black', 'green-flag', 'yellow-flag', 'lava', 'lava-roxa',
@@ -41,6 +41,11 @@ class GameScene extends Phaser.Scene {
             const fileName = name === 'trampoline' ? 'trampoline-thick' : name;
             this.load.image(name, `assets/spritesheets/${fileName}.png`);
         });
+        
+        // Aliases para tilesets que o Tiled pode referenciar com nomes diferentes
+        this.load.image('trampoline-thick', 'assets/spritesheets/trampoline-thick.png');
+        this.load.image('yellow-star-animated', 'assets/spritesheets/yellow-star-animated.png');
+        this.load.image('still-hero (2)', 'assets/spritesheets/still-hero.png');
 
         // Spritesheets
         this.load.spritesheet('star', 'assets/spritesheets/yellow-star-animated.png', {

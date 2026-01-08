@@ -380,7 +380,7 @@ class GameScene extends Phaser.Scene {
         if (this.totalStars > 0) {
             this.starHUD = this.add.container(50, 30).setScrollFactor(0).setDepth(100);
             const starIcon = this.add.sprite(0, 0, 'star', 0).setScale(1.2);
-            this.starText = this.add.text(24, 0, '0', {
+            this.starText = this.add.text(24, 0, `0/${this.totalStars}`, {
                 fontSize: '20px',
                 fontFamily: 'Arial',
                 color: '#ffff00',
@@ -587,7 +587,7 @@ class GameScene extends Phaser.Scene {
         star.disableBody(true, true);
         this.starsCollected++;
         if (this.starText) {
-            this.starText.setText(`${this.starsCollected}`);
+            this.starText.setText(`${this.starsCollected}/${this.totalStars}`);
         }
         this.tweens.add({
             targets: this.starHUD,

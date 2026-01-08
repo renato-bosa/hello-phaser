@@ -501,11 +501,10 @@ class GameScene extends Phaser.Scene {
             if (onGround) player.anims.play('idle', true);
         }
 
-        // Pulo
-        const jumpJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
-                                Phaser.Input.Keyboard.JustDown(this.spaceKey) ||
+        // Pulo (apenas barra de espaço)
+        const jumpJustPressed = Phaser.Input.Keyboard.JustDown(this.spaceKey) ||
                                 this.virtualControls.jumpJustPressed;
-        const jumpHeld = this.cursors.up.isDown || this.spaceKey.isDown || this.virtualControls.jumpHeld;
+        const jumpHeld = this.spaceKey.isDown || this.virtualControls.jumpHeld;
 
         if (this.virtualControls.jumpJustPressed) {
             this.virtualControls.jumpJustPressed = false;

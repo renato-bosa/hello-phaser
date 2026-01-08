@@ -658,6 +658,13 @@ class GameScene extends Phaser.Scene {
 
     reachGoal() {
         if (this.hasWon) return;
+
+        // Se a fase tem estrelas, verifica se todas foram coletadas
+        if (this.totalStars > 0 && this.starsCollected < this.totalStars) {
+            this.showStarsWarning();
+            return;
+        }
+
         this.hasWon = true;
         this.currentView = 'victory';
 
@@ -670,6 +677,46 @@ class GameScene extends Phaser.Scene {
         const result = GameData.saveRecord(this.currentLevel, finalTime, this.playerName);
 
         this.showVictoryScreen(finalTime, result);
+    }
+
+    showStarsWarning() {
+        // Evita mostrar múltiplos avisos
+        if (this.starsWarningActive) return;
+        this.starsWarningActive = true;
+
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
+
+        const remaining = this.totalStars - this.starsCollected;
+        const starWord = remaining === 1 ? 'estrela' : 'estrelas';
+
+        const warningBg = this.add.rectangle(centerX, centerY - 50, 420, 60, 0x000000, 0.85)
+            .setScrollFactor(0).setDepth(200);
+        
+        const warningText = this.add.text(centerX, centerY - 50, 
+            `⭐ Faltam ${remaining} ${starWord}!`, {
+            fontSize: '24px',
+            fontFamily: 'Arial',
+            color: '#ffff00',
+            stroke: '#000000',
+            strokeThickness: 3
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+
+        // Animação de pulso no HUD de estrelas
+        this.tweens.add({
+            targets: this.starHUD,
+            scale: 1.4,
+            duration: 150,
+            yoyo: true,
+            repeat: 2
+        });
+
+        // Remove o aviso após 2 segundos
+        this.time.delayedCall(2000, () => {
+            warningBg.destroy();
+            warningText.destroy();
+            this.starsWarningActive = false;
+        });
     }
 
     showVictoryScreen(finalTime, result) {

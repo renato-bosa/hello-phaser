@@ -59,7 +59,7 @@ class GameScene extends Phaser.Scene {
 
     create() {
         // Estado da cena
-        this.currentView = 'gameplay'; // 'gameplay', 'paused', 'victory', 'ranking'
+        this.currentView = 'countdown'; // 'countdown', 'gameplay', 'paused', 'victory', 'ranking'
         this.hasWon = false;
         this.overlayElements = [];
         this.keyListeners = [];
@@ -72,7 +72,7 @@ class GameScene extends Phaser.Scene {
         this.setupControls();
         this.setupPhysics();
 
-        // Timer (será iniciado no primeiro frame do update)
+        // Timer (será iniciado após o countdown)
         this.levelStartTime = null;
         this.elapsedTime = 0;
         this.pausedAtTime = null; // Marca quando pausou para compensar
@@ -84,6 +84,89 @@ class GameScene extends Phaser.Scene {
         this.currentSpeed = 160;
         this.lastDirection = 0;
         this.isRespawning = false;
+
+        // Inicia countdown apenas na primeira fase
+        if (this.currentLevel === 0) {
+            this.startCountdown();
+        } else {
+            this.currentView = 'gameplay';
+        }
+    }
+
+    startCountdown() {
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
+
+        // Estilo do texto de countdown
+        const countdownStyle = {
+            fontSize: '72px',
+            fontFamily: 'Arial Black, Arial',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 6
+        };
+
+        // Cria texto de countdown
+        const countdownText = this.add.text(centerX, centerY, '3', countdownStyle)
+            .setOrigin(0.5)
+            .setScrollFactor(0)
+            .setDepth(300)
+            .setScale(0);
+
+        // Função para animar cada número
+        const animateNumber = (text, callback) => {
+            this.tweens.add({
+                targets: countdownText,
+                scale: { from: 0, to: 1.2 },
+                duration: 200,
+                ease: 'Back.easeOut',
+                onStart: () => {
+                    countdownText.setText(text);
+                    countdownText.setColor('#ffffff');
+                },
+                onComplete: () => {
+                    this.tweens.add({
+                        targets: countdownText,
+                        scale: 0.9,
+                        alpha: 0.7,
+                        duration: 600,
+                        onComplete: callback
+                    });
+                }
+            });
+        };
+
+        // Sequência: 3 -> 2 -> 1 -> GO!
+        animateNumber('3', () => {
+            animateNumber('2', () => {
+                animateNumber('1', () => {
+                    // GO! - libera controle imediatamente
+                    this.currentView = 'gameplay';
+                    this.tweens.add({
+                        targets: countdownText,
+                        scale: { from: 0, to: 1.5 },
+                        duration: 300,
+                        ease: 'Back.easeOut',
+                        onStart: () => {
+                            countdownText.setText('GO!');
+                            countdownText.setColor('#00ff00');
+                            countdownText.setAlpha(1);
+                        },
+                        onComplete: () => {
+                            this.tweens.add({
+                                targets: countdownText,
+                                scale: 2,
+                                alpha: 0,
+                                duration: 400,
+                                onComplete: () => {
+                                    countdownText.destroy();
+                                }
+                            });
+                        }
+                    });
+                });
+            });
+        });
     }
 
     // ==================== CRIAÇÃO DO MAPA ====================
@@ -441,6 +524,11 @@ class GameScene extends Phaser.Scene {
             if (this.virtualControls.restart && this.currentView === 'paused') {
                 this.virtualControls.restart = false;
                 this.resumeGame();
+            }
+            // Durante countdown, mantém o jogador parado
+            if (this.currentView === 'countdown') {
+                this.player.setVelocity(0, 0);
+                this.player.anims.play('idle', true);
             }
             return;
         }

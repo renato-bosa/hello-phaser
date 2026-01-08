@@ -24,6 +24,13 @@ const GameData = {
             name: 'Fase 2',
             zoom: 0.9,
             roundPixels: false
+        },
+        { 
+            key: 'map3', 
+            file: 'assets/map-3--desafio do luigi.json', 
+            name: 'Desafio do Luigi',
+            zoom: 0.9,
+            roundPixels: false
         }
     ],
 

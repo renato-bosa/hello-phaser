@@ -35,7 +35,7 @@ class GameScene extends Phaser.Scene {
             'black', 'green-flag', 'yellow-flag', 'lava', 'lava-roxa',
             'lava-roxa-animated', 'trampoline', 'abstract-blue',
             'starry-sky', 'grass-floating-platform-middle', 'grass-floating-platform-edges',
-            'lava-bubbles-4fps'
+            'lava-bubbles-4fps', 'blue-bricks2', 'green-bricks'
         ];
         tilesets.forEach(name => {
             const fileName = name === 'trampoline' ? 'trampoline-thick' : name;

@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map-3--desafio do luigi.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -92,17 +92,20 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.33,
+            "scale": 1,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1540.9090909090908,
-                "y": 836.3636363636365
+                "x": 261.5,
+                "y": 886
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#blue-bricks2": {
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx#bricks": {
@@ -116,6 +119,10 @@
         },
         "dev-resources/map-3--desafio do luigi.tmx#grass-floating-platform-middle": {
             "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#green-bricks": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx#green-flag": {
             "scaleInDock": 1
@@ -203,14 +210,15 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
+        "dev-resources/map-2--expansion and speed.tmx",
         "dev-resources/map-3--desafio do luigi.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map-2--expansion and speed.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map.tmx",
-        "dev-resources/map-2--expansion and speed.tmx",
         "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx"
     ],
     "tileset.embedInMap": true

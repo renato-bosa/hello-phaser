@@ -31,6 +31,13 @@ const GameData = {
             name: 'Desafio do Luigi',
             zoom: 0.9,
             roundPixels: false
+        },
+        {
+            key: 'map4',
+            file: 'assets/map-4--big-jumps.json',
+            name: 'Big Jump',
+            zoom: 0.9,
+            roundPixels: false
         }
     ],
 

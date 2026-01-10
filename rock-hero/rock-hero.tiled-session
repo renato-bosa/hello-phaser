@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-3--desafio do luigi.tmx",
+    "activeFile": "dev-resources/map-4--big-jumps.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -155,6 +155,71 @@
         "dev-resources/map-3--desafio do luigi.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-4--big-jumps.tmx": {
+            "expandedObjectLayers": [
+                8
+            ],
+            "scale": 0.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 2471,
+                "y": 462
+            }
+        },
+        "dev-resources/map-4--big-jumps.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#grass-floating-platform-edges": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#grass-floating-platform-middle": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#green-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#lava": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#lava-roxa": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#starry-sky": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-4--big-jumps.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "dev-resources/map.tmx": {
             "expandedObjectLayers": [
                 8
@@ -211,12 +276,13 @@
     "map.width": 20,
     "openFiles": [
         "dev-resources/map-2--expansion and speed.tmx",
-        "dev-resources/map-3--desafio do luigi.tmx"
+        "dev-resources/map-4--big-jumps.tmx"
     ],
     "project": "rock-hero.tiled-project",
-    "property.type": "bool",
+    "property.type": "string",
     "recentFiles": [
         "dev-resources/map-2--expansion and speed.tmx",
+        "dev-resources/map-4--big-jumps.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map.tmx",
         "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx"

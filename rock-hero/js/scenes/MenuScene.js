@@ -155,6 +155,21 @@ class MenuScene extends Phaser.Scene {
         this.menuButtons.push(this.newGameBtn);
         yOffset += 30;
 
+        // Botão "Personagem" (se houver mais de 1 desbloqueado)
+        const unlockedChars = GameData.getAvailableCharacters();
+        if (unlockedChars.length > 1) {
+            const currentChar = GameData.getCharacter(GameData.loadSelectedCharacter());
+            this.characterBtn = this.createButton(
+                this.centerX, 
+                this.centerY + yOffset, 
+                `🎸 ${currentChar.name.toUpperCase()}`,
+                '#ff66ff',
+                () => this.openCharacterSelect()
+            );
+            this.menuButtons.push(this.characterBtn);
+            yOffset += 30;
+        }
+
         // Botão "Ranking"
         this.rankingBtn = this.createButton(
             this.centerX, 
@@ -315,6 +330,13 @@ class MenuScene extends Phaser.Scene {
             // Vai ao mapa do mundo
             this.scene.start('WorldMapScene');
         }
+    }
+
+    openCharacterSelect() {
+        SoundManager.play('menuSelect');
+        this.scene.start('CharacterSelectScene', {
+            returnTo: 'MenuScene'
+        });
     }
 
     showNameInput() {

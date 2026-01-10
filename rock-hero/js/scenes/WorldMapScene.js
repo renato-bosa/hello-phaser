@@ -261,10 +261,14 @@ class WorldMapScene extends Phaser.Scene {
         this.add.rectangle(width / 2, panelY, width - 20, 50, 0x000000, 0.7)
             .setStrokeStyle(2, 0x444444);
         
-        // Instruções
-        const controls = [
+        // Instruções (detecta mobile)
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const controls = isMobile ? [
             { key: '← →', action: 'Navegar' },
-            { key: 'ENTER', action: 'Jogar' },
+            { key: 'PULO', action: 'Jogar' }
+        ] : [
+            { key: '← →', action: 'Navegar' },
+            { key: 'ESPAÇO', action: 'Jogar' },
             { key: 'P', action: 'Personagem' },
             { key: 'ESC', action: 'Menu' }
         ];
@@ -369,6 +373,25 @@ class WorldMapScene extends Phaser.Scene {
         
         // Voltar ao menu
         this.input.keyboard.on('keydown-ESC', () => this.backToMenu());
+        
+        // Suporte a controles virtuais (mobile)
+        this.virtualControls = GameData.getVirtualControls();
+        this.time.addEvent({
+            delay: 100,
+            loop: true,
+            callback: () => {
+                if (this.virtualControls.jumpJustPressed) {
+                    this.virtualControls.jumpJustPressed = false;
+                    this.selectLevel();
+                }
+                if (this.virtualControls.left) {
+                    this.navigateLevel(-1);
+                }
+                if (this.virtualControls.right) {
+                    this.navigateLevel(1);
+                }
+            }
+        });
     }
 
     navigateLevel(direction) {

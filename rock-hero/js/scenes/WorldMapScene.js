@@ -374,24 +374,28 @@ class WorldMapScene extends Phaser.Scene {
         // Voltar ao menu
         this.input.keyboard.on('keydown-ESC', () => this.backToMenu());
         
-        // Suporte a controles virtuais (mobile)
+        // Suporte a controles virtuais (mobile) - verificado no update()
         this.virtualControls = GameData.getVirtualControls();
-        this.time.addEvent({
-            delay: 100,
-            loop: true,
-            callback: () => {
-                if (this.virtualControls.jumpJustPressed) {
-                    this.virtualControls.jumpJustPressed = false;
-                    this.selectLevel();
-                }
-                if (this.virtualControls.left) {
-                    this.navigateLevel(-1);
-                }
-                if (this.virtualControls.right) {
-                    this.navigateLevel(1);
-                }
+        this.lastNavTime = 0;
+    }
+
+    update(time) {
+        // Controles virtuais mobile (mais eficiente que timer separado)
+        if (this.virtualControls.jumpJustPressed) {
+            this.virtualControls.jumpJustPressed = false;
+            this.selectLevel();
+        }
+        
+        // Navegação com throttle (evita repetição muito rápida)
+        if (time - this.lastNavTime > 200) {
+            if (this.virtualControls.left) {
+                this.navigateLevel(-1);
+                this.lastNavTime = time;
+            } else if (this.virtualControls.right) {
+                this.navigateLevel(1);
+                this.lastNavTime = time;
             }
-        });
+        }
     }
 
     navigateLevel(direction) {

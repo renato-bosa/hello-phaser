@@ -57,6 +57,16 @@ class MenuScene extends Phaser.Scene {
         this.overlayElements = [];
     }
 
+    update() {
+        // Controles virtuais mobile (mais eficiente que timer separado)
+        if (this.currentView === 'menu' && this.virtualControls && this.handleSelectFn) {
+            if (this.virtualControls.jumpJustPressed) {
+                this.virtualControls.jumpJustPressed = false;
+                this.handleSelectFn();
+            }
+        }
+    }
+
     // ==================== CRIAÇÃO DE UI ====================
 
     createBackground() {
@@ -288,6 +298,10 @@ class MenuScene extends Phaser.Scene {
 
         enterKey.on('down', handleSelect);
         spaceKey.on('down', handleSelect);
+        
+        // Suporte a controles virtuais (mobile) - verificado no update()
+        this.virtualControls = GameData.getVirtualControls();
+        this.handleSelectFn = handleSelect;
 
         // ESC para voltar
         escKey.on('down', () => {

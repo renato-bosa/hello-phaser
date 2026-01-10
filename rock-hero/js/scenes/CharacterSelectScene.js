@@ -199,6 +199,9 @@ class CharacterSelectScene extends Phaser.Scene {
         this.add.rectangle(centerX, panelY, 500, 50, 0x000000, 0.7)
             .setStrokeStyle(2, 0x444444);
         
+        // Detecta mobile
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        
         // Instruções
         this.add.text(centerX - 150, panelY, '← →  Navegar', {
             fontFamily: '"Press Start 2P", monospace',
@@ -206,18 +209,20 @@ class CharacterSelectScene extends Phaser.Scene {
             color: '#ffff00'
         }).setOrigin(0.5);
         
-        this.add.text(centerX + 50, panelY, 'ENTER  Confirmar', {
+        this.add.text(centerX + 50, panelY, isMobile ? 'PULO  Confirmar' : 'ESPAÇO  Confirmar', {
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '10px',
             color: '#00ff00'
         }).setOrigin(0.5);
         
-        // ESC para voltar
-        this.add.text(centerX + 200, panelY, 'ESC  Voltar', {
-            fontFamily: '"Press Start 2P", monospace',
-            fontSize: '10px',
-            color: '#ff6666'
-        }).setOrigin(0.5);
+        // ESC para voltar (só mostra no desktop)
+        if (!isMobile) {
+            this.add.text(centerX + 200, panelY, 'ESC  Voltar', {
+                fontFamily: '"Press Start 2P", monospace',
+                fontSize: '10px',
+                color: '#ff6666'
+            }).setOrigin(0.5);
+        }
     }
 
     createAnimations() {
@@ -264,6 +269,29 @@ class CharacterSelectScene extends Phaser.Scene {
         
         // Voltar
         this.input.keyboard.on('keydown-ESC', () => this.goBack());
+        
+        // Suporte a controles virtuais (mobile) - verificado no update()
+        this.virtualControls = GameData.getVirtualControls();
+        this.lastNavTime = 0;
+    }
+
+    update(time) {
+        // Controles virtuais mobile (mais eficiente que timer separado)
+        if (this.virtualControls.jumpJustPressed) {
+            this.virtualControls.jumpJustPressed = false;
+            this.confirmSelection();
+        }
+        
+        // Navegação com throttle
+        if (time - this.lastNavTime > 200) {
+            if (this.virtualControls.left) {
+                this.navigate(-1);
+                this.lastNavTime = time;
+            } else if (this.virtualControls.right) {
+                this.navigate(1);
+                this.lastNavTime = time;
+            }
+        }
     }
 
     navigate(direction) {

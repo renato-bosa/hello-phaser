@@ -71,6 +71,17 @@ class WorldCompleteScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-ENTER', () => this.continue());
         this.input.keyboard.on('keydown-SPACE', () => this.continue());
         this.input.keyboard.on('keydown-ESC', () => this.continue());
+        
+        // Suporte a controles virtuais (mobile) - verificado no update()
+        this.virtualControls = GameData.getVirtualControls();
+    }
+
+    update() {
+        // Controles virtuais mobile (mais eficiente que timer separado)
+        if (this.virtualControls && this.virtualControls.jumpJustPressed) {
+            this.virtualControls.jumpJustPressed = false;
+            this.continue();
+        }
     }
 
     createBackground(width, height) {

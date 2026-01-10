@@ -51,6 +51,8 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('star', 'assets/spritesheets/yellow-star-animated.png', {
             frameWidth: 32, frameHeight: 32
         });
+        
+        // Sprites do Vocalista (personagem padrão)
         this.load.spritesheet('hero-idle', 'assets/spritesheets/still-hero.png', {
             frameWidth: 32, frameHeight: 32
         });
@@ -58,6 +60,17 @@ class GameScene extends Phaser.Scene {
             frameWidth: 32, frameHeight: 32
         });
         this.load.spritesheet('hero-jump', 'assets/spritesheets/jumping-hero.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+        
+        // Sprites do Baterista
+        this.load.spritesheet('baterista-idle', 'assets/spritesheets/baterista.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+        this.load.spritesheet('baterista-walk', 'assets/spritesheets/baterista-andando-pra-direita-6fps.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+        this.load.spritesheet('baterista-walk-left', 'assets/spritesheets/baterista-andando-pra-esq-6fps.png', {
             frameWidth: 32, frameHeight: 32
         });
     }
@@ -383,7 +396,14 @@ class GameScene extends Phaser.Scene {
     // ==================== JOGADOR ====================
 
     createPlayer() {
-        this.player = this.physics.add.sprite(this.playerSpawn.x, this.playerSpawn.y, 'hero-idle');
+        // Obtém o personagem selecionado
+        this.selectedCharacter = GameData.loadSelectedCharacter();
+        const characterData = GameData.getCharacter(this.selectedCharacter);
+        
+        // Determina sprite inicial baseado no personagem
+        const idleSprite = this.selectedCharacter === 'baterista' ? 'baterista-idle' : 'hero-idle';
+        
+        this.player = this.physics.add.sprite(this.playerSpawn.x, this.playerSpawn.y, idleSprite);
         this.player.setBounce(0);
         this.player.body.setMaxVelocity(400, 1000);
         this.player.body.setSize(14, 30);
@@ -393,25 +413,49 @@ class GameScene extends Phaser.Scene {
     }
 
     createAnimations() {
-        const anims = [
-            { key: 'idle', texture: 'hero-idle', frames: [0, 3], rate: 6 },
-            { key: 'walk', texture: 'hero-walk', frames: [0, 3], rate: 14 },
-            { key: 'star-spin', texture: 'star', frames: [0, 8], rate: 12 }
-        ];
-
-        anims.forEach(anim => {
-            if (!this.anims.exists(anim.key)) {
+        // Animações baseadas no personagem selecionado
+        let playerAnims;
+        
+        if (this.selectedCharacter === 'baterista') {
+            playerAnims = [
+                { key: 'idle', texture: 'baterista-idle', frames: [0, 0], rate: 6 },
+                { key: 'walk', texture: 'baterista-walk', frames: [0, 3], rate: 6 },
+                { key: 'walk-left', texture: 'baterista-walk-left', frames: [0, 3], rate: 6 }
+            ];
+        } else {
+            // Vocalista (padrão)
+            playerAnims = [
+                { key: 'idle', texture: 'hero-idle', frames: [0, 3], rate: 6 },
+                { key: 'walk', texture: 'hero-walk', frames: [0, 3], rate: 14 }
+            ];
+        }
+        
+        // Cria animações do personagem
+        playerAnims.forEach(anim => {
+            // Remove animação existente para recriar com sprite correto
+            if (this.anims.exists(anim.key)) {
+                this.anims.remove(anim.key);
+            }
             this.anims.create({
-                    key: anim.key,
-                    frames: this.anims.generateFrameNumbers(anim.texture, { 
-                        start: anim.frames[0], 
-                        end: anim.frames[1] 
-                    }),
-                    frameRate: anim.rate,
+                key: anim.key,
+                frames: this.anims.generateFrameNumbers(anim.texture, { 
+                    start: anim.frames[0], 
+                    end: anim.frames[1] 
+                }),
+                frameRate: anim.rate,
+                repeat: -1
+            });
+        });
+        
+        // Animação de estrela (comum para todos)
+        if (!this.anims.exists('star-spin')) {
+            this.anims.create({
+                key: 'star-spin',
+                frames: this.anims.generateFrameNumbers('star', { start: 0, end: 8 }),
+                frameRate: 12,
                 repeat: -1
             });
         }
-        });
 
         this.player.anims.play('idle', true);
 
@@ -595,8 +639,19 @@ class GameScene extends Phaser.Scene {
         if (direction !== 0) {
             this.currentSpeed = Math.min(this.currentSpeed + ACCELERATION * dt, MAX_SPEED);
             player.setVelocityX(direction * this.currentSpeed);
-            player.setFlipX(direction < 0);
-            if (onGround) player.anims.play('walk', true);
+            
+            // Para baterista, usa animação específica de direção
+            // Para outros personagens, usa flip
+            if (this.selectedCharacter === 'baterista') {
+                player.setFlipX(false); // Não usa flip
+            if (onGround) {
+                    const walkAnim = direction < 0 ? 'walk-left' : 'walk';
+                    player.anims.play(walkAnim, true);
+            }
+        } else {
+                player.setFlipX(direction < 0);
+                if (onGround) player.anims.play('walk', true);
+            }
         } else {
             player.setVelocityX(0);
             if (onGround) player.anims.play('idle', true);
@@ -654,7 +709,13 @@ class GameScene extends Phaser.Scene {
         // Animação no ar
         if (!onGround) {
             player.anims.stop();
-            player.setTexture('hero-jump', player.body.velocity.y < 0 ? 1 : 2);
+            if (this.selectedCharacter === 'baterista') {
+                // Baterista usa sprite parado quando no ar (por enquanto)
+                player.setTexture('baterista-idle', 0);
+            } else {
+                // Vocalista tem sprite de pulo
+                player.setTexture('hero-jump', player.body.velocity.y < 0 ? 1 : 2);
+            }
         }
     }
 
@@ -780,6 +841,9 @@ class GameScene extends Phaser.Scene {
         
         const finalTime = this.elapsedTime;
         
+        // Marca a fase como completa
+        GameData.markLevelComplete(this.currentLevel);
+        
         // Salva o tempo (sempre tenta, retorna info sobre posição)
         const result = GameData.saveRecord(this.currentLevel, finalTime, this.playerName);
         
@@ -837,6 +901,9 @@ class GameScene extends Phaser.Scene {
         const centerY = this.cameras.main.centerY;
         const nextLevel = this.currentLevel + 1;
         const hasNextLevel = nextLevel < GameData.LEVELS.length;
+        
+        // Verifica se esta fase completa um mundo
+        const completedWorld = GameData.checkWorldCompletion(this.currentLevel);
 
         // Overlay
         const overlay = this.add.rectangle(centerX, centerY, 640, 400, 0x000000, 0.8)
@@ -856,8 +923,14 @@ class GameScene extends Phaser.Scene {
         }
         const timeColor = result.saved ? '#ffd700' : '#ffffff';
 
+        // Se completou um mundo, mostra tela de comemoração
+        if (completedWorld) {
+            this.showWorldCompleteTransition(centerX, centerY, finalTime, rankLabel, timeColor, completedWorld, continueText);
+            return;
+        }
+
         if (hasNextLevel) {
-            // Fase completa
+            // Fase completa (sem completar mundo)
             this.add.text(centerX, centerY - 60, '✅ FASE COMPLETA!', {
                 fontSize: '32px', fontFamily: 'Arial', color: '#00ff00',
                 stroke: '#000000', strokeThickness: 4
@@ -872,14 +945,14 @@ class GameScene extends Phaser.Scene {
                 fontSize: '16px', fontFamily: 'Arial', color: '#ffffff'
             }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
 
-            // Próxima fase
-            const handleNext = () => {
-                GameData.saveProgress(nextLevel, this.playerName);
-                this.scene.restart({ level: nextLevel, playerName: this.playerName });
+            // Volta ao mapa do mundo
+            const handleContinue = () => {
+                GameData.saveMapPosition(GameData.state.currentWorld, nextLevel);
+                this.scene.start('WorldMapScene');
             };
 
-            this.input.keyboard.once('keydown-SPACE', handleNext);
-            this.input.keyboard.once('keydown-ENTER', handleNext);
+            this.input.keyboard.once('keydown-SPACE', handleContinue);
+            this.input.keyboard.once('keydown-ENTER', handleContinue);
             
             // Suporte mobile
             this.time.addEvent({
@@ -888,12 +961,12 @@ class GameScene extends Phaser.Scene {
                 callback: () => {
                     if (this.virtualControls.jumpJustPressed) {
                         this.virtualControls.jumpJustPressed = false;
-                        handleNext();
+                        handleContinue();
                     }
                 }
             });
         } else {
-            // Jogo completo!
+            // Jogo completo (sem mais mundos por enquanto)
             this.add.text(centerX, centerY - 80, '🎉 VOCÊ ZEROU O JOGO! 🎉', {
                 fontSize: '28px', fontFamily: 'Arial', color: '#ffff00',
                 stroke: '#000000', strokeThickness: 4
@@ -912,18 +985,17 @@ class GameScene extends Phaser.Scene {
                 }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
             }
 
-            this.add.text(centerX, centerY + 55, `${continueText} para voltar ao menu`, {
+            this.add.text(centerX, centerY + 55, `${continueText} para voltar ao mapa`, {
                 fontSize: '16px', fontFamily: 'Arial', color: '#ffffff'
             }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
 
-            // Volta ao menu
-            const handleMenu = () => {
-                GameData.clearProgress();
-                this.scene.start('MenuScene');
+            // Volta ao mapa do mundo
+            const handleBackToMap = () => {
+                this.scene.start('WorldMapScene');
             };
 
-            this.input.keyboard.once('keydown-SPACE', handleMenu);
-            this.input.keyboard.once('keydown-ENTER', handleMenu);
+            this.input.keyboard.once('keydown-SPACE', handleBackToMap);
+            this.input.keyboard.once('keydown-ENTER', handleBackToMap);
             
             // Suporte mobile
             this.time.addEvent({
@@ -932,11 +1004,71 @@ class GameScene extends Phaser.Scene {
                 callback: () => {
                     if (this.virtualControls.jumpJustPressed) {
                         this.virtualControls.jumpJustPressed = false;
-                        handleMenu();
+                        handleBackToMap();
                     }
                 }
             });
         }
+    }
+    
+    /**
+     * Mostra transição quando um mundo é completado
+     */
+    showWorldCompleteTransition(centerX, centerY, finalTime, rankLabel, timeColor, world, continueText) {
+        // Mensagem de fase completa
+        this.add.text(centerX, centerY - 70, '✅ FASE COMPLETA!', {
+            fontSize: '28px', fontFamily: 'Arial', color: '#00ff00',
+            stroke: '#000000', strokeThickness: 4
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+
+        this.add.text(centerX, centerY - 30, `⏱ Tempo: ${GameData.formatTime(finalTime)}${rankLabel}`, {
+            fontSize: '18px', fontFamily: 'monospace', color: timeColor,
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+
+        // Mensagem especial de mundo completo
+        const worldText = this.add.text(centerX, centerY + 20, `🌟 ${world.name.toUpperCase()} COMPLETO! 🌟`, {
+            fontSize: '20px', fontFamily: 'Arial', color: '#ffd700',
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+
+        // Animação de destaque
+        this.tweens.add({
+            targets: worldText,
+            scale: { from: 1, to: 1.1 },
+            duration: 400,
+            yoyo: true,
+            repeat: -1
+        });
+
+        this.add.text(centerX, centerY + 65, `${continueText} para ver a recompensa!`, {
+            fontSize: '14px', fontFamily: 'Arial', color: '#ffffff'
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
+
+        // Handler para ir à tela de comemoração
+        const handleWorldComplete = () => {
+            GameData.clearProgress(); // Limpa progresso do mundo
+            this.scene.start('WorldCompleteScene', {
+                world: world,
+                playerName: this.playerName,
+                totalTime: finalTime
+            });
+        };
+
+        this.input.keyboard.once('keydown-SPACE', handleWorldComplete);
+        this.input.keyboard.once('keydown-ENTER', handleWorldComplete);
+        
+        // Suporte mobile
+        this.time.addEvent({
+            delay: 100,
+            loop: true,
+            callback: () => {
+                if (this.virtualControls.jumpJustPressed) {
+                    this.virtualControls.jumpJustPressed = false;
+                    handleWorldComplete();
+                }
+            }
+        });
     }
     
     // ==================== PAUSE ====================

@@ -129,13 +129,14 @@ class MenuScene extends Phaser.Scene {
 
         // Botão "Continuar" (se houver progresso)
         if (hasProgress) {
-            const progress = GameData.loadProgress();
-            const levelName = GameData.LEVELS[progress.level]?.name || `Fase ${progress.level + 1}`;
+            const completedLevels = GameData.getCompletedLevels();
+            const completedCount = completedLevels.length;
+            const totalLevels = GameData.LEVELS.length;
             
             this.continueBtn = this.createButton(
                 this.centerX, 
                 this.centerY + yOffset, 
-                `Continuar (${levelName})`,
+                `CONTINUAR (${completedCount}/${totalLevels} fases)`,
                 '#00ffff',
                 () => this.continueGame()
             );
@@ -311,11 +312,8 @@ class MenuScene extends Phaser.Scene {
             GameData.state.currentLevel = progress.level;
             GameData.state.playerName = progress.playerName;
             
-            // Inicia a cena do jogo
-            this.scene.start('GameScene', {
-                level: progress.level,
-                playerName: progress.playerName
-            });
+            // Vai ao mapa do mundo
+            this.scene.start('WorldMapScene');
         }
     }
 
@@ -382,17 +380,14 @@ class MenuScene extends Phaser.Scene {
         const handleSubmit = () => {
             const playerName = inputElement.value.trim() || 'Anônimo';
             
-            // Salva e inicia
-            GameData.saveProgress(0, playerName);
+            // Salva nome do jogador
+            GameData.savePlayerName(playerName);
             
             // Remove input HTML
             document.body.removeChild(inputElement);
             
-            // Inicia o jogo
-            this.scene.start('GameScene', {
-                level: 0,
-                playerName: playerName
-            });
+            // Vai ao mapa do mundo
+            this.scene.start('WorldMapScene');
         };
 
         inputElement.addEventListener('keydown', (e) => {

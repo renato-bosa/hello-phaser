@@ -29,7 +29,7 @@ const config = {
     },
     
     // Ordem: MenuScene primeiro (cena inicial)
-    scene: [MenuScene, GameScene]
+    scene: [MenuScene, WorldMapScene, CharacterSelectScene, GameScene, WorldCompleteScene]
 };
 
 // Inicia o jogo

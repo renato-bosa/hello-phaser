@@ -9,6 +9,51 @@
  */
 
 const GameData = {
+    // ==================== PERSONAGENS ====================
+    CHARACTERS: [
+        {
+            id: 'vocalista',
+            name: 'Vocalista',
+            instrument: 'Voz',
+            unlockedByDefault: true,
+            sprites: {
+                idle: 'hero-idle',
+                walk: 'hero-walking',
+                jump: 'hero-jumping'
+            }
+        },
+        {
+            id: 'baterista',
+            name: 'Baterista',
+            instrument: 'Bateria',
+            unlockedByDefault: false,
+            unlockedByWorld: 1,
+            sprites: {
+                idle: 'baterista-idle',
+                walk: 'baterista-walking',
+                jump: 'baterista-idle' // TODO: criar sprite de pulo
+            }
+        }
+        // Futuros personagens: guitarrista, baixista, tecladista...
+    ],
+
+    // ==================== MUNDOS ====================
+    WORLDS: [
+        {
+            id: 1,
+            name: 'Mundo 1',
+            subtitle: 'O Resgate do Baterista',
+            levels: [0, 1, 2, 3], // Índices das fases (0-3 = fases 1-4)
+            rescuedCharacter: 'baterista',
+            celebrationMessage: 'Você resgatou o Baterista!',
+            // Visual no WorldMap
+            theme: 'grass',
+            bgColor: 0x87CEEB, // Azul céu
+            pathColor: 0x8B4513 // Marrom terra
+        }
+        // Futuros mundos...
+    ],
+
     // Configuração das fases
     LEVELS: [
         { 
@@ -16,28 +61,41 @@ const GameData = {
             file: 'assets/map.json', 
             name: 'Fase 1',
             zoom: 1.0,
-            roundPixels: true
+            roundPixels: true,
+            world: 1,
+            // Posição no WorldMap (relativa ao mundo)
+            mapPosition: { x: 80, y: 200 },
+            connectsTo: [1] // Conecta à fase 2
         },
         { 
             key: 'map2', 
             file: 'assets/map-2--expansion and speed.json', 
             name: 'Fase 2',
             zoom: 0.9,
-            roundPixels: false
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 200, y: 180 },
+            connectsTo: [2]
         },
         { 
             key: 'map3', 
             file: 'assets/map-3--desafio do luigi.json', 
             name: 'Desafio do Luigi',
             zoom: 0.9,
-            roundPixels: false
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 340, y: 220 },
+            connectsTo: [3]
         },
         {
             key: 'map4',
             file: 'assets/map-4--big-jumps.json',
             name: 'Big Jump',
             zoom: 0.9,
-            roundPixels: false
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 480, y: 180 },
+            connectsTo: [] // Última fase do mundo
         }
     ],
 
@@ -53,44 +111,172 @@ const GameData = {
     // Estado atual do jogo (em memória, não localStorage)
     state: {
         currentLevel: 0,
+        currentWorld: 1,
         playerName: 'Anônimo',
         isPaused: false,
         elapsedTime: 0,
+        selectedCharacter: 'vocalista',
+        mapCursorLevel: 0, // Posição do cursor no WorldMap
         // Referência à cena do jogo (para resume)
         gameSceneRef: null
     },
 
     // ==================== PROGRESSO ====================
     
-    saveProgress(level, playerName) {
-        localStorage.setItem('rockHero_savedLevel', level.toString());
+    /**
+     * Salva o nome do jogador
+     */
+    savePlayerName(playerName) {
         localStorage.setItem('rockHero_playerName', playerName);
-        // Atualiza estado em memória também
-        this.state.currentLevel = level;
         this.state.playerName = playerName;
     },
 
-    loadProgress() {
-        const savedLevel = localStorage.getItem('rockHero_savedLevel');
-        const savedPlayerName = localStorage.getItem('rockHero_playerName');
+    /**
+     * Carrega o nome do jogador
+     */
+    loadPlayerName() {
+        return localStorage.getItem('rockHero_playerName') || 'Anônimo';
+    },
+
+    /**
+     * Marca uma fase como completa
+     */
+    markLevelComplete(levelIndex) {
+        const key = 'rockHero_completedLevels';
+        let completed = this.getCompletedLevels();
         
-        if (savedLevel !== null && savedPlayerName !== null) {
-            return {
-                level: parseInt(savedLevel),
-                playerName: savedPlayerName
-            };
+        if (!completed.includes(levelIndex)) {
+            completed.push(levelIndex);
+            completed.sort((a, b) => a - b);
+            localStorage.setItem(key, JSON.stringify(completed));
         }
-        return null;
     },
 
+    /**
+     * Retorna lista de fases completadas
+     */
+    getCompletedLevels() {
+        const key = 'rockHero_completedLevels';
+        const stored = localStorage.getItem(key);
+        
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (e) {
+                return [];
+            }
+        }
+        return [];
+    },
+
+    /**
+     * Verifica se uma fase foi completada
+     */
+    isLevelComplete(levelIndex) {
+        return this.getCompletedLevels().includes(levelIndex);
+    },
+
+    /**
+     * Verifica se uma fase está desbloqueada
+     * - Fase 0 (primeira) sempre desbloqueada
+     * - Outras fases: fase anterior precisa estar completa
+     */
+    isLevelUnlocked(levelIndex) {
+        if (levelIndex === 0) return true;
+        
+        // Verifica se a fase anterior está completa
+        const level = this.LEVELS[levelIndex];
+        if (!level) return false;
+        
+        // Encontra a fase anterior no mesmo mundo
+        const world = this.getWorldForLevel(levelIndex);
+        if (!world) return false;
+        
+        const levelIndexInWorld = world.levels.indexOf(levelIndex);
+        if (levelIndexInWorld === 0) {
+            // Primeira fase do mundo - verifica se o mundo está desbloqueado
+            return this.isWorldUnlocked(world.id);
+        }
+        
+        // Verifica se a fase anterior está completa
+        const previousLevelIndex = world.levels[levelIndexInWorld - 1];
+        return this.isLevelComplete(previousLevelIndex);
+    },
+
+    /**
+     * Verifica se um mundo está desbloqueado
+     * - Mundo 1 sempre desbloqueado
+     * - Outros mundos: mundo anterior precisa estar completo
+     */
+    isWorldUnlocked(worldId) {
+        if (worldId === 1) return true;
+        
+        // Verifica se o mundo anterior está completo
+        const previousWorld = this.WORLDS.find(w => w.id === worldId - 1);
+        return previousWorld ? this.isWorldComplete(previousWorld.id) : false;
+    },
+
+    /**
+     * Retorna a próxima fase não-completa de um mundo
+     * (onde o jogador deve estar no mapa)
+     */
+    getNextUnlockedLevel(worldId) {
+        const world = this.WORLDS.find(w => w.id === worldId);
+        if (!world) return 0;
+        
+        for (const levelIndex of world.levels) {
+            if (!this.isLevelComplete(levelIndex)) {
+                return levelIndex;
+            }
+        }
+        
+        // Todas completas - retorna a última
+        return world.levels[world.levels.length - 1];
+    },
+
+    /**
+     * Verifica se há progresso salvo
+     */
     hasProgress() {
-        const progress = this.loadProgress();
-        return progress !== null && progress.level >= 0;
+        return this.getCompletedLevels().length > 0 || 
+               localStorage.getItem('rockHero_playerName') !== null;
     },
 
+    /**
+     * Limpa todo o progresso
+     */
     clearProgress() {
-        localStorage.removeItem('rockHero_savedLevel');
+        localStorage.removeItem('rockHero_completedLevels');
+        localStorage.removeItem('rockHero_completedWorlds');
+        localStorage.removeItem('rockHero_unlockedCharacters');
         this.state.currentLevel = 0;
+        this.state.currentWorld = 1;
+        this.state.mapCursorLevel = 0;
+    },
+
+    /**
+     * Compatibilidade: saveProgress (usado pelo GameScene)
+     */
+    saveProgress(level, playerName) {
+        this.savePlayerName(playerName);
+        // Não marca como completo aqui - isso é feito ao completar a fase
+        this.state.currentLevel = level;
+    },
+
+    /**
+     * Compatibilidade: loadProgress
+     */
+    loadProgress() {
+        const playerName = this.loadPlayerName();
+        const completedLevels = this.getCompletedLevels();
+        const nextLevel = completedLevels.length > 0 
+            ? Math.max(...completedLevels) + 1 
+            : 0;
+        
+        return {
+            level: Math.min(nextLevel, this.LEVELS.length - 1),
+            playerName: playerName
+        };
     },
 
     // ==================== RANKINGS ====================
@@ -212,6 +398,193 @@ const GameData = {
         } catch (e) {
             return '--/--/---- --:--';
         }
+    },
+
+    // ==================== MUNDOS E PERSONAGENS ====================
+
+    /**
+     * Verifica se completar esta fase conclui um mundo
+     * @param {number} levelIndex - Índice da fase completada
+     * @returns {object|null} - Dados do mundo completado ou null
+     */
+    checkWorldCompletion(levelIndex) {
+        for (const world of this.WORLDS) {
+            const lastLevelOfWorld = Math.max(...world.levels);
+            if (levelIndex === lastLevelOfWorld) {
+                return world;
+            }
+        }
+        return null;
+    },
+
+    /**
+     * Retorna o mundo ao qual uma fase pertence
+     */
+    getWorldForLevel(levelIndex) {
+        return this.WORLDS.find(w => w.levels.includes(levelIndex)) || null;
+    },
+
+    /**
+     * Desbloqueia um personagem
+     */
+    unlockCharacter(characterId) {
+        const unlockedKey = 'rockHero_unlockedCharacters';
+        let unlocked = this.getUnlockedCharacters();
+        
+        if (!unlocked.includes(characterId)) {
+            unlocked.push(characterId);
+            localStorage.setItem(unlockedKey, JSON.stringify(unlocked));
+        }
+    },
+
+    /**
+     * Retorna lista de personagens desbloqueados
+     */
+    getUnlockedCharacters() {
+        const unlockedKey = 'rockHero_unlockedCharacters';
+        const stored = localStorage.getItem(unlockedKey);
+        
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (e) {
+                return ['vocalista'];
+            }
+        }
+        
+        // Por padrão, apenas o vocalista está desbloqueado
+        return ['vocalista'];
+    },
+
+    /**
+     * Verifica se um personagem está desbloqueado
+     */
+    isCharacterUnlocked(characterId) {
+        const character = this.CHARACTERS.find(c => c.id === characterId);
+        if (!character) return false;
+        if (character.unlockedByDefault) return true;
+        return this.getUnlockedCharacters().includes(characterId);
+    },
+
+    /**
+     * Retorna dados de um personagem pelo ID
+     */
+    getCharacter(characterId) {
+        return this.CHARACTERS.find(c => c.id === characterId) || this.CHARACTERS[0];
+    },
+
+    /**
+     * Salva o personagem selecionado
+     */
+    saveSelectedCharacter(characterId) {
+        localStorage.setItem('rockHero_selectedCharacter', characterId);
+        this.state.selectedCharacter = characterId;
+    },
+
+    /**
+     * Carrega o personagem selecionado
+     */
+    loadSelectedCharacter() {
+        const saved = localStorage.getItem('rockHero_selectedCharacter');
+        if (saved && this.isCharacterUnlocked(saved)) {
+            this.state.selectedCharacter = saved;
+            return saved;
+        }
+        return 'vocalista';
+    },
+
+    /**
+     * Retorna lista de personagens desbloqueados com dados completos
+     */
+    getAvailableCharacters() {
+        return this.CHARACTERS.filter(c => this.isCharacterUnlocked(c.id));
+    },
+
+    /**
+     * Marca um mundo como completado
+     */
+    markWorldComplete(worldId) {
+        const key = 'rockHero_completedWorlds';
+        let completed = this.getCompletedWorlds();
+        
+        if (!completed.includes(worldId)) {
+            completed.push(worldId);
+            localStorage.setItem(key, JSON.stringify(completed));
+        }
+    },
+
+    /**
+     * Retorna lista de mundos completados
+     */
+    getCompletedWorlds() {
+        const key = 'rockHero_completedWorlds';
+        const stored = localStorage.getItem(key);
+        
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (e) {
+                return [];
+            }
+        }
+        return [];
+    },
+
+    /**
+     * Verifica se um mundo foi completado
+     */
+    isWorldComplete(worldId) {
+        return this.getCompletedWorlds().includes(worldId);
+    },
+
+    /**
+     * Salva a posição do cursor no mapa
+     */
+    saveMapPosition(worldId, levelIndex) {
+        localStorage.setItem('rockHero_mapWorld', worldId.toString());
+        localStorage.setItem('rockHero_mapLevel', levelIndex.toString());
+        this.state.currentWorld = worldId;
+        this.state.mapCursorLevel = levelIndex;
+    },
+
+    /**
+     * Carrega a posição do cursor no mapa
+     */
+    loadMapPosition() {
+        const worldId = parseInt(localStorage.getItem('rockHero_mapWorld')) || 1;
+        const levelIndex = parseInt(localStorage.getItem('rockHero_mapLevel')) || 0;
+        
+        // Valida se a posição é válida
+        const world = this.WORLDS.find(w => w.id === worldId);
+        if (!world || !this.isWorldUnlocked(worldId)) {
+            return { worldId: 1, levelIndex: 0 };
+        }
+        
+        // Valida se a fase está desbloqueada
+        if (!this.isLevelUnlocked(levelIndex)) {
+            return { worldId: worldId, levelIndex: this.getNextUnlockedLevel(worldId) };
+        }
+        
+        return { worldId, levelIndex };
+    },
+
+    /**
+     * Retorna as fases de um mundo com status de desbloqueio/completude
+     */
+    getWorldLevelsWithStatus(worldId) {
+        const world = this.WORLDS.find(w => w.id === worldId);
+        if (!world) return [];
+        
+        return world.levels.map(levelIndex => {
+            const level = this.LEVELS[levelIndex];
+            return {
+                ...level,
+                index: levelIndex,
+                isComplete: this.isLevelComplete(levelIndex),
+                isUnlocked: this.isLevelUnlocked(levelIndex),
+                bestTime: this.getBestTime(levelIndex)
+            };
+        });
     },
 
     // ==================== CONTROLES VIRTUAIS ====================

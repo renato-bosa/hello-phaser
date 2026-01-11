@@ -144,8 +144,11 @@ class WorldCompleteScene extends Phaser.Scene {
     }
 
     createTitle(centerX, centerY) {
-        // "MUNDO X COMPLETO!"
-        const titleText = this.add.text(centerX, centerY - 180, `🎉 ${this.worldData.name.toUpperCase()} COMPLETO! 🎉`, {
+        const { height } = this.cameras.main;
+        
+        // "MUNDO X COMPLETO!" - posicionado a 8% do topo
+        const titleY = height * 0.08;
+        const titleText = this.add.text(centerX, titleY, `🎉 ${this.worldData.name.toUpperCase()} COMPLETO! 🎉`, {
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '24px',
             color: '#ffd700',
@@ -176,7 +179,13 @@ class WorldCompleteScene extends Phaser.Scene {
     }
 
     createRescuedCharacter(centerX, centerY) {
+        const { height } = this.cameras.main;
         const character = GameData.getCharacter(this.worldData.rescuedCharacter);
+        
+        // Posições baseadas em percentual da altura
+        const spriteY = height * 0.38;      // 38% - sprite do personagem
+        const nameY = height * 0.58;        // 58% - nome
+        const instrumentY = height * 0.65;  // 65% - instrumento
         
         // Determina a sprite key e configuração baseado no personagem
         let spriteKey, frameRate, endFrame;
@@ -210,7 +219,7 @@ class WorldCompleteScene extends Phaser.Scene {
 
         // Círculo de luz atrás do personagem (cor baseada no personagem)
         const glowColor = character.id === 'guitarrista' ? 0xff6600 : 0xffd700;
-        const glow = this.add.circle(centerX, centerY - 30, 60, glowColor, 0.3);
+        const glow = this.add.circle(centerX, spriteY, 60, glowColor, 0.3);
         this.tweens.add({
             targets: glow,
             scale: { from: 1, to: 1.3 },
@@ -221,7 +230,7 @@ class WorldCompleteScene extends Phaser.Scene {
         });
 
         // Sprite do personagem
-        const sprite = this.add.sprite(centerX, centerY - 30, spriteKey);
+        const sprite = this.add.sprite(centerX, spriteY, spriteKey);
         sprite.setScale(4); // Escala maior para destaque
         sprite.play(animKey);
 
@@ -238,7 +247,7 @@ class WorldCompleteScene extends Phaser.Scene {
         });
 
         // Nome do personagem abaixo
-        const nameText = this.add.text(centerX, centerY + 50, character.name.toUpperCase(), {
+        const nameText = this.add.text(centerX, nameY, character.name.toUpperCase(), {
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '18px',
             color: '#ffffff',
@@ -254,7 +263,7 @@ class WorldCompleteScene extends Phaser.Scene {
         });
 
         // Instrumento
-        const instrumentText = this.add.text(centerX, centerY + 75, `🥁 ${character.instrument}`, {
+        const instrumentText = this.add.text(centerX, instrumentY, `🥁 ${character.instrument}`, {
             fontFamily: 'Arial',
             fontSize: '14px',
             color: '#aaaaaa',
@@ -271,7 +280,13 @@ class WorldCompleteScene extends Phaser.Scene {
     }
 
     createRescueMessage(centerX, centerY) {
-        const message = this.add.text(centerX, centerY + 110, this.worldData.celebrationMessage, {
+        const { height } = this.cameras.main;
+        
+        // Posições baseadas em percentual
+        const messageY = height * 0.20;    // 20% - acima do sprite
+        const unlockY = height * 0.72;     // 72%
+        
+        const message = this.add.text(centerX, messageY, this.worldData.celebrationMessage, {
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '12px',
             color: '#4ecdc4',
@@ -287,7 +302,7 @@ class WorldCompleteScene extends Phaser.Scene {
         });
 
         // Mensagem de personagem desbloqueado
-        const unlockMsg = this.add.text(centerX, centerY + 140, '✨ NOVO PERSONAGEM DESBLOQUEADO! ✨', {
+        const unlockMsg = this.add.text(centerX, unlockY, '✨ NOVO PERSONAGEM DESBLOQUEADO! ✨', {
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '10px',
             color: '#a855f7',
@@ -314,9 +329,12 @@ class WorldCompleteScene extends Phaser.Scene {
     }
 
     createStats(centerX, centerY) {
+        const { height } = this.cameras.main;
+        const statsY = height * 0.80; // 80%
+        
         // Tempo total do mundo
         if (this.totalTime > 0) {
-            const timeText = this.add.text(centerX, centerY + 170, 
+            const timeText = this.add.text(centerX, statsY, 
                 `Tempo Total: ${GameData.formatTime(this.totalTime)}`, {
                 fontFamily: 'Arial',
                 fontSize: '14px',
@@ -335,7 +353,8 @@ class WorldCompleteScene extends Phaser.Scene {
     }
 
     createContinueButton(centerX, centerY) {
-        const buttonY = centerY + 210;
+        const { height } = this.cameras.main;
+        const buttonY = height * 0.92; // 92% - próximo ao fundo
 
         // Botão de continuar
         const button = this.add.container(centerX, buttonY);

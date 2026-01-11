@@ -124,10 +124,10 @@ const GameData = {
         // ==================== MUNDO 2 ====================
         { 
             key: 'map5', 
-            file: 'assets/map.json', // TODO: criar mapa próprio
+            file: 'assets/map-5--caverna.json',
             name: 'Caverna Sombria',
-            zoom: 1.0,
-            roundPixels: true,
+            zoom: 0.9,
+            roundPixels: false,
             world: 2,
             mapPosition: { x: 80, y: 200 },
             connectsTo: [5]

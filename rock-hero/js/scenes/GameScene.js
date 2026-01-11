@@ -35,7 +35,7 @@ class GameScene extends Phaser.Scene {
             'black', 'green-flag', 'yellow-flag', 'lava', 'lava-roxa',
             'lava-roxa-animated', 'trampoline', 'abstract-blue',
             'starry-sky', 'grass-floating-platform-middle', 'grass-floating-platform-edges',
-            'lava-bubbles-4fps', 'blue-bricks2', 'green-bricks'
+            'lava-bubbles-4fps', 'blue-bricks2', 'green-bricks', 'pedra'
         ];
         tilesets.forEach(name => {
             const fileName = name === 'trampoline' ? 'trampoline-thick' : name;
@@ -46,6 +46,10 @@ class GameScene extends Phaser.Scene {
         this.load.image('trampoline-thick', 'assets/spritesheets/trampoline-thick.png');
         this.load.image('yellow-star-animated', 'assets/spritesheets/yellow-star-animated.png');
         this.load.image('still-hero (2)', 'assets/spritesheets/still-hero.png');
+        
+        // Tilesets do Mundo 2 (Caverna)
+        this.load.image('cristal das notas de som', 'assets/spritesheets/cristal das notas de som.png');
+        this.load.image('grama noturna', 'assets/spritesheets/grama noturna.png');
 
         // Spritesheets
         this.load.spritesheet('star', 'assets/spritesheets/yellow-star-animated.png', {
@@ -256,6 +260,12 @@ class GameScene extends Phaser.Scene {
         if (floatingPlatformEdges) {
             this.solidsLayer.setCollision(floatingPlatformEdges.firstgid);
         }
+        
+        // Adiciona colisão para tiles do Mundo 2 (Caverna)
+        const gramaNortuna = map.tilesets.find(ts => ts.name === 'grama noturna');
+        if (gramaNortuna) {
+            this.solidsLayer.setCollision(gramaNortuna.firstgid);
+        }
 
         // Animação de tiles
         const lavaAnimatedTileset = map.tilesets.find(ts => ts.name === 'lava-roxa-animated');
@@ -282,7 +292,7 @@ class GameScene extends Phaser.Scene {
         objectsLayer.objects.forEach(obj => {
             const type = obj.properties?.find(p => p.name === 'type')?.value;
 
-            if (type === 'player_spawn') {
+            if (type === 'player_spawn' || type === 'player-spawn') {
                 this.playerSpawn = { x: obj.x + 16, y: obj.y - 16 };
             } else if (type === 'goal') {
                 this.goalPosition = { x: obj.x + 16, y: obj.y - 16 };

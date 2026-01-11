@@ -66,13 +66,24 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     createBackgroundDecoration(width, height) {
+        const theme = this.worldData?.theme || 'grass';
+        
+        if (theme === 'cave') {
+            // Tema caverna/noturno
+            this.createCaveDecoration(width, height);
+        } else {
+            // Tema padrão (grama)
+            this.createGrassDecoration(width, height);
+        }
+    }
+
+    createGrassDecoration(width, height) {
         // Nuvens decorativas
         for (let i = 0; i < 5; i++) {
             const x = Phaser.Math.Between(50, width - 50);
             const y = Phaser.Math.Between(30, 100);
             const cloud = this.add.ellipse(x, y, 80, 40, 0xffffff, 0.7);
             
-            // Animação suave de movimento
             this.tweens.add({
                 targets: cloud,
                 x: cloud.x + Phaser.Math.Between(-20, 20),
@@ -97,6 +108,70 @@ class WorldMapScene extends Phaser.Scene {
                 10, 0,
                 0x32CD32
             ).setOrigin(0, 1);
+        }
+    }
+
+    createCaveDecoration(width, height) {
+        // Estrelas/cristais no céu noturno
+        for (let i = 0; i < 30; i++) {
+            const x = Phaser.Math.Between(10, width - 10);
+            const y = Phaser.Math.Between(70, height - 100);
+            const size = Phaser.Math.Between(1, 3);
+            const star = this.add.circle(x, y, size, 0xffffff, Phaser.Math.FloatBetween(0.3, 0.8));
+            
+            // Animação de brilho
+            this.tweens.add({
+                targets: star,
+                alpha: { from: star.alpha, to: Phaser.Math.FloatBetween(0.1, 0.5) },
+                duration: Phaser.Math.Between(1000, 3000),
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+        }
+        
+        // Cristais roxos decorativos
+        for (let i = 0; i < 8; i++) {
+            const x = Phaser.Math.Between(50, width - 50);
+            const baseY = height - 60;
+            const crystalHeight = Phaser.Math.Between(15, 35);
+            
+            // Cristal (triângulo)
+            const crystal = this.add.triangle(
+                x, baseY,
+                0, 0,
+                Phaser.Math.Between(5, 12), -crystalHeight,
+                Phaser.Math.Between(10, 20), 0,
+                Phaser.Math.Between(0x6a0dad, 0x9932cc),
+                0.7
+            ).setOrigin(0.5, 1);
+            
+            // Brilho do cristal
+            this.tweens.add({
+                targets: crystal,
+                alpha: { from: 0.5, to: 0.9 },
+                duration: Phaser.Math.Between(1500, 2500),
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+        }
+        
+        // Chão rochoso
+        const groundHeight = 60;
+        this.add.rectangle(0, height - groundHeight, width, groundHeight, 0x2d2d3d).setOrigin(0);
+        
+        // Pedras decorativas
+        for (let x = 0; x < width; x += Phaser.Math.Between(30, 60)) {
+            const rockWidth = Phaser.Math.Between(15, 40);
+            const rockHeight = Phaser.Math.Between(8, 20);
+            this.add.ellipse(
+                x + rockWidth/2, 
+                height - groundHeight + rockHeight/2, 
+                rockWidth, 
+                rockHeight, 
+                Phaser.Math.Between(0x3d3d4d, 0x4d4d5d)
+            );
         }
     }
 

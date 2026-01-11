@@ -21,11 +21,20 @@ class WorldCompleteScene extends Phaser.Scene {
         const character = GameData.getCharacter(this.worldData.rescuedCharacter);
         
         if (character.id === 'baterista') {
-            // Spritesheet do baterista (idle/walking para animação)
+            // Spritesheet do baterista
             this.load.spritesheet('baterista-idle', 'assets/spritesheets/baterista-andando-pra-direita-6fps.png', {
                 frameWidth: 32,
                 frameHeight: 32
             });
+        } else if (character.id === 'guitarrista') {
+            // Guitarrista usa sprites do vocalista como placeholder
+            // Os sprites já são carregados pelo GameScene, então verificamos se existem
+            if (!this.textures.exists('hero-idle')) {
+                this.load.spritesheet('hero-idle', 'assets/spritesheets/still-hero.png', {
+                    frameWidth: 32,
+                    frameHeight: 32
+                });
+            }
         }
     }
 
@@ -169,18 +178,39 @@ class WorldCompleteScene extends Phaser.Scene {
     createRescuedCharacter(centerX, centerY) {
         const character = GameData.getCharacter(this.worldData.rescuedCharacter);
         
-        // Cria animação do personagem (6fps = 166ms por frame)
-        if (!this.anims.exists('rescued-character-idle')) {
+        // Determina a sprite key e configuração baseado no personagem
+        let spriteKey, frameRate, endFrame;
+        
+        if (character.id === 'baterista') {
+            spriteKey = 'baterista-idle';
+            frameRate = 6;
+            endFrame = 3;
+        } else if (character.id === 'guitarrista') {
+            // Guitarrista usa sprites do vocalista como placeholder
+            spriteKey = 'hero-idle';
+            frameRate = 6;
+            endFrame = 3;
+        } else {
+            // Fallback para outros personagens
+            spriteKey = character.sprites.idle;
+            frameRate = 6;
+            endFrame = 3;
+        }
+        
+        // Cria animação do personagem
+        const animKey = `rescued-${character.id}-idle`;
+        if (!this.anims.exists(animKey)) {
             this.anims.create({
-                key: 'rescued-character-idle',
-                frames: this.anims.generateFrameNumbers('baterista-idle', { start: 0, end: 3 }),
-                frameRate: 6,
+                key: animKey,
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: 0, end: endFrame }),
+                frameRate: frameRate,
                 repeat: -1
             });
         }
 
-        // Círculo de luz atrás do personagem
-        const glow = this.add.circle(centerX, centerY - 30, 60, 0xffd700, 0.3);
+        // Círculo de luz atrás do personagem (cor baseada no personagem)
+        const glowColor = character.id === 'guitarrista' ? 0xff6600 : 0xffd700;
+        const glow = this.add.circle(centerX, centerY - 30, 60, glowColor, 0.3);
         this.tweens.add({
             targets: glow,
             scale: { from: 1, to: 1.3 },
@@ -191,9 +221,9 @@ class WorldCompleteScene extends Phaser.Scene {
         });
 
         // Sprite do personagem
-        const sprite = this.add.sprite(centerX, centerY - 30, 'baterista-idle');
+        const sprite = this.add.sprite(centerX, centerY - 30, spriteKey);
         sprite.setScale(4); // Escala maior para destaque
-        sprite.play('rescued-character-idle');
+        sprite.play(animKey);
 
         // Efeito de entrada
         sprite.setAlpha(0);

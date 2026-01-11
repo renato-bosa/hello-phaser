@@ -33,8 +33,21 @@ const GameData = {
                 walk: 'baterista-walking',
                 jump: 'baterista-idle' // TODO: criar sprite de pulo
             }
+        },
+        {
+            id: 'guitarrista',
+            name: 'Guitarrista',
+            instrument: 'Guitarra',
+            unlockedByDefault: false,
+            unlockedByWorld: 2,
+            sprites: {
+                // TODO: criar sprites do guitarrista (usando vocalista como placeholder)
+                idle: 'hero-idle',
+                walk: 'hero-walking',
+                jump: 'hero-jumping'
+            }
         }
-        // Futuros personagens: guitarrista, baixista, tecladista...
+        // Futuros personagens: baixista, tecladista...
     ],
 
     // ==================== MUNDOS ====================
@@ -50,8 +63,20 @@ const GameData = {
             theme: 'grass',
             bgColor: 0x87CEEB, // Azul céu
             pathColor: 0x8B4513 // Marrom terra
+        },
+        {
+            id: 2,
+            name: 'Mundo 2',
+            subtitle: 'O Resgate do Guitarrista',
+            levels: [4, 5, 6, 7], // Índices das fases (4-7 = fases 5-8)
+            rescuedCharacter: 'guitarrista',
+            celebrationMessage: 'Você resgatou o Guitarrista!',
+            // Visual no WorldMap (tema caverna/noturno)
+            theme: 'cave',
+            bgColor: 0x1a1a2e, // Azul escuro noturno
+            pathColor: 0x4a4a6a // Cinza arroxeado
         }
-        // Futuros mundos...
+        // Futuros mundos: Mundo 3 (Baixista), Mundo 4 (Tecladista)...
     ],
 
     // Configuração das fases
@@ -94,6 +119,47 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
+            mapPosition: { x: 480, y: 180 },
+            connectsTo: [] // Última fase do mundo
+        },
+        // ==================== MUNDO 2 ====================
+        { 
+            key: 'map5', 
+            file: 'assets/map.json', // TODO: criar mapa próprio
+            name: 'Caverna Sombria',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 2,
+            mapPosition: { x: 80, y: 200 },
+            connectsTo: [5]
+        },
+        { 
+            key: 'map6', 
+            file: 'assets/map.json', // TODO: criar mapa próprio
+            name: 'Cristais Perigosos',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 2,
+            mapPosition: { x: 200, y: 160 },
+            connectsTo: [6]
+        },
+        { 
+            key: 'map7', 
+            file: 'assets/map.json', // TODO: criar mapa próprio
+            name: 'Abismo Rochoso',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 2,
+            mapPosition: { x: 340, y: 210 },
+            connectsTo: [7]
+        },
+        { 
+            key: 'map8', 
+            file: 'assets/map.json', // TODO: criar mapa próprio
+            name: 'Covil do Guitarrista',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 2,
             mapPosition: { x: 480, y: 180 },
             connectsTo: [] // Última fase do mundo
         }

@@ -4,7 +4,7 @@
  * Responsabilidades:
  * - Exibir menu principal
  * - Navegação entre opções
- * - Iniciar novo jogo ou continuar
+ * - Redirecionar para seleção de slots
  * - Mostrar ranking
  */
 
@@ -29,7 +29,7 @@ class MenuScene extends Phaser.Scene {
         this.centerY = this.cameras.main.centerY;
         
         // Estado da cena
-        this.currentView = 'menu'; // 'menu', 'ranking', 'nameInput'
+        this.currentView = 'menu'; // 'menu', 'ranking'
         this.selectedIndex = 0;
         this.menuButtons = [];
         
@@ -144,52 +144,58 @@ class MenuScene extends Phaser.Scene {
     }
 
     createMenuButtons() {
-        const hasProgress = GameData.hasProgress();
-        let yOffset = hasProgress ? -20 : 0;
+        // Verifica se há slot ativo para mostrar "Continuar"
+        const activeSlotId = GameData.getActiveSlot();
+        const activeSlot = activeSlotId ? GameData.getSlot(activeSlotId) : null;
+        const hasAnySlots = GameData.hasAnyProgress();
+        
+        let yOffset = hasAnySlots ? -30 : 0;
         
         // Container para botões (facilita limpeza)
         this.buttonContainer = this.add.container(0, 0).setDepth(10);
 
-        // Botão "Continuar" (se houver progresso)
-        if (hasProgress) {
-            const completedLevels = GameData.getCompletedLevels();
-            const completedCount = completedLevels.length;
+        // Botão "Continuar" (se houver slot ativo)
+        if (activeSlot) {
+            const completedCount = activeSlot.completedLevels?.length || 0;
             const totalLevels = GameData.LEVELS.length;
             
             this.continueBtn = this.createButton(
                 this.centerX, 
                 this.centerY + yOffset, 
-                `CONTINUAR (${completedCount}/${totalLevels} fases)`,
+                `▶ CONTINUAR (${activeSlot.playerName})`,
                 '#00ffff',
                 () => this.continueGame()
             );
             this.menuButtons.push(this.continueBtn);
-            yOffset += 30;
+            yOffset += 35;
         }
 
-        // Botão "Novo Jogo"
-        this.newGameBtn = this.createButton(
+        // Botão "Jogar" ou "Nova Partida" (vai para seleção de slots)
+        const playButtonText = hasAnySlots ? '🎮 PARTIDAS SALVAS' : '🎮 JOGAR';
+        this.playBtn = this.createButton(
             this.centerX, 
             this.centerY + yOffset, 
-            'NOVO JOGO',
+            playButtonText,
             '#00ff00',
-            () => this.showNameInput()
+            () => this.openSlotSelect()
         );
-        this.menuButtons.push(this.newGameBtn);
-        yOffset += 30;
+        this.menuButtons.push(this.playBtn);
+        yOffset += 35;
 
-        // Botão "Personagem" (se houver mais de 1 desbloqueado)
-        const unlockedChars = GameData.getAvailableCharacters();
-        if (unlockedChars.length > 1) {
-            this.characterBtn = this.createButton(
-                this.centerX, 
-                this.centerY + yOffset, 
-                '🎸 Selecionar Integrante',
-                '#ff66ff',
-                () => this.openCharacterSelect()
-            );
-            this.menuButtons.push(this.characterBtn);
-            yOffset += 30;
+        // Botão "Personagem" (só aparece se tiver slot ativo com mais de 1 personagem)
+        if (activeSlot) {
+            const unlockedChars = activeSlot.unlockedCharacters || ['vocalista'];
+            if (unlockedChars.length > 1) {
+                this.characterBtn = this.createButton(
+                    this.centerX, 
+                    this.centerY + yOffset, 
+                    '🎸 Selecionar Integrante',
+                    '#ff66ff',
+                    () => this.openCharacterSelect()
+                );
+                this.menuButtons.push(this.characterBtn);
+                yOffset += 35;
+            }
         }
 
         // Botão "Ranking"
@@ -225,7 +231,7 @@ class MenuScene extends Phaser.Scene {
 
     createButton(x, y, text, color, callback) {
         const btn = this.add.text(x, y, text, {
-            fontSize: '24px',
+            fontSize: '22px',
             fontFamily: 'Arial',
             color: color,
             stroke: '#000000',
@@ -255,10 +261,13 @@ class MenuScene extends Phaser.Scene {
     }
 
     createInstructions() {
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const text = isMobile ? '↑↓: Navegar | Pulo: Selecionar' : '↑↓: Navegar | Enter: Selecionar';
+        
         this.instructions = this.add.text(
             this.centerX, 
-            this.centerY + 100, 
-            '↑↓: Navegar | Enter: Selecionar', 
+            this.centerY + 120, 
+            text, 
             {
                 fontSize: '14px',
                 fontFamily: 'Arial',
@@ -317,8 +326,8 @@ class MenuScene extends Phaser.Scene {
 
         // ESC para voltar
         escKey.on('down', () => {
-            if (this.currentView === 'ranking' || this.currentView === 'nameInput') {
-                SoundManager.play('menuBack');
+            if (this.currentView === 'ranking') {
+                SoundManager.play('menuNavigate');
                 this.closeOverlay();
             }
         });
@@ -346,110 +355,48 @@ class MenuScene extends Phaser.Scene {
 
     // ==================== AÇÕES DO MENU ====================
 
+    /**
+     * Continua o jogo no slot ativo
+     */
     continueGame() {
-        const progress = GameData.loadProgress();
-        if (progress) {
-            // Atualiza estado global
-            GameData.state.currentLevel = progress.level;
-            GameData.state.playerName = progress.playerName;
-            
-            // Vai ao mapa do mundo
-            this.scene.start('WorldMapScene');
+        const activeSlotId = GameData.getActiveSlot();
+        if (!activeSlotId) {
+            // Sem slot ativo, vai para seleção
+            this.openSlotSelect();
+            return;
         }
+
+        const slot = GameData.getSlot(activeSlotId);
+        if (!slot) {
+            this.openSlotSelect();
+            return;
+        }
+
+        // Carrega o slot para o estado
+        GameData.loadSlotIntoState(slot);
+        GameData.updateLastPlayed();
+
+        // Vai ao mapa do mundo
+        this.scene.start('WorldMapScene');
     }
 
+    /**
+     * Abre a tela de seleção de slots
+     */
+    openSlotSelect() {
+        this.scene.start('SlotSelectScene', {
+            returnTo: 'MenuScene'
+        });
+    }
+
+    /**
+     * Abre seleção de personagem
+     */
     openCharacterSelect() {
         SoundManager.play('menuSelect');
         this.scene.start('CharacterSelectScene', {
             returnTo: 'MenuScene'
         });
-    }
-
-    showNameInput() {
-        this.currentView = 'nameInput';
-        this.overlayElements = [];
-
-        // Overlay escuro
-        const overlay = this.add.rectangle(
-            this.centerX, this.centerY, 640, 352, 0x000000, 0.9
-        ).setDepth(100);
-        this.overlayElements.push(overlay);
-
-        // Título
-        const promptText = this.add.text(this.centerX, this.centerY - 50, 'Digite seu nome:', {
-            fontSize: '28px',
-            fontFamily: 'Arial',
-            color: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: 4
-        }).setOrigin(0.5).setDepth(101);
-        this.overlayElements.push(promptText);
-
-        // Input HTML
-        const inputElement = document.createElement('input');
-        inputElement.type = 'text';
-        inputElement.maxLength = 15;
-        inputElement.placeholder = 'Seu nome';
-        inputElement.value = localStorage.getItem('rockHero_playerName') || '';
-        
-        // Estilo do input
-        Object.assign(inputElement.style, {
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '300px',
-            padding: '10px',
-            fontSize: '18px',
-            textAlign: 'center',
-            border: '3px solid #4a90d9',
-            borderRadius: '5px',
-            backgroundColor: '#1a1a2e',
-            color: '#ffffff',
-            zIndex: '10000',
-            marginTop: '20px'
-        });
-
-        document.body.appendChild(inputElement);
-        inputElement.focus();
-        inputElement.select();
-        this.nameInput = inputElement;
-
-        // Botão confirmar
-        const confirmBtn = this.add.text(this.centerX, this.centerY + 50, '[Confirmar]', {
-            fontSize: '18px',
-            fontFamily: 'Arial',
-            color: '#00ff00',
-            stroke: '#000000',
-            strokeThickness: 2
-        }).setOrigin(0.5).setDepth(101).setInteractive({ useHandCursor: true });
-        this.overlayElements.push(confirmBtn);
-
-        const handleSubmit = () => {
-            const playerName = inputElement.value.trim() || 'Anônimo';
-            
-            // Salva nome do jogador
-            GameData.savePlayerName(playerName);
-            
-            // Remove input HTML
-            document.body.removeChild(inputElement);
-            
-            // Vai ao mapa do mundo
-            this.scene.start('WorldMapScene');
-        };
-
-        inputElement.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleSubmit();
-            } else if (e.key === 'Escape') {
-                e.preventDefault();
-                document.body.removeChild(inputElement);
-                this.closeOverlay();
-            }
-        });
-
-        confirmBtn.on('pointerdown', handleSubmit);
     }
 
     showRanking() {
@@ -463,8 +410,8 @@ class MenuScene extends Phaser.Scene {
         this.overlayElements.push(overlay);
 
         // Título
-        const title = this.add.text(this.centerX, this.centerY - 160, '🏆 RANKING DE HI-SCORES 🏆', {
-            fontSize: '24px',
+        const title = this.add.text(this.centerX, 40, '🏆 RANKING DE HI-SCORES 🏆', {
+            fontSize: '20px',
             fontFamily: 'Arial',
             color: '#ffd700',
             stroke: '#000000',
@@ -472,96 +419,99 @@ class MenuScene extends Phaser.Scene {
         }).setOrigin(0.5).setDepth(101);
         this.overlayElements.push(title);
 
-        // Renderiza tabelas para cada fase
-        let currentY = this.centerY - 120;
-        
-        for (let level = 0; level < GameData.LEVELS.length; level++) {
-            currentY = this.renderRankingTable(level, currentY);
-            currentY += 20; // Espaço entre tabelas
+        // Subtítulo
+        const subtitle = this.add.text(this.centerX, 65, 
+            GameData.getActiveSlot() 
+                ? `Partida: ${GameData.loadPlayerName()}`
+                : 'Nenhuma partida selecionada', {
+            fontSize: '12px',
+            fontFamily: 'Arial',
+            color: '#888888'
+        }).setOrigin(0.5).setDepth(101);
+        this.overlayElements.push(subtitle);
+
+        // Renderiza melhores tempos
+        if (GameData.getActiveSlot()) {
+            this.renderBestTimes();
+        } else {
+            const noData = this.add.text(this.centerX, this.centerY, 
+                'Selecione uma partida para ver seus tempos', {
+                fontSize: '14px',
+                fontFamily: 'Arial',
+                color: '#666666'
+            }).setOrigin(0.5).setDepth(101);
+            this.overlayElements.push(noData);
         }
 
         // Instrução para fechar
-        const closeText = this.add.text(this.centerX, this.centerY + 140, 'Pressione ESC para voltar', {
-            fontSize: '16px',
+        const closeText = this.add.text(this.centerX, this.centerY + 140, 
+            'Pressione ESC para voltar', {
+            fontSize: '14px',
             fontFamily: 'Arial',
             color: '#aaaaaa'
         }).setOrigin(0.5).setDepth(101);
         this.overlayElements.push(closeText);
     }
 
-    renderRankingTable(level, startY) {
-        const records = GameData.getTopRecords(level, 4);
-        const levelName = GameData.LEVELS[level]?.name || `Fase ${level + 1}`;
-        let y = startY;
+    renderBestTimes() {
+        const startY = 90;
+        const colWidth = 150;
+        const startX = this.centerX - (GameData.WORLDS.length * colWidth) / 2 + colWidth / 2;
 
-        // Título da fase
-        const faseTitle = this.add.text(this.centerX, y, levelName.toUpperCase(), {
-            fontSize: '18px',
-            fontFamily: 'Arial',
-            color: '#00ff00',
-            fontStyle: 'bold'
-        }).setOrigin(0.5).setDepth(101);
-        this.overlayElements.push(faseTitle);
-        y += 25;
-
-        // Cabeçalho
-        const headers = [
-            { text: 'TEMPO', x: this.centerX - 150 },
-            { text: 'JOGADOR', x: this.centerX },
-            { text: 'DATA/HORA', x: this.centerX + 150 }
-        ];
-
-        headers.forEach(h => {
-            const header = this.add.text(h.x, y, h.text, {
+        GameData.WORLDS.forEach((world, worldIndex) => {
+            const x = startX + worldIndex * colWidth;
+            
+            // Título do mundo
+            const worldTitle = this.add.text(x, startY, world.name, {
                 fontSize: '14px',
+                fontFamily: 'Arial',
+                color: '#00ffff',
+                fontStyle: 'bold'
+            }).setOrigin(0.5).setDepth(101);
+            this.overlayElements.push(worldTitle);
+
+            // Fases do mundo
+            let y = startY + 25;
+            world.levels.forEach(levelIndex => {
+                const level = GameData.LEVELS[levelIndex];
+                const bestTime = GameData.getBestTime(levelIndex);
+                const isComplete = GameData.isLevelComplete(levelIndex);
+                
+                // Nome da fase
+                const levelName = this.add.text(x - 50, y, level.name, {
+                    fontSize: '11px',
+                    fontFamily: 'Arial',
+                    color: isComplete ? '#ffffff' : '#666666'
+                }).setOrigin(0, 0.5).setDepth(101);
+                this.overlayElements.push(levelName);
+
+                // Tempo
+                const timeText = bestTime !== null 
+                    ? GameData.formatTime(bestTime) 
+                    : '--:--.---';
+                const timeDisplay = this.add.text(x + 50, y, timeText, {
+                    fontSize: '11px',
+                    fontFamily: 'monospace',
+                    color: bestTime !== null ? '#00ff00' : '#444444'
+                }).setOrigin(1, 0.5).setDepth(101);
+                this.overlayElements.push(timeDisplay);
+
+                y += 20;
+            });
+        });
+
+        // Tempo total (se todas fases completas)
+        const totalTime = GameData.getTotalBestTime();
+        if (totalTime !== null) {
+            const totalText = this.add.text(this.centerX, this.centerY + 100, 
+                `⏱️ Tempo Total: ${GameData.formatTime(totalTime)}`, {
+                fontSize: '16px',
                 fontFamily: 'Arial',
                 color: '#ffd700',
                 fontStyle: 'bold'
             }).setOrigin(0.5).setDepth(101);
-            this.overlayElements.push(header);
-        });
-        y += 20;
-
-        // Recordes
-        if (records.length > 0) {
-            records.forEach(record => {
-                // Tempo
-                const timeText = this.add.text(this.centerX - 150, y, GameData.formatTime(record.time), {
-                    fontSize: '12px',
-                    fontFamily: 'monospace',
-                    color: '#00ffff'
-                }).setOrigin(0.5).setDepth(101);
-                this.overlayElements.push(timeText);
-
-                // Jogador
-                const playerText = this.add.text(this.centerX, y, record.playerName || 'Anônimo', {
-                    fontSize: '12px',
-                    fontFamily: 'Arial',
-                    color: '#ffffff'
-                }).setOrigin(0.5).setDepth(101);
-                this.overlayElements.push(playerText);
-
-                // Data
-                const dateText = this.add.text(this.centerX + 150, y, GameData.formatDate(record.date), {
-                    fontSize: '11px',
-                    fontFamily: 'Arial',
-                    color: '#aaaaaa'
-                }).setOrigin(0.5).setDepth(101);
-                this.overlayElements.push(dateText);
-
-                y += 18;
-            });
-        } else {
-            const noRecord = this.add.text(this.centerX, y, 'Nenhum recorde ainda', {
-                fontSize: '12px',
-                fontFamily: 'Arial',
-                color: '#666666'
-            }).setOrigin(0.5).setDepth(101);
-            this.overlayElements.push(noRecord);
-            y += 18;
+            this.overlayElements.push(totalText);
         }
-
-        return y;
     }
 
     closeOverlay() {
@@ -571,12 +521,6 @@ class MenuScene extends Phaser.Scene {
                 if (el && el.destroy) el.destroy();
             });
             this.overlayElements = [];
-        }
-
-        // Remove input HTML se existir
-        if (this.nameInput && this.nameInput.parentNode) {
-            document.body.removeChild(this.nameInput);
-            this.nameInput = null;
         }
 
         this.currentView = 'menu';

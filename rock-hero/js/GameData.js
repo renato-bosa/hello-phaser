@@ -2,6 +2,7 @@
  * GAME DATA - Módulo Centralizado de Dados
  * 
  * Gerencia:
+ * - Sistema de Slots (4 partidas independentes)
  * - Rankings (hi-scores)
  * - Progresso salvo
  * - Configurações de níveis
@@ -9,6 +10,11 @@
  */
 
 const GameData = {
+    // ==================== CONFIGURAÇÕES DE SLOTS ====================
+    MAX_SLOTS: 4,
+    STORAGE_KEY_SLOTS: 'rockHero_slots',
+    STORAGE_KEY_ACTIVE: 'rockHero_activeSlot',
+
     // ==================== PERSONAGENS ====================
     CHARACTERS: [
         {
@@ -182,53 +188,264 @@ const GameData = {
         elapsedTime: 0,
         selectedCharacter: 'vocalista',
         mapCursorLevel: 0, // Posição do cursor no WorldMap
+        activeSlot: null, // Slot ativo (1-4)
         // Referência à cena do jogo (para resume)
         gameSceneRef: null
     },
 
-    // ==================== PROGRESSO ====================
-    
+    // ==================== SISTEMA DE SLOTS ====================
+
     /**
-     * Salva o nome do jogador
+     * Cria um novo slot vazio
      */
-    savePlayerName(playerName) {
-        localStorage.setItem('rockHero_playerName', playerName);
-        this.state.playerName = playerName;
+    createEmptySlot(slotId) {
+        return {
+            id: slotId,
+            playerName: '',
+            createdAt: null,
+            lastPlayedAt: null,
+            completedLevels: [],
+            completedWorlds: [],
+            unlockedCharacters: ['vocalista'],
+            selectedCharacter: 'vocalista',
+            mapPosition: { worldId: 1, levelIndex: 0 },
+            bestTimes: {} // { levelIndex: time }
+        };
     },
 
     /**
-     * Carrega o nome do jogador
+     * Retorna todos os slots (4 slots, alguns podem ser null se vazios)
      */
-    loadPlayerName() {
-        return localStorage.getItem('rockHero_playerName') || 'Anônimo';
-    },
-
-    /**
-     * Marca uma fase como completa
-     */
-    markLevelComplete(levelIndex) {
-        const key = 'rockHero_completedLevels';
-        let completed = this.getCompletedLevels();
-        
-        if (!completed.includes(levelIndex)) {
-            completed.push(levelIndex);
-            completed.sort((a, b) => a - b);
-            localStorage.setItem(key, JSON.stringify(completed));
-        }
-    },
-
-    /**
-     * Retorna lista de fases completadas
-     */
-    getCompletedLevels() {
-        const key = 'rockHero_completedLevels';
-        const stored = localStorage.getItem(key);
-        
+    getAllSlots() {
+        const stored = localStorage.getItem(this.STORAGE_KEY_SLOTS);
         if (stored) {
             try {
                 return JSON.parse(stored);
             } catch (e) {
-                return [];
+                console.error('Erro ao carregar slots:', e);
+            }
+        }
+        // Retorna array com 4 slots vazios
+        return [null, null, null, null];
+    },
+
+    /**
+     * Salva todos os slots
+     */
+    saveAllSlots(slots) {
+        localStorage.setItem(this.STORAGE_KEY_SLOTS, JSON.stringify(slots));
+    },
+
+    /**
+     * Retorna um slot específico
+     */
+    getSlot(slotId) {
+        const slots = this.getAllSlots();
+        return slots[slotId - 1] || null;
+    },
+
+    /**
+     * Salva um slot específico
+     */
+    saveSlot(slotId, slotData) {
+        const slots = this.getAllSlots();
+        slots[slotId - 1] = slotData;
+        this.saveAllSlots(slots);
+    },
+
+    /**
+     * Cria um novo jogo em um slot
+     */
+    createNewGame(slotId, playerName) {
+        const slot = this.createEmptySlot(slotId);
+        slot.playerName = playerName || 'Anônimo';
+        slot.createdAt = new Date().toISOString();
+        slot.lastPlayedAt = slot.createdAt;
+        
+        this.saveSlot(slotId, slot);
+        this.setActiveSlot(slotId);
+        this.loadSlotIntoState(slot);
+        
+        return slot;
+    },
+
+    /**
+     * Deleta um slot
+     */
+    deleteSlot(slotId) {
+        const slots = this.getAllSlots();
+        slots[slotId - 1] = null;
+        this.saveAllSlots(slots);
+        
+        // Se era o slot ativo, limpa
+        if (this.state.activeSlot === slotId) {
+            this.state.activeSlot = null;
+            localStorage.removeItem(this.STORAGE_KEY_ACTIVE);
+        }
+    },
+
+    /**
+     * Define o slot ativo
+     */
+    setActiveSlot(slotId) {
+        this.state.activeSlot = slotId;
+        localStorage.setItem(this.STORAGE_KEY_ACTIVE, slotId.toString());
+    },
+
+    /**
+     * Retorna o slot ativo
+     */
+    getActiveSlot() {
+        if (this.state.activeSlot) {
+            return this.state.activeSlot;
+        }
+        const stored = localStorage.getItem(this.STORAGE_KEY_ACTIVE);
+        if (stored) {
+            this.state.activeSlot = parseInt(stored);
+            return this.state.activeSlot;
+        }
+        return null;
+    },
+
+    /**
+     * Carrega um slot para a memória (state)
+     */
+    loadSlotIntoState(slot) {
+        if (!slot) return;
+        
+        this.state.playerName = slot.playerName;
+        this.state.selectedCharacter = slot.selectedCharacter;
+        this.state.currentWorld = slot.mapPosition?.worldId || 1;
+        this.state.mapCursorLevel = slot.mapPosition?.levelIndex || 0;
+        this.state.activeSlot = slot.id;
+    },
+
+    /**
+     * Carrega o slot ativo para o estado
+     */
+    loadActiveSlotIntoState() {
+        const slotId = this.getActiveSlot();
+        if (slotId) {
+            const slot = this.getSlot(slotId);
+            if (slot) {
+                this.loadSlotIntoState(slot);
+                return true;
+            }
+        }
+        return false;
+    },
+
+    /**
+     * Atualiza o timestamp de último jogo do slot ativo
+     */
+    updateLastPlayed() {
+        const slotId = this.getActiveSlot();
+        if (!slotId) return;
+        
+        const slot = this.getSlot(slotId);
+        if (slot) {
+            slot.lastPlayedAt = new Date().toISOString();
+            this.saveSlot(slotId, slot);
+        }
+    },
+
+    /**
+     * Verifica se há algum slot com progresso
+     */
+    hasAnyProgress() {
+        const slots = this.getAllSlots();
+        return slots.some(slot => slot !== null);
+    },
+
+    /**
+     * Retorna informações resumidas de um slot para exibição
+     */
+    getSlotSummary(slotId) {
+        const slot = this.getSlot(slotId);
+        if (!slot) {
+            return {
+                isEmpty: true,
+                slotId: slotId
+            };
+        }
+        
+        const completedLevels = slot.completedLevels?.length || 0;
+        const totalLevels = this.LEVELS.length;
+        const completedWorlds = slot.completedWorlds?.length || 0;
+        const totalWorlds = this.WORLDS.length;
+        
+        return {
+            isEmpty: false,
+            slotId: slotId,
+            playerName: slot.playerName || 'Anônimo',
+            completedLevels: completedLevels,
+            totalLevels: totalLevels,
+            completedWorlds: completedWorlds,
+            totalWorlds: totalWorlds,
+            lastPlayedAt: slot.lastPlayedAt,
+            unlockedCharacters: slot.unlockedCharacters?.length || 1
+        };
+    },
+
+    // ==================== PROGRESSO (usa slot ativo) ====================
+    
+    /**
+     * Salva o nome do jogador no slot ativo
+     */
+    savePlayerName(playerName) {
+        const slotId = this.getActiveSlot();
+        if (!slotId) return;
+        
+        const slot = this.getSlot(slotId);
+        if (slot) {
+            slot.playerName = playerName;
+            this.saveSlot(slotId, slot);
+        }
+        this.state.playerName = playerName;
+    },
+
+    /**
+     * Carrega o nome do jogador do slot ativo
+     */
+    loadPlayerName() {
+        const slotId = this.getActiveSlot();
+        if (slotId) {
+            const slot = this.getSlot(slotId);
+            if (slot) {
+                return slot.playerName || 'Anônimo';
+            }
+        }
+        return 'Anônimo';
+    },
+
+    /**
+     * Marca uma fase como completa no slot ativo
+     */
+    markLevelComplete(levelIndex) {
+        const slotId = this.getActiveSlot();
+        if (!slotId) return;
+        
+        const slot = this.getSlot(slotId);
+        if (!slot) return;
+        
+        if (!slot.completedLevels) slot.completedLevels = [];
+        
+        if (!slot.completedLevels.includes(levelIndex)) {
+            slot.completedLevels.push(levelIndex);
+            slot.completedLevels.sort((a, b) => a - b);
+            this.saveSlot(slotId, slot);
+        }
+    },
+
+    /**
+     * Retorna lista de fases completadas do slot ativo
+     */
+    getCompletedLevels() {
+        const slotId = this.getActiveSlot();
+        if (slotId) {
+            const slot = this.getSlot(slotId);
+            if (slot && slot.completedLevels) {
+                return [...slot.completedLevels];
             }
         }
         return [];
@@ -243,47 +460,37 @@ const GameData = {
 
     /**
      * Verifica se uma fase está desbloqueada
-     * - Fase 0 (primeira) sempre desbloqueada
-     * - Outras fases: fase anterior precisa estar completa
      */
     isLevelUnlocked(levelIndex) {
         if (levelIndex === 0) return true;
         
-        // Verifica se a fase anterior está completa
         const level = this.LEVELS[levelIndex];
         if (!level) return false;
         
-        // Encontra a fase anterior no mesmo mundo
         const world = this.getWorldForLevel(levelIndex);
         if (!world) return false;
         
         const levelIndexInWorld = world.levels.indexOf(levelIndex);
         if (levelIndexInWorld === 0) {
-            // Primeira fase do mundo - verifica se o mundo está desbloqueado
             return this.isWorldUnlocked(world.id);
         }
         
-        // Verifica se a fase anterior está completa
         const previousLevelIndex = world.levels[levelIndexInWorld - 1];
         return this.isLevelComplete(previousLevelIndex);
     },
 
     /**
      * Verifica se um mundo está desbloqueado
-     * - Mundo 1 sempre desbloqueado
-     * - Outros mundos: mundo anterior precisa estar completo
      */
     isWorldUnlocked(worldId) {
         if (worldId === 1) return true;
         
-        // Verifica se o mundo anterior está completo
         const previousWorld = this.WORLDS.find(w => w.id === worldId - 1);
         return previousWorld ? this.isWorldComplete(previousWorld.id) : false;
     },
 
     /**
      * Retorna a próxima fase não-completa de um mundo
-     * (onde o jogador deve estar no mapa)
      */
     getNextUnlockedLevel(worldId) {
         const world = this.WORLDS.find(w => w.id === worldId);
@@ -295,37 +502,46 @@ const GameData = {
             }
         }
         
-        // Todas completas - retorna a última
         return world.levels[world.levels.length - 1];
     },
 
     /**
-     * Verifica se há progresso salvo
+     * Verifica se há progresso salvo no slot ativo
      */
     hasProgress() {
-        return this.getCompletedLevels().length > 0 || 
-               localStorage.getItem('rockHero_playerName') !== null;
+        return this.getCompletedLevels().length > 0;
     },
 
     /**
-     * Limpa todo o progresso
+     * Limpa o progresso do slot ativo (usado apenas internamente)
      */
     clearProgress() {
-        localStorage.removeItem('rockHero_completedLevels');
-        localStorage.removeItem('rockHero_completedWorlds');
-        localStorage.removeItem('rockHero_unlockedCharacters');
+        const slotId = this.getActiveSlot();
+        if (!slotId) return;
+        
+        const slot = this.getSlot(slotId);
+        if (slot) {
+            slot.completedLevels = [];
+            slot.completedWorlds = [];
+            slot.unlockedCharacters = ['vocalista'];
+            slot.selectedCharacter = 'vocalista';
+            slot.mapPosition = { worldId: 1, levelIndex: 0 };
+            slot.bestTimes = {};
+            this.saveSlot(slotId, slot);
+        }
+        
         this.state.currentLevel = 0;
         this.state.currentWorld = 1;
         this.state.mapCursorLevel = 0;
     },
 
     /**
-     * Compatibilidade: saveProgress (usado pelo GameScene)
+     * Compatibilidade: saveProgress
      */
     saveProgress(level, playerName) {
         this.savePlayerName(playerName);
-        // Não marca como completo aqui - isso é feito ao completar a fase
         this.state.currentLevel = level;
+        this.updateLastPlayed();
     },
 
     /**
@@ -344,74 +560,63 @@ const GameData = {
         };
     },
 
-    // ==================== RANKINGS ====================
+    // ==================== RANKINGS (por slot) ====================
 
     getTopRecords(level, limit = 4) {
-        const key = `rockHero_records_level${level}`;
-        const stored = localStorage.getItem(key);
+        const slotId = this.getActiveSlot();
+        if (!slotId) return [];
         
-        if (stored) {
-            try {
-                const records = JSON.parse(stored);
-                return records.slice(0, limit);
-            } catch (e) {
-                // Fallback para formato antigo
-                return this._migrateLegacyRecords(level);
-            }
+        const slot = this.getSlot(slotId);
+        if (!slot || !slot.bestTimes) return [];
+        
+        // Para compatibilidade, retorna no formato de array
+        const time = slot.bestTimes[level];
+        if (time !== undefined) {
+            return [{
+                time: time,
+                playerName: slot.playerName,
+                date: slot.lastPlayedAt
+            }];
         }
         return [];
     },
 
     /**
-     * Salva um tempo se ele estiver entre os top N
-     * @param {number} level - Índice da fase
-     * @param {number} time - Tempo em ms
-     * @param {string} playerName - Nome do jogador
-     * @param {number} topN - Quantos melhores tempos manter (default: 4)
-     * @returns {object} { saved: boolean, position: number, isRecord: boolean }
+     * Salva um tempo no slot ativo
      */
     saveRecord(level, time, playerName, topN = 4) {
-        const key = `rockHero_records_level${level}`;
+        const slotId = this.getActiveSlot();
+        if (!slotId) return { saved: false, position: 0, isRecord: false };
         
-        // Obtém lista atual
-        let records = this.getTopRecords(level, 100); // Pega todos
+        const slot = this.getSlot(slotId);
+        if (!slot) return { saved: false, position: 0, isRecord: false };
         
-        // Verifica se entra no ranking antes de adicionar
-        const wouldRank = records.length < topN || time < records[records.length - 1]?.time || records.length === 0;
+        if (!slot.bestTimes) slot.bestTimes = {};
         
-        // Novo recorde
-        const newRecord = {
-            time: time,
-            playerName: playerName || 'Anônimo',
-            date: new Date().toISOString()
-        };
+        const previousBest = slot.bestTimes[level];
+        const isNewRecord = previousBest === undefined || time < previousBest;
         
-        // Adiciona e ordena
-        records.push(newRecord);
-        records.sort((a, b) => a.time - b.time);
-        
-        // Encontra posição do novo tempo
-        const position = records.findIndex(r => r.time === time && r.date === newRecord.date) + 1;
-        
-        // Mantém top N
-        records = records.slice(0, topN);
-        
-        // Só salva se entrou no ranking
-        const saved = position <= topN;
-        if (saved) {
-            localStorage.setItem(key, JSON.stringify(records));
+        if (isNewRecord) {
+            slot.bestTimes[level] = time;
+            this.saveSlot(slotId, slot);
         }
         
         return {
-            saved: saved,
-            position: position,
-            isRecord: position === 1
+            saved: isNewRecord,
+            position: 1,
+            isRecord: isNewRecord
         };
     },
 
     getBestTime(level) {
-        const records = this.getTopRecords(level, 1);
-        return records.length > 0 ? records[0].time : null;
+        const slotId = this.getActiveSlot();
+        if (!slotId) return null;
+        
+        const slot = this.getSlot(slotId);
+        if (slot && slot.bestTimes) {
+            return slot.bestTimes[level] ?? null;
+        }
+        return null;
     },
 
     getTotalBestTime() {
@@ -422,23 +627,6 @@ const GameData = {
             total += best;
         }
         return total;
-    },
-
-    _migrateLegacyRecords(level) {
-        const oldKey = `rockHero_record_level${level}`;
-        const oldStored = localStorage.getItem(oldKey);
-        if (oldStored) {
-            try {
-                const oldRecord = JSON.parse(oldStored);
-                return [oldRecord];
-            } catch (e) {
-                const time = parseFloat(oldStored);
-                if (!isNaN(time)) {
-                    return [{ time: time, playerName: 'Anônimo', date: new Date().toISOString() }];
-                }
-            }
-        }
-        return [];
     },
 
     // ==================== FORMATAÇÃO ====================
@@ -465,13 +653,19 @@ const GameData = {
         }
     },
 
+    formatDateShort(dateString) {
+        try {
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            return `${day}/${month}`;
+        } catch (e) {
+            return '--/--';
+        }
+    },
+
     // ==================== MUNDOS E PERSONAGENS ====================
 
-    /**
-     * Verifica se completar esta fase conclui um mundo
-     * @param {number} levelIndex - Índice da fase completada
-     * @returns {object|null} - Dados do mundo completado ou null
-     */
     checkWorldCompletion(levelIndex) {
         for (const world of this.WORLDS) {
             const lastLevelOfWorld = Math.max(...world.levels);
@@ -482,48 +676,42 @@ const GameData = {
         return null;
     },
 
-    /**
-     * Retorna o mundo ao qual uma fase pertence
-     */
     getWorldForLevel(levelIndex) {
         return this.WORLDS.find(w => w.levels.includes(levelIndex)) || null;
     },
 
     /**
-     * Desbloqueia um personagem
+     * Desbloqueia um personagem no slot ativo
      */
     unlockCharacter(characterId) {
-        const unlockedKey = 'rockHero_unlockedCharacters';
-        let unlocked = this.getUnlockedCharacters();
+        const slotId = this.getActiveSlot();
+        if (!slotId) return;
         
-        if (!unlocked.includes(characterId)) {
-            unlocked.push(characterId);
-            localStorage.setItem(unlockedKey, JSON.stringify(unlocked));
+        const slot = this.getSlot(slotId);
+        if (!slot) return;
+        
+        if (!slot.unlockedCharacters) slot.unlockedCharacters = ['vocalista'];
+        
+        if (!slot.unlockedCharacters.includes(characterId)) {
+            slot.unlockedCharacters.push(characterId);
+            this.saveSlot(slotId, slot);
         }
     },
 
     /**
-     * Retorna lista de personagens desbloqueados
+     * Retorna lista de personagens desbloqueados do slot ativo
      */
     getUnlockedCharacters() {
-        const unlockedKey = 'rockHero_unlockedCharacters';
-        const stored = localStorage.getItem(unlockedKey);
-        
-        if (stored) {
-            try {
-                return JSON.parse(stored);
-            } catch (e) {
-                return ['vocalista'];
+        const slotId = this.getActiveSlot();
+        if (slotId) {
+            const slot = this.getSlot(slotId);
+            if (slot && slot.unlockedCharacters) {
+                return [...slot.unlockedCharacters];
             }
         }
-        
-        // Por padrão, apenas o vocalista está desbloqueado
         return ['vocalista'];
     },
 
-    /**
-     * Verifica se um personagem está desbloqueado
-     */
     isCharacterUnlocked(characterId) {
         const character = this.CHARACTERS.find(c => c.id === characterId);
         if (!character) return false;
@@ -531,111 +719,116 @@ const GameData = {
         return this.getUnlockedCharacters().includes(characterId);
     },
 
-    /**
-     * Retorna dados de um personagem pelo ID
-     */
     getCharacter(characterId) {
         return this.CHARACTERS.find(c => c.id === characterId) || this.CHARACTERS[0];
     },
 
     /**
-     * Salva o personagem selecionado
+     * Salva o personagem selecionado no slot ativo
      */
     saveSelectedCharacter(characterId) {
-        localStorage.setItem('rockHero_selectedCharacter', characterId);
+        const slotId = this.getActiveSlot();
+        if (slotId) {
+            const slot = this.getSlot(slotId);
+            if (slot) {
+                slot.selectedCharacter = characterId;
+                this.saveSlot(slotId, slot);
+            }
+        }
         this.state.selectedCharacter = characterId;
     },
 
     /**
-     * Carrega o personagem selecionado
+     * Carrega o personagem selecionado do slot ativo
      */
     loadSelectedCharacter() {
-        const saved = localStorage.getItem('rockHero_selectedCharacter');
-        if (saved && this.isCharacterUnlocked(saved)) {
-            this.state.selectedCharacter = saved;
-            return saved;
+        const slotId = this.getActiveSlot();
+        if (slotId) {
+            const slot = this.getSlot(slotId);
+            if (slot && slot.selectedCharacter && this.isCharacterUnlocked(slot.selectedCharacter)) {
+                this.state.selectedCharacter = slot.selectedCharacter;
+                return slot.selectedCharacter;
+            }
         }
         return 'vocalista';
     },
 
-    /**
-     * Retorna lista de personagens desbloqueados com dados completos
-     */
     getAvailableCharacters() {
         return this.CHARACTERS.filter(c => this.isCharacterUnlocked(c.id));
     },
 
     /**
-     * Marca um mundo como completado
+     * Marca um mundo como completado no slot ativo
      */
     markWorldComplete(worldId) {
-        const key = 'rockHero_completedWorlds';
-        let completed = this.getCompletedWorlds();
+        const slotId = this.getActiveSlot();
+        if (!slotId) return;
         
-        if (!completed.includes(worldId)) {
-            completed.push(worldId);
-            localStorage.setItem(key, JSON.stringify(completed));
+        const slot = this.getSlot(slotId);
+        if (!slot) return;
+        
+        if (!slot.completedWorlds) slot.completedWorlds = [];
+        
+        if (!slot.completedWorlds.includes(worldId)) {
+            slot.completedWorlds.push(worldId);
+            this.saveSlot(slotId, slot);
         }
     },
 
-    /**
-     * Retorna lista de mundos completados
-     */
     getCompletedWorlds() {
-        const key = 'rockHero_completedWorlds';
-        const stored = localStorage.getItem(key);
-        
-        if (stored) {
-            try {
-                return JSON.parse(stored);
-            } catch (e) {
-                return [];
+        const slotId = this.getActiveSlot();
+        if (slotId) {
+            const slot = this.getSlot(slotId);
+            if (slot && slot.completedWorlds) {
+                return [...slot.completedWorlds];
             }
         }
         return [];
     },
 
-    /**
-     * Verifica se um mundo foi completado
-     */
     isWorldComplete(worldId) {
         return this.getCompletedWorlds().includes(worldId);
     },
 
     /**
-     * Salva a posição do cursor no mapa
+     * Salva a posição do cursor no mapa do slot ativo
      */
     saveMapPosition(worldId, levelIndex) {
-        localStorage.setItem('rockHero_mapWorld', worldId.toString());
-        localStorage.setItem('rockHero_mapLevel', levelIndex.toString());
+        const slotId = this.getActiveSlot();
+        if (slotId) {
+            const slot = this.getSlot(slotId);
+            if (slot) {
+                slot.mapPosition = { worldId, levelIndex };
+                this.saveSlot(slotId, slot);
+            }
+        }
         this.state.currentWorld = worldId;
         this.state.mapCursorLevel = levelIndex;
     },
 
     /**
-     * Carrega a posição do cursor no mapa
+     * Carrega a posição do cursor no mapa do slot ativo
      */
     loadMapPosition() {
-        const worldId = parseInt(localStorage.getItem('rockHero_mapWorld')) || 1;
-        const levelIndex = parseInt(localStorage.getItem('rockHero_mapLevel')) || 0;
-        
-        // Valida se a posição é válida
-        const world = this.WORLDS.find(w => w.id === worldId);
-        if (!world || !this.isWorldUnlocked(worldId)) {
-            return { worldId: 1, levelIndex: 0 };
+        const slotId = this.getActiveSlot();
+        if (slotId) {
+            const slot = this.getSlot(slotId);
+            if (slot && slot.mapPosition) {
+                const { worldId, levelIndex } = slot.mapPosition;
+                
+                // Valida se a posição é válida
+                const world = this.WORLDS.find(w => w.id === worldId);
+                if (world && this.isWorldUnlocked(worldId)) {
+                    if (this.isLevelUnlocked(levelIndex)) {
+                        return { worldId, levelIndex };
+                    }
+                    return { worldId, levelIndex: this.getNextUnlockedLevel(worldId) };
+                }
+            }
         }
-        
-        // Valida se a fase está desbloqueada
-        if (!this.isLevelUnlocked(levelIndex)) {
-            return { worldId: worldId, levelIndex: this.getNextUnlockedLevel(worldId) };
-        }
-        
-        return { worldId, levelIndex };
+        return { worldId: 1, levelIndex: 0 };
     },
 
-    /**
-     * Retorna as fases de um mundo com status de desbloqueio/completude
-     */
     getWorldLevelsWithStatus(worldId) {
         const world = this.WORLDS.find(w => w.id === worldId);
         if (!world) return [];
@@ -668,4 +861,3 @@ const GameData = {
 
 // Exporta globalmente
 window.GameData = GameData;
-

@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Rock Hero</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤘</text></svg>">
+    
+    <!-- Google Fonts - Rock Salt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap" rel="stylesheet">
+    
     <style>
         * {
             margin: 0;
@@ -22,6 +28,14 @@
         body {
             background: #1a1a2e;
             font-family: 'Segoe UI', sans-serif;
+        }
+        
+        /* Preload da fonte Rock Salt - força carregamento antes do jogo */
+        .font-preload {
+            font-family: "Rock Salt", cursive;
+            position: absolute;
+            left: -9999px;
+            visibility: hidden;
         }
         
         #game-container {
@@ -144,6 +158,9 @@
     </style>
 </head>
 <body>
+    <!-- Elemento oculto para forçar carregamento da fonte antes do jogo -->
+    <div class="font-preload">Rock Hero</div>
+    
     <div id="game-container"></div>
 
     <!-- Controles Mobile (HTML sobreposto ao canvas) -->

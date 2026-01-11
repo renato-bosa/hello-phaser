@@ -85,10 +85,10 @@ class MenuScene extends Phaser.Scene {
         }
 
         // Sprite animado à esquerda (camada de fundo)
-        // Posição horizontal: 25% da largura visível (considerando zoom se houver)
+        // Posição horizontal: 12% da largura visível (considerando zoom se houver)
         const zoom = this.cameras.main.zoom || 1;
         const visibleWidth = this.cameras.main.width / zoom;
-        const heroX = visibleWidth * 0.25;
+        const heroX = visibleWidth * 0.12;
         
         // Garante filtro NEAREST (pixel art nítido) - pode ter sido alterado pelo GameScene
         this.textures.get('hero-idle').setFilter(Phaser.Textures.FilterMode.NEAREST);
@@ -110,20 +110,33 @@ class MenuScene extends Phaser.Scene {
     }
 
     createTitle() {
-        this.title = this.add.text(this.centerX, this.centerY - 100, 'ROCK HERO', {
+        // Cria o título com fonte padrão inicialmente
+        this.title = this.add.text(this.centerX, this.centerY - 100, 'Rock Hero', {
             fontSize: '48px',
-            fontFamily: 'Arial',
+            fontFamily: 'Arial', // Fallback inicial
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 6,
-            fontStyle: 'bold'
+            strokeThickness: 5
         }).setOrigin(0.5).setDepth(10);
 
-        // Animação de pulo
+        // Aguarda a fonte Rock Salt carregar e então aplica
+        if (document.fonts && document.fonts.load) {
+            document.fonts.load('42px "Rock Salt"').then(() => {
+                // Fonte carregada - atualiza o estilo
+                if (this.title && this.title.active) {
+                    this.title.setFontFamily('"Rock Salt", cursive');
+                }
+            }).catch(() => {
+                // Se falhar, mantém Arial
+                console.log('Fonte Rock Salt não disponível, usando fallback');
+            });
+        }
+
+        // Animação de pulo suave
         this.tweens.add({
             targets: this.title,
-            y: this.title.y - 10,
-            duration: 1000,
+            y: this.title.y - 8,
+            duration: 1200,
             yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut'
@@ -168,11 +181,10 @@ class MenuScene extends Phaser.Scene {
         // Botão "Personagem" (se houver mais de 1 desbloqueado)
         const unlockedChars = GameData.getAvailableCharacters();
         if (unlockedChars.length > 1) {
-            const currentChar = GameData.getCharacter(GameData.loadSelectedCharacter());
             this.characterBtn = this.createButton(
                 this.centerX, 
                 this.centerY + yOffset, 
-                `🎸 ${currentChar.name.toUpperCase()}`,
+                '🎸 Selecionar Integrante',
                 '#ff66ff',
                 () => this.openCharacterSelect()
             );
@@ -190,8 +202,8 @@ class MenuScene extends Phaser.Scene {
         );
         this.menuButtons.push(this.rankingBtn);
 
-        // Cursor de seleção
-        this.cursor = this.add.text(this.centerX - 120, this.menuButtons[0].y, '▶', {
+        // Cursor de seleção (posicionado à esquerda dos botões)
+        this.cursor = this.add.text(this.centerX - 170, this.menuButtons[0].y, '▶', {
             fontSize: '24px',
             fontFamily: 'Arial',
             color: '#ffffff',

@@ -35,19 +35,18 @@ const GameData = {
             }
         },
         {
-            id: 'guitarrista',
-            name: 'Guitarrista',
-            instrument: 'Guitarra',
+            id: 'baixista',
+            name: 'Baixista',
+            instrument: 'Baixo',
             unlockedByDefault: false,
             unlockedByWorld: 2,
             sprites: {
-                // TODO: criar sprites do guitarrista (usando vocalista como placeholder)
-                idle: 'hero-idle',
-                walk: 'hero-walking',
-                jump: 'hero-jumping'
+                idle: 'baixista-idle',
+                walk: 'baixista-idle',  // placeholder
+                jump: 'baixista-idle'   // placeholder
             }
         }
-        // Futuros personagens: baixista, tecladista...
+        // Futuros personagens: guitarrista, tecladista...
     ],
 
     // ==================== MUNDOS ====================
@@ -67,16 +66,16 @@ const GameData = {
         {
             id: 2,
             name: 'Mundo 2',
-            subtitle: 'O Resgate do Guitarrista',
+            subtitle: 'O Resgate do Baixista',
             levels: [4, 5, 6, 7], // Índices das fases (4-7 = fases 5-8)
-            rescuedCharacter: 'guitarrista',
-            celebrationMessage: 'Você resgatou o Guitarrista!',
+            rescuedCharacter: 'baixista',
+            celebrationMessage: 'Você resgatou o Baixista!',
             // Visual no WorldMap (tema caverna/noturno)
             theme: 'cave',
             bgColor: 0x1a1a2e, // Azul escuro noturno
             pathColor: 0x4a4a6a // Cinza arroxeado
         }
-        // Futuros mundos: Mundo 3 (Baixista), Mundo 4 (Tecladista)...
+        // Futuros mundos: Mundo 3 (Guitarrista), Mundo 4 (Tecladista)...
     ],
 
     // Configuração das fases

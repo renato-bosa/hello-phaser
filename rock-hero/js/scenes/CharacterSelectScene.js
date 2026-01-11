@@ -31,7 +31,12 @@ class CharacterSelectScene extends Phaser.Scene {
         });
         
         // Baterista
-        this.load.spritesheet('baterista-walk', 'assets/spritesheets/baterista-andando-pra-direita-6fps.png', {
+        this.load.spritesheet('baterista-idle-select', 'assets/spritesheets/baterista-parado-animado-6fps.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+        
+        // Baixista
+        this.load.spritesheet('baixista-idle-select', 'assets/spritesheets/baixista-parado.png', {
             frameWidth: 32, frameHeight: 32
         });
     }
@@ -128,7 +133,9 @@ class CharacterSelectScene extends Phaser.Scene {
                 if (character.id === 'vocalista') {
                     sprite = this.add.sprite(0, spriteY, 'hero-idle');
                 } else if (character.id === 'baterista') {
-                    sprite = this.add.sprite(0, spriteY, 'baterista-walk');
+                    sprite = this.add.sprite(0, spriteY, 'baterista-idle-select');
+                } else if (character.id === 'baixista') {
+                    sprite = this.add.sprite(0, spriteY, 'baixista-idle-select');
                 }
                 
                 if (sprite) {
@@ -230,8 +237,8 @@ class CharacterSelectScene extends Phaser.Scene {
         if (!this.anims.exists('char-vocalista-idle')) {
             this.anims.create({
                 key: 'char-vocalista-idle',
-                frames: this.anims.generateFrameNumbers('hero-idle', { start: 0, end: 1 }),
-                frameRate: 4,
+                frames: this.anims.generateFrameNumbers('hero-idle', { start: 0, end: 3 }),
+                frameRate: 6,
                 repeat: -1
             });
         }
@@ -240,7 +247,17 @@ class CharacterSelectScene extends Phaser.Scene {
         if (!this.anims.exists('char-baterista-idle')) {
             this.anims.create({
                 key: 'char-baterista-idle',
-                frames: this.anims.generateFrameNumbers('baterista-walk', { start: 0, end: 3 }),
+                frames: this.anims.generateFrameNumbers('baterista-idle-select', { start: 0, end: 3 }),
+                frameRate: 6,
+                repeat: -1
+            });
+        }
+        
+        // Animação do baixista
+        if (!this.anims.exists('char-baixista-idle')) {
+            this.anims.create({
+                key: 'char-baixista-idle',
+                frames: this.anims.generateFrameNumbers('baixista-idle-select', { start: 0, end: 3 }),
                 frameRate: 6,
                 repeat: -1
             });

@@ -64,13 +64,18 @@ class GameScene extends Phaser.Scene {
         });
         
         // Sprites do Baterista
-        this.load.spritesheet('baterista-idle', 'assets/spritesheets/baterista.png', {
+        this.load.spritesheet('baterista-idle', 'assets/spritesheets/baterista-parado-animado-6fps.png', {
             frameWidth: 32, frameHeight: 32
         });
         this.load.spritesheet('baterista-walk', 'assets/spritesheets/baterista-andando-pra-direita-6fps.png', {
             frameWidth: 32, frameHeight: 32
         });
         this.load.spritesheet('baterista-walk-left', 'assets/spritesheets/baterista-andando-pra-esq-6fps.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+        
+        // Sprites do Baixista (usando placeholder por enquanto)
+        this.load.spritesheet('baixista-idle', 'assets/spritesheets/baixista-parado.png', {
             frameWidth: 32, frameHeight: 32
         });
     }
@@ -401,7 +406,7 @@ class GameScene extends Phaser.Scene {
         const characterData = GameData.getCharacter(this.selectedCharacter);
         
         // Determina sprite inicial baseado no personagem
-        const idleSprite = this.selectedCharacter === 'baterista' ? 'baterista-idle' : 'hero-idle';
+        const idleSprite = characterData.sprites.idle;
         
         this.player = this.physics.add.sprite(this.playerSpawn.x, this.playerSpawn.y, idleSprite);
         this.player.setBounce(0);
@@ -418,9 +423,16 @@ class GameScene extends Phaser.Scene {
         
         if (this.selectedCharacter === 'baterista') {
             playerAnims = [
-                { key: 'idle', texture: 'baterista-idle', frames: [0, 0], rate: 6 },
+                { key: 'idle', texture: 'baterista-idle', frames: [0, 3], rate: 6 },
                 { key: 'walk', texture: 'baterista-walk', frames: [0, 3], rate: 6 },
                 { key: 'walk-left', texture: 'baterista-walk-left', frames: [0, 3], rate: 6 }
+            ];
+        } else if (this.selectedCharacter === 'baixista') {
+            // Baixista (usando sprite parado como placeholder para todas as animações)
+            playerAnims = [
+                { key: 'idle', texture: 'baixista-idle', frames: [0, 3], rate: 6 },
+                { key: 'walk', texture: 'baixista-idle', frames: [0, 3], rate: 6 },
+                { key: 'walk-left', texture: 'baixista-idle', frames: [0, 3], rate: 6 }
             ];
         } else {
             // Vocalista (padrão)
@@ -644,11 +656,11 @@ class GameScene extends Phaser.Scene {
             // Para outros personagens, usa flip
             if (this.selectedCharacter === 'baterista') {
                 player.setFlipX(false); // Não usa flip
-            if (onGround) {
+                if (onGround) {
                     const walkAnim = direction < 0 ? 'walk-left' : 'walk';
                     player.anims.play(walkAnim, true);
-            }
-        } else {
+                }
+            } else {
                 player.setFlipX(direction < 0);
                 if (onGround) player.anims.play('walk', true);
             }
@@ -709,12 +721,15 @@ class GameScene extends Phaser.Scene {
         // Animação no ar
         if (!onGround) {
             player.anims.stop();
-            if (this.selectedCharacter === 'baterista') {
-                // Baterista usa sprite parado quando no ar (por enquanto)
-                player.setTexture('baterista-idle', 0);
-            } else {
-                // Vocalista tem sprite de pulo
+            const charData = GameData.getCharacter(this.selectedCharacter);
+            const jumpSprite = charData.sprites.jump;
+            
+            if (jumpSprite === 'hero-jumping') {
+                // Vocalista tem sprite de pulo com frames específicos
                 player.setTexture('hero-jump', player.body.velocity.y < 0 ? 1 : 2);
+            } else {
+                // Outros personagens usam seu sprite de pulo (ou idle como placeholder)
+                player.setTexture(jumpSprite, 0);
             }
         }
     }

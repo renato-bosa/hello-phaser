@@ -21,20 +21,17 @@ class WorldCompleteScene extends Phaser.Scene {
         const character = GameData.getCharacter(this.worldData.rescuedCharacter);
         
         if (character.id === 'baterista') {
-            // Spritesheet do baterista
-            this.load.spritesheet('baterista-idle', 'assets/spritesheets/baterista-andando-pra-direita-6fps.png', {
+            // Spritesheet do baterista parado (para tela de celebração)
+            this.load.spritesheet('baterista-celebration', 'assets/spritesheets/baterista-parado-animado-6fps.png', {
                 frameWidth: 32,
                 frameHeight: 32
             });
-        } else if (character.id === 'guitarrista') {
-            // Guitarrista usa sprites do vocalista como placeholder
-            // Os sprites já são carregados pelo GameScene, então verificamos se existem
-            if (!this.textures.exists('hero-idle')) {
-                this.load.spritesheet('hero-idle', 'assets/spritesheets/still-hero.png', {
-                    frameWidth: 32,
-                    frameHeight: 32
-                });
-            }
+        } else if (character.id === 'baixista') {
+            // Spritesheet do baixista parado
+            this.load.spritesheet('baixista-celebration', 'assets/spritesheets/baixista-parado.png', {
+                frameWidth: 32,
+                frameHeight: 32
+            });
         }
     }
 
@@ -184,19 +181,18 @@ class WorldCompleteScene extends Phaser.Scene {
         
         // Posições baseadas em percentual da altura
         const spriteY = height * 0.38;      // 38% - sprite do personagem
-        const nameY = height * 0.58;        // 58% - nome
+        const nameY = height * 0.60;        // 58% - nome
         const instrumentY = height * 0.65;  // 65% - instrumento
         
         // Determina a sprite key e configuração baseado no personagem
         let spriteKey, frameRate, endFrame;
         
         if (character.id === 'baterista') {
-            spriteKey = 'baterista-idle';
+            spriteKey = 'baterista-celebration';
             frameRate = 6;
             endFrame = 3;
-        } else if (character.id === 'guitarrista') {
-            // Guitarrista usa sprites do vocalista como placeholder
-            spriteKey = 'hero-idle';
+        } else if (character.id === 'baixista') {
+            spriteKey = 'baixista-celebration';
             frameRate = 6;
             endFrame = 3;
         } else {
@@ -218,7 +214,7 @@ class WorldCompleteScene extends Phaser.Scene {
         }
 
         // Círculo de luz atrás do personagem (cor baseada no personagem)
-        const glowColor = character.id === 'guitarrista' ? 0xff6600 : 0xffd700;
+        const glowColor = character.id === 'baixista' ? 0x00aaff : 0xffd700;
         const glow = this.add.circle(centerX, spriteY, 60, glowColor, 0.3);
         this.tweens.add({
             targets: glow,
@@ -298,7 +294,7 @@ class WorldCompleteScene extends Phaser.Scene {
             targets: message,
             alpha: 1,
             duration: 500,
-            delay: 1600
+            delay: 500
         });
 
         // Mensagem de personagem desbloqueado

@@ -2,7 +2,7 @@
  * WORLD MAP SCENE - Mapa do Mundo (estilo Super Mario World)
  * 
  * Navegação visual entre fases de um mundo.
- * Permite selecionar fases desbloqueadas e acessar seleção de personagem.
+ * Inclui portais para mundos adjacentes como extensão natural do caminho.
  */
 
 class WorldMapScene extends Phaser.Scene {
@@ -27,11 +27,19 @@ class WorldMapScene extends Phaser.Scene {
         this.worldData = GameData.WORLDS.find(w => w.id === this.currentWorldId);
         this.levelsData = GameData.getWorldLevelsWithStatus(this.currentWorldId);
         
+        // Mundos adjacentes
+        this.previousWorld = GameData.WORLDS.find(w => w.id === this.currentWorldId - 1);
+        this.nextWorld = GameData.WORLDS.find(w => w.id === this.currentWorldId + 1);
+        
+        // Todos os nós navegáveis (fases + portais)
+        this.allNodes = [];
+        
         // Cria elementos visuais
         this.createBackground(width, height);
         this.createTitle(width);
         this.createPaths();
         this.createLevelNodes();
+        this.createWorldPortals(width, height);
         this.createPlayerCursor();
         this.createUI(width, height);
         this.createInfoPanel(width, height);
@@ -116,7 +124,7 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     createPaths() {
-        const graphics = this.add.graphics();
+        this.graphics = this.add.graphics();
         const pathColor = this.worldData?.pathColor || 0x8B4513;
         
         // Desenha linhas conectando as fases
@@ -125,23 +133,31 @@ class WorldMapScene extends Phaser.Scene {
                 level.connectsTo.forEach(targetIndex => {
                     const targetLevel = this.levelsData.find(l => l.index === targetIndex);
                     if (targetLevel) {
-                        // Linha principal (estrada)
-                        graphics.lineStyle(8, pathColor, 1);
-                        graphics.beginPath();
-                        graphics.moveTo(level.mapPosition.x, level.mapPosition.y);
-                        graphics.lineTo(targetLevel.mapPosition.x, targetLevel.mapPosition.y);
-                        graphics.strokePath();
-                        
-                        // Linha de destaque (meio da estrada)
-                        graphics.lineStyle(2, 0xDEB887, 0.5);
-                        graphics.beginPath();
-                        graphics.moveTo(level.mapPosition.x, level.mapPosition.y);
-                        graphics.lineTo(targetLevel.mapPosition.x, targetLevel.mapPosition.y);
-                        graphics.strokePath();
+                        this.drawPath(
+                            level.mapPosition.x, level.mapPosition.y,
+                            targetLevel.mapPosition.x, targetLevel.mapPosition.y,
+                            pathColor
+                        );
                     }
                 });
             }
         });
+    }
+
+    drawPath(x1, y1, x2, y2, color) {
+        // Linha principal (estrada)
+        this.graphics.lineStyle(8, color, 1);
+        this.graphics.beginPath();
+        this.graphics.moveTo(x1, y1);
+        this.graphics.lineTo(x2, y2);
+        this.graphics.strokePath();
+        
+        // Linha de destaque (meio da estrada)
+        this.graphics.lineStyle(2, 0xDEB887, 0.5);
+        this.graphics.beginPath();
+        this.graphics.moveTo(x1, y1);
+        this.graphics.lineTo(x2, y2);
+        this.graphics.strokePath();
     }
 
     createLevelNodes() {
@@ -212,24 +228,174 @@ class WorldMapScene extends Phaser.Scene {
             }
             
             // Guarda referência
-            this.levelNodes.push({
+            const node = {
                 container,
                 circle,
                 level,
-                index: level.index
-            });
+                index: level.index,
+                type: 'level',
+                isUnlocked: level.isUnlocked,
+                mapPosition: level.mapPosition
+            };
+            this.levelNodes.push(node);
+            this.allNodes.push(node);
         });
+    }
+
+    createWorldPortals(width, height) {
+        this.portalNodes = [];
+        
+        // Portal para mundo anterior (à esquerda da primeira fase)
+        if (this.previousWorld && GameData.isWorldUnlocked(this.previousWorld.id)) {
+            const firstLevel = this.levelsData[0];
+            const portalX = 30;
+            const portalY = firstLevel?.mapPosition?.y || 200;
+            
+            // Desenha caminho para o portal
+            if (firstLevel) {
+                this.drawPath(portalX, portalY, firstLevel.mapPosition.x, firstLevel.mapPosition.y, 0x6b4c9a);
+            }
+            
+            // Cria o portal
+            const portalNode = this.createPortalNode(
+                portalX, portalY,
+                this.previousWorld,
+                '←',
+                0x9966cc
+            );
+            
+            // Adiciona à lista de nós (antes das fases)
+            this.portalNodes.push(portalNode);
+            this.allNodes.unshift(portalNode); // No início da navegação
+        }
+        
+        // Portal para próximo mundo (à direita da última fase)
+        if (this.nextWorld) {
+            const lastLevel = this.levelsData[this.levelsData.length - 1];
+            const portalX = width - 30;
+            const portalY = lastLevel?.mapPosition?.y || 200;
+            
+            // Verifica se o próximo mundo está desbloqueado
+            const isNextUnlocked = GameData.isWorldUnlocked(this.nextWorld.id);
+            
+            // Desenha caminho para o portal
+            if (lastLevel) {
+                this.drawPath(lastLevel.mapPosition.x, lastLevel.mapPosition.y, portalX, portalY, 
+                    isNextUnlocked ? 0x6b4c9a : 0x444444);
+            }
+            
+            // Cria o portal
+            const portalNode = this.createPortalNode(
+                portalX, portalY,
+                this.nextWorld,
+                '→',
+                isNextUnlocked ? 0x9966cc : 0x444444,
+                !isNextUnlocked
+            );
+            
+            // Adiciona à lista de nós (depois das fases)
+            this.portalNodes.push(portalNode);
+            this.allNodes.push(portalNode); // No final da navegação
+        }
+    }
+
+    createPortalNode(x, y, targetWorld, arrow, color, locked = false) {
+        const container = this.add.container(x, y);
+        
+        // Forma de portal (arco/portão)
+        const portalWidth = 40;
+        const portalHeight = 50;
+        
+        // Sombra
+        const shadow = this.add.ellipse(0, 5, portalWidth + 4, 20, 0x000000, 0.3);
+        container.add(shadow);
+        
+        // Base do portal (retângulo arredondado simulado)
+        const portalBg = this.add.rectangle(0, 0, portalWidth, portalHeight, color, locked ? 0.4 : 0.9);
+        portalBg.setStrokeStyle(3, locked ? 0x333333 : 0xffffff);
+        container.add(portalBg);
+        
+        // Arco superior
+        const arc = this.add.arc(0, -portalHeight/2 + 5, portalWidth/2, 180, 360, false, color, locked ? 0.4 : 0.9);
+        arc.setStrokeStyle(3, locked ? 0x333333 : 0xffffff);
+        container.add(arc);
+        
+        // Interior do portal (efeito de profundidade)
+        if (!locked) {
+            const inner = this.add.rectangle(0, 5, portalWidth - 10, portalHeight - 15, 0x2d1b4e, 0.8);
+            container.add(inner);
+            
+            // Efeito de brilho/energia
+            const glow = this.add.ellipse(0, 0, 20, 30, 0xaa88ff, 0.5);
+            container.add(glow);
+            
+            // Animação de energia
+            this.tweens.add({
+                targets: glow,
+                alpha: { from: 0.3, to: 0.7 },
+                scaleX: { from: 0.8, to: 1.2 },
+                scaleY: { from: 0.9, to: 1.1 },
+                duration: 1000,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+        }
+        
+        // Seta direcional
+        const arrowText = this.add.text(0, 0, arrow, {
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '16px',
+            color: locked ? '#666666' : '#ffffff'
+        }).setOrigin(0.5);
+        container.add(arrowText);
+        
+        // Nome do mundo de destino
+        const worldName = this.add.text(0, 35, targetWorld.name, {
+            fontFamily: 'Arial',
+            fontSize: '10px',
+            color: locked ? '#666666' : '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 2
+        }).setOrigin(0.5);
+        container.add(worldName);
+        
+        // Cadeado se bloqueado
+        if (locked) {
+            const lock = this.add.text(15, -20, '🔒', {
+                fontSize: '14px'
+            }).setOrigin(0.5);
+            container.add(lock);
+        }
+        
+        return {
+            container,
+            circle: portalBg, // Usa o retângulo como referência para highlight
+            type: 'portal',
+            targetWorld: targetWorld,
+            isUnlocked: !locked,
+            index: `portal_${targetWorld.id}`,
+            mapPosition: { x, y },
+            name: targetWorld.name,
+            subtitle: locked ? 'Complete o mundo atual' : `Ir para ${targetWorld.name}`
+        };
     }
 
     createPlayerCursor() {
         // Encontra a posição inicial do cursor
-        const startNode = this.levelNodes.find(n => n.index === this.cursorLevelIndex);
-        if (!startNode) return;
+        let startNode = this.allNodes.find(n => n.index === this.cursorLevelIndex);
         
-        const { x, y } = startNode.level.mapPosition;
+        // Se não encontrou (pode ser um portal), usa a primeira fase desbloqueada
+        if (!startNode) {
+            startNode = this.allNodes.find(n => n.type === 'level' && n.isUnlocked);
+        }
+        if (!startNode) {
+            startNode = this.allNodes[0];
+        }
         
-        // Sprite do personagem selecionado
-        const character = GameData.getCharacter(GameData.state.selectedCharacter);
+        this.currentNodeIndex = this.allNodes.indexOf(startNode);
+        
+        const { x, y } = startNode.mapPosition;
         
         // Cursor (triângulo apontando para baixo)
         this.cursor = this.add.container(x, y - 45);
@@ -249,8 +415,8 @@ class WorldMapScene extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
         
-        // Guarda posição base para animação
-        this.cursorBaseY = y - 45;
+        // Destaque inicial
+        this.highlightNode(startNode);
     }
 
     createUI(width, height) {
@@ -265,10 +431,10 @@ class WorldMapScene extends Phaser.Scene {
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         const controls = isMobile ? [
             { key: '← →', action: 'Navegar' },
-            { key: 'PULO', action: 'Jogar' }
+            { key: 'PULO', action: 'Selecionar' }
         ] : [
             { key: '← →', action: 'Navegar' },
-            { key: 'ESPAÇO', action: 'Jogar' },
+            { key: 'ESPAÇO', action: 'Selecionar' },
             { key: 'P', action: 'Personagem' },
             { key: 'ESC', action: 'Menu' }
         ];
@@ -331,42 +497,57 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     updateInfoPanel() {
-        const node = this.levelNodes.find(n => n.index === this.cursorLevelIndex);
+        const node = this.allNodes[this.currentNodeIndex];
         if (!node) return;
         
-        const level = node.level;
-        
-        // Nome
-        this.infoLevelName.setText(level.name);
-        
-        // Status
-        if (level.isComplete) {
-            this.infoStatus.setText('✓ Completa');
-            this.infoStatus.setColor('#00ff00');
-        } else if (level.isUnlocked) {
-            this.infoStatus.setText('● Disponível');
-            this.infoStatus.setColor('#ffff00');
+        if (node.type === 'portal') {
+            // Info de portal
+            this.infoLevelName.setText(node.name);
+            
+            if (node.isUnlocked) {
+                this.infoStatus.setText('🌀 Portal Aberto');
+                this.infoStatus.setColor('#aa88ff');
+            } else {
+                this.infoStatus.setText('🔒 Portal Fechado');
+                this.infoStatus.setColor('#888888');
+            }
+            
+            this.infoBestTime.setText(node.subtitle);
+            this.infoBestTime.setColor('#aaaaaa');
         } else {
-            this.infoStatus.setText('🔒 Bloqueada');
-            this.infoStatus.setColor('#888888');
-        }
-        
-        // Melhor tempo
-        if (level.bestTime) {
-            this.infoBestTime.setText(`⏱ ${GameData.formatTime(level.bestTime)}`);
-        } else {
-            this.infoBestTime.setText('');
+            // Info de fase
+            const level = node.level;
+            
+            this.infoLevelName.setText(level.name);
+            
+            if (level.isComplete) {
+                this.infoStatus.setText('✓ Completa');
+                this.infoStatus.setColor('#00ff00');
+            } else if (level.isUnlocked) {
+                this.infoStatus.setText('● Disponível');
+                this.infoStatus.setColor('#ffff00');
+            } else {
+                this.infoStatus.setText('🔒 Bloqueada');
+                this.infoStatus.setColor('#888888');
+            }
+            
+            if (level.bestTime) {
+                this.infoBestTime.setText(`⏱ ${GameData.formatTime(level.bestTime)}`);
+                this.infoBestTime.setColor('#00ffff');
+            } else {
+                this.infoBestTime.setText('');
+            }
         }
     }
 
     setupControls() {
         // Navegação
-        this.input.keyboard.on('keydown-LEFT', () => this.navigateLevel(-1));
-        this.input.keyboard.on('keydown-RIGHT', () => this.navigateLevel(1));
+        this.input.keyboard.on('keydown-LEFT', () => this.navigateNode(-1));
+        this.input.keyboard.on('keydown-RIGHT', () => this.navigateNode(1));
         
-        // Selecionar fase
-        this.input.keyboard.on('keydown-ENTER', () => this.selectLevel());
-        this.input.keyboard.on('keydown-SPACE', () => this.selectLevel());
+        // Selecionar
+        this.input.keyboard.on('keydown-ENTER', () => this.selectNode());
+        this.input.keyboard.on('keydown-SPACE', () => this.selectNode());
         
         // Seleção de personagem
         this.input.keyboard.on('keydown-P', () => this.openCharacterSelect());
@@ -374,64 +555,60 @@ class WorldMapScene extends Phaser.Scene {
         // Voltar ao menu
         this.input.keyboard.on('keydown-ESC', () => this.backToMenu());
         
-        // Suporte a controles virtuais (mobile) - verificado no update()
+        // Suporte a controles virtuais (mobile)
         this.virtualControls = GameData.getVirtualControls();
         this.lastNavTime = 0;
     }
 
     update(time) {
-        // Controles virtuais mobile (mais eficiente que timer separado)
+        // Controles virtuais mobile
         if (this.virtualControls.jumpJustPressed) {
             this.virtualControls.jumpJustPressed = false;
-            this.selectLevel();
+            this.selectNode();
         }
         
-        // Navegação com throttle (evita repetição muito rápida)
+        // Navegação com throttle
         if (time - this.lastNavTime > 200) {
             if (this.virtualControls.left) {
-                this.navigateLevel(-1);
+                this.navigateNode(-1);
                 this.lastNavTime = time;
             } else if (this.virtualControls.right) {
-                this.navigateLevel(1);
+                this.navigateNode(1);
                 this.lastNavTime = time;
             }
         }
     }
 
-    navigateLevel(direction) {
-        // Encontra próxima fase navegável
-        const currentNode = this.levelNodes.find(n => n.index === this.cursorLevelIndex);
-        if (!currentNode) return;
+    navigateNode(direction) {
+        let newIndex = this.currentNodeIndex + direction;
         
-        // Encontra a posição atual na lista de fases do mundo
-        const worldLevels = this.worldData.levels;
-        const currentPos = worldLevels.indexOf(this.cursorLevelIndex);
+        // Limita aos bounds
+        if (newIndex < 0) newIndex = 0;
+        if (newIndex >= this.allNodes.length) newIndex = this.allNodes.length - 1;
         
-        // Calcula nova posição
-        let newPos = currentPos + direction;
-        if (newPos < 0) newPos = 0;
-        if (newPos >= worldLevels.length) newPos = worldLevels.length - 1;
+        const newNode = this.allNodes[newIndex];
         
-        const newLevelIndex = worldLevels[newPos];
-        
-        // Só move se a fase estiver desbloqueada
-        if (!GameData.isLevelUnlocked(newLevelIndex)) {
+        // Só move se o nó estiver desbloqueado
+        if (!newNode.isUnlocked) {
             SoundManager.play('warning');
             return;
         }
         
-        if (newLevelIndex !== this.cursorLevelIndex) {
-            this.cursorLevelIndex = newLevelIndex;
-            this.moveCursorToLevel(newLevelIndex);
+        if (newIndex !== this.currentNodeIndex) {
+            this.currentNodeIndex = newIndex;
+            this.moveCursorToNode(newNode);
             SoundManager.play('menuNavigate');
+            
+            // Salva posição se for uma fase
+            if (newNode.type === 'level') {
+                this.cursorLevelIndex = newNode.index;
+                GameData.saveMapPosition(this.currentWorldId, newNode.index);
+            }
         }
     }
 
-    moveCursorToLevel(levelIndex) {
-        const node = this.levelNodes.find(n => n.index === levelIndex);
-        if (!node) return;
-        
-        const { x, y } = node.level.mapPosition;
+    moveCursorToNode(node) {
+        const { x, y } = node.mapPosition;
         
         // Para a animação atual
         this.tweens.killTweensOf(this.cursor);
@@ -445,10 +622,9 @@ class WorldMapScene extends Phaser.Scene {
             ease: 'Power2',
             onComplete: () => {
                 // Reinicia animação de bounce
-                this.cursorBaseY = y - 45;
                 this.tweens.add({
                     targets: this.cursor,
-                    y: this.cursorBaseY - 8,
+                    y: y - 45 - 8,
                     duration: 400,
                     yoyo: true,
                     repeat: -1,
@@ -457,21 +633,22 @@ class WorldMapScene extends Phaser.Scene {
             }
         });
         
-        // Destaque visual no nó
+        // Destaque visual
         this.highlightNode(node);
         
         // Atualiza painel de info
         this.updateInfoPanel();
-        
-        // Salva posição
-        GameData.saveMapPosition(this.currentWorldId, levelIndex);
     }
 
     highlightNode(node) {
-        // Remove destaque de outros nós
-        this.levelNodes.forEach(n => {
-            n.circle.setStrokeStyle(3, n.level.isComplete ? 0x008800 : 
-                                        n.level.isUnlocked ? 0xccaa00 : 0x444444);
+        // Remove destaque de todos os nós
+        this.allNodes.forEach(n => {
+            if (n.type === 'level') {
+                n.circle.setStrokeStyle(3, n.level?.isComplete ? 0x008800 : 
+                                            n.isUnlocked ? 0xccaa00 : 0x444444);
+            } else {
+                n.circle.setStrokeStyle(3, n.isUnlocked ? 0xffffff : 0x333333);
+            }
         });
         
         // Adiciona destaque ao nó selecionado
@@ -486,21 +663,67 @@ class WorldMapScene extends Phaser.Scene {
         });
     }
 
-    selectLevel() {
-        const node = this.levelNodes.find(n => n.index === this.cursorLevelIndex);
+    selectNode() {
+        const node = this.allNodes[this.currentNodeIndex];
         if (!node) return;
         
-        if (!node.level.isUnlocked) {
+        if (!node.isUnlocked) {
             SoundManager.play('warning');
             return;
         }
         
         SoundManager.play('menuSelect');
         
-        // Inicia a fase
-        this.scene.start('GameScene', {
-            level: this.cursorLevelIndex,
-            playerName: GameData.loadPlayerName()
+        if (node.type === 'portal') {
+            // Transição para outro mundo
+            this.transitionToWorld(node.targetWorld);
+        } else {
+            // Inicia a fase
+            this.scene.start('GameScene', {
+                level: node.index,
+                playerName: GameData.loadPlayerName()
+            });
+        }
+    }
+
+    transitionToWorld(targetWorld) {
+        // Efeito de transição
+        const { width, height } = this.cameras.main;
+        const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0)
+            .setOrigin(0).setDepth(100);
+        
+        // Texto de transição
+        const transitionText = this.add.text(width / 2, height / 2, `Entrando no ${targetWorld.name}...`, {
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '14px',
+            color: '#ffffff'
+        }).setOrigin(0.5).setDepth(101).setAlpha(0);
+        
+        // Animação de fade
+        this.tweens.add({
+            targets: overlay,
+            alpha: 1,
+            duration: 500,
+            ease: 'Power2'
+        });
+        
+        this.tweens.add({
+            targets: transitionText,
+            alpha: 1,
+            duration: 300,
+            delay: 200
+        });
+        
+        // Troca de cena após a animação
+        this.time.delayedCall(800, () => {
+            // Define a posição inicial no novo mundo
+            const firstLevel = targetWorld.levels[0];
+            GameData.saveMapPosition(targetWorld.id, firstLevel);
+            
+            this.scene.start('WorldMapScene', {
+                worldId: targetWorld.id,
+                levelIndex: firstLevel
+            });
         });
     }
 

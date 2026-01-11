@@ -363,17 +363,19 @@ class WorldCompleteScene extends Phaser.Scene {
         GameData.markWorldComplete(this.worldData.id);
         GameData.unlockCharacter(this.worldData.rescuedCharacter);
 
-        // Verifica se há próximo mundo desbloqueado
+        // Verifica se há próximo mundo
         const nextWorldId = this.worldData.id + 1;
         const nextWorld = GameData.WORLDS.find(w => w.id === nextWorldId);
         
-        if (nextWorld && GameData.isWorldUnlocked(nextWorldId)) {
-            // Vai ao mapa do próximo mundo
+        if (nextWorld) {
+            // Vai ao mapa do próximo mundo (primeira fase)
             GameData.saveMapPosition(nextWorldId, nextWorld.levels[0]);
-            this.scene.start('WorldMapScene', { worldId: nextWorldId });
+            this.scene.start('WorldMapScene', { worldId: nextWorldId, levelIndex: nextWorld.levels[0] });
         } else {
-            // Volta ao mapa do mundo atual (ou menu se não houver mais mundos)
-            this.scene.start('WorldMapScene', { worldId: this.worldData.id });
+            // Não há próximo mundo - mantém no mundo atual na última fase completada
+            const lastLevelOfWorld = this.worldData.levels[this.worldData.levels.length - 1];
+            GameData.saveMapPosition(this.worldData.id, lastLevelOfWorld);
+            this.scene.start('WorldMapScene', { worldId: this.worldData.id, levelIndex: lastLevelOfWorld });
         }
     }
 }

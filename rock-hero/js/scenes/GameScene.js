@@ -989,8 +989,9 @@ class GameScene extends Phaser.Scene {
                 fontSize: '16px', fontFamily: 'Arial', color: '#ffffff'
             }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
 
-            // Volta ao mapa do mundo
+            // Volta ao mapa do mundo (mantém na última fase completada)
             const handleBackToMap = () => {
+                GameData.saveMapPosition(GameData.state.currentWorld, this.currentLevel);
                 this.scene.start('WorldMapScene');
             };
 
@@ -1047,7 +1048,6 @@ class GameScene extends Phaser.Scene {
 
         // Handler para ir à tela de comemoração
         const handleWorldComplete = () => {
-            GameData.clearProgress(); // Limpa progresso do mundo
             this.scene.start('WorldCompleteScene', {
                 world: world,
                 playerName: this.playerName,

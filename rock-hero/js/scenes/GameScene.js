@@ -322,6 +322,7 @@ class GameScene extends Phaser.Scene {
         const trampolines = [];
         const stars = [];
         const enemies = [];
+        const speedBoosts = [];
 
         // ========== DETECÇÃO AUTOMÁTICA DE TIPOS ==========
         // Monta um mapa de gid → nome do tileset para detecção automática
@@ -376,6 +377,12 @@ class GameScene extends Phaser.Scene {
                     type: 'sapo'
                 });
             }
+            // ========== SETAS DE VELOCIDADE (Speed Boost) ==========
+            else if (type === 'speed_boost' || type === 'boost' ||
+                     tilesetName.includes('setas') || tilesetName.includes('velocidade') ||
+                     tilesetName.includes('speed') || tilesetName.includes('boost')) {
+                speedBoosts.push({ x: obj.x + 16, y: obj.y - 16 });
+            }
         });
 
         this.currentCheckpoint = this.playerSpawn;
@@ -386,6 +393,7 @@ class GameScene extends Phaser.Scene {
         this.createTrampolines(trampolines);
         this.createStars(stars);
         this.createEnemies(enemies);
+        this.createSpeedBoosts(speedBoosts);
     }
 
     createGoal() {
@@ -440,8 +448,9 @@ class GameScene extends Phaser.Scene {
         const sapo = this.physics.add.sprite(x, y, 'sapo-tomate');
         
         // Configuração física
-        sapo.body.setSize(24, 20);
-        sapo.body.setOffset(4, 12);
+        // Hitbox cobre mais a parte superior para facilitar pular em cima
+        sapo.body.setSize(26, 32);
+        sapo.body.setOffset(3, 0);
         sapo.body.allowGravity = true;
         sapo.body.setCollideWorldBounds(true);
         
@@ -517,10 +526,121 @@ class GameScene extends Phaser.Scene {
     }
 
     handleEnemyCollision(player, enemy) {
-        // Jogador encosta no inimigo = dano
-        if (!this.isRespawning) {
+        if (!enemy || !enemy.active) return;
+        
+        // Verifica se o jogador está caindo de cima do inimigo
+        // Condições: jogador descendo (velocityY > 0) E pés do jogador acima do centro do inimigo
+        const playerBottom = player.body.bottom;
+        const enemyCenter = enemy.body.center.y;
+        const isStomping = player.body.velocity.y > 0 && playerBottom <= enemyCenter + 8;
+        
+        if (isStomping) {
+            // Elimina o inimigo
+            this.killEnemy(enemy);
+            // Impulso para cima no jogador (quique satisfatório)
+            player.setVelocityY(-400);
+        } else if (!this.isRespawning) {
+            // Jogador encosta no inimigo pelo lado = dano
             SoundManager.play('death');
             this.respawnAtCheckpoint();
+        }
+    }
+
+    killEnemy(enemy) {
+        // Efeito visual de morte
+        this.tweens.add({
+            targets: enemy,
+            scaleY: 0.2,
+            scaleX: 1.3,
+            alpha: 0,
+            y: enemy.y + 16,
+            duration: 200,
+            ease: 'Power2',
+            onComplete: () => {
+                enemy.destroy();
+            }
+        });
+        
+        // Desativa colisão imediatamente
+        enemy.body.enable = false;
+        
+        // Som de eliminar inimigo
+        SoundManager.play('damage');
+    }
+
+    // ========== SETAS DE VELOCIDADE ==========
+    
+    createSpeedBoosts(positions) {
+        this.speedBoosts = this.physics.add.staticGroup();
+        
+        positions.forEach(pos => {
+            const boost = this.physics.add.staticSprite(pos.x, pos.y, 'setas-velocidade');
+            boost.body.setSize(32, 16);
+            boost.body.setOffset(0, 8);
+            boost.setAlpha(0.9);
+            this.speedBoosts.add(boost);
+        });
+    }
+
+    handleSpeedBoost(player, boost) {
+        // Só ativa se este boost específico não foi usado recentemente (cooldown de 300ms)
+        if (boost.lastUsed && this.time.now - boost.lastUsed < 300) return;
+        boost.lastUsed = this.time.now;
+        
+        // Configuração do boost
+        const BOOST_DURATION = 500; // 0,5 segundos
+        const BOOST_SPEED = 1000; // Velocidade fixa durante o boost
+        
+        // Ativa/estende o boost (sem interrupção se já está ativo)
+        this.speedBoostActive = true;
+        this.speedBoostSpeed = BOOST_SPEED;
+        this.speedBoostEndTime = this.time.now + BOOST_DURATION;
+        
+        // Aplica velocidade imediatamente na direção que o jogador está olhando
+        const direction = player.flipX ? -1 : 1;
+        player.setVelocityX(direction * BOOST_SPEED);
+        
+        // Efeito visual no jogador (tint amarelo)
+        player.setTint(0xffff00);
+        
+        // Cancela timer anterior se existir
+        if (this.speedBoostTimer) {
+            this.speedBoostTimer.remove();
+        }
+        
+        // Cria novo timer para remover o boost
+        this.speedBoostTimer = this.time.delayedCall(BOOST_DURATION, () => {
+            this.speedBoostActive = false;
+            this.speedBoostSpeed = 0;
+            player.clearTint();
+            this.speedBoostTimer = null;
+        });
+        
+        // Efeito visual no objeto de boost
+        this.tweens.add({
+            targets: boost,
+            alpha: 0.3,
+            duration: 100,
+            yoyo: true,
+            repeat: 2,
+            onComplete: () => boost.setAlpha(0.9)
+        });
+        
+        // Som de aceleração
+        SoundManager.play('speedBoost');
+    }
+
+    cancelSpeedBoost() {
+        if (!this.speedBoostActive) return;
+        
+        this.speedBoostActive = false;
+        this.speedBoostSpeed = 0;
+        this.player.clearTint();
+        
+        // Cancela o timer se existir
+        if (this.speedBoostTimer) {
+            this.speedBoostTimer.remove();
+            this.speedBoostTimer = null;
         }
     }
 
@@ -544,10 +664,10 @@ class GameScene extends Phaser.Scene {
 
     setupTileAnimations(layer, tileset) {
         if (!tileset) return;
-
+        
         const firstGid = tileset.firstgid;
         let currentFrame = 0;
-
+        
         this.time.addEvent({
             delay: 200,
             loop: true,
@@ -594,7 +714,7 @@ class GameScene extends Phaser.Scene {
         
         this.player = this.physics.add.sprite(this.playerSpawn.x, this.playerSpawn.y, idleSprite);
         this.player.setBounce(0);
-        this.player.body.setMaxVelocity(400, 1000);
+        this.player.body.setMaxVelocity(2000, 1000); // Permite velocidade alta para boost
         this.player.body.setSize(14, 30);
         this.player.body.setOffset(9, 2);
         this.player.setCollideWorldBounds(true);
@@ -676,6 +796,11 @@ class GameScene extends Phaser.Scene {
             this.physics.add.overlap(this.player, this.enemies, this.handleEnemyCollision, null, this);
         }
 
+        // Setas de velocidade (speed boost)
+        if (this.speedBoosts && this.speedBoosts.children.size > 0) {
+            this.physics.add.overlap(this.player, this.speedBoosts, this.handleSpeedBoost, null, this);
+        }
+
         // Checkpoints
         this.checkpoints.forEach(flag => {
             this.physics.add.overlap(this.player, flag, () => {
@@ -740,7 +865,7 @@ class GameScene extends Phaser.Scene {
             stroke: '#000000',
             strokeThickness: 3
         }).setOrigin(0.5).setScrollFactor(0).setDepth(100);
-
+        
         this.tweens.add({
             targets: text,
             alpha: 0,
@@ -788,8 +913,8 @@ class GameScene extends Phaser.Scene {
             }
             // Durante countdown, mantém o jogador parado
             if (this.currentView === 'countdown') {
-                this.player.setVelocity(0, 0);
-                this.player.anims.play('idle', true);
+        this.player.setVelocity(0, 0);
+        this.player.anims.play('idle', true);
             }
             return;
         }
@@ -821,9 +946,9 @@ class GameScene extends Phaser.Scene {
         const player = this.player;
         const onGround = player.body.blocked.down;
 
-        // Constantes
-        const MIN_SPEED = 160;
-        const MAX_SPEED = 260;
+        // Constantes base
+        const BASE_MIN_SPEED = 160;
+        const BASE_MAX_SPEED = 260;
         const ACCELERATION = 200;
         const JUMP_FORCE = -480;
         const JUMP_CUT = 0.4;
@@ -838,30 +963,53 @@ class GameScene extends Phaser.Scene {
         const moveRight = this.cursors.right.isDown || this.virtualControls.right;
         let direction = moveLeft ? -1 : (moveRight ? 1 : 0);
 
-        if (direction !== this.lastDirection) {
-            this.currentSpeed = MIN_SPEED;
-        }
-        this.lastDirection = direction;
-        
-        if (direction !== 0) {
-            this.currentSpeed = Math.min(this.currentSpeed + ACCELERATION * dt, MAX_SPEED);
-            player.setVelocityX(direction * this.currentSpeed);
+        // Se boost está ativo, mantém velocidade fixa
+        if (this.speedBoostActive && this.speedBoostSpeed && direction !== 0) {
+            // Durante o boost, usa velocidade fixa
+            player.setVelocityX(direction * this.speedBoostSpeed);
             
-            // Para baterista, usa animação específica de direção
-            // Para outros personagens, usa flip
+            // Animações durante o boost
             if (this.selectedCharacter === 'baterista') {
-                player.setFlipX(false); // Não usa flip
-            if (onGround) {
+                player.setFlipX(false);
+                if (onGround) {
                     const walkAnim = direction < 0 ? 'walk-left' : 'walk';
                     player.anims.play(walkAnim, true);
-            }
-        } else {
+                }
+            } else {
                 player.setFlipX(direction < 0);
                 if (onGround) player.anims.play('walk', true);
             }
         } else {
-            player.setVelocityX(0);
-            if (onGround) player.anims.play('idle', true);
+            // Soltou o botão durante o boost = cancela o boost
+            if (this.speedBoostActive && direction === 0) {
+                this.cancelSpeedBoost();
+            }
+            
+            // Movimento normal (sem boost)
+            if (direction !== this.lastDirection) {
+                this.currentSpeed = BASE_MIN_SPEED;
+            }
+            this.lastDirection = direction;
+            
+            if (direction !== 0) {
+                this.currentSpeed = Math.min(this.currentSpeed + ACCELERATION * dt, BASE_MAX_SPEED);
+                player.setVelocityX(direction * this.currentSpeed);
+                
+                // Para baterista, usa animação específica de direção
+                if (this.selectedCharacter === 'baterista') {
+                    player.setFlipX(false);
+                    if (onGround) {
+                        const walkAnim = direction < 0 ? 'walk-left' : 'walk';
+                        player.anims.play(walkAnim, true);
+                    }
+                } else {
+                    player.setFlipX(direction < 0);
+                    if (onGround) player.anims.play('walk', true);
+                }
+            } else {
+                player.setVelocityX(0);
+                if (onGround) player.anims.play('idle', true);
+            }
         }
 
         // Pulo (apenas barra de espaço)
@@ -936,18 +1084,18 @@ class GameScene extends Phaser.Scene {
             this.respawnAtCheckpoint();
         }
     }
-
+    
     handleTrampolineCollision(player, trampoline) {
         if (player.body.velocity.y >= 0 && !trampoline.justBounced) {
             player.setVelocityY(-990);
             this.isJumping = true;
             SoundManager.play('jumpTrampoline');
-
+            
             trampoline.justBounced = true;
             this.time.delayedCall(200, () => {
                 trampoline.justBounced = false;
             });
-
+            
             this.tweens.add({
                 targets: trampoline,
                 scaleY: 0.6,
@@ -957,7 +1105,7 @@ class GameScene extends Phaser.Scene {
             });
         }
     }
-
+    
     collectStar(player, star) {
         star.disableBody(true, true);
         this.starsCollected++;

@@ -149,6 +149,27 @@ const SoundManager = {
             vibratoDepth: 30,
             vibratoSpeed: 20
         },
+        death: {
+            type: 'square',
+            frequency: 300,
+            duration: 0.4,
+            volume: 0.45,
+            attack: 0.01,
+            decay: 0.35,
+            slide: -200,
+            sequence: [300, 200, 150, 100] // Descida dramática
+        },
+        speedBoost: {
+            type: 'sawtooth',
+            frequency: 200,
+            duration: 0.25,
+            volume: 0.4,
+            attack: 0.01,
+            decay: 0.2,
+            slide: 800, // Slide ascendente rápido = sensação de aceleração
+            vibratoDepth: 15,
+            vibratoSpeed: 30
+        },
         
         // === FEEDBACK ===
         warning: {

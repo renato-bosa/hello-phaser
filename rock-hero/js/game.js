@@ -6,11 +6,15 @@
  * - MenuScene.js: Menu principal
  * - GameScene.js: Gameplay
  * 
- * Debug: Adicione ?fps=true na URL para mostrar contador de FPS
+ * Debug:
+ * - ?fps=true   → Mostra contador de FPS
+ * - ?debug=true → Mostra hitboxes de colisão
  */
 
-// Verifica se deve mostrar FPS
-const showFPS = window.location.search.includes('fps=true');
+// Parâmetros de debug via URL
+const urlParams = new URLSearchParams(window.location.search);
+const showFPS = urlParams.get('fps') === 'true';
+const showDebug = urlParams.get('debug') === 'true';
 
 const config = {
     type: Phaser.AUTO,
@@ -29,7 +33,13 @@ const config = {
         arcade: {
             gravity: { y: 800 },
             fps: 120, // Evita tunneling
-            debug: false
+            debug: showDebug, // Mostra hitboxes quando ?debug=true
+            debugShowBody: showDebug,
+            debugShowStaticBody: showDebug,
+            debugShowVelocity: showDebug,
+            debugBodyColor: 0x00ff00,
+            debugStaticBodyColor: 0x0000ff,
+            debugVelocityColor: 0xff0000
         }
     },
     

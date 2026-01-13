@@ -140,10 +140,10 @@ const GameData = {
         },
         { 
             key: 'map6', 
-            file: 'assets/map.json', // TODO: criar mapa próprio
+            file: 'assets/map-6--caverna2.json',
             name: 'Cristais Perigosos',
-            zoom: 1.0,
-            roundPixels: true,
+            zoom: 0.9,
+            roundPixels: false,
             world: 2,
             mapPosition: { x: 200, y: 160 },
             connectsTo: [6]

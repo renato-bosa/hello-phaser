@@ -29,29 +29,11 @@ class GameScene extends Phaser.Scene {
             this.load.tilemapTiledJSON(level.key, level.file);
         });
         
-        // Tilesets (nome no código → nome do arquivo)
-        const tilesets = [
-            'grass', 'grass-with-barrier', 'bricks', 'abstract-background',
-            'black', 'green-flag', 'yellow-flag', 'lava', 'lava-roxa',
-            'lava-roxa-animated', 'trampoline', 'abstract-blue',
-            'starry-sky', 'grass-floating-platform-middle', 'grass-floating-platform-edges',
-            'lava-bubbles-4fps', 'blue-bricks2', 'green-bricks', 'pedra'
-        ];
-        tilesets.forEach(name => {
-            const fileName = name === 'trampoline' ? 'trampoline-thick' : name;
-            this.load.image(name, `assets/spritesheets/${fileName}.png`);
-        });
-        
-        // Aliases para tilesets que o Tiled pode referenciar com nomes diferentes
-        this.load.image('trampoline-thick', 'assets/spritesheets/trampoline-thick.png');
-        this.load.image('yellow-star-animated', 'assets/spritesheets/yellow-star-animated.png');
-        this.load.image('still-hero (2)', 'assets/spritesheets/still-hero.png');
-        
-        // Tilesets do Mundo 2 (Caverna)
-        this.load.image('cristal das notas de som', 'assets/spritesheets/cristal das notas de som.png');
-        this.load.image('grama noturna', 'assets/spritesheets/grama noturna.png');
+        // ========== CARREGAMENTO AUTOMÁTICO DE TILESETS ==========
+        // Carrega dinamicamente todos os tilesets de todos os mapas
+        this.loadTilesetsFromMaps();
 
-        // Spritesheets
+        // ========== SPRITESHEETS DE GAMEPLAY ==========
         this.load.spritesheet('star', 'assets/spritesheets/yellow-star-animated.png', {
             frameWidth: 32, frameHeight: 32
         });
@@ -81,6 +63,66 @@ class GameScene extends Phaser.Scene {
         // Sprites do Baixista (usando placeholder por enquanto)
         this.load.spritesheet('baixista-idle', 'assets/spritesheets/baixista-parado.png', {
             frameWidth: 32, frameHeight: 32
+        });
+        
+        // ========== INIMIGOS ==========
+        // Sapo-tomate (6 frames de animação de pulo)
+        this.load.spritesheet('sapo-tomate', 'assets/spritesheets/sapo-tomate-6fps.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+    }
+
+    /**
+     * Carrega automaticamente TODOS os tilesets referenciados nos mapas JSON
+     * Isso elimina a necessidade de adicionar tilesets manualmente ao código
+     */
+    loadTilesetsFromMaps() {
+        const loadedTilesets = new Set();
+        
+        // Aliases: nome usado no código → nome no tileset do Tiled
+        // Usado quando o código espera um nome diferente do que está no mapa
+        const TILESET_ALIASES = {
+            'trampoline-thick': 'trampoline', // código usa 'trampoline', Tiled usa 'trampoline-thick'
+        };
+        
+        GameData.LEVELS.forEach(level => {
+            // Usa XMLHttpRequest síncrono para ler o JSON do mapa
+            // (durante o preload, isso é seguro e simples)
+            try {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', level.file, false); // false = síncrono
+                xhr.send();
+                
+                if (xhr.status === 200) {
+                    const mapData = JSON.parse(xhr.responseText);
+                    
+                    if (mapData.tilesets) {
+                        mapData.tilesets.forEach(ts => {
+                            const tilesetName = ts.name;
+                            
+                            // Evita carregar o mesmo tileset múltiplas vezes
+                            if (loadedTilesets.has(tilesetName)) return;
+                            loadedTilesets.add(tilesetName);
+                            
+                            // Extrai o nome do arquivo da imagem (caminho relativo no JSON)
+                            if (ts.image) {
+                                // Converte "spritesheets/nome.png" → "assets/spritesheets/nome.png"
+                                const imagePath = 'assets/' + ts.image.replace(/\\/g, '/');
+                                
+                                // Carrega com o nome original do tileset
+                                this.load.image(tilesetName, imagePath);
+                                
+                                // Se existe um alias, carrega também com o nome alternativo
+                                if (TILESET_ALIASES[tilesetName]) {
+                                    this.load.image(TILESET_ALIASES[tilesetName], imagePath);
+                                }
+                            }
+                        });
+                    }
+                }
+            } catch (e) {
+                console.warn(`Não foi possível carregar tilesets do mapa: ${level.file}`, e);
+            }
         });
     }
 
@@ -242,29 +284,20 @@ class GameScene extends Phaser.Scene {
         }
         
         this.solidsLayer = map.createLayer('solids', allTilesets);
+        
+        // ========== COLISÃO AUTOMÁTICA NA CAMADA 'solids' ==========
+        // Primeiro: aplica colisão por propriedade (tiles com collider: true no Tiled)
         this.solidsLayer.setCollisionByProperty({ collider: true });
+        
+        // Segundo: aplica colisão em TODOS os tiles não-vazios da camada 'solids'
+        // Isso garante que qualquer tile na camada 'solids' terá colisão
+        this.solidsLayer.setCollisionByExclusion([-1, 0]);
         
         // Camada de decoração de foreground (se existir)
         const fgDecoLayer = map.getLayer('fg_decoration');
         if (fgDecoLayer) {
             this.fgDecorationLayer = map.createLayer('fg_decoration', allTilesets);
             this.fgDecorationLayer.setDepth(5); // Acima dos sólidos, mas atrás do jogador
-        }
-        
-        // Adiciona colisão para tiles de plataforma flutuante (sem propriedade collider no tileset)
-        const floatingPlatformMiddle = map.tilesets.find(ts => ts.name === 'grass-floating-platform-middle');
-        const floatingPlatformEdges = map.tilesets.find(ts => ts.name === 'grass-floating-platform-edges');
-        if (floatingPlatformMiddle) {
-            this.solidsLayer.setCollision(floatingPlatformMiddle.firstgid);
-        }
-        if (floatingPlatformEdges) {
-            this.solidsLayer.setCollision(floatingPlatformEdges.firstgid);
-        }
-        
-        // Adiciona colisão para tiles do Mundo 2 (Caverna)
-        const gramaNortuna = map.tilesets.find(ts => ts.name === 'grama noturna');
-        if (gramaNortuna) {
-            this.solidsLayer.setCollision(gramaNortuna.firstgid);
         }
 
         // Animação de tiles
@@ -288,20 +321,60 @@ class GameScene extends Phaser.Scene {
         this.checkpointPositions = [];
         const trampolines = [];
         const stars = [];
+        const enemies = [];
+
+        // ========== DETECÇÃO AUTOMÁTICA DE TIPOS ==========
+        // Monta um mapa de gid → nome do tileset para detecção automática
+        const gidToTilesetName = {};
+        map.tilesets.forEach(ts => {
+            // Para cada tile do tileset, mapeia o gid para o nome
+            for (let i = 0; i < ts.total; i++) {
+                gidToTilesetName[ts.firstgid + i] = ts.name.toLowerCase();
+            }
+        });
 
         objectsLayer.objects.forEach(obj => {
+            // Primeiro: verifica se tem type definido manualmente nas propriedades
             const type = obj.properties?.find(p => p.name === 'type')?.value;
-
-            if (type === 'player_spawn' || type === 'player-spawn') {
+            
+            // Segundo: detecta automaticamente pelo nome do tileset
+            const tilesetName = gidToTilesetName[obj.gid] || '';
+            
+            // ========== PLAYER SPAWN ==========
+            // Detecta automaticamente: still-hero, still-hero (2), hero, etc
+            if (type === 'player_spawn' || type === 'player-spawn' ||
+                tilesetName.includes('still-hero') || tilesetName.includes('still hero')) {
                 this.playerSpawn = { x: obj.x + 16, y: obj.y - 16 };
-            } else if (type === 'goal') {
+            }
+            // ========== GOAL (Bandeira Verde) ==========
+            // Detecta automaticamente: green-flag, green flag, etc
+            else if (type === 'goal' || 
+                     tilesetName.includes('green-flag') || tilesetName.includes('green flag')) {
                 this.goalPosition = { x: obj.x + 16, y: obj.y - 16 };
-            } else if (obj.gid === 11) { // Checkpoint
+            }
+            // ========== CHECKPOINT (Bandeira Amarela) ==========
+            else if (type === 'checkpoint' ||
+                     tilesetName.includes('yellow-flag') || tilesetName.includes('yellow flag')) {
                 this.checkpointPositions.push({ x: obj.x + 16, y: obj.y - 16 });
-            } else if (obj.gid === 16) { // Trampolim
+            }
+            // ========== TRAMPOLIM ==========
+            else if (type === 'trampoline' ||
+                     tilesetName.includes('trampoline')) {
                 trampolines.push({ x: obj.x + 16, y: obj.y - 16 });
-            } else if (obj.gid >= 17 && obj.gid <= 25) { // Estrela
+            }
+            // ========== ESTRELAS ==========
+            else if (type === 'star' ||
+                     tilesetName.includes('star') || tilesetName.includes('estrela')) {
                 stars.push({ x: obj.x + 16, y: obj.y - 16 });
+            }
+            // ========== INIMIGOS (Sapos) ==========
+            else if (type === 'enemy' || type === 'sapo' ||
+                     tilesetName.includes('sapo') || tilesetName.includes('frog')) {
+                enemies.push({ 
+                    x: obj.x + 16, 
+                    y: obj.y - 16,
+                    type: 'sapo'
+                });
             }
         });
 
@@ -312,6 +385,7 @@ class GameScene extends Phaser.Scene {
         this.createCheckpoints();
         this.createTrampolines(trampolines);
         this.createStars(stars);
+        this.createEnemies(enemies);
     }
 
     createGoal() {
@@ -348,6 +422,106 @@ class GameScene extends Phaser.Scene {
         });
         this.starsCollected = 0;
         this.totalStars = positions.length;
+    }
+
+    // ========== INIMIGOS ==========
+    
+    createEnemies(enemies) {
+        this.enemies = this.physics.add.group();
+        
+        enemies.forEach(e => {
+            if (e.type === 'sapo') {
+                this.createSapo(e.x, e.y);
+            }
+        });
+    }
+
+    createSapo(x, y) {
+        const sapo = this.physics.add.sprite(x, y, 'sapo-tomate');
+        
+        // Configuração física
+        sapo.body.setSize(24, 20);
+        sapo.body.setOffset(4, 12);
+        sapo.body.allowGravity = true;
+        sapo.body.setCollideWorldBounds(true);
+        
+        // Configuração de patrulha
+        // 3 blocos para cada lado = 96px (32px * 3)
+        const PATROL_DISTANCE = 96;
+        const SPEED = 60;
+        const JUMP_DISTANCE = 32; // Pula a cada bloco
+        const JUMP_FORCE = -180; // Força do pulo (pequeno pulo)
+        
+        sapo.patrolData = {
+            startX: x,
+            leftLimit: x - PATROL_DISTANCE,
+            rightLimit: x + PATROL_DISTANCE,
+            speed: SPEED,
+            direction: 1, // 1 = direita, -1 = esquerda
+            lastJumpX: x, // Última posição onde pulou
+            jumpDistance: JUMP_DISTANCE,
+            jumpForce: JUMP_FORCE
+        };
+        
+        // Inicia movimento
+        sapo.setVelocityX(sapo.patrolData.speed * sapo.patrolData.direction);
+        
+        // Animação
+        if (!this.anims.exists('sapo-walk')) {
+            this.anims.create({
+                key: 'sapo-walk',
+                frames: this.anims.generateFrameNumbers('sapo-tomate', { start: 0, end: 5 }),
+                frameRate: 6,
+                repeat: -1
+            });
+        }
+        sapo.anims.play('sapo-walk', true);
+        
+        this.enemies.add(sapo);
+    }
+
+    updateEnemies() {
+        if (!this.enemies) return;
+        
+        this.enemies.children.iterate(enemy => {
+            if (!enemy || !enemy.active || !enemy.patrolData) return;
+            
+            const data = enemy.patrolData;
+            const onGround = enemy.body.blocked.down;
+            
+            // Pula a cada bloco (32px)
+            const distanceFromLastJump = Math.abs(enemy.x - data.lastJumpX);
+            if (distanceFromLastJump >= data.jumpDistance && onGround) {
+                enemy.setVelocityY(data.jumpForce);
+                data.lastJumpX = enemy.x;
+            }
+            
+            // Verifica se atingiu os limites da patrulha
+            if (enemy.x >= data.rightLimit && data.direction === 1) {
+                // Chegou no limite direito, vira para esquerda
+                data.direction = -1;
+                enemy.setVelocityX(data.speed * data.direction);
+                enemy.setFlipX(true);
+            } else if (enemy.x <= data.leftLimit && data.direction === -1) {
+                // Chegou no limite esquerdo, vira para direita
+                data.direction = 1;
+                enemy.setVelocityX(data.speed * data.direction);
+                enemy.setFlipX(false);
+            }
+            
+            // Garante que está andando (pode parar se colidir com algo)
+            if (enemy.body.velocity.x === 0 && onGround) {
+                enemy.setVelocityX(data.speed * data.direction);
+            }
+        });
+    }
+
+    handleEnemyCollision(player, enemy) {
+        // Jogador encosta no inimigo = dano
+        if (!this.isRespawning) {
+            SoundManager.play('death');
+            this.respawnAtCheckpoint();
+        }
     }
 
     setupCamera(map, levelConfig) {
@@ -494,6 +668,14 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.trampolines, this.handleTrampolineCollision, null, this);
         this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
 
+        // Inimigos
+        if (this.enemies && this.enemies.children.size > 0) {
+            // Inimigos colidem com o chão
+            this.physics.add.collider(this.enemies, this.solidsLayer);
+            // Jogador encosta no inimigo = dano
+            this.physics.add.overlap(this.player, this.enemies, this.handleEnemyCollision, null, this);
+        }
+
         // Checkpoints
         this.checkpoints.forEach(flag => {
             this.physics.add.overlap(this.player, flag, () => {
@@ -623,6 +805,9 @@ class GameScene extends Phaser.Scene {
 
         // Processa movimento
         this.handlePlayerMovement(delta);
+        
+        // Atualiza inimigos
+        this.updateEnemies();
 
         // Restart via mobile
         if (this.virtualControls.restart) {
@@ -666,11 +851,11 @@ class GameScene extends Phaser.Scene {
             // Para outros personagens, usa flip
             if (this.selectedCharacter === 'baterista') {
                 player.setFlipX(false); // Não usa flip
-                if (onGround) {
+            if (onGround) {
                     const walkAnim = direction < 0 ? 'walk-left' : 'walk';
                     player.anims.play(walkAnim, true);
-                }
-            } else {
+            }
+        } else {
                 player.setFlipX(direction < 0);
                 if (onGround) player.anims.play('walk', true);
             }

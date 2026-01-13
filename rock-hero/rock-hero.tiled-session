@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map-5--caverna.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -224,11 +224,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.25,
+            "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 986,
-                "y": 804
+                "x": 1496.6666666666665,
+                "y": 564
             }
         },
         "dev-resources/map-5--caverna.tmx#abstract-blue": {

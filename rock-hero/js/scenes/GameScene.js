@@ -505,8 +505,24 @@ class GameScene extends Phaser.Scene {
                 data.lastJumpX = enemy.x;
             }
             
-            // Verifica se atingiu os limites da patrulha
-            if (enemy.x >= data.rightLimit && data.direction === 1) {
+            // Detecta colisão com parede e inverte direção imediatamente
+            if (enemy.body.blocked.right && data.direction === 1) {
+                // Bateu na parede à direita, vira para esquerda
+                data.direction = -1;
+                enemy.setVelocityX(data.speed * data.direction);
+                enemy.setFlipX(true);
+                // Atualiza limite para não tentar voltar para a parede
+                data.rightLimit = Math.min(data.rightLimit, enemy.x - 16);
+            } else if (enemy.body.blocked.left && data.direction === -1) {
+                // Bateu na parede à esquerda, vira para direita
+                data.direction = 1;
+                enemy.setVelocityX(data.speed * data.direction);
+                enemy.setFlipX(false);
+                // Atualiza limite para não tentar voltar para a parede
+                data.leftLimit = Math.max(data.leftLimit, enemy.x + 16);
+            }
+            // Verifica se atingiu os limites normais da patrulha
+            else if (enemy.x >= data.rightLimit && data.direction === 1) {
                 // Chegou no limite direito, vira para esquerda
                 data.direction = -1;
                 enemy.setVelocityX(data.speed * data.direction);
@@ -518,8 +534,8 @@ class GameScene extends Phaser.Scene {
                 enemy.setFlipX(false);
             }
             
-            // Garante que está andando (pode parar se colidir com algo)
-            if (enemy.body.velocity.x === 0 && onGround) {
+            // Garante que está andando
+            if (Math.abs(enemy.body.velocity.x) < data.speed * 0.5 && onGround) {
                 enemy.setVelocityX(data.speed * data.direction);
             }
         });

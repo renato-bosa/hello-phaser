@@ -341,31 +341,7 @@
                  "visible":true,
                  "width":32,
                  "x":1920,
-                 "y":224
-                }, 
-                {
-                 "gid":11,
-                 "height":32,
-                 "id":198,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":1184,
-                 "y":448
-                }, 
-                {
-                 "gid":39,
-                 "height":32,
-                 "id":199,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":800,
-                 "y":768
+                 "y":544
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -374,7 +350,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":200,
+ "nextobjectid":198,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -795,19 +771,6 @@
                          "value":true
                         }]
                 }],
-         "tilewidth":32
-        }, 
-        {
-         "columns":2,
-         "firstgid":39,
-         "image":"spritesheets\/sapo-tomate-6fps.png",
-         "imageheight":96,
-         "imagewidth":64,
-         "margin":0,
-         "name":"sapo-tomate-6fps",
-         "spacing":0,
-         "tilecount":6,
-         "tileheight":32,
          "tilewidth":32
         }],
  "tilewidth":32,

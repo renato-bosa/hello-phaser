@@ -61,7 +61,7 @@ const GameData = {
             id: 1,
             name: 'Mundo 1',
             subtitle: 'O Resgate do Baterista',
-            levels: [0, 1, 2, 3], // Índices das fases (0-3 = fases 1-4)
+            levels: [0, 1, 2, 3, 4], // Índices das fases (0-4 = fases 0-1 até 4)
             rescuedCharacter: 'baterista',
             celebrationMessage: 'Você resgatou o Baterista!',
             // Visual no WorldMap
@@ -73,7 +73,7 @@ const GameData = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [4, 5, 6, 7], // Índices das fases (4-7 = fases 5-8)
+            levels: [5, 6, 7, 8], // Índices das fases (5-8 = fases 5-8)
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             // Visual no WorldMap (tema caverna/noturno)
@@ -87,15 +87,25 @@ const GameData = {
     // Configuração das fases
     LEVELS: [
         { 
+            key: 'map0-1', 
+            file: 'assets/map0-1.json', 
+            name: 'Fase 0-1',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 1,
+            // Posição no WorldMap (relativa ao mundo)
+            mapPosition: { x: 80, y: 200 },
+            connectsTo: [1] // Conecta à fase 1
+        },
+        { 
             key: 'map1', 
             file: 'assets/map.json', 
             name: 'Fase 1',
             zoom: 1.0,
             roundPixels: true,
             world: 1,
-            // Posição no WorldMap (relativa ao mundo)
-            mapPosition: { x: 80, y: 200 },
-            connectsTo: [1] // Conecta à fase 2
+            mapPosition: { x: 160, y: 190 },
+            connectsTo: [2] // Conecta à fase 2
         },
         { 
             key: 'map2', 
@@ -104,8 +114,8 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 200, y: 180 },
-            connectsTo: [2]
+            mapPosition: { x: 240, y: 180 },
+            connectsTo: [3]
         },
         { 
             key: 'map3', 
@@ -115,7 +125,7 @@ const GameData = {
             roundPixels: false,
             world: 1,
             mapPosition: { x: 340, y: 220 },
-            connectsTo: [3]
+            connectsTo: [4]
         },
         {
             key: 'map4',
@@ -124,7 +134,7 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 480, y: 180 },
+            mapPosition: { x: 440, y: 180 },
             connectsTo: [] // Última fase do mundo
         },
         // ==================== MUNDO 2 ====================
@@ -136,7 +146,7 @@ const GameData = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 80, y: 200 },
-            connectsTo: [5]
+            connectsTo: [6]
         },
         { 
             key: 'map6', 
@@ -146,17 +156,17 @@ const GameData = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 200, y: 160 },
-            connectsTo: [6]
+            connectsTo: [7]
         },
         { 
             key: 'map7', 
-            file: 'assets/map.json', // TODO: criar mapa próprio
-            name: 'Abismo Rochoso',
-            zoom: 1.0,
-            roundPixels: true,
+            file: 'assets/map-7--planicie.json',
+            name: 'Planície',
+            zoom: 0.9,
+            roundPixels: false,
             world: 2,
             mapPosition: { x: 340, y: 210 },
-            connectsTo: [7]
+            connectsTo: [8]
         },
         { 
             key: 'map8', 

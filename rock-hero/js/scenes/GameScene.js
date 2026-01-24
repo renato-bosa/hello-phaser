@@ -270,15 +270,19 @@ class GameScene extends Phaser.Scene {
         });
 
         // Camadas - usa todos os tilesets para garantir renderização correta
-        map.createLayer('bg', allTilesets);
+        this.bgLayer = map.createLayer('bg', allTilesets);
+        // Animações automáticas no bg (se houver tiles com propriedades fps/frames_random)
+        this.setupAutoTileAnimations(map, this.bgLayer);
         
         // Camada de decoração de background (se existir)
         const bgDecoLayer = map.getLayer('bg_decoration');
         if (bgDecoLayer) {
             this.bgDecorationLayer = map.createLayer('bg_decoration', allTilesets);
-            // Animação das bolhas de lava
+            // Animações automáticas baseadas em propriedades do Tiled (fps, frames_random)
+            this.setupAutoTileAnimations(map, this.bgDecorationLayer);
+            // Fallback: animação hardcoded para lava-bubbles (caso não tenha propriedades)
             const lavaBubblesTileset = map.tilesets.find(ts => ts.name === 'lava-bubbles-4fps');
-            if (lavaBubblesTileset) {
+            if (lavaBubblesTileset && !this.getTilesetProperties(lavaBubblesTileset).fps) {
                 this.setupLavaBubblesAnimation(this.bgDecorationLayer, lavaBubblesTileset);
             }
         }
@@ -716,6 +720,127 @@ class GameScene extends Phaser.Scene {
                 });
             }
         });
+    }
+
+    /**
+     * Configura animações automáticas para tiles baseado em propriedades do Tiled
+     * 
+     * Propriedades do tileset no Tiled:
+     * - fps: int - frames por segundo (0 = sem animação)
+     * - frames_random: int - range de offset aleatório por tile (0 = todos sincronizados)
+     * 
+     * Exemplo: fps=8, frames_random=12 → anima a 8fps com offset aleatório de 0-11 frames
+     */
+    setupAutoTileAnimations(map, layer) {
+        if (!layer) return;
+
+        // Agrupa tilesets por fps para otimizar (um timer por fps)
+        const animationsByFps = new Map();
+
+        // Acessa os dados raw do JSON do mapa (Phaser não expõe properties diretamente)
+        const levelConfig = GameData.LEVELS[GameData.state.currentLevel];
+        const mapKey = levelConfig ? levelConfig.key : 'map1';
+        const rawMapData = this.cache.tilemap.get(mapKey);
+        const rawTilesets = rawMapData?.data?.tilesets || [];
+
+        // Varre todos os tilesets do mapa procurando propriedades de animação
+        map.tilesets.forEach((tileset, index) => {
+            // Busca os dados raw do tileset correspondente
+            const rawTileset = rawTilesets.find(ts => ts.name === tileset.name) || rawTilesets[index];
+            
+            // Lê propriedades do tileset (do JSON raw)
+            const props = this.getTilesetProperties(rawTileset || tileset);
+            const fps = props.fps || 0;
+            const framesRandom = props.frames_random || 0;
+
+            if (fps <= 0) return; // Animação desativada
+
+            const frameCount = rawTileset?.tilecount || tileset.total || 1;
+            const delay = Math.round(1000 / fps);
+
+            // Agrupa por delay (fps) para usar um único timer
+            if (!animationsByFps.has(delay)) {
+                animationsByFps.set(delay, []);
+            }
+
+            animationsByFps.get(delay).push({
+                name: tileset.name,
+                firstGid: tileset.firstgid,
+                frameCount: frameCount,
+                framesRandom: framesRandom
+            });
+        });
+
+        // Para cada grupo de fps, cria um timer
+        animationsByFps.forEach((tilesets, delay) => {
+            // Mapeia tiles para offsets aleatórios (se necessário)
+            const tileOffsets = new Map();
+
+            layer.forEachTile(tile => {
+                tilesets.forEach(ts => {
+                    if (tile.index >= ts.firstGid && tile.index < ts.firstGid + ts.frameCount) {
+                        const key = `${tile.x},${tile.y}`;
+                        const randomOffset = ts.framesRandom > 0 
+                            ? Math.floor(Math.random() * ts.framesRandom)
+                            : 0;
+                        
+                        tileOffsets.set(key, {
+                            offset: randomOffset,
+                            firstGid: ts.firstGid,
+                            frameCount: ts.frameCount
+                        });
+                    }
+                });
+            });
+
+            if (tileOffsets.size === 0) return;
+
+            let globalFrame = 0;
+            const maxFrames = Math.max(...tilesets.map(ts => ts.frameCount));
+
+            this.time.addEvent({
+                delay: delay,
+                loop: true,
+                callback: () => {
+                    globalFrame = (globalFrame + 1) % maxFrames;
+                    layer.forEachTile(tile => {
+                        const key = `${tile.x},${tile.y}`;
+                        const data = tileOffsets.get(key);
+                        if (data) {
+                            const individualFrame = (globalFrame + data.offset) % data.frameCount;
+                            tile.index = data.firstGid + individualFrame;
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    /**
+     * Extrai propriedades customizadas de um tileset
+     * Funciona tanto com tilesets do Phaser quanto com dados raw do JSON
+     * Aceita propriedades no nível do tileset OU no primeiro tile (tiles[0])
+     */
+    getTilesetProperties(tileset) {
+        const props = {};
+        
+        // Primeiro: tenta propriedades no nível do tileset
+        let properties = tileset.properties || tileset.tilesetProperties || [];
+        
+        // Fallback: tenta propriedades no primeiro tile (tiles[0].properties)
+        if ((!properties || properties.length === 0) && tileset.tiles && tileset.tiles[0]) {
+            properties = tileset.tiles[0].properties || [];
+        }
+        
+        if (Array.isArray(properties)) {
+            properties.forEach(prop => {
+                props[prop.name] = prop.value;
+            });
+        } else if (typeof properties === 'object') {
+            Object.assign(props, properties);
+        }
+
+        return props;
     }
 
     // ==================== JOGADOR ====================

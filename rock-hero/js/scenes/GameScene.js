@@ -70,6 +70,10 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('sapo-tomate', 'assets/spritesheets/sapo-tomate-6fps.png', {
             frameWidth: 32, frameHeight: 32
         });
+        // Sapo-verde (6 frames - só pula, não anda)
+        this.load.spritesheet('sapo-verde', 'assets/spritesheets/sapo-verde-6fps.png', {
+            frameWidth: 32, frameHeight: 32
+        });
     }
 
     /**
@@ -375,10 +379,12 @@ class GameScene extends Phaser.Scene {
             // ========== INIMIGOS (Sapos) ==========
             else if (type === 'enemy' || type === 'sapo' ||
                      tilesetName.includes('sapo') || tilesetName.includes('frog')) {
+                // Diferencia sapo-verde (só pula) do sapo-tomate (anda e pula)
+                const isSapoVerde = tilesetName.includes('sapo-verde') || tilesetName.includes('verde');
                 enemies.push({ 
                     x: obj.x + 16, 
                     y: obj.y - 16,
-                    type: 'sapo'
+                    type: isSapoVerde ? 'sapo-verde' : 'sapo'
                 });
             }
             // ========== SETAS DE VELOCIDADE (Speed Boost) ==========
@@ -442,7 +448,9 @@ class GameScene extends Phaser.Scene {
         this.enemies = this.physics.add.group();
         
         enemies.forEach(e => {
-            if (e.type === 'sapo') {
+            if (e.type === 'sapo-verde') {
+                this.createSapoVerde(e.x, e.y);
+            } else if (e.type === 'sapo') {
                 this.createSapo(e.x, e.y);
             }
         });
@@ -493,8 +501,53 @@ class GameScene extends Phaser.Scene {
         this.enemies.add(sapo);
     }
 
+    /**
+     * Cria um sapo verde - fica parado e só pula (3-4 blocos de altura)
+     */
+    createSapoVerde(x, y) {
+        const sapo = this.physics.add.sprite(x, y, 'sapo-verde');
+        
+        // Hitbox igual ao sapo-tomate
+        sapo.body.setSize(26, 32);
+        sapo.body.setOffset(3, 0);
+        sapo.body.allowGravity = true;
+        sapo.body.setCollideWorldBounds(true);
+        
+        // Configuração de pulo (sem patrulha - fica parado)
+        // Pulo de 3-4 blocos = 96-128px
+        // Força calculada: v = sqrt(2 * g * h) ≈ -420 para ~3.5 blocos
+        const JUMP_FORCE = -420;
+        const JUMP_INTERVAL = 1500; // Pula a cada 1.5 segundos
+        
+        sapo.patrolData = {
+            type: 'sapo-verde',
+            startX: x,
+            startY: y,
+            speed: 0, // Não anda
+            direction: 1,
+            jumpForce: JUMP_FORCE,
+            jumpInterval: JUMP_INTERVAL,
+            lastJumpTime: 0
+        };
+        
+        // Animação
+        if (!this.anims.exists('sapo-verde-idle')) {
+            this.anims.create({
+                key: 'sapo-verde-idle',
+                frames: this.anims.generateFrameNumbers('sapo-verde', { start: 0, end: 5 }),
+                frameRate: 6,
+                repeat: -1
+            });
+        }
+        sapo.anims.play('sapo-verde-idle', true);
+        
+        this.enemies.add(sapo);
+    }
+
     updateEnemies() {
         if (!this.enemies) return;
+        
+        const currentTime = this.time.now;
         
         this.enemies.children.iterate(enemy => {
             if (!enemy || !enemy.active || !enemy.patrolData) return;
@@ -502,6 +555,24 @@ class GameScene extends Phaser.Scene {
             const data = enemy.patrolData;
             const onGround = enemy.body.blocked.down;
             
+            // ========== SAPO VERDE (fica parado, só pula) ==========
+            if (data.type === 'sapo-verde') {
+                // Pula baseado em intervalo de tempo
+                if (onGround && currentTime - data.lastJumpTime >= data.jumpInterval) {
+                    enemy.setVelocityY(data.jumpForce);
+                    data.lastJumpTime = currentTime;
+                }
+                // Mantém parado horizontalmente
+                enemy.setVelocityX(0);
+                
+                // Vira para a direção do jogador
+                if (this.player && this.player.active) {
+                    enemy.setFlipX(this.player.x < enemy.x);
+                }
+                return;
+            }
+            
+            // ========== SAPO TOMATE (patrulha + pula) ==========
             // Pula a cada bloco (32px)
             const distanceFromLastJump = Math.abs(enemy.x - data.lastJumpX);
             if (distanceFromLastJump >= data.jumpDistance && onGround) {

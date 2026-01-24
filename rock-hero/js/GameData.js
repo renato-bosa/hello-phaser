@@ -87,10 +87,10 @@ const GameData = {
     // Configuração das fases
     LEVELS: [
         { 
-            key: 'map0-1', 
-            file: 'assets/map0-1.json', 
+            key: 'map0-0', 
+            file: 'assets/map0-0.json', 
             name: 'Fase 0-1',
-            zoom: 1.0,
+            zoom: 1,
             roundPixels: true,
             world: 1,
             // Posição no WorldMap (relativa ao mundo)
@@ -98,8 +98,8 @@ const GameData = {
             connectsTo: [1] // Conecta à fase 1
         },
         { 
-            key: 'map1', 
-            file: 'assets/map.json', 
+            key: 'map0-1', 
+            file: 'assets/map0-1.json', 
             name: 'Fase 1',
             zoom: 1.0,
             roundPixels: true,

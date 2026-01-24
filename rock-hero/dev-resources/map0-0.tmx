@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="35" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="16">
+ <editorsettings>
+  <export target="../assets/map0-1.json" format="json"/>
+ </editorsettings>
+ <tileset firstgid="1" name="grass" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/grass.png" width="32" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="2" name="bricks" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/bricks.png" width="32" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="3" name="black" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/black.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="4" name="still-hero (2)" tilewidth="32" tileheight="32" tilecount="4" columns="2">
+  <image source="../assets/spritesheets/still-hero (2).png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="8" name="green-flag" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/green-flag.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="9" name="lava-roxa-animated" tilewidth="32" tileheight="32" tilecount="4" columns="2">
+  <image source="../assets/spritesheets/lava-roxa-animated.png" width="64" height="64"/>
+  <tile id="0">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+    <property name="jump_back_to_checkpoint" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+    <property name="jump_back_to_checkpoint" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+    <property name="jump_back_to_checkpoint" type="bool" value="true"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+    <property name="jump_back_to_checkpoint" type="bool" value="true"/>
+   </properties>
+   <animation>
+    <frame tileid="0" duration="200"/>
+    <frame tileid="1" duration="200"/>
+    <frame tileid="2" duration="200"/>
+    <frame tileid="3" duration="200"/>
+   </animation>
+  </tile>
+ </tileset>
+ <tileset firstgid="13" name="grass-with-barrier" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <properties>
+   <property name="collider" type="bool" value="true"/>
+  </properties>
+  <image source="../assets/spritesheets/grass-with-barrier.png" width="32" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="14" name="abstract-blue" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/abstract-blue.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="15" name="lava-bubbles-4fps" tilewidth="32" tileheight="32" tilecount="4" columns="2">
+  <image source="../assets/spritesheets/lava-bubbles-4fps.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="19" name="abstract-smooth-blue" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/abstract-smooth-blue.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="20" name="yellow-star-animated" tilewidth="32" tileheight="32" tilecount="9" columns="3">
+  <image source="../assets/spritesheets/yellow-star-animated.png" width="96" height="96"/>
+ </tileset>
+ <tileset firstgid="29" name="abstract-spread-blue-blinking-green-8fps" tilewidth="32" tileheight="32" tilecount="16" columns="4">
+  <image source="../assets/spritesheets/abstract-spread-blue-blinking-green-8fps.png" width="128" height="128"/>
+  <tile id="0">
+   <properties>
+    <property name="fps" type="int" value="8"/>
+    <property name="frames_random" type="int" value="10"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="45" name="abstract-spread-blue-blinking-red-8fps" tilewidth="32" tileheight="32" tilecount="12" columns="3">
+  <properties>
+   <property name="fps" type="int" value="8"/>
+   <property name="frames_random" type="int" value="10"/>
+  </properties>
+  <image source="../assets/spritesheets/abstract-spread-blue-blinking-red-8fps.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="57" name="abstract-spread-blue-blinking-yellow-8fps" tilewidth="32" tileheight="32" tilecount="12" columns="3">
+  <properties>
+   <property name="fps" type="int" value="8"/>
+   <property name="frames_random" type="int" value="10"/>
+  </properties>
+  <image source="../assets/spritesheets/abstract-spread-blue-blinking-yellow-8fps.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="69" name="green-bricks" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/green-bricks.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="70" name="blue-bricks2" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/blue-bricks2.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="71" name="sapo-verde-6fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/sapo-verde-6fps.png" width="64" height="96"/>
+ </tileset>
+ <layer id="5" name="bg" width="35" height="11">
+  <data encoding="csv">
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,
+19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19
+</data>
+ </layer>
+ <layer id="9" name="bg_decoration" width="35" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,15,15,15,0,0,0,0,0,0,0,0,0,15,15,15,15,15,15,15,15,15,15,15,15,15,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="3" name="solids" width="35" height="11">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,69,69,69,69,69,69,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,70,70,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+1,1,1,1,1,1,1,1,1,13,9,9,9,2147483661,1,1,1,1,1,1,1,13,9,9,9,9,9,9,9,9,9,9,9,9,9
+</data>
+ </layer>
+ <objectgroup id="8" name="objects">
+  <object id="3" name="player_spawn" gid="4" x="64" y="320" width="32" height="32">
+   <properties>
+    <property name="type" value="player_spawn"/>
+   </properties>
+  </object>
+  <object id="4" name="goal" gid="8" x="1024" y="96" width="32" height="32">
+   <properties>
+    <property name="type" value="goal"/>
+   </properties>
+  </object>
+  <object id="9" gid="20" x="64" y="224" width="32" height="32"/>
+  <object id="10" gid="20" x="352" y="192" width="32" height="32"/>
+  <object id="12" gid="20" x="736" y="224" width="32" height="32"/>
+  <object id="13" gid="20" x="960" y="96" width="32" height="32"/>
+  <object id="14" gid="20" x="832" y="160" width="32" height="32"/>
+  <object id="15" gid="2147483719" x="544" y="320" width="32" height="32"/>
+ </objectgroup>
+</map>

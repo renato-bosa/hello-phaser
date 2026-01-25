@@ -580,16 +580,23 @@ class GameScene extends Phaser.Scene {
                 data.lastJumpX = enemy.x;
             }
             
-            // Detecta colisão com parede e inverte direção imediatamente
-            if (enemy.body.blocked.right && data.direction === 1) {
-                // Bateu na parede à direita, vira para esquerda
+            // Limites do mapa (margem de 16px para não encostar na borda)
+            const mapLeftEdge = 16;
+            const mapRightEdge = this.map ? this.map.widthInPixels - 16 : 9999;
+            
+            // Detecta colisão com parede ou borda do mapa
+            const hitRightWall = enemy.body.blocked.right || enemy.x >= mapRightEdge;
+            const hitLeftWall = enemy.body.blocked.left || enemy.x <= mapLeftEdge;
+            
+            if (hitRightWall && data.direction === 1) {
+                // Bateu na parede/borda à direita, vira para esquerda
                 data.direction = -1;
                 enemy.setVelocityX(data.speed * data.direction);
                 enemy.setFlipX(true);
                 // Atualiza limite para não tentar voltar para a parede
                 data.rightLimit = Math.min(data.rightLimit, enemy.x - 16);
-            } else if (enemy.body.blocked.left && data.direction === -1) {
-                // Bateu na parede à esquerda, vira para direita
+            } else if (hitLeftWall && data.direction === -1) {
+                // Bateu na parede/borda à esquerda, vira para direita
                 data.direction = 1;
                 enemy.setVelocityX(data.speed * data.direction);
                 enemy.setFlipX(false);

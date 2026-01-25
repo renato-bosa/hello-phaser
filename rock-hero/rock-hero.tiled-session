@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map.tmx",
+    "activeFile": "dev-resources/map-3--desafio do luigi.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
@@ -113,14 +113,17 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.33,
-            "selectedLayer": 4,
+            "scale": 1.5,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 1259.0909090909092,
-                "y": 333.33333333333326
+                "x": 230.33333333333334,
+                "y": 768.6666666666666
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#abstract-smooth-blue": {
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx#black": {
@@ -132,6 +135,27 @@
         "dev-resources/map-3--desafio do luigi.tmx#bricks": {
             "scaleInDock": 1
         },
+        "dev-resources/map-3--desafio do luigi.tmx#bricks-purple": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#bricks-purple2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#dark-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#dark-bricks-fuzzy": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#dark-bricks-fuzzy-shades": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#dark-bricks-super-fuzzy": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-3--desafio do luigi.tmx#grass": {
             "scaleInDock": 1
         },
@@ -139,6 +163,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx#grass-floating-platform-middle": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#gray-bricks": {
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx#green-bricks": {
@@ -161,6 +188,9 @@
         "dev-resources/map-3--desafio do luigi.tmx#lava-roxa-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-3--desafio do luigi.tmx#red-bricks": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-3--desafio do luigi.tmx#sapo-tomate-6fps": {
             "scaleInDock": 1
         },
@@ -177,6 +207,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#yellow-bricks": {
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx#yellow-flag": {
@@ -691,21 +724,19 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map.tmx",
-        "dev-resources/map0-0.tmx",
-        "dev-resources/map-2--expansion and speed.tmx"
+        "dev-resources/map-3--desafio do luigi.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "int",
     "recentFiles": [
-        "dev-resources/map0-1.tmx",
-        "dev-resources/map-2--expansion and speed.tmx",
-        "dev-resources/map0-0.tmx",
+        "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map.tmx",
+        "dev-resources/map0-0.tmx",
+        "dev-resources/map-2--expansion and speed.tmx",
+        "dev-resources/map0-1.tmx",
         "dev-resources/map-6--caverna2.tmx",
         "dev-resources/map-5--caverna.tmx",
         "dev-resources/map-4--big-jumps.tmx",
-        "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-7--planicie.tmx",
         "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx"
     ],

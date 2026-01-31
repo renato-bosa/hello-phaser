@@ -24,52 +24,22 @@ class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        // Carrega todos os mapas
+        // ========== CARREGAMENTO AUTOMÁTICO DE TILESETS ==========
+        // Configura callback para carregar tilesets quando cada mapa JSON terminar de carregar
+        this.setupTilesetAutoLoader();
+        
+        // Carrega todos os mapas (os tilesets serão carregados automaticamente via callback)
         GameData.LEVELS.forEach(level => {
             this.load.tilemapTiledJSON(level.key, level.file);
         });
-        
-        // ========== CARREGAMENTO AUTOMÁTICO DE TILESETS ==========
-        // Carrega dinamicamente todos os tilesets de todos os mapas
-        this.loadTilesetsFromMaps();
 
         // ========== SPRITESHEETS DE GAMEPLAY ==========
         this.load.spritesheet('star', 'assets/spritesheets/yellow-star-animated.png', {
             frameWidth: 32, frameHeight: 32
         });
         
-        // Sprites do Vocalista (personagem padrão)
-        this.load.spritesheet('hero-idle', 'assets/spritesheets/still-hero.png', {
-            frameWidth: 32, frameHeight: 32
-        });
-        this.load.spritesheet('hero-walk', 'assets/spritesheets/walking-hero.png', {
-            frameWidth: 32, frameHeight: 32
-        });
-        this.load.spritesheet('hero-jump', 'assets/spritesheets/jumping-hero.png', {
-            frameWidth: 32, frameHeight: 32
-        });
-        
-        // Sprites do Baterista
-        this.load.spritesheet('baterista-idle', 'assets/spritesheets/baterista-parado-animado-6fps.png', {
-            frameWidth: 32, frameHeight: 32
-        });
-        this.load.spritesheet('baterista-walk', 'assets/spritesheets/baterista-andando-pra-direita-6fps.png', {
-            frameWidth: 32, frameHeight: 32
-        });
-        this.load.spritesheet('baterista-walk-left', 'assets/spritesheets/baterista-andando-pra-esq-6fps.png', {
-            frameWidth: 32, frameHeight: 32
-        });
-        
-        // Sprites do Baixista
-        this.load.spritesheet('baixista-idle', 'assets/spritesheets/baixista-parado-animado-6fps.png', {
-            frameWidth: 32, frameHeight: 32
-        });
-        this.load.spritesheet('baixista-walk', 'assets/spritesheets/baixista-andando2-dir-6fps.png', {
-            frameWidth: 32, frameHeight: 32
-        });
-        this.load.spritesheet('baixista-walk-left', 'assets/spritesheets/baixista-andando-esq-6fps.png', {
-            frameWidth: 32, frameHeight: 32
-        });
+        // Carrega sprites de TODOS os personagens (definição centralizada em GameData)
+        GameData.loadCharacterSprites(this);
         
         // ========== INIMIGOS ==========
         // Sapo-tomate (6 frames de animação de pulo)
@@ -83,56 +53,50 @@ class GameScene extends Phaser.Scene {
     }
 
     /**
-     * Carrega automaticamente TODOS os tilesets referenciados nos mapas JSON
-     * Isso elimina a necessidade de adicionar tilesets manualmente ao código
+     * Configura o carregamento automático de tilesets usando eventos do Phaser Loader
+     * Quando cada mapa JSON termina de carregar, extrai os tilesets e adiciona à fila
+     * (substitui XMLHttpRequest síncrono - método deprecado)
      */
-    loadTilesetsFromMaps() {
+    setupTilesetAutoLoader() {
+        // Set para evitar carregar o mesmo tileset múltiplas vezes
         const loadedTilesets = new Set();
         
         // Aliases: nome usado no código → nome no tileset do Tiled
-        // Usado quando o código espera um nome diferente do que está no mapa
         const TILESET_ALIASES = {
-            'trampoline-thick': 'trampoline', // código usa 'trampoline', Tiled usa 'trampoline-thick'
+            'trampoline-thick': 'trampoline',
         };
         
-        GameData.LEVELS.forEach(level => {
-            // Usa XMLHttpRequest síncrono para ler o JSON do mapa
-            // (durante o preload, isso é seguro e simples)
-            try {
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', level.file, false); // false = síncrono
-                xhr.send();
+        // Callback executado quando qualquer arquivo termina de carregar
+        // Usamos 'filecomplete' genérico e filtramos por tipo
+        this.load.on('filecomplete', (key, type, data) => {
+            // Só processa arquivos de tilemap JSON
+            if (type !== 'tilemapJSON') return;
+            
+            // Acessa os dados do tilemap do cache do Phaser
+            const tilemapData = this.cache.tilemap.get(key);
+            if (!tilemapData || !tilemapData.data || !tilemapData.data.tilesets) return;
+            
+            tilemapData.data.tilesets.forEach(ts => {
+                const tilesetName = ts.name;
                 
-                if (xhr.status === 200) {
-                    const mapData = JSON.parse(xhr.responseText);
+                // Evita carregar o mesmo tileset múltiplas vezes
+                if (loadedTilesets.has(tilesetName)) return;
+                loadedTilesets.add(tilesetName);
+                
+                // Extrai o nome do arquivo da imagem (caminho relativo no JSON)
+                if (ts.image) {
+                    // Converte "spritesheets/nome.png" → "assets/spritesheets/nome.png"
+                    const imagePath = 'assets/' + ts.image.replace(/\\/g, '/');
                     
-                    if (mapData.tilesets) {
-                        mapData.tilesets.forEach(ts => {
-                            const tilesetName = ts.name;
-                            
-                            // Evita carregar o mesmo tileset múltiplas vezes
-                            if (loadedTilesets.has(tilesetName)) return;
-                            loadedTilesets.add(tilesetName);
-                            
-                            // Extrai o nome do arquivo da imagem (caminho relativo no JSON)
-                            if (ts.image) {
-                                // Converte "spritesheets/nome.png" → "assets/spritesheets/nome.png"
-                                const imagePath = 'assets/' + ts.image.replace(/\\/g, '/');
-                                
-                                // Carrega com o nome original do tileset
-                                this.load.image(tilesetName, imagePath);
-                                
-                                // Se existe um alias, carrega também com o nome alternativo
-                                if (TILESET_ALIASES[tilesetName]) {
-                                    this.load.image(TILESET_ALIASES[tilesetName], imagePath);
-                                }
-                            }
-                        });
+                    // Adiciona à fila de carregamento (Phaser adiciona automaticamente durante preload)
+                    this.load.image(tilesetName, imagePath);
+                    
+                    // Se existe um alias, carrega também com o nome alternativo
+                    if (TILESET_ALIASES[tilesetName]) {
+                        this.load.image(TILESET_ALIASES[tilesetName], imagePath);
                     }
                 }
-            } catch (e) {
-                console.warn(`Não foi possível carregar tilesets do mapa: ${level.file}`, e);
-            }
+            });
         });
     }
 
@@ -757,13 +721,14 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.setZoom(zoom);
         this.cameras.main.setRoundPixels(roundPixels);
         
-        // Filtro de texturas
-        const filterMode = roundPixels 
-            ? Phaser.Textures.FilterMode.NEAREST 
-            : Phaser.Textures.FilterMode.LINEAR;
-        ['hero-idle', 'hero-walk', 'hero-jump'].forEach(key => {
-            this.textures.get(key).setFilter(filterMode);
-        });
+        // Filtro de texturas para sprites de personagens
+        // zoom < 1: LINEAR para suavizar o downscaling
+        // zoom >= 1: NEAREST para pixel art nítido
+        if (zoom < 1) {
+            GameData.applyLinearFilter(this);
+        } else {
+            GameData.applyPixelArtFilter(this);
+        }
     }
 
     setupTileAnimations(layer, tileset) {
@@ -947,45 +912,9 @@ class GameScene extends Phaser.Scene {
     }
 
     createAnimations() {
-        // Animações baseadas no personagem selecionado
-        let playerAnims;
-        
-        if (this.selectedCharacter === 'baterista') {
-            playerAnims = [
-                { key: 'idle', texture: 'baterista-idle', frames: [0, 3], rate: 6 },
-                { key: 'walk', texture: 'baterista-walk', frames: [0, 3], rate: 6 },
-                { key: 'walk-left', texture: 'baterista-walk-left', frames: [0, 3], rate: 6 }
-            ];
-        } else if (this.selectedCharacter === 'baixista') {
-            playerAnims = [
-                { key: 'idle', texture: 'baixista-idle', frames: [0, 3], rate: 6 },
-                { key: 'walk', texture: 'baixista-walk', frames: [0, 3], rate: 6 },
-                { key: 'walk-left', texture: 'baixista-walk-left', frames: [0, 3], rate: 6 }
-            ];
-        } else {
-            // Vocalista (padrão)
-            playerAnims = [
-                { key: 'idle', texture: 'hero-idle', frames: [0, 3], rate: 6 },
-                { key: 'walk', texture: 'hero-walk', frames: [0, 3], rate: 14 }
-            ];
-        }
-        
-        // Cria animações do personagem
-        playerAnims.forEach(anim => {
-            // Remove animação existente para recriar com sprite correto
-            if (this.anims.exists(anim.key)) {
-                this.anims.remove(anim.key);
-            }
-            this.anims.create({
-                key: anim.key,
-                frames: this.anims.generateFrameNumbers(anim.texture, { 
-                    start: anim.frames[0], 
-                    end: anim.frames[1] 
-                }),
-                frameRate: anim.rate,
-                repeat: -1
-            });
-        });
+        // Cria animações do personagem selecionado (definição centralizada em GameData)
+        // recreate=true para recriar ao trocar de personagem entre fases
+        GameData.createCharacterAnimations(this, this.selectedCharacter, '', true);
         
         // Animação de estrela (comum para todos)
         if (!this.anims.exists('star-spin')) {
@@ -1291,12 +1220,16 @@ class GameScene extends Phaser.Scene {
             const charData = GameData.getCharacter(this.selectedCharacter);
             const jumpSprite = charData.sprites.jump;
             
-            if (jumpSprite === 'hero-jumping') {
+            if (jumpSprite && jumpSprite.key === 'hero-jump') {
                 // Vocalista tem sprite de pulo com frames específicos
                 player.setTexture('hero-jump', player.body.velocity.y < 0 ? 1 : 2);
+            } else if (jumpSprite) {
+                // Outros personagens usam seu sprite de pulo
+                player.setTexture(jumpSprite.key, 0);
             } else {
-                // Outros personagens usam seu sprite de pulo (ou idle como placeholder)
-                player.setTexture(jumpSprite, 0);
+                // Fallback para idle se não tiver sprite de pulo
+                const idleKey = GameData.getCharacterTextureKey(this.selectedCharacter, 'idle');
+                player.setTexture(idleKey, 0);
             }
         }
     }

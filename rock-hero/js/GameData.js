@@ -16,6 +16,7 @@ const GameData = {
     STORAGE_KEY_ACTIVE: 'rockHero_activeSlot',
 
     // ==================== PERSONAGENS ====================
+    // Definição centralizada de sprites - todas as cenas usam isso
     CHARACTERS: [
         {
             id: 'vocalista',
@@ -23,9 +24,28 @@ const GameData = {
             instrument: 'Voz',
             unlockedByDefault: true,
             sprites: {
-                idle: 'hero-idle',
-                walk: 'hero-walking',
-                jump: 'hero-jumping'
+                idle: {
+                    key: 'hero-idle',
+                    file: 'assets/spritesheets/still-hero.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                walk: {
+                    key: 'hero-walk',
+                    file: 'assets/spritesheets/walking-hero.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 14
+                },
+                jump: {
+                    key: 'hero-jump',
+                    file: 'assets/spritesheets/jumping-hero.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                }
+                // Vocalista não tem walk-left separado, usa flip
             }
         },
         {
@@ -35,9 +55,28 @@ const GameData = {
             unlockedByDefault: false,
             unlockedByWorld: 1,
             sprites: {
-                idle: 'baterista-idle',
-                walk: 'baterista-walking',
-                jump: 'baterista-idle' // TODO: criar sprite de pulo
+                idle: {
+                    key: 'baterista-idle',
+                    file: 'assets/spritesheets/baterista-parado-animado-6fps.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                walk: {
+                    key: 'baterista-walk',
+                    file: 'assets/spritesheets/baterista-andando-pra-direita-6fps.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                'walk-left': {
+                    key: 'baterista-walk-left',
+                    file: 'assets/spritesheets/baterista-andando-pra-esq-6fps.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                jump: null // TODO: criar sprite de pulo (usa idle por enquanto)
             }
         },
         {
@@ -47,9 +86,28 @@ const GameData = {
             unlockedByDefault: false,
             unlockedByWorld: 2,
             sprites: {
-                idle: 'baixista-idle',
-                walk: 'baixista-idle',  // placeholder
-                jump: 'baixista-idle'   // placeholder
+                idle: {
+                    key: 'baixista-idle',
+                    file: 'assets/spritesheets/baixista-parado-animado-6fps.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                walk: {
+                    key: 'baixista-walk',
+                    file: 'assets/spritesheets/baixista-andando2-dir-6fps.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                'walk-left': {
+                    key: 'baixista-walk-left',
+                    file: 'assets/spritesheets/baixista-andando-esq-6fps.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                jump: null // TODO: criar sprite de pulo (usa idle por enquanto)
             }
         }
         // Futuros personagens: guitarrista, tecladista...
@@ -170,10 +228,10 @@ const GameData = {
         },
         { 
             key: 'map8', 
-            file: 'assets/map.json', // TODO: criar mapa próprio
-            name: 'Covil do Guitarrista',
-            zoom: 1.0,
-            roundPixels: true,
+            file: 'assets/map-8.json',
+            name: 'O Resgate do Baixista',
+            zoom: 0.9,
+            roundPixels: false,
             world: 2,
             mapPosition: { x: 480, y: 180 },
             connectsTo: [] // Última fase do mundo
@@ -731,6 +789,150 @@ const GameData = {
 
     getCharacter(characterId) {
         return this.CHARACTERS.find(c => c.id === characterId) || this.CHARACTERS[0];
+    },
+
+    // ==================== SPRITE LOADING UTILITIES ====================
+
+    /**
+     * Carrega spritesheets de personagens no preload() de uma cena
+     * @param {Phaser.Scene} scene - A cena Phaser
+     * @param {string|string[]|null} characterIds - IDs dos personagens a carregar, ou null para todos
+     */
+    loadCharacterSprites(scene, characterIds = null) {
+        const loadedKeys = new Set();
+        
+        // Determina quais personagens carregar
+        let characters;
+        if (characterIds === null) {
+            characters = this.CHARACTERS;
+        } else if (typeof characterIds === 'string') {
+            characters = [this.getCharacter(characterIds)];
+        } else {
+            characters = characterIds.map(id => this.getCharacter(id));
+        }
+        
+        // Carrega sprites de cada personagem
+        characters.forEach(character => {
+            if (!character || !character.sprites) return;
+            
+            Object.values(character.sprites).forEach(sprite => {
+                if (!sprite || loadedKeys.has(sprite.key)) return;
+                loadedKeys.add(sprite.key);
+                
+                scene.load.spritesheet(sprite.key, sprite.file, {
+                    frameWidth: sprite.frameWidth,
+                    frameHeight: sprite.frameHeight
+                });
+            });
+        });
+    },
+
+    /**
+     * Cria animações para um personagem específico
+     * @param {Phaser.Scene} scene - A cena Phaser
+     * @param {string} characterId - ID do personagem
+     * @param {string} prefix - Prefixo para nomes das animações (ex: 'player-' ou '')
+     * @param {boolean} recreate - Se deve recriar animações existentes
+     */
+    createCharacterAnimations(scene, characterId, prefix = '', recreate = false) {
+        const character = this.getCharacter(characterId);
+        if (!character || !character.sprites) return;
+        
+        const sprites = character.sprites;
+        
+        // Para cada estado (idle, walk, jump, walk-left...)
+        Object.entries(sprites).forEach(([state, sprite]) => {
+            // Se sprite é null, pula (ex: jump sem sprite próprio)
+            if (!sprite) return;
+            
+            const animKey = prefix + state;
+            
+            // Remove animação existente se recreate=true
+            if (recreate && scene.anims.exists(animKey)) {
+                scene.anims.remove(animKey);
+            }
+            
+            // Cria animação se não existir
+            if (!scene.anims.exists(animKey)) {
+                scene.anims.create({
+                    key: animKey,
+                    frames: scene.anims.generateFrameNumbers(sprite.key, {
+                        start: sprite.startFrame,
+                        end: sprite.endFrame
+                    }),
+                    frameRate: sprite.frameRate,
+                    repeat: -1
+                });
+            }
+        });
+    },
+
+    /**
+     * Retorna a texture key para um estado específico de um personagem
+     * Útil quando precisa da textura diretamente (ex: criar sprite inicial)
+     * @param {string} characterId - ID do personagem
+     * @param {string} state - Estado desejado (idle, walk, jump, walk-left)
+     * @returns {string} - Key da textura
+     */
+    getCharacterTextureKey(characterId, state = 'idle') {
+        const character = this.getCharacter(characterId);
+        if (!character || !character.sprites) return 'hero-idle';
+        
+        const sprite = character.sprites[state];
+        if (!sprite) {
+            // Fallback para idle se estado não existir
+            return character.sprites.idle?.key || 'hero-idle';
+        }
+        return sprite.key;
+    },
+
+    /**
+     * Aplica filtro em sprites de personagens
+     * @param {Phaser.Scene} scene - A cena Phaser
+     * @param {string|string[]|null} characterIds - IDs dos personagens, ou null para todos
+     * @param {number} filterMode - Phaser.Textures.FilterMode (NEAREST ou LINEAR)
+     */
+    _applyFilter(scene, characterIds, filterMode) {
+        // Determina quais personagens processar
+        let characters;
+        if (characterIds === null) {
+            characters = this.CHARACTERS;
+        } else if (typeof characterIds === 'string') {
+            characters = [this.getCharacter(characterIds)];
+        } else {
+            characters = characterIds.map(id => this.getCharacter(id));
+        }
+        
+        // Aplica filtro em todas as texturas
+        characters.forEach(character => {
+            if (!character || !character.sprites) return;
+            
+            Object.values(character.sprites).forEach(sprite => {
+                if (sprite && sprite.key && scene.textures.exists(sprite.key)) {
+                    scene.textures.get(sprite.key).setFilter(filterMode);
+                }
+            });
+        });
+    },
+
+    /**
+     * Aplica filtro NEAREST (pixel art nítido) em sprites de personagens
+     * Ideal para sprites ampliados (scale > 1) ou zoom >= 1
+     * @param {Phaser.Scene} scene - A cena Phaser
+     * @param {string|string[]|null} characterIds - IDs dos personagens, ou null para todos
+     */
+    applyPixelArtFilter(scene, characterIds = null) {
+        this._applyFilter(scene, characterIds, Phaser.Textures.FilterMode.NEAREST);
+    },
+
+    /**
+     * Aplica filtro LINEAR (suavizado) em sprites de personagens
+     * Ideal para sprites reduzidos (zoom < 1) para evitar aliasing
+     * @param {Phaser.Scene} scene - A cena Phaser
+     * @param {string|string[]|null} characterIds - IDs dos personagens, ou null para todos
+     */
+    applyLinearFilter(scene, characterIds = null) {
+        this._applyFilter(scene, characterIds, Phaser.Textures.FilterMode.LINEAR);
     },
 
     /**

@@ -17,22 +17,8 @@ class WorldCompleteScene extends Phaser.Scene {
     }
 
     preload() {
-        // Carrega sprites do personagem resgatado
-        const character = GameData.getCharacter(this.worldData.rescuedCharacter);
-        
-        if (character.id === 'baterista') {
-            // Spritesheet do baterista parado (para tela de celebração)
-            this.load.spritesheet('baterista-celebration', 'assets/spritesheets/baterista-parado-animado-6fps.png', {
-                frameWidth: 32,
-                frameHeight: 32
-            });
-        } else if (character.id === 'baixista') {
-            // Spritesheet do baixista parado
-            this.load.spritesheet('baixista-celebration', 'assets/spritesheets/baixista-parado.png', {
-                frameWidth: 32,
-                frameHeight: 32
-            });
-        }
+        // Carrega sprites do personagem resgatado (definição centralizada em GameData)
+        GameData.loadCharacterSprites(this, this.worldData.rescuedCharacter);
     }
 
     create() {
@@ -184,30 +170,18 @@ class WorldCompleteScene extends Phaser.Scene {
         const nameY = height * 0.60;        // 58% - nome
         const instrumentY = height * 0.65;  // 65% - instrumento
         
-        // Determina a sprite key e configuração baseado no personagem
-        let spriteKey, frameRate, endFrame;
-        
-        if (character.id === 'baterista') {
-            spriteKey = 'baterista-celebration';
-            frameRate = 6;
-            endFrame = 3;
-        } else if (character.id === 'baixista') {
-            spriteKey = 'baixista-celebration';
-            frameRate = 6;
-            endFrame = 3;
-        } else {
-            // Fallback para outros personagens
-            spriteKey = character.sprites.idle;
-            frameRate = 6;
-            endFrame = 3;
-        }
+        // Usa dados centralizados do GameData
+        const idleSprite = character.sprites.idle;
+        const spriteKey = idleSprite.key;
+        const frameRate = idleSprite.frameRate;
+        const endFrame = idleSprite.endFrame;
         
         // Cria animação do personagem
         const animKey = `rescued-${character.id}-idle`;
         if (!this.anims.exists(animKey)) {
             this.anims.create({
                 key: animKey,
-                frames: this.anims.generateFrameNumbers(spriteKey, { start: 0, end: endFrame }),
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: idleSprite.startFrame, end: endFrame }),
                 frameRate: frameRate,
                 repeat: -1
             });
@@ -226,6 +200,9 @@ class WorldCompleteScene extends Phaser.Scene {
         });
 
         // Sprite do personagem
+        // Aplica filtro pixel art nítido
+        GameData.applyPixelArtFilter(this, character.id);
+        
         const sprite = this.add.sprite(centerX, spriteY, spriteKey);
         sprite.setScale(4); // Escala maior para destaque
         sprite.play(animKey);

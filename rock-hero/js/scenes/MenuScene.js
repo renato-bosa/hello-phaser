@@ -14,10 +14,8 @@ class MenuScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.spritesheet('hero-idle', 'assets/spritesheets/still-hero.png', {
-            frameWidth: 32,
-            frameHeight: 32
-        });
+        // Carrega apenas sprite do vocalista para o menu (definição centralizada em GameData)
+        GameData.loadCharacterSprites(this, 'vocalista');
     }
 
     create() {
@@ -74,12 +72,18 @@ class MenuScene extends Phaser.Scene {
     }
 
     createHeroSprite() {
-        // Cria animação se não existir
-        if (!this.anims.exists('hero-idle-menu')) {
+        const textureKey = GameData.getCharacterTextureKey('vocalista', 'idle');
+        
+        // Cria animação específica do menu (prefixo para não conflitar com gameplay)
+        if (!this.anims.exists('menu-idle')) {
+            const sprite = GameData.getCharacter('vocalista').sprites.idle;
             this.anims.create({
-                key: 'hero-idle-menu',
-                frames: this.anims.generateFrameNumbers('hero-idle', { start: 0, end: 3 }),
-                frameRate: 6,
+                key: 'menu-idle',
+                frames: this.anims.generateFrameNumbers(textureKey, { 
+                    start: sprite.startFrame, 
+                    end: sprite.endFrame 
+                }),
+                frameRate: sprite.frameRate,
                 repeat: -1
             });
         }
@@ -91,12 +95,12 @@ class MenuScene extends Phaser.Scene {
         const heroX = visibleWidth * 0.12;
         
         // Garante filtro NEAREST (pixel art nítido) - pode ter sido alterado pelo GameScene
-        this.textures.get('hero-idle').setFilter(Phaser.Textures.FilterMode.NEAREST);
+        this.textures.get(textureKey).setFilter(Phaser.Textures.FilterMode.NEAREST);
         
-        this.heroSprite = this.add.sprite(heroX, this.centerY, 'hero-idle');
+        this.heroSprite = this.add.sprite(heroX, this.centerY, textureKey);
         this.heroSprite.setScale(3);
         this.heroSprite.setDepth(0);
-        this.heroSprite.play('hero-idle-menu');
+        this.heroSprite.play('menu-idle');
 
         // Flutuação
         this.tweens.add({

@@ -24,21 +24,8 @@ class CharacterSelectScene extends Phaser.Scene {
     }
 
     preload() {
-        // Carrega sprites dos personagens
-        // Vocalista
-        this.load.spritesheet('hero-idle', 'assets/spritesheets/still-hero.png', {
-            frameWidth: 32, frameHeight: 32
-        });
-        
-        // Baterista
-        this.load.spritesheet('baterista-idle-select', 'assets/spritesheets/baterista-parado-animado-6fps.png', {
-            frameWidth: 32, frameHeight: 32
-        });
-        
-        // Baixista
-        this.load.spritesheet('baixista-idle-select', 'assets/spritesheets/baixista-parado-animado-6fps.png', {
-            frameWidth: 32, frameHeight: 32
-        });
+        // Carrega sprites de todos os personagens (definição centralizada em GameData)
+        GameData.loadCharacterSprites(this);
     }
 
     create() {
@@ -53,6 +40,9 @@ class CharacterSelectScene extends Phaser.Scene {
         // Encontra índice do personagem atual
         this.selectedIndex = this.characters.findIndex(c => c.id === this.selectedCharacterId);
         if (this.selectedIndex < 0) this.selectedIndex = 0;
+        
+        // Aplica filtro pixel art em todos os sprites de personagens
+        GameData.applyPixelArtFilter(this);
         
         // Cria elementos visuais
         this.createBackground(width, height);
@@ -128,24 +118,15 @@ class CharacterSelectScene extends Phaser.Scene {
             const spriteY = -40;
             
             if (isUnlocked) {
-                // Sprite do personagem
-                let sprite;
-                if (character.id === 'vocalista') {
-                    sprite = this.add.sprite(0, spriteY, 'hero-idle');
-                } else if (character.id === 'baterista') {
-                    sprite = this.add.sprite(0, spriteY, 'baterista-idle-select');
-                } else if (character.id === 'baixista') {
-                    sprite = this.add.sprite(0, spriteY, 'baixista-idle-select');
-                }
+                // Sprite do personagem (usa key centralizada do GameData)
+                const textureKey = GameData.getCharacterTextureKey(character.id, 'idle');
+                const sprite = this.add.sprite(0, spriteY, textureKey);
+                sprite.setScale(2.5);
+                container.add(sprite);
                 
-                if (sprite) {
-                    sprite.setScale(2.5);
-                    container.add(sprite);
-                    
-                    // Guarda referência para animação
-                    container.setData('sprite', sprite);
-                    container.setData('characterId', character.id);
-                }
+                // Guarda referência para animação
+                container.setData('sprite', sprite);
+                container.setData('characterId', character.id);
             } else {
                 // Silhueta (personagem bloqueado)
                 const silhouette = this.add.rectangle(0, spriteY, 50, 70, 0x333333);
@@ -233,35 +214,11 @@ class CharacterSelectScene extends Phaser.Scene {
     }
 
     createAnimations() {
-        // Animação do vocalista (idle)
-        if (!this.anims.exists('char-vocalista-idle')) {
-            this.anims.create({
-                key: 'char-vocalista-idle',
-                frames: this.anims.generateFrameNumbers('hero-idle', { start: 0, end: 3 }),
-                frameRate: 6,
-                repeat: -1
-            });
-        }
-        
-        // Animação do baterista
-        if (!this.anims.exists('char-baterista-idle')) {
-            this.anims.create({
-                key: 'char-baterista-idle',
-                frames: this.anims.generateFrameNumbers('baterista-idle-select', { start: 0, end: 3 }),
-                frameRate: 6,
-                repeat: -1
-            });
-        }
-        
-        // Animação do baixista
-        if (!this.anims.exists('char-baixista-idle')) {
-            this.anims.create({
-                key: 'char-baixista-idle',
-                frames: this.anims.generateFrameNumbers('baixista-idle-select', { start: 0, end: 3 }),
-                frameRate: 6,
-                repeat: -1
-            });
-        }
+        // Cria animações para todos os personagens com prefixo 'char-' 
+        // para não conflitar com animações do gameplay
+        GameData.CHARACTERS.forEach(character => {
+            GameData.createCharacterAnimations(this, character.id, `char-${character.id}-`);
+        });
         
         // Inicia animações nos sprites
         this.characterCards.forEach(card => {

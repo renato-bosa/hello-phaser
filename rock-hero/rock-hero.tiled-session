@@ -116,8 +116,8 @@
             "scale": 1,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 2367.5,
-                "y": 712
+                "x": 1359,
+                "y": 545.5
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
@@ -293,8 +293,8 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1308.6666666666665,
-                "y": 377.33333333333326
+                "x": 976,
+                "y": 400.6666666666667
             }
         },
         "dev-resources/map-5--caverna.tmx#abstract-blue": {
@@ -460,11 +460,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.5,
+            "scale": 0.25,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 609,
-                "y": 528
+                "x": 1202,
+                "y": 1052
             }
         },
         "dev-resources/map-7--planicie.tmx#abstract-blue": {

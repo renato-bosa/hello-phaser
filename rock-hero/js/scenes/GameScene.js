@@ -64,7 +64,7 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('baixista-idle', 'assets/spritesheets/baixista-parado-animado-6fps.png', {
             frameWidth: 32, frameHeight: 32
         });
-        this.load.spritesheet('baixista-walk', 'assets/spritesheets/baixista-andando-dir2-6fps.png', {
+        this.load.spritesheet('baixista-walk', 'assets/spritesheets/baixista-andando2-dir-6fps.png', {
             frameWidth: 32, frameHeight: 32
         });
         this.load.spritesheet('baixista-walk-left', 'assets/spritesheets/baixista-andando-esq-6fps.png', {

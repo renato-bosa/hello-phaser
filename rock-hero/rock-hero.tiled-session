@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-3--desafio do luigi.tmx",
+    "activeFile": "dev-resources/map-7--planicie.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
@@ -113,11 +113,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 1.5,
-            "selectedLayer": 0,
+            "scale": 1,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 230.33333333333334,
-                "y": 768.6666666666666
+                "x": 2367.5,
+                "y": 712
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
@@ -293,8 +293,8 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 976.6666666666665,
-                "y": 401.33333333333326
+                "x": 1308.6666666666665,
+                "y": 377.33333333333326
             }
         },
         "dev-resources/map-5--caverna.tmx#abstract-blue": {
@@ -347,6 +347,9 @@
             "scaleInEditor": 1
         },
         "dev-resources/map-5--caverna.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-5--caverna.tmx#sapo-verde-6fps": {
             "scaleInDock": 1
         },
         "dev-resources/map-5--caverna.tmx#starry-sky": {
@@ -457,11 +460,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 1,
-            "selectedLayer": 2,
+            "scale": 0.5,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 569.5,
-                "y": 354
+                "x": 609,
+                "y": 528
             }
         },
         "dev-resources/map-7--planicie.tmx#abstract-blue": {
@@ -519,6 +522,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-7--planicie.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-7--planicie.tmx#sapo-verde-6fps": {
             "scaleInDock": 1
         },
         "dev-resources/map-7--planicie.tmx#setas-velocidade": {
@@ -724,20 +730,23 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-3--desafio do luigi.tmx"
+        "dev-resources/map-3--desafio do luigi.tmx",
+        "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-6--caverna2.tmx",
+        "dev-resources/map-7--planicie.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "int",
     "recentFiles": [
         "dev-resources/map-3--desafio do luigi.tmx",
+        "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-6--caverna2.tmx",
+        "dev-resources/map-7--planicie.tmx",
         "dev-resources/map.tmx",
         "dev-resources/map0-0.tmx",
         "dev-resources/map-2--expansion and speed.tmx",
         "dev-resources/map0-1.tmx",
-        "dev-resources/map-6--caverna2.tmx",
-        "dev-resources/map-5--caverna.tmx",
         "dev-resources/map-4--big-jumps.tmx",
-        "dev-resources/map-7--planicie.tmx",
         "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx"
     ],
     "tileset.embedInMap": true

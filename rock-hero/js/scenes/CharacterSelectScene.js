@@ -36,7 +36,7 @@ class CharacterSelectScene extends Phaser.Scene {
         });
         
         // Baixista
-        this.load.spritesheet('baixista-idle-select', 'assets/spritesheets/baixista-parado.png', {
+        this.load.spritesheet('baixista-idle-select', 'assets/spritesheets/baixista-parado-animado-6fps.png', {
             frameWidth: 32, frameHeight: 32
         });
     }

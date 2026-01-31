@@ -60,8 +60,14 @@ class GameScene extends Phaser.Scene {
             frameWidth: 32, frameHeight: 32
         });
         
-        // Sprites do Baixista (usando placeholder por enquanto)
-        this.load.spritesheet('baixista-idle', 'assets/spritesheets/baixista-parado.png', {
+        // Sprites do Baixista
+        this.load.spritesheet('baixista-idle', 'assets/spritesheets/baixista-parado-animado-6fps.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+        this.load.spritesheet('baixista-walk', 'assets/spritesheets/baixista-andando-dir-6fps.png', {
+            frameWidth: 32, frameHeight: 32
+        });
+        this.load.spritesheet('baixista-walk-left', 'assets/spritesheets/baixista-andando-esq-6fps.png', {
             frameWidth: 32, frameHeight: 32
         });
         
@@ -951,11 +957,10 @@ class GameScene extends Phaser.Scene {
                 { key: 'walk-left', texture: 'baterista-walk-left', frames: [0, 3], rate: 6 }
             ];
         } else if (this.selectedCharacter === 'baixista') {
-            // Baixista (usando sprite parado como placeholder para todas as animações)
             playerAnims = [
                 { key: 'idle', texture: 'baixista-idle', frames: [0, 3], rate: 6 },
-                { key: 'walk', texture: 'baixista-idle', frames: [0, 3], rate: 6 },
-                { key: 'walk-left', texture: 'baixista-idle', frames: [0, 3], rate: 6 }
+                { key: 'walk', texture: 'baixista-walk', frames: [0, 3], rate: 6 },
+                { key: 'walk-left', texture: 'baixista-walk-left', frames: [0, 3], rate: 6 }
             ];
         } else {
             // Vocalista (padrão)

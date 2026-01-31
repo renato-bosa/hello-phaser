@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-7--planicie.tmx",
+    "activeFile": "dev-resources/map-5--caverna.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -291,10 +291,10 @@
                 8
             ],
             "scale": 0.75,
-            "selectedLayer": 4,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 976,
-                "y": 400.6666666666667
+                "x": 1330,
+                "y": 377.33333333333326
             }
         },
         "dev-resources/map-5--caverna.tmx#abstract-blue": {
@@ -739,9 +739,9 @@
     "property.type": "int",
     "recentFiles": [
         "dev-resources/map-3--desafio do luigi.tmx",
-        "dev-resources/map-5--caverna.tmx",
-        "dev-resources/map-6--caverna2.tmx",
         "dev-resources/map-7--planicie.tmx",
+        "dev-resources/map-6--caverna2.tmx",
+        "dev-resources/map-5--caverna.tmx",
         "dev-resources/map.tmx",
         "dev-resources/map0-0.tmx",
         "dev-resources/map-2--expansion and speed.tmx",

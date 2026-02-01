@@ -1592,70 +1592,75 @@ class GameScene extends Phaser.Scene {
         this.currentView = 'paused';
         GameData.saveProgress(this.currentLevel, this.playerName);
         
+        // Pausa a física
+        this.physics.pause();
+        
         // Salva o tempo decorrido no momento da pausa
         this.pausedAtTime = this.time.now;
 
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
 
-        // Overlay
-        const overlay = this.add.rectangle(centerX, centerY, 640, 352, 0x000000, 0.7)
+        // Overlay escuro
+        const overlay = this.add.rectangle(centerX, centerY, 640, 352, 0x000000, 0.8)
             .setScrollFactor(0).setDepth(200);
         this.overlayElements.push(overlay);
 
         // Título
-        const title = this.add.text(centerX, centerY - 60, 'PAUSADO', {
-            fontSize: '36px', fontFamily: 'Arial', color: '#ffffff',
+        const title = this.add.text(centerX, centerY - 100, '⏸ PAUSADO', {
+            fontSize: '32px', fontFamily: '"Press Start 2P", Arial', color: '#ffffff',
             stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
         this.overlayElements.push(title);
 
-        // Botões
+        // Botões do menu de pausa
         this.pauseSelectedIndex = 0;
         this.pauseButtons = [];
-
-        const continueBtn = this.add.text(centerX, centerY - 10, '▶ CONTINUAR', {
-            fontSize: '24px', fontFamily: 'Arial', color: '#00ff00',
-            stroke: '#000000', strokeThickness: 3
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setInteractive({ useHandCursor: true });
-        continueBtn.defaultColor = '#00ff00';
-        continueBtn.on('pointerover', () => { 
-            if (this.pauseSelectedIndex !== 0) SoundManager.play('menuNavigate');
-            this.pauseSelectedIndex = 0; 
-            this.updatePauseStyles(); 
+        
+        const buttonConfigs = [
+            { text: '▶ Continuar Jogando', color: '#00ff00', action: () => this.resumeGame() },
+            { text: '🗺 Voltar ao Mapa', color: '#4ecdc4', action: () => this.goToWorldMap() },
+            { text: '👤 Trocar Personagem', color: '#a855f7', action: () => this.changeCharacter() },
+            { text: '🚪 Sair do Jogo', color: '#ff6b6b', action: () => this.goToMenu() }
+        ];
+        
+        const startY = centerY - 40;
+        const spacing = 38;
+        
+        buttonConfigs.forEach((config, index) => {
+            const btn = this.add.text(centerX, startY + (index * spacing), config.text, {
+                fontSize: '18px', fontFamily: '"Press Start 2P", Arial', color: config.color,
+                stroke: '#000000', strokeThickness: 3
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setInteractive({ useHandCursor: true });
+            
+            btn.defaultColor = config.color;
+            btn.action = config.action;
+            
+            btn.on('pointerover', () => { 
+                if (this.pauseSelectedIndex !== index) SoundManager.play('menuNavigate');
+                this.pauseSelectedIndex = index; 
+                this.updatePauseStyles(); 
+            });
+            btn.on('pointerdown', () => {
+                SoundManager.play('menuSelect');
+                config.action();
+            });
+            
+            this.pauseButtons.push(btn);
+            this.overlayElements.push(btn);
         });
-        continueBtn.on('pointerdown', () => {
-            SoundManager.play('menuSelect');
-            this.resumeGame();
-        });
-        this.pauseButtons.push(continueBtn);
-        this.overlayElements.push(continueBtn);
-
-        const menuBtn = this.add.text(centerX, centerY + 40, 'MENU PRINCIPAL', {
-            fontSize: '24px', fontFamily: 'Arial', color: '#ffd700',
-            stroke: '#000000', strokeThickness: 3
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setInteractive({ useHandCursor: true });
-        menuBtn.defaultColor = '#ffd700';
-        menuBtn.on('pointerover', () => { 
-            if (this.pauseSelectedIndex !== 1) SoundManager.play('menuNavigate');
-            this.pauseSelectedIndex = 1; 
-            this.updatePauseStyles(); 
-        });
-        menuBtn.on('pointerdown', () => {
-            SoundManager.play('menuSelect');
-            this.goToMenu();
-        });
-        this.pauseButtons.push(menuBtn);
-        this.overlayElements.push(menuBtn);
 
         // Instruções
-        const instructions = this.add.text(centerX, centerY + 100, '↑↓: Navegar | Enter: Selecionar | ESC: Voltar', {
-            fontSize: '14px', fontFamily: 'Arial', color: '#aaaaaa'
+        const instructions = this.add.text(centerX, centerY + 130, '↑↓: Navegar | Enter: Selecionar | ESC: Voltar', {
+            fontSize: '10px', fontFamily: 'Arial', color: '#888888'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
         this.overlayElements.push(instructions);
 
         this.updatePauseStyles();
-
+        this.setupPauseControls();
+    }
+    
+    setupPauseControls() {
         // Controles do menu de pause
         const upKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         const downKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
@@ -1686,8 +1691,7 @@ class GameScene extends Phaser.Scene {
         enterKey.on('down', () => {
             if (this.currentView === 'paused') {
                 SoundManager.play('menuSelect');
-                if (this.pauseSelectedIndex === 0) this.resumeGame();
-                else this.goToMenu();
+                this.pauseButtons[this.pauseSelectedIndex].action();
             }
         });
 
@@ -1714,6 +1718,9 @@ class GameScene extends Phaser.Scene {
             this.pausedAtTime = null;
         }
         
+        // Retoma a física
+        this.physics.resume();
+        
         this.currentView = 'gameplay';
         this.clearOverlay();
         this.clearPauseListeners();
@@ -1723,6 +1730,35 @@ class GameScene extends Phaser.Scene {
         this.clearOverlay();
         this.clearPauseListeners();
         this.scene.start('MenuScene');
+    }
+
+    goToWorldMap() {
+        this.clearOverlay();
+        this.clearPauseListeners();
+        
+        // Obtém o mundo atual baseado na fase
+        const levelConfig = GameData.LEVELS[this.currentLevel];
+        const worldId = levelConfig?.world || 1;
+        
+        // Volta ao mapa do mundo na fase atual
+        this.scene.start('WorldMapScene', { 
+            worldId: worldId, 
+            levelIndex: this.currentLevel 
+        });
+    }
+
+    changeCharacter() {
+        this.clearOverlay();
+        this.clearPauseListeners();
+        
+        // Vai para seleção de personagem, passando dados para retornar à fase atual
+        this.scene.start('CharacterSelectScene', {
+            returnTo: 'GameScene',
+            returnData: {
+                level: this.currentLevel,
+                playerName: this.playerName
+            }
+        });
     }
 
     clearOverlay() {

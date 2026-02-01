@@ -13,7 +13,7 @@ class CharacterSelectScene extends Phaser.Scene {
     init(data) {
         // Dados para retorno
         this.returnTo = data?.returnTo || 'WorldMapScene';
-        this.returnData = {
+        this.returnData = data?.returnData || {
             worldId: data?.worldId,
             levelIndex: data?.levelIndex
         };

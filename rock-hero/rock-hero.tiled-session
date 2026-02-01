@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-5--caverna.tmx",
+    "activeFile": "dev-resources/map-8--o-resgate-do-baixista.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -551,6 +551,98 @@
         "dev-resources/map-7--planicie.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 1870.3333333333333,
+                "y": 405.33333333333326
+            }
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#ceu-azul": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#cristal das notas de som": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#grama noturna": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#grass-floating-platform-edges": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#grass-floating-platform-middle": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#green-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#lava": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#lava-roxa": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#pedra": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#pedra-dark": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#starry-sky": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#terra": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#terra-escura": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "dev-resources/map.tmx": {
             "expandedObjectLayers": [
                 8
@@ -730,14 +822,12 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-3--desafio do luigi.tmx",
-        "dev-resources/map-5--caverna.tmx",
-        "dev-resources/map-6--caverna2.tmx",
-        "dev-resources/map-7--planicie.tmx"
+        "dev-resources/map-8--o-resgate-do-baixista.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "dev-resources/map-8--o-resgate-do-baixista.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-7--planicie.tmx",
         "dev-resources/map-6--caverna2.tmx",

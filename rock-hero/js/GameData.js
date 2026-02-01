@@ -33,7 +33,7 @@ const GameData = {
                 },
                 walk: {
                     key: 'hero-walk',
-                    file: 'assets/spritesheets/walking-hero.png',
+                    file: 'assets/spritesheets/walking-hero2.png',
                     frameWidth: 32, frameHeight: 32,
                     startFrame: 0, endFrame: 3,
                     frameRate: 14

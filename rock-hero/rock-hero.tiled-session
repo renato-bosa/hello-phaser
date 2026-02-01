@@ -552,14 +552,17 @@
             "scaleInDock": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx": {
-            "scale": 1.5,
-            "selectedLayer": 2,
+            "scale": 0.33,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 1870.3333333333333,
-                "y": 405.33333333333326
+                "x": 895.4545454545455,
+                "y": 418.18181818181813
             }
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#abstract-smooth-blue": {
             "scaleInDock": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#black": {
@@ -572,6 +575,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#ceu-azul": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#ceu-azul-medio": {
             "scaleInDock": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#cristal das notas de som": {

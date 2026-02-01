@@ -975,31 +975,31 @@ class GameScene extends Phaser.Scene {
 
     createHUD() {
         // Timer
-        this.timerText = this.add.text(this.cameras.main.width - 16, 16, '⏱ 0:00.000', {
+        this.timerText = this.add.text(this.cameras.main.width - 16, 5, '⏱ 0:00.000', {
             fontSize: '18px',
             fontFamily: 'monospace',
             color: '#ffffff',
             stroke: '#000000',
             strokeThickness: 3
-        }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
+        }).setOrigin(1, 0).setScrollFactor(0).setDepth(100).setAlpha(0.8);
 
         // Melhor tempo
         const bestTime = GameData.getBestTime(this.currentLevel);
         if (bestTime) {
-            this.bestTimeText = this.add.text(this.cameras.main.width - 16, 38, `🏆 ${GameData.formatTime(bestTime)}`, {
+            this.bestTimeText = this.add.text(this.cameras.main.width - 16, 30, `🏆 ${GameData.formatTime(bestTime)}`, {
                 fontSize: '14px',
                 fontFamily: 'monospace',
                 color: '#ffd700',
                 stroke: '#000000',
                 strokeThickness: 2
-            }).setOrigin(1, 0).setScrollFactor(0).setDepth(100);
+            }).setOrigin(1, 0).setScrollFactor(0).setDepth(100).setAlpha(0.8);
         }
 
         // Estrelas (se houver)
         if (this.totalStars > 0) {
-            this.starHUD = this.add.container(50, 30).setScrollFactor(0).setDepth(100);
-            const starIcon = this.add.sprite(0, 0, 'star', 0).setScale(1.2);
-            this.starText = this.add.text(24, 0, `0/${this.totalStars}`, {
+            this.starHUD = this.add.container(20, 16).setScrollFactor(0).setDepth(100).setAlpha(0.8);
+            const starIcon = this.add.sprite(0, 0, 'star', 0).setScale(0.8);
+            this.starText = this.add.text(20, 0, `0/${this.totalStars}`, {
                 fontSize: '20px',
                 fontFamily: 'Arial',
                 color: '#ffff00',

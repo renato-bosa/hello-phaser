@@ -7,9 +7,66 @@
  * - Progresso salvo
  * - Configurações de níveis
  * - Estado do jogo
+ * - Feature Flags (funcionalidades experimentais)
  */
 
 const GameData = {
+    // ==================== FEATURE FLAGS ====================
+    // Sistema para testar novas funcionalidades
+    // Pode ser ativado via URL: ?trail=true&particles=true
+    // Ou programaticamente: GameData.FEATURES.playerTrail = true
+    FEATURES: {
+        // Efeito de rastro do jogador (estilo "trail do mouse" do Windows)
+        playerTrail: false,
+        
+        // Partículas ao coletar estrelas
+        starParticles: false,
+        
+        // Efeito de poeira ao andar/pular
+        dustEffect: false,
+        
+        // Screen shake ao tomar dano
+        screenShake: false,
+        
+        // Slow motion ao completar fase
+        victorySlowMo: false,
+    },
+
+    /**
+     * Inicializa feature flags a partir de URL params
+     * Chamado no início do jogo (game.js)
+     */
+    initFeatureFlags() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        Object.keys(this.FEATURES).forEach(feature => {
+            const urlValue = urlParams.get(feature);
+            if (urlValue === 'true') {
+                this.FEATURES[feature] = true;
+                console.log(`🚩 Feature "${feature}" ativada via URL`);
+            } else if (urlValue === 'false') {
+                this.FEATURES[feature] = false;
+            }
+        });
+        
+        // Log das features ativas
+        const activeFeatures = Object.entries(this.FEATURES)
+            .filter(([_, v]) => v)
+            .map(([k, _]) => k);
+        if (activeFeatures.length > 0) {
+            console.log('🎮 Features ativas:', activeFeatures.join(', '));
+        }
+    },
+
+    /**
+     * Verifica se uma feature está ativa
+     * @param {string} featureName - Nome da feature
+     * @returns {boolean}
+     */
+    isFeatureEnabled(featureName) {
+        return this.FEATURES[featureName] === true;
+    },
+
     // ==================== CONFIGURAÇÕES DE SLOTS ====================
     MAX_SLOTS: 4,
     STORAGE_KEY_SLOTS: 'rockHero_slots',

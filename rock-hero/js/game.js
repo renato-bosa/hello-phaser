@@ -16,6 +16,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const showFPS = urlParams.get('fps') === 'true';
 const showDebug = urlParams.get('debug') === 'true';
 
+// Inicializa feature flags (funcionalidades experimentais)
+GameData.initFeatureFlags();
+
 const config = {
     type: Phaser.AUTO,
     width: 640,

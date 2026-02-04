@@ -128,6 +128,10 @@ class GameScene extends Phaser.Scene {
         this.lastDirection = 0;
         this.isRespawning = false;
 
+        // Sistema de trail (rastro do jogador)
+        this.trailSprites = [];
+        this.lastTrailTime = 0;
+
         // Inicia countdown apenas na primeira fase
         if (this.currentLevel === 0) {
             this.startCountdown();
@@ -591,6 +595,63 @@ class GameScene extends Phaser.Scene {
                 enemy.setVelocityX(data.speed * data.direction);
             }
         });
+    }
+
+    // ==================== EFEITOS VISUAIS ====================
+
+    /**
+     * Atualiza o efeito de rastro do jogador (trail)
+     * Cria cópias semi-transparentes do sprite que desvanecem
+     */
+    updatePlayerTrail() {
+        const now = this.time.now;
+        const player = this.player;
+        
+        // Só cria trail se o jogador está se movendo
+        const isMoving = Math.abs(player.body.velocity.x) > 20 || Math.abs(player.body.velocity.y) > 20;
+        
+        // Intervalo entre cada sprite do trail (ms)
+        const TRAIL_INTERVAL = 20;
+        // Quantidade máxima de sprites no trail
+        const MAX_TRAIL = 300;
+        // Duração do fade (ms)
+        const FADE_DURATION = 3000;
+        
+        // Cria novo sprite de trail
+        if (isMoving && now - this.lastTrailTime > TRAIL_INTERVAL) {
+            this.lastTrailTime = now;
+            
+            // Cria sprite na posição atual do jogador
+            const trailSprite = this.add.sprite(player.x, player.y, player.texture.key, player.frame.name);
+            trailSprite.setFlipX(player.flipX);
+            trailSprite.setScale(player.scaleX, player.scaleY);
+            trailSprite.setAlpha(0.5);
+            trailSprite.setTint(0x88aaff); // Leve tom azulado
+            trailSprite.setDepth(player.depth - 1);
+            
+            // Animação de fade out
+            this.tweens.add({
+                targets: trailSprite,
+                alpha: 0,
+                scale: trailSprite.scale * 0.8,
+                duration: FADE_DURATION,
+                ease: 'Power2',
+                onComplete: () => {
+                    trailSprite.destroy();
+                    this.trailSprites = this.trailSprites.filter(s => s !== trailSprite);
+                }
+            });
+            
+            this.trailSprites.push(trailSprite);
+            
+            // Remove sprites excedentes
+            while (this.trailSprites.length > MAX_TRAIL) {
+                const oldSprite = this.trailSprites.shift();
+                if (oldSprite && oldSprite.destroy) {
+                    oldSprite.destroy();
+                }
+            }
+        }
     }
 
     handleEnemyCollision(player, enemy) {
@@ -1086,6 +1147,11 @@ class GameScene extends Phaser.Scene {
         
         // Atualiza inimigos
         this.updateEnemies();
+
+        // Atualiza efeito de rastro (se ativado)
+        if (GameData.isFeatureEnabled('playerTrail')) {
+            this.updatePlayerTrail();
+        }
 
         // Restart via mobile
         if (this.virtualControls.restart) {

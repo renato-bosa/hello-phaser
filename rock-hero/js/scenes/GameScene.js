@@ -654,6 +654,144 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    /**
+     * Efeito neon: trail brilhante + partículas ao pousar/pular
+     */
+    updateDustNeonEffect() {
+        const player = this.player;
+        const onGround = player.body.blocked.down;
+        const now = this.time.now;
+        
+        // Inicializa variáveis de controle
+        if (!this.lastNeonTrailTime) this.lastNeonTrailTime = 0;
+        if (!this.wasOnGround) this.wasOnGround = false;
+        if (!this.neonTrailSprites) this.neonTrailSprites = [];
+        
+        // Cores neon para as partículas e trail
+        const neonColors = [0x00ffff, 0xff00ff, 0x00ff00, 0xffff00, 0xff6600];
+        
+        // ========== TRAIL NEON ==========
+        const isMoving = Math.abs(player.body.velocity.x) > 20 || Math.abs(player.body.velocity.y) > 20;
+        const TRAIL_INTERVAL = 15;
+        const MAX_TRAIL = 20;
+        
+        if (isMoving && now - this.lastNeonTrailTime > TRAIL_INTERVAL) {
+            this.lastNeonTrailTime = now;
+            
+            // Escolhe cor aleatória do array neon
+            const color = Phaser.Math.RND.pick(neonColors);
+            const size = Phaser.Math.Between(4, 8);
+            
+            // Cria círculo neon na posição do jogador
+            const trailDot = this.add.circle(player.x, player.y, size, color, 0.8);
+            trailDot.setDepth(player.depth - 1);
+            
+            // Glow (círculo maior e mais transparente)
+            const glow = this.add.circle(player.x, player.y, size * 2.5, color, 0.25);
+            glow.setDepth(player.depth - 2);
+            
+            // Animação de fade out
+            this.tweens.add({
+                targets: [trailDot, glow],
+                alpha: 0,
+                scale: 0.2,
+                duration: 400,
+                ease: 'Power2',
+                onComplete: () => {
+                    trailDot.destroy();
+                    glow.destroy();
+                    this.neonTrailSprites = this.neonTrailSprites.filter(s => s !== trailDot);
+                }
+            });
+            
+            this.neonTrailSprites.push(trailDot);
+            
+            // Remove excedentes
+            while (this.neonTrailSprites.length > MAX_TRAIL) {
+                const old = this.neonTrailSprites.shift();
+                if (old && old.destroy) old.destroy();
+            }
+        }
+        
+        // ========== PARTÍCULAS AO POUSAR ==========
+        if (onGround && !this.wasOnGround && Math.abs(player.body.velocity.y) < 50) {
+            this.createNeonDustParticle(
+                player.x,
+                player.y + 14,
+                neonColors,
+                { count: 8, speedY: -60, speedX: 80, burst: true }
+            );
+        }
+        
+        // ========== PARTÍCULAS AO PULAR ==========
+        if (!onGround && this.wasOnGround) {
+            this.createNeonDustParticle(
+                player.x,
+                player.y + 14,
+                neonColors,
+                { count: 5, speedY: 20, speedX: 40, burst: true }
+            );
+        }
+        
+        this.wasOnGround = onGround;
+    }
+
+    /**
+     * Cria partículas de poeira neon
+     */
+    createNeonDustParticle(x, y, colors, options = {}) {
+        const count = options.count || 3;
+        const baseSpeedY = options.speedY || -40;
+        const baseSpeedX = options.speedX || 30;
+        const burst = options.burst || false;
+        
+        for (let i = 0; i < count; i++) {
+            const color = Phaser.Math.RND.pick(colors);
+            const size = Phaser.Math.Between(2, 5);
+            
+            // Cria partícula como círculo
+            const particle = this.add.circle(
+                x + Phaser.Math.Between(-6, 6),
+                y,
+                size,
+                color,
+                0.9
+            );
+            particle.setDepth(this.player.depth - 1);
+            
+            // Adiciona glow effect (círculo maior e mais transparente)
+            const glow = this.add.circle(
+                particle.x,
+                particle.y,
+                size * 2,
+                color,
+                0.3
+            );
+            glow.setDepth(particle.depth - 1);
+            
+            // Velocidades
+            const vx = burst 
+                ? Phaser.Math.Between(-baseSpeedX, baseSpeedX)
+                : baseSpeedX + Phaser.Math.Between(-10, 10);
+            const vy = baseSpeedY + Phaser.Math.Between(-20, 20);
+            
+            // Animação da partícula
+            this.tweens.add({
+                targets: [particle, glow],
+                x: particle.x + vx * 0.5,
+                y: particle.y + vy,
+                alpha: 0,
+                scale: 0.3,
+                duration: Phaser.Math.Between(200, 400),
+                ease: 'Power2',
+                onComplete: () => {
+                    particle.destroy();
+                    glow.destroy();
+                }
+            });
+        }
+    }
+
     handleEnemyCollision(player, enemy) {
         if (!enemy || !enemy.active) return;
         
@@ -1148,9 +1286,12 @@ class GameScene extends Phaser.Scene {
         // Atualiza inimigos
         this.updateEnemies();
 
-        // Atualiza efeito de rastro (se ativado)
+        // Atualiza efeitos visuais (se ativados)
         if (GameData.isFeatureEnabled('playerTrail')) {
             this.updatePlayerTrail();
+        }
+        if (GameData.isFeatureEnabled('dustNeonEffect')) {
+            this.updateDustNeonEffect();
         }
 
         // Restart via mobile

@@ -25,6 +25,9 @@ const GameData = {
         // Efeito de poeira ao andar/pular
         dustEffect: false,
         
+        // Efeito de poeira neon ao andar/pular (mais estilizado)
+        dustNeonEffect: false,
+        
         // Screen shake ao tomar dano
         screenShake: false,
         

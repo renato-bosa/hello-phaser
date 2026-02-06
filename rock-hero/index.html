@@ -269,6 +269,17 @@
                 element.classList.remove('active');
             }
 
+            // Função para encontrar qual botão está sob um ponto de toque
+            function getButtonAtPoint(x, y) {
+                for (const [control, element] of Object.entries(buttons)) {
+                    const rect = element.getBoundingClientRect();
+                    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                        return { control, element };
+                    }
+                }
+                return null;
+            }
+
             // Configura eventos para cada botão
             Object.entries(buttons).forEach(([control, element]) => {
                 // Touch Start
@@ -322,8 +333,39 @@
                 });
             });
 
-            // Previne comportamentos indesejados
+            // Touch Move global - permite deslizar entre botões direcionais
             document.addEventListener('touchmove', (e) => {
+                for (let touch of e.changedTouches) {
+                    const touchData = activeTouches.get(touch.identifier);
+                    if (!touchData) continue;
+
+                    // Verifica se o toque está agora sobre outro botão
+                    const newButton = getButtonAtPoint(touch.clientX, touch.clientY);
+                    
+                    if (newButton && newButton.control !== touchData.control) {
+                        // Permite deslizar apenas entre left e right (botões direcionais)
+                        const isDirectional = (ctrl) => ctrl === 'left' || ctrl === 'right';
+                        
+                        if (isDirectional(touchData.control) && isDirectional(newButton.control)) {
+                            // Desativa o botão anterior
+                            deactivateControl(touchData.control, touchData.element);
+                            // Ativa o novo botão
+                            activateControl(newButton.control, newButton.element);
+                            // Atualiza o rastreamento
+                            activeTouches.set(touch.identifier, newButton);
+                        }
+                    } else if (!newButton && touchData) {
+                        // Se saiu de todos os botões, desativa
+                        // (mas só para direcionais, para permitir manter pulo pressionado)
+                        const isDirectional = (ctrl) => ctrl === 'left' || ctrl === 'right';
+                        if (isDirectional(touchData.control)) {
+                            deactivateControl(touchData.control, touchData.element);
+                            activeTouches.delete(touch.identifier);
+                        }
+                    }
+                }
+
+                // Previne scroll durante toque nos controles
                 if (e.target.classList.contains('mobile-btn')) {
                     e.preventDefault();
                 }

@@ -16,6 +16,7 @@ const GameData = {
     // Pode ser ativado via URL: ?trail=true&particles=true
     // Ou programaticamente: GameData.FEATURES.playerTrail = true
     FEATURES: {
+        // ===== EFEITOS VISUAIS =====
         // Efeito de rastro do jogador (estilo "trail do mouse" do Windows)
         playerTrail: false,
         
@@ -25,14 +26,24 @@ const GameData = {
         // Efeito de poeira ao andar/pular
         dustEffect: false,
         
-        // Efeito de poeira neon ao andar/pular (mais estilizado)
-        dustNeonEffect: false,
+        // Burst neon ao pular
+        jumpNeonBurst: false,
+        
+        // Burst neon ao pousar
+        landNeonBurst: false,
+        
+        // Linha neon brilhante seguindo a trajetória do jogador
+        neonLineTrail: false,
         
         // Screen shake ao tomar dano
         screenShake: false,
         
         // Slow motion ao completar fase
         victorySlowMo: false,
+        
+        // ===== MECÂNICAS DE FÍSICA =====
+        // Double-jump: pular novamente no ar
+        doubleJump: false,
     },
 
     /**

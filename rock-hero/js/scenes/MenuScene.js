@@ -211,6 +211,17 @@ class MenuScene extends Phaser.Scene {
             () => this.showRanking()
         );
         this.menuButtons.push(this.rankingBtn);
+        yOffset += 35;
+
+        // Botão "Efeitos"
+        this.effectsBtn = this.createButton(
+            this.centerX, 
+            this.centerY + yOffset, 
+            '✨ EFEITOS',
+            '#00ffaa',
+            () => this.showEffectsMenu()
+        );
+        this.menuButtons.push(this.effectsBtn);
 
         // Cursor de seleção (posicionado à esquerda dos botões)
         this.cursor = this.add.text(this.centerX - 170, this.menuButtons[0].y, '▶', {
@@ -299,6 +310,13 @@ class MenuScene extends Phaser.Scene {
                     SoundManager.play('menuNavigate');
                 }
                 this.updateButtonStyles();
+            } else if (this.currentView === 'effects') {
+                const prevIndex = this.effectSelectedIndex;
+                this.effectSelectedIndex = Math.max(0, this.effectSelectedIndex - 1);
+                if (this.effectSelectedIndex !== prevIndex) {
+                    SoundManager.play('menuNavigate');
+                    this.updateEffectSelection();
+                }
             }
         });
 
@@ -310,6 +328,13 @@ class MenuScene extends Phaser.Scene {
                     SoundManager.play('menuNavigate');
                 }
                 this.updateButtonStyles();
+            } else if (this.currentView === 'effects') {
+                const prevIndex = this.effectSelectedIndex;
+                this.effectSelectedIndex = Math.min(this.effectToggles.length - 1, this.effectSelectedIndex + 1);
+                if (this.effectSelectedIndex !== prevIndex) {
+                    SoundManager.play('menuNavigate');
+                    this.updateEffectSelection();
+                }
             }
         });
 
@@ -318,6 +343,9 @@ class MenuScene extends Phaser.Scene {
             if (this.currentView === 'menu') {
                 SoundManager.play('menuSelect');
                 this.menuButtons[this.selectedIndex].callback();
+            } else if (this.currentView === 'effects') {
+                const toggle = this.effectToggles[this.effectSelectedIndex];
+                this.toggleEffect(toggle.key, toggle.bg, toggle.text);
             }
         };
 
@@ -330,7 +358,7 @@ class MenuScene extends Phaser.Scene {
 
         // ESC para voltar
         escKey.on('down', () => {
-            if (this.currentView === 'ranking') {
+            if (this.currentView === 'ranking' || this.currentView === 'effects') {
                 SoundManager.play('menuNavigate');
                 this.closeOverlay();
             }
@@ -527,7 +555,169 @@ class MenuScene extends Phaser.Scene {
             this.overlayElements = [];
         }
 
+        // Limpa referências do menu de efeitos
+        this.effectToggles = [];
+
         this.currentView = 'menu';
+    }
+
+    // ==================== MENU DE EFEITOS ====================
+
+    showEffectsMenu() {
+        this.currentView = 'effects';
+        this.overlayElements = [];
+        this.effectToggles = [];
+        this.effectSelectedIndex = 0;
+
+        // Overlay
+        const overlay = this.add.rectangle(
+            this.centerX, this.centerY, 640, 352, 0x000000, 0.95
+        ).setDepth(100);
+        this.overlayElements.push(overlay);
+
+        // Título
+        const title = this.add.text(this.centerX, 35, '✨ EFEITOS VISUAIS ✨', {
+            fontSize: '20px',
+            fontFamily: '"Press Start 2P", Arial',
+            color: '#00ffaa',
+            stroke: '#000000',
+            strokeThickness: 4
+        }).setOrigin(0.5).setDepth(101);
+        this.overlayElements.push(title);
+
+        // Configuração das duas colunas
+        const columns = [
+            {
+                title: '✨ Efeitos Visuais',
+                color: '#00ffaa',
+                x: this.centerX - 155,
+                items: [
+                    { key: 'playerTrail', name: 'Rastro Sprite', desc: 'Cópias semi-transparentes' },
+                    { key: 'neonLineTrail', name: 'Linha Neon', desc: 'Linha brilhante na trajetória' },
+                    { key: 'jumpNeonBurst', name: 'Burst Pular', desc: 'Partículas neon ao pular' },
+                    { key: 'landNeonBurst', name: 'Burst Pousar', desc: 'Partículas neon ao pousar' },
+                ]
+            },
+            {
+                title: '⚡ Mecânicas de Física',
+                color: '#ffaa00',
+                x: this.centerX + 155,
+                items: [
+                    { key: 'doubleJump', name: 'Double-Jump', desc: 'Pular novamente no ar' },
+                ]
+            }
+        ];
+
+        const startY = 80;
+        const spacing = 55;
+        let globalIndex = 0;
+
+        columns.forEach((column) => {
+            // Título da coluna
+            const colTitle = this.add.text(column.x, startY - 20, column.title, {
+                fontSize: '12px',
+                fontFamily: '"Press Start 2P", Arial',
+                color: column.color,
+                stroke: '#000000',
+                strokeThickness: 2
+            }).setOrigin(0.5).setDepth(101);
+            this.overlayElements.push(colTitle);
+
+            column.items.forEach((effect, itemIndex) => {
+                const y = startY + itemIndex * spacing + 20;
+                const isEnabled = GameData.FEATURES[effect.key];
+                const currentIndex = globalIndex;
+
+                // Container para o toggle
+                const toggleContainer = this.add.container(column.x, y).setDepth(101);
+
+                // Nome do efeito
+                const nameText = this.add.text(-110, -8, effect.name, {
+                    fontSize: '11px',
+                    fontFamily: '"Press Start 2P", Arial',
+                    color: '#ffffff'
+                }).setOrigin(0, 0.5);
+                toggleContainer.add(nameText);
+
+                // Descrição
+                const descText = this.add.text(-110, 10, effect.desc, {
+                    fontSize: '9px',
+                    fontFamily: 'Arial',
+                    color: '#666666'
+                }).setOrigin(0, 0.5);
+                toggleContainer.add(descText);
+
+                // Botão toggle
+                const toggleBg = this.add.rectangle(100, 0, 50, 22, isEnabled ? 0x00ff00 : 0x333333)
+                    .setStrokeStyle(2, 0xffffff);
+                toggleContainer.add(toggleBg);
+
+                const toggleText = this.add.text(100, 0, isEnabled ? 'ON' : 'OFF', {
+                    fontSize: '9px',
+                    fontFamily: '"Press Start 2P", Arial',
+                    color: isEnabled ? '#000000' : '#888888'
+                }).setOrigin(0.5);
+                toggleContainer.add(toggleText);
+
+                // Indicador de seleção
+                const selector = this.add.text(-130, 0, '▶', {
+                    fontSize: '14px',
+                    fontFamily: 'Arial',
+                    color: column.color
+                }).setOrigin(0.5).setAlpha(currentIndex === 0 ? 1 : 0);
+                toggleContainer.add(selector);
+
+                this.overlayElements.push(toggleContainer);
+
+                // Interatividade
+                toggleBg.setInteractive({ useHandCursor: true });
+                toggleBg.on('pointerdown', () => {
+                    this.toggleEffect(effect.key, toggleBg, toggleText);
+                });
+                toggleBg.on('pointerover', () => {
+                    if (this.effectSelectedIndex !== currentIndex) {
+                        SoundManager.play('menuNavigate');
+                    }
+                    this.effectSelectedIndex = currentIndex;
+                    this.updateEffectSelection();
+                });
+
+                this.effectToggles.push({
+                    key: effect.key,
+                    bg: toggleBg,
+                    text: toggleText,
+                    selector: selector
+                });
+
+                globalIndex++;
+            });
+        });
+
+        // Instrução para fechar
+        const closeText = this.add.text(this.centerX, this.centerY + 145, 
+            '↑↓: Navegar | Enter: Alternar | ESC: Voltar', {
+            fontSize: '10px',
+            fontFamily: 'Arial',
+            color: '#aaaaaa'
+        }).setOrigin(0.5).setDepth(101);
+        this.overlayElements.push(closeText);
+    }
+
+    updateEffectSelection() {
+        this.effectToggles.forEach((toggle, index) => {
+            toggle.selector.setAlpha(index === this.effectSelectedIndex ? 1 : 0);
+        });
+    }
+
+    toggleEffect(key, bg, text) {
+        GameData.FEATURES[key] = !GameData.FEATURES[key];
+        const isEnabled = GameData.FEATURES[key];
+
+        bg.setFillStyle(isEnabled ? 0x00ff00 : 0x333333);
+        text.setText(isEnabled ? 'ON' : 'OFF');
+        text.setColor(isEnabled ? '#000000' : '#888888');
+
+        SoundManager.play('menuSelect');
     }
 
     // Limpeza ao sair da cena

@@ -132,6 +132,10 @@ class GameScene extends Phaser.Scene {
         this.trailSprites = [];
         this.lastTrailTime = 0;
 
+        // Sistema de linha neon
+        this.neonLinePoints = [];
+        this.neonLineGraphics = null;
+
         // Inicia countdown apenas na primeira fase
         if (this.currentLevel === 0) {
             this.startCountdown();
@@ -655,82 +659,41 @@ class GameScene extends Phaser.Scene {
     }
 
     /**
-     * Efeito neon: trail brilhante + partículas ao pousar/pular
+     * Efeitos de burst neon ao pular/pousar
+     * Separados em duas features independentes
      */
-    updateDustNeonEffect() {
+    updateNeonBurstEffects() {
         const player = this.player;
         const onGround = player.body.blocked.down;
-        const now = this.time.now;
         
-        // Inicializa variáveis de controle
-        if (!this.lastNeonTrailTime) this.lastNeonTrailTime = 0;
-        if (!this.wasOnGround) this.wasOnGround = false;
-        if (!this.neonTrailSprites) this.neonTrailSprites = [];
+        // Inicializa variável de controle
+        if (this.wasOnGround === undefined) this.wasOnGround = false;
         
-        // Cores neon para as partículas e trail
+        // Cores neon para as partículas
         const neonColors = [0x00ffff, 0xff00ff, 0x00ff00, 0xffff00, 0xff6600];
         
-        // ========== TRAIL NEON ==========
-        const isMoving = Math.abs(player.body.velocity.x) > 20 || Math.abs(player.body.velocity.y) > 20;
-        const TRAIL_INTERVAL = 15;
-        const MAX_TRAIL = 20;
-        
-        if (isMoving && now - this.lastNeonTrailTime > TRAIL_INTERVAL) {
-            this.lastNeonTrailTime = now;
-            
-            // Escolhe cor aleatória do array neon
-            const color = Phaser.Math.RND.pick(neonColors);
-            const size = Phaser.Math.Between(4, 8);
-            
-            // Cria círculo neon na posição do jogador
-            const trailDot = this.add.circle(player.x, player.y, size, color, 0.8);
-            trailDot.setDepth(player.depth - 1);
-            
-            // Glow (círculo maior e mais transparente)
-            const glow = this.add.circle(player.x, player.y, size * 2.5, color, 0.25);
-            glow.setDepth(player.depth - 2);
-            
-            // Animação de fade out
-            this.tweens.add({
-                targets: [trailDot, glow],
-                alpha: 0,
-                scale: 0.2,
-                duration: 400,
-                ease: 'Power2',
-                onComplete: () => {
-                    trailDot.destroy();
-                    glow.destroy();
-                    this.neonTrailSprites = this.neonTrailSprites.filter(s => s !== trailDot);
-                }
-            });
-            
-            this.neonTrailSprites.push(trailDot);
-            
-            // Remove excedentes
-            while (this.neonTrailSprites.length > MAX_TRAIL) {
-                const old = this.neonTrailSprites.shift();
-                if (old && old.destroy) old.destroy();
+        // Partículas ao pousar (burst maior)
+        if (GameData.isFeatureEnabled('landNeonBurst')) {
+            if (onGround && !this.wasOnGround && Math.abs(player.body.velocity.y) < 50) {
+                this.createNeonDustParticle(
+                    player.x,
+                    player.y + 14,
+                    neonColors,
+                    { count: 8, speedY: -60, speedX: 80, burst: true }
+                );
             }
         }
         
-        // ========== PARTÍCULAS AO POUSAR ==========
-        if (onGround && !this.wasOnGround && Math.abs(player.body.velocity.y) < 50) {
-            this.createNeonDustParticle(
-                player.x,
-                player.y + 14,
-                neonColors,
-                { count: 8, speedY: -60, speedX: 80, burst: true }
-            );
-        }
-        
-        // ========== PARTÍCULAS AO PULAR ==========
-        if (!onGround && this.wasOnGround) {
-            this.createNeonDustParticle(
-                player.x,
-                player.y + 14,
-                neonColors,
-                { count: 5, speedY: 20, speedX: 40, burst: true }
-            );
+        // Partículas ao pular
+        if (GameData.isFeatureEnabled('jumpNeonBurst')) {
+            if (!onGround && this.wasOnGround) {
+                this.createNeonDustParticle(
+                    player.x,
+                    player.y + 14,
+                    neonColors,
+                    { count: 5, speedY: 20, speedX: 40, burst: true }
+                );
+            }
         }
         
         this.wasOnGround = onGround;
@@ -790,6 +753,107 @@ class GameScene extends Phaser.Scene {
                 }
             });
         }
+    }
+
+    /**
+     * Efeito de linha neon brilhante seguindo a trajetória do jogador
+     * Desenha uma linha glow azul no formato do movimento
+     */
+    updateNeonLineTrail() {
+        const player = this.player;
+        const now = this.time.now;
+        
+        // Configurações
+        const MAX_POINTS = 25;           // Quantidade de pontos na linha
+        const POINT_INTERVAL = 16;       // Intervalo entre pontos (ms)
+        const LINE_WIDTH = 4;            // Largura da linha principal
+        const GLOW_WIDTH = 12;           // Largura do glow
+        const NEON_COLOR = 0x00aaff;     // Azul neon
+        const GLOW_COLOR = 0x0044aa;     // Azul mais escuro para glow
+        
+        // Inicializa o graphics se não existir
+        if (!this.neonLineGraphics) {
+            this.neonLineGraphics = this.add.graphics();
+            this.neonLineGraphics.setDepth(this.player.depth - 2);
+        }
+        
+        // Inicializa controle de tempo
+        if (!this.lastNeonPointTime) this.lastNeonPointTime = 0;
+        
+        // Adiciona novo ponto se está se movendo
+        const isMoving = Math.abs(player.body.velocity.x) > 10 || Math.abs(player.body.velocity.y) > 10;
+        
+        if (isMoving && now - this.lastNeonPointTime > POINT_INTERVAL) {
+            this.lastNeonPointTime = now;
+            
+            this.neonLinePoints.push({
+                x: player.x,
+                y: player.y,
+                time: now,
+                alpha: 1
+            });
+            
+            // Remove pontos antigos
+            while (this.neonLinePoints.length > MAX_POINTS) {
+                this.neonLinePoints.shift();
+            }
+        }
+        
+        // Atualiza alpha dos pontos (fade out gradual)
+        const FADE_SPEED = 0.03;
+        this.neonLinePoints.forEach(point => {
+            point.alpha = Math.max(0, point.alpha - FADE_SPEED);
+        });
+        
+        // Remove pontos totalmente transparentes
+        this.neonLinePoints = this.neonLinePoints.filter(p => p.alpha > 0);
+        
+        // Desenha a linha
+        this.neonLineGraphics.clear();
+        
+        if (this.neonLinePoints.length >= 2) {
+            // Desenha glow (linha mais grossa e transparente)
+            this.neonLineGraphics.lineStyle(GLOW_WIDTH, GLOW_COLOR, 0.3);
+            this.drawSmoothLine(this.neonLineGraphics, this.neonLinePoints);
+            
+            // Desenha linha principal
+            this.neonLineGraphics.lineStyle(LINE_WIDTH, NEON_COLOR, 0.8);
+            this.drawSmoothLine(this.neonLineGraphics, this.neonLinePoints);
+            
+            // Desenha núcleo brilhante (linha fina e mais clara)
+            this.neonLineGraphics.lineStyle(2, 0xffffff, 0.6);
+            this.drawSmoothLine(this.neonLineGraphics, this.neonLinePoints);
+        }
+    }
+
+    /**
+     * Desenha uma linha suave através dos pontos
+     */
+    drawSmoothLine(graphics, points) {
+        if (points.length < 2) return;
+        
+        graphics.beginPath();
+        graphics.moveTo(points[0].x, points[0].y);
+        
+        for (let i = 1; i < points.length; i++) {
+            const point = points[i];
+            const prevPoint = points[i - 1];
+            
+            // Usa curva quadrática para suavizar
+            if (i < points.length - 1) {
+                const nextPoint = points[i + 1];
+                const cpX = point.x;
+                const cpY = point.y;
+                const endX = (point.x + nextPoint.x) / 2;
+                const endY = (point.y + nextPoint.y) / 2;
+                
+                graphics.lineTo(cpX, cpY);
+            } else {
+                graphics.lineTo(point.x, point.y);
+            }
+        }
+        
+        graphics.strokePath();
     }
 
     handleEnemyCollision(player, enemy) {
@@ -1290,8 +1354,11 @@ class GameScene extends Phaser.Scene {
         if (GameData.isFeatureEnabled('playerTrail')) {
             this.updatePlayerTrail();
         }
-        if (GameData.isFeatureEnabled('dustNeonEffect')) {
-            this.updateDustNeonEffect();
+        if (GameData.isFeatureEnabled('jumpNeonBurst') || GameData.isFeatureEnabled('landNeonBurst')) {
+            this.updateNeonBurstEffects();
+        }
+        if (GameData.isFeatureEnabled('neonLineTrail')) {
+            this.updateNeonLineTrail();
         }
 
         // Restart via mobile
@@ -1419,6 +1486,25 @@ class GameScene extends Phaser.Scene {
         if (!onGround && player.body.velocity.y > 0) {
             const extraGravity = this.physics.world.gravity.y * FALL_GRAVITY * dt;
             player.setVelocityY(player.body.velocity.y + extraGravity);
+        }
+
+        // ===== MECÂNICAS EXPERIMENTAIS =====
+        
+        // Double-Jump: pular novamente no ar
+        if (GameData.isFeatureEnabled('doubleJump')) {
+            // Reset do double-jump ao tocar o chão
+            if (onGround) {
+                this.hasDoubleJumped = false;
+            }
+            
+            // Executa double-jump se não estiver no chão e ainda não usou
+            if (jumpJustPressed && !onGround && !this.hasDoubleJumped) {
+                const DOUBLE_JUMP_FORCE = -400;
+                player.setVelocityY(DOUBLE_JUMP_FORCE);
+                this.hasDoubleJumped = true;
+                this.isJumping = true;
+                SoundManager.play('jump');
+            }
         }
         
         // Animação no ar

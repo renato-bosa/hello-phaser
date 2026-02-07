@@ -89,31 +89,38 @@
             fill: rgba(255, 255, 255, 0.7);
         }
 
-        /* D-Pad (esquerda) */
+        /* D-Pad (esquerda) - retângulo arredondado dividido ao meio */
         #dpad-container {
             position: absolute;
             bottom: 30px;
             left: 20px;
-            height: 90px;
+            display: flex;
+            height: 80px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         #btn-left, #btn-right {
-            width: 70px;
-            height: 90px;
+            width: 67.5px; /* 45% cada lado */
+            height: 100%;
+            border-radius: 0;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
         }
 
-        #btn-left {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
+        /* Zona morta central (~10% da largura total) */
+        #dpad-deadzone {
+            width: 15px; /* 10% de 150px */
+            height: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            pointer-events: none;
         }
 
-        #btn-right {
-            position: absolute;
-            left: 90px;
-            top: 50%;
-            transform: translateY(-50%);
+        #btn-left.active, #btn-right.active {
+            background: rgba(255, 255, 255, 0.35);
+            transform: none;
         }
 
         /* Botão O - confirmar/pular (direita, embaixo) */
@@ -142,12 +149,15 @@
 
         /* Ajustes para telas muito pequenas */
         @media (max-width: 480px) {
-            #btn-left, #btn-right {
-                width: 55px;
-                height: 55px;
+            #dpad-container {
+                height: 60px;
+                border-radius: 14px;
             }
-            #btn-right {
-                left: 70px;
+            #btn-left, #btn-right {
+                width: 52px;
+            }
+            #dpad-deadzone {
+                width: 12px;
             }
             #btn-jump {
                 width: 70px;
@@ -177,6 +187,7 @@
             <div id="btn-left" class="mobile-btn" data-control="left">
                 <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
             </div>
+            <div id="dpad-deadzone"></div>
             <div id="btn-right" class="mobile-btn" data-control="right">
                 <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
             </div>
@@ -287,16 +298,10 @@
             }
 
             // Função para encontrar qual botão está sob um ponto de toque
-            // Adiciona margem extra nos direcionais para cobrir o gap entre eles
             function getButtonAtPoint(x, y) {
-                const DPAD_MARGIN = 15; // px extra para facilitar deslizar
                 for (const [control, element] of Object.entries(buttons)) {
                     const rect = element.getBoundingClientRect();
-                    const isDir = control === 'left' || control === 'right';
-                    const mx = isDir ? DPAD_MARGIN : 0;
-                    const my = isDir ? DPAD_MARGIN : 0;
-                    if (x >= rect.left - mx && x <= rect.right + mx && 
-                        y >= rect.top - my && y <= rect.bottom + my) {
+                    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
                         return { control, element };
                     }
                 }

@@ -202,7 +202,7 @@
     </div>
     
     <!-- Versão do jogo (source-of-truth único) -->
-    <script>window.GAME_VERSION = '0.83';</script>
+    <script>window.GAME_VERSION = '0.84';</script>
 
     <!-- Phaser 3 via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
@@ -324,41 +324,36 @@
                 return null;
             }
 
+            // Desativa o controle real rastreado para um toque (resolve slide entre botões)
+            function releaseTouch(touchId) {
+                const touchData = activeTouches.get(touchId);
+                if (!touchData) return;
+                
+                const ctrl = touchData.control;
+                const elem = touchData.element;
+                activeTouches.delete(touchId);
+                
+                // Só desativa se não houver outro toque no mesmo controle
+                if (ctrl && ctrl !== 'deadzone') {
+                    let stillTouching = false;
+                    activeTouches.forEach((data) => {
+                        if (data.control === ctrl) stillTouching = true;
+                    });
+                    if (!stillTouching) {
+                        deactivateControl(ctrl, elem);
+                    }
+                }
+            }
+
             // Configura eventos para cada botão
             Object.entries(buttons).forEach(([control, element]) => {
                 // Touch Start
                 element.addEventListener('touchstart', (e) => {
                     e.preventDefault();
-                    // Registra todos os toques neste elemento
                     for (let touch of e.changedTouches) {
                         activeTouches.set(touch.identifier, { control, element });
                     }
                     activateControl(control, element);
-                }, { passive: false });
-
-                // Touch End
-                element.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    for (let touch of e.changedTouches) {
-                        activeTouches.delete(touch.identifier);
-                    }
-                    // Só desativa se não houver mais toques neste botão
-                    let stillTouching = false;
-                    activeTouches.forEach((data) => {
-                        if (data.control === control) stillTouching = true;
-                    });
-                    if (!stillTouching) {
-                        deactivateControl(control, element);
-                    }
-                }, { passive: false });
-
-                // Touch Cancel
-                element.addEventListener('touchcancel', (e) => {
-                    e.preventDefault();
-                    for (let touch of e.changedTouches) {
-                        activeTouches.delete(touch.identifier);
-                    }
-                    deactivateControl(control, element);
                 }, { passive: false });
 
                 // Também suporta mouse (para testes em desktop com ?mobile=true)
@@ -376,6 +371,21 @@
                     deactivateControl(control, element);
                 });
             });
+
+            // Touch End/Cancel global - desativa o controle REAL do toque (não o do elemento original)
+            document.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                for (let touch of e.changedTouches) {
+                    releaseTouch(touch.identifier);
+                }
+            }, { passive: false });
+
+            document.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                for (let touch of e.changedTouches) {
+                    releaseTouch(touch.identifier);
+                }
+            }, { passive: false });
 
             // Touch Move global - permite deslizar entre botões direcionais
             // Usa getButtonAtPoint (bounding rects) ao invés de elementFromPoint

@@ -217,7 +217,7 @@ class MenuScene extends Phaser.Scene {
         this.effectsBtn = this.createButton(
             this.centerX, 
             this.centerY + yOffset, 
-            '✨ EFEITOS',
+            '⚙ CONFIGS',
             '#00ffaa',
             () => this.showEffectsMenu()
         );
@@ -289,6 +289,13 @@ class MenuScene extends Phaser.Scene {
                 color: '#aaaaaa'
             }
         ).setOrigin(0.5).setDepth(10);
+
+        // Versão do jogo (canto inferior direito)
+        this.add.text(this.cameras.main.width - 8, this.cameras.main.height - 8, GameData.VERSION, {
+            fontSize: '10px',
+            fontFamily: 'Arial',
+            color: '#555555'
+        }).setOrigin(1, 1).setDepth(10);
     }
 
     // ==================== CONTROLES ====================
@@ -561,7 +568,7 @@ class MenuScene extends Phaser.Scene {
         this.currentView = 'menu';
     }
 
-    // ==================== MENU DE EFEITOS ====================
+    // ==================== MENU DE CONFIGURAÇÕES ====================
 
     showEffectsMenu() {
         this.currentView = 'effects';
@@ -576,7 +583,7 @@ class MenuScene extends Phaser.Scene {
         this.overlayElements.push(overlay);
 
         // Título
-        const title = this.add.text(this.centerX, 35, '✨ EFEITOS VISUAIS ✨', {
+        const title = this.add.text(this.centerX, 35, '⚙ CONFIGURAÇÕES ⚙', {
             fontSize: '20px',
             fontFamily: '"Press Start 2P", Arial',
             color: '#00ffaa',

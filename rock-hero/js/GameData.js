@@ -11,6 +11,14 @@
  */
 
 const GameData = {
+    // ==================== VERSÃO ====================
+    VERSION: 'v0.7',
+
+    // Helper para cache-busting em caminhos de assets
+    assetUrl(path) {
+        return `${path}?v=${this.VERSION}`;
+    },
+
     // ==================== FEATURE FLAGS ====================
     // Sistema para testar novas funcionalidades
     // Pode ser ativado via URL: ?trail=true&particles=true
@@ -890,7 +898,7 @@ const GameData = {
                 if (!sprite || loadedKeys.has(sprite.key)) return;
                 loadedKeys.add(sprite.key);
                 
-                scene.load.spritesheet(sprite.key, sprite.file, {
+                scene.load.spritesheet(sprite.key, GameData.assetUrl(sprite.file), {
                     frameWidth: sprite.frameWidth,
                     frameHeight: sprite.frameHeight
                 });

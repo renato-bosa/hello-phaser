@@ -30,11 +30,11 @@ class GameScene extends Phaser.Scene {
         
         // Carrega todos os mapas (os tilesets serão carregados automaticamente via callback)
         GameData.LEVELS.forEach(level => {
-            this.load.tilemapTiledJSON(level.key, level.file);
+            this.load.tilemapTiledJSON(level.key, GameData.assetUrl(level.file));
         });
 
         // ========== SPRITESHEETS DE GAMEPLAY ==========
-        this.load.spritesheet('star', 'assets/spritesheets/yellow-star-animated.png', {
+        this.load.spritesheet('star', GameData.assetUrl('assets/spritesheets/yellow-star-animated.png'), {
             frameWidth: 32, frameHeight: 32
         });
         
@@ -43,11 +43,11 @@ class GameScene extends Phaser.Scene {
         
         // ========== INIMIGOS ==========
         // Sapo-tomate (6 frames de animação de pulo)
-        this.load.spritesheet('sapo-tomate', 'assets/spritesheets/sapo-tomate-6fps.png', {
+        this.load.spritesheet('sapo-tomate', GameData.assetUrl('assets/spritesheets/sapo-tomate-6fps.png'), {
             frameWidth: 32, frameHeight: 32
         });
         // Sapo-verde (6 frames - só pula, não anda)
-        this.load.spritesheet('sapo-verde', 'assets/spritesheets/sapo-verde-6fps.png', {
+        this.load.spritesheet('sapo-verde', GameData.assetUrl('assets/spritesheets/sapo-verde-6fps.png'), {
             frameWidth: 32, frameHeight: 32
         });
     }
@@ -89,11 +89,11 @@ class GameScene extends Phaser.Scene {
                     const imagePath = 'assets/' + ts.image.replace(/\\/g, '/');
                     
                     // Adiciona à fila de carregamento (Phaser adiciona automaticamente durante preload)
-                    this.load.image(tilesetName, imagePath);
+                    this.load.image(tilesetName, GameData.assetUrl(imagePath));
                     
                     // Se existe um alias, carrega também com o nome alternativo
                     if (TILESET_ALIASES[tilesetName]) {
-                        this.load.image(TILESET_ALIASES[tilesetName], imagePath);
+                        this.load.image(TILESET_ALIASES[tilesetName], GameData.assetUrl(imagePath));
                     }
                 }
             });

@@ -188,15 +188,15 @@
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
     
     <!-- Game Scripts (ordem importante: dados → sons → cenas → inicialização) -->
-    <script src="js/GameData.js"></script>
-    <script src="js/SoundManager.js"></script>
-    <script src="js/scenes/MenuScene.js"></script>
-    <script src="js/scenes/SlotSelectScene.js"></script>
-    <script src="js/scenes/WorldMapScene.js"></script>
-    <script src="js/scenes/CharacterSelectScene.js"></script>
-    <script src="js/scenes/GameScene.js"></script>
-    <script src="js/scenes/WorldCompleteScene.js"></script>
-    <script src="js/game.js"></script>
+    <script src="js/GameData.js?v=0.7"></script>
+    <script src="js/SoundManager.js?v=0.7"></script>
+    <script src="js/scenes/MenuScene.js?v=0.7"></script>
+    <script src="js/scenes/SlotSelectScene.js?v=0.7"></script>
+    <script src="js/scenes/WorldMapScene.js?v=0.7"></script>
+    <script src="js/scenes/CharacterSelectScene.js?v=0.7"></script>
+    <script src="js/scenes/GameScene.js?v=0.7"></script>
+    <script src="js/scenes/WorldCompleteScene.js?v=0.7"></script>
+    <script src="js/game.js?v=0.7"></script>
 
     <!-- Mobile Controls Script -->
     <script>
@@ -335,26 +335,30 @@
 
             // Touch Move global - permite deslizar entre botões direcionais
             document.addEventListener('touchmove', (e) => {
-                for (let touch of e.changedTouches) {
+                // Usa touches (todos os toques ativos) ao invés de changedTouches
+                for (let touch of e.touches) {
                     const touchData = activeTouches.get(touch.identifier);
                     if (!touchData) continue;
 
-                    // Verifica se o toque está agora sobre outro botão
-                    const newButton = getButtonAtPoint(touch.clientX, touch.clientY);
+                    // Usa elementFromPoint para detecção mais precisa
+                    const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+                    const buttonUnderTouch = elementUnderTouch?.closest('.mobile-btn');
+                    const newControl = buttonUnderTouch?.dataset?.control;
                     
-                    if (newButton && newButton.control !== touchData.control) {
+                    if (newControl && newControl !== touchData.control) {
                         // Permite deslizar apenas entre left e right (botões direcionais)
                         const isDirectional = (ctrl) => ctrl === 'left' || ctrl === 'right';
                         
-                        if (isDirectional(touchData.control) && isDirectional(newButton.control)) {
+                        if (isDirectional(touchData.control) && isDirectional(newControl)) {
+                            const newElement = buttons[newControl];
                             // Desativa o botão anterior
                             deactivateControl(touchData.control, touchData.element);
                             // Ativa o novo botão
-                            activateControl(newButton.control, newButton.element);
+                            activateControl(newControl, newElement);
                             // Atualiza o rastreamento
-                            activeTouches.set(touch.identifier, newButton);
+                            activeTouches.set(touch.identifier, { control: newControl, element: newElement });
                         }
-                    } else if (!newButton && touchData) {
+                    } else if (!newControl && touchData) {
                         // Se saiu de todos os botões, desativa
                         // (mas só para direcionais, para permitir manter pulo pressionado)
                         const isDirectional = (ctrl) => ctrl === 'left' || ctrl === 'right';
@@ -366,9 +370,7 @@
                 }
 
                 // Previne scroll durante toque nos controles
-                if (e.target.classList.contains('mobile-btn')) {
-                    e.preventDefault();
-                }
+                e.preventDefault();
             }, { passive: false });
         }
 

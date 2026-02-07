@@ -1322,17 +1322,51 @@ class GameScene extends Phaser.Scene {
     update(time, delta) {
         // Se não está em gameplay, não processa movimento
         if (this.currentView !== 'gameplay' || this.hasWon) {
-            // Processa apenas restart no mobile quando pausado
-            if (this.virtualControls.restart && this.currentView === 'paused') {
-                this.virtualControls.restart = false;
-                this.resumeGame();
+            // Controles virtuais no menu de pausa
+            if (this.currentView === 'paused') {
+                // X = voltar (resume)
+                if (this.virtualControls.backJustPressed) {
+                    this.virtualControls.backJustPressed = false;
+                    this.resumeGame();
+                }
+                // O = confirmar opção selecionada
+                if (this.virtualControls.jumpJustPressed) {
+                    this.virtualControls.jumpJustPressed = false;
+                    SoundManager.play('menuSelect');
+                    this.pauseButtons[this.pauseSelectedIndex].action();
+                }
+                // Navegação com left/right no pause menu
+                if (this.virtualControls.left) {
+                    this.virtualControls.left = false;
+                    const prevIndex = this.pauseSelectedIndex;
+                    this.pauseSelectedIndex = Math.max(0, this.pauseSelectedIndex - 1);
+                    if (this.pauseSelectedIndex !== prevIndex) {
+                        SoundManager.play('menuNavigate');
+                        this.updatePauseStyles();
+                    }
+                }
+                if (this.virtualControls.right) {
+                    this.virtualControls.right = false;
+                    const prevIndex = this.pauseSelectedIndex;
+                    this.pauseSelectedIndex = Math.min(this.pauseButtons.length - 1, this.pauseSelectedIndex + 1);
+                    if (this.pauseSelectedIndex !== prevIndex) {
+                        SoundManager.play('menuNavigate');
+                        this.updatePauseStyles();
+                    }
+                }
             }
             // Durante countdown, mantém o jogador parado
             if (this.currentView === 'countdown') {
-        this.player.setVelocity(0, 0);
-        this.player.anims.play('idle', true);
+                this.player.setVelocity(0, 0);
+                this.player.anims.play('idle', true);
             }
             return;
+        }
+
+        // X = pausar durante gameplay
+        if (this.virtualControls.backJustPressed) {
+            this.virtualControls.backJustPressed = false;
+            this.pauseGame();
         }
 
         // Inicia o timer no primeiro frame de gameplay
@@ -1359,13 +1393,6 @@ class GameScene extends Phaser.Scene {
         }
         if (GameData.isFeatureEnabled('neonLineTrail')) {
             this.updateNeonLineTrail();
-        }
-
-        // Restart via mobile
-        if (this.virtualControls.restart) {
-            this.virtualControls.restart = false;
-            GameData.saveProgress(this.currentLevel, this.playerName);
-            this.scene.restart({ level: this.currentLevel, playerName: this.playerName });
         }
     }
 
@@ -1720,7 +1747,7 @@ class GameScene extends Phaser.Scene {
 
         // Detecta mobile
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        const continueText = isMobile ? 'Toque no botão de PULO' : 'ESPAÇO';
+        const continueText = isMobile ? 'Pressione O' : 'ENTER';
 
         // Monta label baseado no resultado
         let rankLabel = '';
@@ -1944,7 +1971,11 @@ class GameScene extends Phaser.Scene {
         });
 
         // Instruções
-        const instructions = this.add.text(centerX, centerY + 130, '↑↓: Navegar | Enter: Selecionar | ESC: Voltar', {
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const instrText = isMobile 
+            ? '← →: Navegar | O: Selecionar | X: Voltar'
+            : '↑↓: Navegar | Enter: Selecionar | ESC: Voltar';
+        const instructions = this.add.text(centerX, centerY + 130, instrText, {
             fontSize: '10px', fontFamily: 'Arial', color: '#888888'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(201);
         this.overlayElements.push(instructions);

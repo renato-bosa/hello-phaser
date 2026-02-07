@@ -42,6 +42,7 @@ class WorldMapScene extends Phaser.Scene {
         this.createWorldPortals(width, height);
         this.createPlayerCursor();
         this.createUI(width, height);
+        this.createCharacterButton(width, height);
         this.createInfoPanel(width, height);
         
         // Setup de controles
@@ -506,10 +507,11 @@ class WorldMapScene extends Phaser.Scene {
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         const controls = isMobile ? [
             { key: '← →', action: 'Navegar' },
-            { key: 'PULO', action: 'Selecionar' }
+            { key: 'O', action: 'Selecionar' },
+            { key: 'X', action: 'Voltar' }
         ] : [
             { key: '← →', action: 'Navegar' },
-            { key: 'ESPAÇO', action: 'Selecionar' },
+            { key: 'ENTER', action: 'Selecionar' },
             { key: 'P', action: 'Personagem' },
             { key: 'ESC', action: 'Menu' }
         ];
@@ -533,6 +535,24 @@ class WorldMapScene extends Phaser.Scene {
                 fontSize: '11px',
                 color: '#aaaaaa'
             }).setOrigin(0.5);
+        });
+    }
+
+    createCharacterButton(width, height) {
+        // Botão de trocar personagem (canto superior esquerdo)
+        const charBtn = this.add.text(20, 15, '🎸', {
+            fontSize: '24px',
+        }).setInteractive({ useHandCursor: true }).setDepth(10);
+        
+        // Label
+        const charLabel = this.add.text(48, 20, GameData.loadSelectedCharacter(), {
+            fontFamily: 'Arial',
+            fontSize: '10px',
+            color: '#aaaaaa'
+        }).setDepth(10);
+
+        charBtn.on('pointerdown', () => {
+            this.openCharacterSelect();
         });
     }
 
@@ -636,10 +656,16 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     update(time) {
-        // Controles virtuais mobile
+        // O = selecionar
         if (this.virtualControls.jumpJustPressed) {
             this.virtualControls.jumpJustPressed = false;
             this.selectNode();
+        }
+
+        // X = voltar ao menu
+        if (this.virtualControls.backJustPressed) {
+            this.virtualControls.backJustPressed = false;
+            this.backToMenu();
         }
         
         // Navegação com throttle

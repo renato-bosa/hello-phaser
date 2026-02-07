@@ -197,20 +197,17 @@ class CharacterSelectScene extends Phaser.Scene {
             color: '#ffff00'
         }).setOrigin(0.5);
         
-        this.add.text(centerX + 50, panelY, isMobile ? 'PULO  Confirmar' : 'ESPAÇO  Confirmar', {
+        this.add.text(centerX + 50, panelY, isMobile ? 'O  Confirmar' : 'ENTER  Confirmar', {
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '10px',
             color: '#00ff00'
         }).setOrigin(0.5);
         
-        // ESC para voltar (só mostra no desktop)
-        if (!isMobile) {
-            this.add.text(centerX + 200, panelY, 'ESC  Voltar', {
-                fontFamily: '"Press Start 2P", monospace',
-                fontSize: '10px',
-                color: '#ff6666'
-            }).setOrigin(0.5);
-        }
+        this.add.text(centerX + 200, panelY, isMobile ? 'X  Voltar' : 'ESC  Voltar', {
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '10px',
+            color: '#ff6666'
+        }).setOrigin(0.5);
     }
 
     createAnimations() {
@@ -250,10 +247,16 @@ class CharacterSelectScene extends Phaser.Scene {
     }
 
     update(time) {
-        // Controles virtuais mobile (mais eficiente que timer separado)
+        // O = confirmar
         if (this.virtualControls.jumpJustPressed) {
             this.virtualControls.jumpJustPressed = false;
             this.confirmSelection();
+        }
+
+        // X = voltar
+        if (this.virtualControls.backJustPressed) {
+            this.virtualControls.backJustPressed = false;
+            this.goBack();
         }
         
         // Navegação com throttle

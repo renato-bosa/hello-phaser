@@ -69,9 +69,14 @@ class WorldCompleteScene extends Phaser.Scene {
     }
 
     update() {
-        // Controles virtuais mobile (mais eficiente que timer separado)
+        // O = continuar
         if (this.virtualControls && this.virtualControls.jumpJustPressed) {
             this.virtualControls.jumpJustPressed = false;
+            this.continue();
+        }
+        // X = continuar (também funciona como voltar)
+        if (this.virtualControls && this.virtualControls.backJustPressed) {
+            this.virtualControls.backJustPressed = false;
             this.continue();
         }
     }

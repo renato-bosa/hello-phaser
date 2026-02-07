@@ -55,12 +55,62 @@ class MenuScene extends Phaser.Scene {
         this.overlayElements = [];
     }
 
-    update() {
-        // Controles virtuais mobile (mais eficiente que timer separado)
-        if (this.currentView === 'menu' && this.virtualControls && this.handleSelectFn) {
-            if (this.virtualControls.jumpJustPressed) {
-                this.virtualControls.jumpJustPressed = false;
+    update(time) {
+        if (!this.virtualControls) return;
+        
+        // O = confirmar (mesmo que ENTER)
+        if (this.virtualControls.jumpJustPressed) {
+            this.virtualControls.jumpJustPressed = false;
+            if (this.handleSelectFn) {
                 this.handleSelectFn();
+            }
+        }
+
+        // X = voltar (mesmo que ESC)
+        if (this.virtualControls.backJustPressed) {
+            this.virtualControls.backJustPressed = false;
+            if (this.currentView === 'ranking' || this.currentView === 'effects') {
+                SoundManager.play('menuNavigate');
+                this.closeOverlay();
+            }
+        }
+
+        // Navegação via d-pad (left/right) com throttle
+        if (time - this.lastNavTime > 200) {
+            if (this.virtualControls.left) {
+                this.lastNavTime = time;
+                if (this.currentView === 'menu') {
+                    const prevIndex = this.selectedIndex;
+                    this.selectedIndex = Math.max(0, this.selectedIndex - 1);
+                    if (this.selectedIndex !== prevIndex) {
+                        SoundManager.play('menuNavigate');
+                        this.updateButtonStyles();
+                    }
+                } else if (this.currentView === 'effects') {
+                    const prevIndex = this.effectSelectedIndex;
+                    this.effectSelectedIndex = Math.max(0, this.effectSelectedIndex - 1);
+                    if (this.effectSelectedIndex !== prevIndex) {
+                        SoundManager.play('menuNavigate');
+                        this.updateEffectSelection();
+                    }
+                }
+            } else if (this.virtualControls.right) {
+                this.lastNavTime = time;
+                if (this.currentView === 'menu') {
+                    const prevIndex = this.selectedIndex;
+                    this.selectedIndex = Math.min(this.menuButtons.length - 1, this.selectedIndex + 1);
+                    if (this.selectedIndex !== prevIndex) {
+                        SoundManager.play('menuNavigate');
+                        this.updateButtonStyles();
+                    }
+                } else if (this.currentView === 'effects') {
+                    const prevIndex = this.effectSelectedIndex;
+                    this.effectSelectedIndex = Math.min(this.effectToggles.length - 1, this.effectSelectedIndex + 1);
+                    if (this.effectSelectedIndex !== prevIndex) {
+                        SoundManager.play('menuNavigate');
+                        this.updateEffectSelection();
+                    }
+                }
             }
         }
     }
@@ -148,59 +198,21 @@ class MenuScene extends Phaser.Scene {
     }
 
     createMenuButtons() {
-        // Verifica se há slot ativo para mostrar "Continuar"
-        const activeSlotId = GameData.getActiveSlot();
-        const activeSlot = activeSlotId ? GameData.getSlot(activeSlotId) : null;
-        const hasAnySlots = GameData.hasAnyProgress();
-        
-        let yOffset = hasAnySlots ? -30 : 0;
+        let yOffset = 0;
         
         // Container para botões (facilita limpeza)
         this.buttonContainer = this.add.container(0, 0).setDepth(10);
 
-        // Botão "Continuar" (se houver slot ativo)
-        if (activeSlot) {
-            const completedCount = activeSlot.completedLevels?.length || 0;
-            const totalLevels = GameData.LEVELS.length;
-            
-            this.continueBtn = this.createButton(
-                this.centerX, 
-                this.centerY + yOffset, 
-                `▶ CONTINUAR (${activeSlot.playerName})`,
-                '#00ffff',
-                () => this.continueGame()
-            );
-            this.menuButtons.push(this.continueBtn);
-            yOffset += 35;
-        }
-
-        // Botão "Jogar" ou "Nova Partida" (vai para seleção de slots)
-        const playButtonText = hasAnySlots ? '🎮 PARTIDAS SALVAS' : '🎮 JOGAR';
+        // Botão "Jogar" (sempre vai para seleção de slots)
         this.playBtn = this.createButton(
             this.centerX, 
             this.centerY + yOffset, 
-            playButtonText,
+            '🎮 JOGAR',
             '#00ff00',
             () => this.openSlotSelect()
         );
         this.menuButtons.push(this.playBtn);
         yOffset += 35;
-
-        // Botão "Personagem" (só aparece se tiver slot ativo com mais de 1 personagem)
-        if (activeSlot) {
-            const unlockedChars = activeSlot.unlockedCharacters || ['vocalista'];
-            if (unlockedChars.length > 1) {
-                this.characterBtn = this.createButton(
-                    this.centerX, 
-                    this.centerY + yOffset, 
-                    '🎸 Selecionar Integrante',
-                    '#ff66ff',
-                    () => this.openCharacterSelect()
-                );
-                this.menuButtons.push(this.characterBtn);
-                yOffset += 35;
-            }
-        }
 
         // Botão "Ranking"
         this.rankingBtn = this.createButton(
@@ -213,7 +225,7 @@ class MenuScene extends Phaser.Scene {
         this.menuButtons.push(this.rankingBtn);
         yOffset += 35;
 
-        // Botão "Efeitos"
+        // Botão "Configs"
         this.effectsBtn = this.createButton(
             this.centerX, 
             this.centerY + yOffset, 
@@ -277,7 +289,7 @@ class MenuScene extends Phaser.Scene {
 
     createInstructions() {
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        const text = isMobile ? '↑↓: Navegar | Pulo: Selecionar' : '↑↓: Navegar | Enter: Selecionar';
+        const text = isMobile ? '← →: Navegar | O: Selecionar' : '↑↓: Navegar | Enter: Selecionar';
         
         this.instructions = this.add.text(
             this.centerX, 
@@ -304,12 +316,13 @@ class MenuScene extends Phaser.Scene {
         // Cria teclas
         const upKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         const downKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+        const leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        const rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         const enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-        const spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         const escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
-        // Navegação
-        upKey.on('down', () => {
+        // Navegação (up/left = anterior, down/right = próximo)
+        const navigateUp = () => {
             if (this.currentView === 'menu') {
                 const prevIndex = this.selectedIndex;
                 this.selectedIndex = Math.max(0, this.selectedIndex - 1);
@@ -325,9 +338,9 @@ class MenuScene extends Phaser.Scene {
                     this.updateEffectSelection();
                 }
             }
-        });
+        };
 
-        downKey.on('down', () => {
+        const navigateDown = () => {
             if (this.currentView === 'menu') {
                 const prevIndex = this.selectedIndex;
                 this.selectedIndex = Math.min(this.menuButtons.length - 1, this.selectedIndex + 1);
@@ -343,7 +356,12 @@ class MenuScene extends Phaser.Scene {
                     this.updateEffectSelection();
                 }
             }
-        });
+        };
+
+        upKey.on('down', navigateUp);
+        leftKey.on('down', navigateUp);
+        downKey.on('down', navigateDown);
+        rightKey.on('down', navigateDown);
 
         // Seleção
         const handleSelect = () => {
@@ -357,11 +375,11 @@ class MenuScene extends Phaser.Scene {
         };
 
         enterKey.on('down', handleSelect);
-        spaceKey.on('down', handleSelect);
         
         // Suporte a controles virtuais (mobile) - verificado no update()
         this.virtualControls = GameData.getVirtualControls();
         this.handleSelectFn = handleSelect;
+        this.lastNavTime = 0;
 
         // ESC para voltar
         escKey.on('down', () => {
@@ -372,7 +390,7 @@ class MenuScene extends Phaser.Scene {
         });
 
         // Guarda referências para limpeza
-        this.keyListeners = [upKey, downKey, enterKey, spaceKey, escKey];
+        this.keyListeners = [upKey, downKey, leftKey, rightKey, enterKey, escKey];
     }
 
     updateButtonStyles() {
@@ -395,45 +413,10 @@ class MenuScene extends Phaser.Scene {
     // ==================== AÇÕES DO MENU ====================
 
     /**
-     * Continua o jogo no slot ativo
-     */
-    continueGame() {
-        const activeSlotId = GameData.getActiveSlot();
-        if (!activeSlotId) {
-            // Sem slot ativo, vai para seleção
-            this.openSlotSelect();
-            return;
-        }
-
-        const slot = GameData.getSlot(activeSlotId);
-        if (!slot) {
-            this.openSlotSelect();
-            return;
-        }
-
-        // Carrega o slot para o estado
-        GameData.loadSlotIntoState(slot);
-        GameData.updateLastPlayed();
-
-        // Vai ao mapa do mundo
-        this.scene.start('WorldMapScene');
-    }
-
-    /**
      * Abre a tela de seleção de slots
      */
     openSlotSelect() {
         this.scene.start('SlotSelectScene', {
-            returnTo: 'MenuScene'
-        });
-    }
-
-    /**
-     * Abre seleção de personagem
-     */
-    openCharacterSelect() {
-        SoundManager.play('menuSelect');
-        this.scene.start('CharacterSelectScene', {
             returnTo: 'MenuScene'
         });
     }

@@ -1145,7 +1145,8 @@ const GameData = {
             jump: false,
             jumpHeld: false,
             jumpJustPressed: false,
-            restart: false
+            back: false,
+            backJustPressed: false
         };
     }
 };

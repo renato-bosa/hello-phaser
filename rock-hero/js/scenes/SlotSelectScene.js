@@ -214,20 +214,18 @@ class SlotSelectScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         this.selectText = this.add.text(this.centerX, panelY, 
-            isMobile ? 'PULO  Selecionar' : 'ENTER  Selecionar', {
+            isMobile ? 'O  Selecionar' : 'ENTER  Selecionar', {
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '9px',
             color: '#00ff00'
         }).setOrigin(0.5);
 
-        // ESC/Voltar (apenas desktop)
-        if (!isMobile) {
-            this.add.text(this.centerX + 180, panelY, 'ESC  Voltar', {
-                fontFamily: '"Press Start 2P", monospace',
-                fontSize: '9px',
-                color: '#ff6666'
-            }).setOrigin(0.5);
-        }
+        this.add.text(this.centerX + 180, panelY, 
+            isMobile ? 'X  Voltar' : 'ESC  Voltar', {
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '9px',
+            color: '#ff6666'
+        }).setOrigin(0.5);
 
         // Texto de deletar (só aparece em slots com dados)
         this.deleteText = this.add.text(this.centerX, panelY + 18, 
@@ -262,9 +260,16 @@ class SlotSelectScene extends Phaser.Scene {
     update(time) {
         // Controles virtuais mobile
         if (this.mode === 'select') {
+            // O = confirmar
             if (this.virtualControls.jumpJustPressed) {
                 this.virtualControls.jumpJustPressed = false;
                 this.selectSlot(this.selectedSlot);
+            }
+
+            // X = voltar
+            if (this.virtualControls.backJustPressed) {
+                this.virtualControls.backJustPressed = false;
+                this.goBack();
             }
 
             // Navegação com throttle

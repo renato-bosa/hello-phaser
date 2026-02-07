@@ -116,23 +116,27 @@
             transform: translateY(-50%);
         }
 
-        /* Botão de pulo (direita) */
+        /* Botão O - confirmar/pular (direita, embaixo) */
         #btn-jump {
             bottom: 30px;
             right: 20px;
             width: 90px;
             height: 90px;
-        }
-
-        /* Botão de reiniciar (canto superior direito) */
-        #btn-restart {
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            font-size: 18px;
+            font-size: 28px;
             font-weight: bold;
             color: rgba(255, 255, 255, 0.7);
+            font-family: sans-serif;
+        }
+
+        /* Botão X - voltar/ESC (direita, acima do O) */
+        #btn-back {
+            bottom: 140px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            font-size: 22px;
+            font-weight: bold;
+            color: rgba(255, 100, 100, 0.7);
             font-family: sans-serif;
         }
 
@@ -148,11 +152,14 @@
             #btn-jump {
                 width: 70px;
                 height: 70px;
+                font-size: 22px;
             }
-            #btn-restart {
-                width: 40px;
-                height: 40px;
-                font-size: 14px;
+            #btn-back {
+                bottom: 115px;
+                right: 25px;
+                width: 45px;
+                height: 45px;
+                font-size: 16px;
             }
         }
     </style>
@@ -175,13 +182,11 @@
             </div>
         </div>
 
-        <!-- Botão de Pulo -->
-        <div id="btn-jump" class="mobile-btn" data-control="jump">
-            <svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>
-        </div>
+        <!-- Botão O - confirmar/pular -->
+        <div id="btn-jump" class="mobile-btn" data-control="jump">O</div>
 
-        <!-- Botão de Reiniciar -->
-        <div id="btn-restart" class="mobile-btn" data-control="restart">R</div>
+        <!-- Botão X - voltar/ESC -->
+        <div id="btn-back" class="mobile-btn" data-control="back">X</div>
     </div>
     
     <!-- Phaser 3 via CDN -->
@@ -207,7 +212,8 @@
             jump: false,
             jumpHeld: false,
             jumpJustPressed: false,
-            restart: false
+            back: false,
+            backJustPressed: false
         };
 
         // Detecta dispositivo touch
@@ -236,7 +242,7 @@
                 left: document.getElementById('btn-left'),
                 right: document.getElementById('btn-right'),
                 jump: document.getElementById('btn-jump'),
-                restart: document.getElementById('btn-restart')
+                back: document.getElementById('btn-back')
             };
 
             // Rastreamento de toques ativos por botão
@@ -248,8 +254,9 @@
                     window.virtualControls.jump = true;
                     window.virtualControls.jumpHeld = true;
                     window.virtualControls.jumpJustPressed = true;
-                } else if (control === 'restart') {
-                    window.virtualControls.restart = true;
+                } else if (control === 'back') {
+                    window.virtualControls.back = true;
+                    window.virtualControls.backJustPressed = true;
                 } else {
                     window.virtualControls[control] = true;
                 }
@@ -261,8 +268,8 @@
                 if (control === 'jump') {
                     window.virtualControls.jump = false;
                     window.virtualControls.jumpHeld = false;
-                } else if (control === 'restart') {
-                    window.virtualControls.restart = false;
+                } else if (control === 'back') {
+                    window.virtualControls.back = false;
                 } else {
                     window.virtualControls[control] = false;
                 }

@@ -12,7 +12,7 @@
 
 const GameData = {
     // ==================== VERSÃO ====================
-    VERSION: 'v0.7',
+    VERSION: `v${window.GAME_VERSION || '0.0'}`,
 
     // Helper para cache-busting em caminhos de assets
     assetUrl(path) {

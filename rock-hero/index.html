@@ -202,7 +202,7 @@
     </div>
     
     <!-- Versão do jogo (source-of-truth único) -->
-    <script>window.GAME_VERSION = '0.82';</script>
+    <script>window.GAME_VERSION = '0.83';</script>
 
     <!-- Phaser 3 via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
@@ -299,11 +299,26 @@
             }
 
             // Função para encontrar qual botão está sob um ponto de toque
+            // Direcionais têm 20% de tolerância nas bordas externas (não na interna/deadzone)
             function getButtonAtPoint(x, y) {
                 for (const [control, element] of Object.entries(buttons)) {
                     const rect = element.getBoundingClientRect();
-                    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                        return { control, element };
+                    
+                    if (control === 'left' || control === 'right') {
+                        const marginX = rect.width * 0.2;
+                        const marginY = rect.height * 0.2;
+                        // Tolerância apenas nas bordas externas (esq/cima/baixo para left, dir/cima/baixo para right)
+                        const left = control === 'left' ? rect.left - marginX : rect.left;
+                        const right = control === 'right' ? rect.right + marginX : rect.right;
+                        const top = rect.top - marginY;
+                        const bottom = rect.bottom + marginY;
+                        if (x >= left && x <= right && y >= top && y <= bottom) {
+                            return { control, element };
+                        }
+                    } else {
+                        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                            return { control, element };
+                        }
                     }
                 }
                 return null;

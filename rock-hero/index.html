@@ -190,7 +190,7 @@
     </div>
     
     <!-- Versão do jogo (source-of-truth único) -->
-    <script>window.GAME_VERSION = '0.8';</script>
+    <script>window.GAME_VERSION = '0.81';</script>
 
     <!-- Phaser 3 via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
@@ -287,10 +287,16 @@
             }
 
             // Função para encontrar qual botão está sob um ponto de toque
+            // Adiciona margem extra nos direcionais para cobrir o gap entre eles
             function getButtonAtPoint(x, y) {
+                const DPAD_MARGIN = 15; // px extra para facilitar deslizar
                 for (const [control, element] of Object.entries(buttons)) {
                     const rect = element.getBoundingClientRect();
-                    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                    const isDir = control === 'left' || control === 'right';
+                    const mx = isDir ? DPAD_MARGIN : 0;
+                    const my = isDir ? DPAD_MARGIN : 0;
+                    if (x >= rect.left - mx && x <= rect.right + mx && 
+                        y >= rect.top - my && y <= rect.bottom + my) {
                         return { control, element };
                     }
                 }
@@ -351,29 +357,28 @@
             });
 
             // Touch Move global - permite deslizar entre botões direcionais
+            // Usa getButtonAtPoint (bounding rects) ao invés de elementFromPoint
+            // pois pointer-events:none no container impede elementFromPoint de funcionar
             document.addEventListener('touchmove', (e) => {
-                // Usa touches (todos os toques ativos) ao invés de changedTouches
                 for (let touch of e.touches) {
                     const touchData = activeTouches.get(touch.identifier);
                     if (!touchData) continue;
 
-                    // Usa elementFromPoint para detecção mais precisa
-                    const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
-                    const buttonUnderTouch = elementUnderTouch?.closest('.mobile-btn');
-                    const newControl = buttonUnderTouch?.dataset?.control;
+                    // Verifica via bounding rect qual botão está sob o dedo
+                    const hit = getButtonAtPoint(touch.clientX, touch.clientY);
+                    const newControl = hit?.control;
                     
                     if (newControl && newControl !== touchData.control) {
                         // Permite deslizar apenas entre left e right (botões direcionais)
                         const isDirectional = (ctrl) => ctrl === 'left' || ctrl === 'right';
                         
                         if (isDirectional(touchData.control) && isDirectional(newControl)) {
-                            const newElement = buttons[newControl];
                             // Desativa o botão anterior
                             deactivateControl(touchData.control, touchData.element);
                             // Ativa o novo botão
-                            activateControl(newControl, newElement);
+                            activateControl(newControl, hit.element);
                             // Atualiza o rastreamento
-                            activeTouches.set(touch.identifier, { control: newControl, element: newElement });
+                            activeTouches.set(touch.identifier, { control: newControl, element: hit.element });
                         }
                     } else if (!newControl && touchData) {
                         // Se saiu de todos os botões, desativa

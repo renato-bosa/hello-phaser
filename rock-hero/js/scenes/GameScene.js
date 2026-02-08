@@ -629,7 +629,13 @@ class GameScene extends Phaser.Scene {
             this.lastTrailTime = now;
             
             // Cria sprite de trail na posição atual do jogador
+            
+            // Versão com sprite do jogador
+            // const trailSprite = this.add.sprite(player.x, player.y, player.texture.key, player.frame.name);
+            
+            // Versão com imagem de trail
             const trailSprite = this.add.image(player.x, player.y, 'player-trail');
+
             trailSprite.setFlipX(player.flipX);
             trailSprite.setScale(player.scaleX, player.scaleY);
             trailSprite.setAlpha(0.5);

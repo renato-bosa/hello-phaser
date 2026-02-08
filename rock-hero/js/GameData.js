@@ -52,6 +52,9 @@ const GameData = {
         // ===== MECÂNICAS DE FÍSICA =====
         // Double-jump: pular novamente no ar
         doubleJump: false,
+        
+        // Física de água: gravidade e movimento reduzidos
+        waterPhysics: true,
     },
 
     /**
@@ -210,7 +213,7 @@ const GameData = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [5, 6, 7, 8], // Índices das fases (5-8 = fases 5-8)
+            levels: [5, 6, 7, 8, 9], // Índices das fases (5-9 = fases 5-9)
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             // Visual no WorldMap (tema caverna/noturno)
@@ -313,7 +316,17 @@ const GameData = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 480, y: 180 },
-            connectsTo: [] // Última fase do mundo
+            connectsTo: [9]
+        },
+        { 
+            key: 'map9', 
+            file: 'assets/map9.json',
+            name: 'Águas Profundas',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 2,
+            mapPosition: { x: 580, y: 220 },
+            connectsTo: []
         }
     ],
 

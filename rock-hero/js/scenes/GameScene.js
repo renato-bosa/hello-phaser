@@ -139,6 +139,17 @@ class GameScene extends Phaser.Scene {
         this.neonLinePoints = [];
         this.neonLineGraphics = null;
 
+        // Debug: texto de velocidade (só aparece com ?debug=true)
+        if (this.physics.world.drawDebug) {
+            this.debugVelocityText = this.add.text(0, 0, '', {
+                fontSize: '10px',
+                fontFamily: 'monospace',
+                color: '#ff4444',
+                stroke: '#000000',
+                strokeThickness: 2
+            }).setOrigin(0, 1).setDepth(999);
+        }
+
         // Inicia countdown apenas na primeira fase
         if (this.currentLevel === 0) {
             this.startCountdown();
@@ -385,6 +396,43 @@ class GameScene extends Phaser.Scene {
         this.createStars(stars);
         this.createEnemies(enemies);
         this.createSpeedBoosts(speedBoosts);
+        this.createWaterZones(map);
+    }
+
+    createWaterZones(map) {
+        const waterLayer = map.getObjectLayer('water-zone');
+        if (!waterLayer || !GameData.isFeatureEnabled('waterPhysics')) {
+            this.waterZones = [];
+            return;
+        }
+
+        this.waterZones = [];
+
+        waterLayer.objects.forEach(obj => {
+            // Cria zona de água invisível usando StaticGroup
+            const zone = this.add.zone(obj.x + obj.width / 2, obj.y + obj.height / 2, obj.width, obj.height);
+            this.physics.world.enable(zone, Phaser.Physics.Arcade.STATIC_BODY);
+            
+            // Configura o body
+            zone.body.setSize(obj.width, obj.height);
+            
+            // Debug visual (opcional - pode comentar depois)
+            if (false) { // mude para true para ver as zonas
+                const debugRect = this.add.rectangle(
+                    obj.x + obj.width / 2, 
+                    obj.y + obj.height / 2, 
+                    obj.width, 
+                    obj.height, 
+                    0x0088ff, 
+                    0.3
+                );
+            }
+            
+            this.waterZones.push(zone);
+        });
+
+        // Setup overlap com o jogador (será criado após createPlayer)
+        // Fazemos isso no setupPhysics()
     }
 
     createGoal() {
@@ -865,6 +913,72 @@ class GameScene extends Phaser.Scene {
         graphics.strokePath();
     }
 
+    /**
+     * Efeitos visuais de água (splash, tint, bolhas)
+     */
+    updateWaterEffects() {
+        const inWater = this.wasInWaterPrev || false;
+        
+        // Splash ao entrar na água
+        if (this.justEnteredWater) {
+            this.createWaterSplash(this.player.x, this.player.y);
+        }
+        
+        // Enquanto está na água
+        if (inWater) {
+            // Tint azulado no jogador
+            this.player.setTint(0x88ddff);
+            
+            // Bolhas ocasionais
+            if (Phaser.Math.Between(0, 100) < 5) { // 5% de chance por frame
+                this.createWaterBubble(
+                    this.player.x + Phaser.Math.Between(-8, 8),
+                    this.player.y + Phaser.Math.Between(-8, 8)
+                );
+            }
+        } else {
+            // Remove tint quando sai da água
+            this.player.clearTint();
+        }
+    }
+
+    createWaterSplash(x, y) {
+        // Cria partículas de splash
+        for (let i = 0; i < 8; i++) {
+            const angle = (Math.PI * 2 / 8) * i;
+            const speed = 100 + Math.random() * 50;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed - 50; // bias para cima
+            
+            const particle = this.add.circle(x, y, 2, 0x4499ff, 0.8);
+            
+            this.tweens.add({
+                targets: particle,
+                x: x + vx * 0.3,
+                y: y + vy * 0.3,
+                alpha: 0,
+                duration: 400,
+                ease: 'Cubic.easeOut',
+                onComplete: () => particle.destroy()
+            });
+        }
+    }
+
+    createWaterBubble(x, y) {
+        const bubble = this.add.circle(x, y, 2, 0xaaeeff, 0.6);
+        
+        this.tweens.add({
+            targets: bubble,
+            y: y - 20 - Math.random() * 30,
+            x: x + (Math.random() - 0.5) * 10,
+            scale: 0.5,
+            alpha: 0,
+            duration: 800 + Math.random() * 400,
+            ease: 'Sine.easeOut',
+            onComplete: () => bubble.destroy()
+        });
+    }
+
     handleEnemyCollision(player, enemy) {
         if (!enemy || !enemy.active) return;
         
@@ -1239,6 +1353,16 @@ class GameScene extends Phaser.Scene {
             });
         });
 
+        // Zonas de água
+        if (this.waterZones && this.waterZones.length > 0) {
+            this.waterZones.forEach(zone => {
+                this.physics.add.overlap(this.player, zone, null, () => {
+                    this.isInWater = true;
+                    return true;
+                }, this);
+            });
+        }
+
         // Câmera segue jogador
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     }
@@ -1390,6 +1514,16 @@ class GameScene extends Phaser.Scene {
         // Processa movimento
         this.handlePlayerMovement(delta);
         
+        // Debug: atualiza texto de velocidade
+        if (this.debugVelocityText) {
+            const vx = Math.round(this.player.body.velocity.x);
+            const vy = Math.round(this.player.body.velocity.y);
+            const speed = Math.round(Math.sqrt(vx * vx + vy * vy));
+            const inWater = this.isInWater ? ' [WATER]' : '';
+            this.debugVelocityText.setText(`${speed}px/s (${vx}, ${vy})${inWater}`);
+            this.debugVelocityText.setPosition(this.player.x + 20, this.player.y - 20);
+        }
+        
         // Atualiza inimigos
         this.updateEnemies();
 
@@ -1403,19 +1537,41 @@ class GameScene extends Phaser.Scene {
         if (GameData.isFeatureEnabled('neonLineTrail')) {
             this.updateNeonLineTrail();
         }
+        
+        // Atualiza efeitos de água
+        if (GameData.isFeatureEnabled('waterPhysics')) {
+            this.updateWaterEffects();
+        }
     }
 
     handlePlayerMovement(delta) {
         const player = this.player;
         const onGround = player.body.blocked.down;
 
-        // Constantes base
-        const BASE_MIN_SPEED = 160;
-        const BASE_MAX_SPEED = 260;
+        // Detecta se está na água (reseta a cada frame e é setado pelo overlap)
+        const inWater = this.isInWater || false;
+        this.isInWater = false; // Será setado para true pelo overlap se ainda estiver na água
+        
+        // Detecta transição ar → água
+        const justEnteredWater = inWater && !this.wasInWaterPrev;
+        const justExitedWater = !inWater && this.wasInWaterPrev;
+        this.wasInWaterPrev = inWater;
+        
+        // Impacto com a superfície da água: freia a queda abruptamente
+        if (justEnteredWater && player.body.velocity.y > 20) {
+            player.setVelocityY(20);
+        }
+        
+        // Flag para efeitos visuais usarem
+        this.justEnteredWater = justEnteredWater;
+        const waterMultiplier = inWater ? 0.5 : 1.0; // 60% da velocidade na água
+        
+        const BASE_MIN_SPEED = 160 * waterMultiplier;
+        const BASE_MAX_SPEED = 260 * waterMultiplier;
         const ACCELERATION = 200;
-        const JUMP_FORCE = -480;
+        const JUMP_FORCE = inWater ? -150 : -480; // pulo mais fraco na água
         const JUMP_CUT = 0.4;
-        const FALL_GRAVITY = 0.5;
+        const FALL_GRAVITY = inWater ? -0.15 : 0.5; // cai mais devagar na água (30% da gravidade)
         const COYOTE_DURATION = 100;
         const BUFFER_DURATION = 100;
 
@@ -1518,10 +1674,39 @@ class GameScene extends Phaser.Scene {
             SoundManager.stop('jump');
         }
         
-        // Gravidade extra na queda
+        // Gravidade extra na queda (reduzida na água)
         if (!onGround && player.body.velocity.y > 0) {
             const extraGravity = this.physics.world.gravity.y * FALL_GRAVITY * dt;
             player.setVelocityY(player.body.velocity.y + extraGravity);
+            
+            // Limita velocidade de queda na água (simula resistência)
+            if (inWater && player.body.velocity.y > 90) {
+                player.setVelocityY(90);
+            }
+        }
+        
+        // ===== FÍSICA DE ÁGUA =====
+        if (inWater && GameData.isFeatureEnabled('waterPhysics')) {
+            // Reduz a gravidade efetiva na água
+            // Gravidade do mundo = 800, queremos 20% = 160 efetivo
+            // body.gravity é SOMADO à gravidade do mundo: 160 - 800 = -640
+            player.body.gravity.y = -640;
+            
+            // Na água, reseta isJumping quando começa a cair (permite nadar novamente)
+            if (player.body.velocity.y >= 0) {
+                this.isJumping = false;
+            }
+            
+            // Permite pular múltiplas vezes na água (nadar)
+            if (jumpJustPressed && !this.isJumping) {
+                const SWIM_FORCE = -280;
+                player.setVelocityY(SWIM_FORCE);
+                this.isJumping = true;
+                SoundManager.play('jump');
+            }
+        } else {
+            // Fora da água: gravidade normal (sem offset)
+            player.body.gravity.y = 0;
         }
 
         // ===== MECÂNICAS EXPERIMENTAIS =====

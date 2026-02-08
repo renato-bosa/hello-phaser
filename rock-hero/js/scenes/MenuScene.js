@@ -594,6 +594,7 @@ class MenuScene extends Phaser.Scene {
                 x: this.centerX + 155,
                 items: [
                     { key: 'doubleJump', name: 'Double-Jump', desc: 'Pular novamente no ar' },
+                    { key: 'waterPhysics', name: 'Física de Água', desc: 'Gravidade e movimento reduzidos' },
                 ]
             }
         ];

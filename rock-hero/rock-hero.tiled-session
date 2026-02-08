@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-8--o-resgate-do-baixista.tmx",
+    "activeFile": "dev-resources/map-9.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -649,6 +649,53 @@
         "dev-resources/map-8--o-resgate-do-baixista.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-9.tmx": {
+            "scale": 1.004921875,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 319.92536733265956,
+                "y": 176.13309492342376
+            }
+        },
+        "dev-resources/map-9.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-9.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "dev-resources/map.tmx": {
             "expandedObjectLayers": [
                 8
@@ -828,17 +875,18 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-8--o-resgate-do-baixista.tmx"
+        "dev-resources/map-9.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "dev-resources/map-9.tmx",
+        "dev-resources/map.tmx",
         "dev-resources/map-8--o-resgate-do-baixista.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-7--planicie.tmx",
         "dev-resources/map-6--caverna2.tmx",
         "dev-resources/map-5--caverna.tmx",
-        "dev-resources/map.tmx",
         "dev-resources/map0-0.tmx",
         "dev-resources/map-2--expansion and speed.tmx",
         "dev-resources/map0-1.tmx",

@@ -41,6 +41,9 @@ class GameScene extends Phaser.Scene {
         // Carrega sprites de TODOS os personagens (definição centralizada em GameData)
         GameData.loadCharacterSprites(this);
         
+        // Sprite do rastro do jogador (trail)
+        this.load.image('player-trail', GameData.assetUrl('assets/spritesheets/player-trail1.png'));
+        
         // ========== INIMIGOS ==========
         // Sapo-tomate (6 frames de animação de pulo)
         this.load.spritesheet('sapo-tomate', GameData.assetUrl('assets/spritesheets/sapo-tomate-6fps.png'), {
@@ -625,8 +628,8 @@ class GameScene extends Phaser.Scene {
         if (isMoving && now - this.lastTrailTime > TRAIL_INTERVAL) {
             this.lastTrailTime = now;
             
-            // Cria sprite na posição atual do jogador
-            const trailSprite = this.add.sprite(player.x, player.y, player.texture.key, player.frame.name);
+            // Cria sprite de trail na posição atual do jogador
+            const trailSprite = this.add.image(player.x, player.y, 'player-trail');
             trailSprite.setFlipX(player.flipX);
             trailSprite.setScale(player.scaleX, player.scaleY);
             trailSprite.setAlpha(0.5);

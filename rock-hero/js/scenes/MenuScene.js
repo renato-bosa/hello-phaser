@@ -165,7 +165,7 @@ class MenuScene extends Phaser.Scene {
 
     createTitle() {
         // Cria o título com fonte padrão inicialmente
-        this.title = this.add.text(this.centerX, this.centerY - 100, 'Rock Hero', {
+        this.title = this.add.text(this.centerX, this.centerY - 100, 'The Lost Band', {
             fontSize: '48px',
             fontFamily: 'Arial', // Fallback inicial
             color: '#ffffff',

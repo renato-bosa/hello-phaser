@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-9.tmx",
+    "activeFile": "dev-resources/map-7--planicie.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         ".",
@@ -25,6 +25,69 @@
                 "x": 358,
                 "y": 624
             }
+        },
+        "dev-resources/map-10.tmx": {
+            "expandedObjectLayers": [
+                8,
+                10
+            ],
+            "scale": 0.33,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 4.545454545454504,
+                "y": 242.42424242424238
+            }
+        },
+        "dev-resources/map-10.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#green-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#terra": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#yellow-star-animated": {
+            "scaleInDock": 1
         },
         "dev-resources/map-2--expansion and speed.tmx": {
             "expandedObjectLayers": [
@@ -458,16 +521,20 @@
         },
         "dev-resources/map-7--planicie.tmx": {
             "expandedObjectLayers": [
+                11,
                 8
             ],
-            "scale": 0.25,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1202,
-                "y": 1052
+                "x": 537,
+                "y": 460
             }
         },
         "dev-resources/map-7--planicie.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-7--planicie.tmx#agua": {
             "scaleInDock": 1
         },
         "dev-resources/map-7--planicie.tmx#black": {
@@ -480,6 +547,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-7--planicie.tmx#ceu-azul": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-7--planicie.tmx#ceu-azul-medio": {
             "scaleInDock": 1
         },
         "dev-resources/map-7--planicie.tmx#cristal das notas de som": {
@@ -552,10 +622,13 @@
             "scaleInDock": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx": {
+            "expandedObjectLayers": [
+                8
+            ],
             "scale": 0.33,
-            "selectedLayer": 4,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 895.4545454545455,
+                "x": 737.8787878787879,
                 "y": 418.18181818181813
             }
         },
@@ -875,23 +948,26 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-9.tmx"
+        "dev-resources/map-9.tmx",
+        "dev-resources/map-7--planicie.tmx",
+        "dev-resources/map-8--o-resgate-do-baixista.tmx",
+        "dev-resources/map-10.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "int",
     "recentFiles": [
         "dev-resources/map-9.tmx",
-        "dev-resources/map.tmx",
+        "dev-resources/map-10.tmx",
         "dev-resources/map-8--o-resgate-do-baixista.tmx",
-        "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-7--planicie.tmx",
+        "dev-resources/map.tmx",
+        "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-6--caverna2.tmx",
         "dev-resources/map-5--caverna.tmx",
         "dev-resources/map0-0.tmx",
         "dev-resources/map-2--expansion and speed.tmx",
         "dev-resources/map0-1.tmx",
-        "dev-resources/map-4--big-jumps.tmx",
-        "C:/Users/Renato/OneDrive/Desktop/a aventura do pinguim perdido/mapa 1/fase 1 - teste.tmx"
+        "dev-resources/map-4--big-jumps.tmx"
     ],
     "tileset.embedInMap": true
 }

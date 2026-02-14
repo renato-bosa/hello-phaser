@@ -213,15 +213,27 @@ const GameData = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [5, 6, 7, 8, 9], // Índices das fases (5-9 = fases 5-9)
+            levels: [5, 6, 7, 8, 9], // Índices das fases (5-9)
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             // Visual no WorldMap (tema caverna/noturno)
             theme: 'cave',
             bgColor: 0x1a1a2e, // Azul escuro noturno
             pathColor: 0x4a4a6a // Cinza arroxeado
+        },
+        {
+            id: 3,
+            name: 'Mundo 3',
+            subtitle: 'O Resgate do Guitarrista',
+            levels: [10], // Índices das fases
+            rescuedCharacter: 'guitarrista',
+            celebrationMessage: 'Você resgatou o Guitarrista!',
+            // Visual no WorldMap (tema aquático)
+            theme: 'water',
+            bgColor: 0x0a2a4a, // Azul profundo
+            pathColor: 0x2288aa // Azul água
         }
-        // Futuros mundos: Mundo 3 (Guitarrista), Mundo 4 (Tecladista)...
+        // Futuros mundos: Mundo 4 (Tecladista)...
     ],
 
     // Configuração das fases
@@ -326,6 +338,16 @@ const GameData = {
             roundPixels: true,
             world: 2,
             mapPosition: { x: 580, y: 220 },
+            connectsTo: []
+        },
+        { 
+            key: 'map10', 
+            file: 'assets/map-10.json',
+            name: 'Ruínas Submersas',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 120, y: 200 },
             connectsTo: []
         }
     ],

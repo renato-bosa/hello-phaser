@@ -26,7 +26,7 @@ const GameData = {
     FEATURES: {
         // ===== EFEITOS VISUAIS =====
         // Efeito de rastro do jogador (estilo "trail do mouse" do Windows)
-        playerTrail: false,
+        playerTrail: true,
         
         // Partículas ao coletar estrelas
         starParticles: false,
@@ -358,7 +358,9 @@ const GameData = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 240, y: 180 },
-            connectsTo: []
+            connectsTo: [],
+            // Features ativadas automaticamente nesta fase
+            features: { doubleJump: true, neonLineTrail: true }
         }
     ],
 

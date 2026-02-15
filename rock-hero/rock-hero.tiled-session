@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-11.tmx",
+    "activeFile": "",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
@@ -31,11 +31,11 @@
                 8,
                 10
             ],
-            "scale": 0.33,
-            "selectedLayer": 4,
+            "scale": 0.75,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 4.545454545454504,
-                "y": 242.42424242424238
+                "x": 433.33333333333337,
+                "y": 336
             }
         },
         "dev-resources/map-10.tmx#abstract-blue": {
@@ -90,10 +90,14 @@
             "scaleInDock": 1
         },
         "dev-resources/map-11.tmx": {
+            "expandedObjectLayers": [
+                8,
+                10
+            ],
             "scale": 0.5,
-            "selectedLayer": 0,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 819,
+                "x": 636,
                 "y": 326
             }
         },
@@ -139,6 +143,100 @@
         "dev-resources/map-11.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-12.tmx": {
+            "scale": 1.045,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 319.6172248803828,
+                "y": 176.0765550239235
+            }
+        },
+        "dev-resources/map-12.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx": {
+            "scale": 1.045,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 319.6172248803828,
+                "y": 176.0765550239235
+            }
+        },
+        "dev-resources/map-13.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-13.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-2--expansion and speed.tmx": {
             "expandedObjectLayers": [
                 8
@@ -146,7 +244,7 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1691,
+                "x": 1692,
                 "y": 478
             }
         },
@@ -226,11 +324,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 1,
+            "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1359.5,
-                "y": 546
+                "x": 2306.6666666666665,
+                "y": 556
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
@@ -335,11 +433,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 1,
+            "scale": 0.75,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1440.5,
-                "y": 481
+                "x": 1992,
+                "y": 713.3333333333333
             }
         },
         "dev-resources/map-4--big-jumps.tmx#abstract-blue": {
@@ -403,11 +501,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.75,
-            "selectedLayer": 1,
+            "scale": 0.5,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 1330,
-                "y": 377.33333333333326
+                "x": 1456,
+                "y": 390
             }
         },
         "dev-resources/map-5--caverna.tmx#abstract-blue": {
@@ -487,7 +585,7 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1121,
+                "x": 648,
                 "y": 398
             }
         },
@@ -577,7 +675,7 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 537,
+                "x": 734,
                 "y": 460
             }
         },
@@ -678,7 +776,7 @@
             "scale": 0.33,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 737.8787878787879,
+                "x": 1296.969696969697,
                 "y": 418.18181818181813
             }
         },
@@ -777,7 +875,7 @@
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 335.34945191634927,
-                "y": 240.31718883619686
+                "y": 239.81963772059393
             }
         },
         "dev-resources/map-9.tmx#abstract-blue": {
@@ -826,7 +924,7 @@
             "scale": 0.75,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 298,
+                "x": 297.3333333333333,
                 "y": 373.33333333333326
             }
         },
@@ -876,7 +974,7 @@
             "scale": 0.9938244047619047,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 676.6788949614433,
+                "x": 540.3369019989518,
                 "y": 184.13715654712882
             }
         },
@@ -938,7 +1036,7 @@
             "scale": 0.75,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 335.33333333333326,
+                "x": 334.66666666666663,
                 "y": 190.66666666666669
             }
         },
@@ -998,23 +1096,22 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-11.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "int",
     "recentFiles": [
         "dev-resources/map-11.tmx",
-        "dev-resources/map-10.tmx",
-        "dev-resources/map-8--o-resgate-do-baixista.tmx",
         "dev-resources/map-7--planicie.tmx",
-        "dev-resources/map-9.tmx",
         "dev-resources/map.tmx",
-        "dev-resources/map-3--desafio do luigi.tmx",
-        "dev-resources/map-6--caverna2.tmx",
-        "dev-resources/map-5--caverna.tmx",
         "dev-resources/map0-0.tmx",
-        "dev-resources/map-2--expansion and speed.tmx",
-        "dev-resources/map0-1.tmx"
+        "dev-resources/map-8--o-resgate-do-baixista.tmx",
+        "dev-resources/map-9.tmx",
+        "dev-resources/map-6--caverna2.tmx",
+        "dev-resources/map0-1.tmx",
+        "dev-resources/map-10.tmx",
+        "dev-resources/map-12.tmx",
+        "dev-resources/map-13.tmx",
+        "dev-resources/map-2--expansion and speed.tmx"
     ],
     "tileset.embedInMap": true
 }

@@ -225,7 +225,7 @@ const GameData = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [10], // Índices das fases
+            levels: [10, 11], // Índices das fases
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             // Visual no WorldMap (tema aquático)
@@ -348,6 +348,16 @@ const GameData = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 120, y: 200 },
+            connectsTo: [11]
+        },
+        { 
+            key: 'map11', 
+            file: 'assets/map-11.json',
+            name: 'Labirinto de Lava',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 240, y: 180 },
             connectsTo: []
         }
     ],

@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "dev-resources/map-12.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
@@ -144,11 +144,11 @@
             "scaleInDock": 1
         },
         "dev-resources/map-12.tmx": {
-            "scale": 1.045,
-            "selectedLayer": 0,
+            "scale": 0.5,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 319.6172248803828,
-                "y": 176.0765550239235
+                "x": 530,
+                "y": 332
             }
         },
         "dev-resources/map-12.tmx#abstract-blue": {
@@ -169,10 +169,19 @@
         "dev-resources/map-12.tmx#bricks": {
             "scaleInDock": 1
         },
+        "dev-resources/map-12.tmx#bricks-purple2": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-12.tmx#grass": {
             "scaleInDock": 1
         },
         "dev-resources/map-12.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#green-bricks": {
             "scaleInDock": 1
         },
         "dev-resources/map-12.tmx#green-flag": {
@@ -184,7 +193,16 @@
         "dev-resources/map-12.tmx#lava-roxa-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-12.tmx#red-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-12.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#yellow-bricks": {
             "scaleInDock": 1
         },
         "dev-resources/map-12.tmx#yellow-star-animated": {
@@ -1096,11 +1114,16 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
+        "dev-resources/map-10.tmx",
+        "dev-resources/map-11.tmx",
+        "dev-resources/map-12.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "dev-resources/map-10.tmx",
         "dev-resources/map-11.tmx",
+        "dev-resources/map-12.tmx",
         "dev-resources/map-7--planicie.tmx",
         "dev-resources/map.tmx",
         "dev-resources/map0-0.tmx",
@@ -1108,8 +1131,6 @@
         "dev-resources/map-9.tmx",
         "dev-resources/map-6--caverna2.tmx",
         "dev-resources/map0-1.tmx",
-        "dev-resources/map-10.tmx",
-        "dev-resources/map-12.tmx",
         "dev-resources/map-13.tmx",
         "dev-resources/map-2--expansion and speed.tmx"
     ],

@@ -225,7 +225,7 @@ const GameData = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [10, 11], // Índices das fases
+            levels: [10, 11, 12], // Índices das fases
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             // Visual no WorldMap (tema aquático)
@@ -358,9 +358,19 @@ const GameData = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 240, y: 180 },
-            connectsTo: [],
+            connectsTo: [12],
             // Features ativadas automaticamente nesta fase
             features: { doubleJump: true, neonLineTrail: true }
+        },
+        { 
+            key: 'map12', 
+            file: 'assets/map-12.json',
+            name: 'Abismo Submerso',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 360, y: 210 },
+            connectsTo: []
         }
     ],
 

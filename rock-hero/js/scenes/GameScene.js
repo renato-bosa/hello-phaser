@@ -1568,8 +1568,8 @@ class GameScene extends Phaser.Scene {
         this.wasInWaterPrev = inWater;
         
         // Impacto com a superfície da água: freia a queda abruptamente
-        if (justEnteredWater && player.body.velocity.y > 20) {
-            player.setVelocityY(20);
+        if (justEnteredWater && player.body.velocity.y > 55) {
+            player.setVelocityY(55);
         }
         
         // Flag para efeitos visuais usarem
@@ -1581,7 +1581,7 @@ class GameScene extends Phaser.Scene {
         const ACCELERATION = 200;
         const JUMP_FORCE = inWater ? -150 : -480; // pulo mais fraco na água
         const JUMP_CUT = 0.4;
-        const FALL_GRAVITY = inWater ? -0.15 : 0.5; // cai mais devagar na água (30% da gravidade)
+        const FALL_GRAVITY = inWater ? 0.2 : 0.5; // gravidade extra na queda: 20% na água, 50% fora
         const COYOTE_DURATION = 100;
         const BUFFER_DURATION = 100;
 
@@ -1690,8 +1690,8 @@ class GameScene extends Phaser.Scene {
             player.setVelocityY(player.body.velocity.y + extraGravity);
             
             // Limita velocidade de queda na água (simula resistência)
-            if (inWater && player.body.velocity.y > 90) {
-                player.setVelocityY(90);
+            if (inWater && player.body.velocity.y > 120) {
+                player.setVelocityY(120);
             }
         }
         
@@ -1709,7 +1709,7 @@ class GameScene extends Phaser.Scene {
             
             // Permite pular múltiplas vezes na água (nadar)
             if (jumpJustPressed && !this.isJumping) {
-                const SWIM_FORCE = -280;
+                const SWIM_FORCE = -300;
                 player.setVelocityY(SWIM_FORCE);
                 this.isJumping = true;
                 SoundManager.play('jump');

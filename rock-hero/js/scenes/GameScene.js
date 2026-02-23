@@ -1581,7 +1581,7 @@ class GameScene extends Phaser.Scene {
         const ACCELERATION = 200;
         const JUMP_FORCE = inWater ? -150 : -480; // pulo mais fraco na água
         const JUMP_CUT = 0.4;
-        const FALL_GRAVITY = inWater ? 0.2 : 0.5; // gravidade extra na queda: 20% na água, 50% fora
+        const FALL_GRAVITY = inWater ? 0.1 : 0.5; // gravidade extra na queda: 10% na água, 50% fora
         const COYOTE_DURATION = 100;
         const BUFFER_DURATION = 100;
 
@@ -1700,7 +1700,7 @@ class GameScene extends Phaser.Scene {
             // Reduz a gravidade efetiva na água
             // Gravidade do mundo = 800, queremos 20% = 160 efetivo
             // body.gravity é SOMADO à gravidade do mundo: 160 - 800 = -640
-            player.body.gravity.y = -640;
+            player.body.gravity.y = -550;
             
             // Na água, reseta isJumping quando começa a cair (permite nadar novamente)
             if (player.body.velocity.y >= 0) {

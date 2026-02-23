@@ -191,8 +191,39 @@ const GameData = {
                 },
                 jump: null // TODO: criar sprite de pulo (usa idle por enquanto)
             }
+        },
+        {
+            id: 'guitarrista',
+            name: 'Guitarrista',
+            instrument: 'Guitarra',
+            unlockedByDefault: false,
+            unlockedByWorld: 3,
+            sprites: {
+                idle: {
+                    key: 'guitarrista-idle',
+                    file: 'assets/spritesheets/Guitarrista-parado-2-animado3-6fps.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                walk: {
+                    key: 'guitarrista-walk',
+                    file: 'assets/spritesheets/Guitarrista-andando-6fps.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                'walk-left': {
+                    key: 'guitarrista-walk-left',
+                    file: 'assets/spritesheets/Guitarrista-andando-6fps.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                jump: null // TODO: criar sprite de pulo (usa idle por enquanto)
+            }
         }
-        // Futuros personagens: guitarrista, tecladista...
+        // Futuros personagens: tecladista...
     ],
 
     // ==================== MUNDOS ====================

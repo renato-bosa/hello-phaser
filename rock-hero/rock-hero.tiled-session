@@ -28,8 +28,8 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 0,
@@ -91,8 +91,8 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.5,
             "selectedLayer": 4,
@@ -342,11 +342,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.75,
+            "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 2306.6666666666665,
-                "y": 556
+                "x": 634,
+                "y": 434
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
@@ -687,14 +687,14 @@
         },
         "dev-resources/map-7--planicie.tmx": {
             "expandedObjectLayers": [
-                8,
-                11
+                11,
+                8
             ],
-            "scale": 0.5,
-            "selectedLayer": 0,
+            "scale": 0.25,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 734,
-                "y": 460
+                "x": 2256,
+                "y": 1076
             }
         },
         "dev-resources/map-7--planicie.tmx#abstract-blue": {
@@ -795,7 +795,7 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": 1296.969696969697,
-                "y": 418.18181818181813
+                "y": 418.1818181818182
             }
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#abstract-blue": {
@@ -893,7 +893,7 @@
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 335.34945191634927,
-                "y": 239.81963772059393
+                "y": 239.81963772059402
             }
         },
         "dev-resources/map-9.tmx#abstract-blue": {
@@ -993,7 +993,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 540.3369019989518,
-                "y": 184.13715654712882
+                "y": 184.13715654712885
             }
         },
         "dev-resources/map0-0.tmx#abstract-blue": {

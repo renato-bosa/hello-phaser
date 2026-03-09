@@ -361,6 +361,7 @@ const GameData = {
             mapPosition: { x: 480, y: 180 },
             connectsTo: [9]
         },
+        /*
         { 
             key: 'map9', 
             file: 'assets/map9.json',
@@ -371,6 +372,7 @@ const GameData = {
             mapPosition: { x: 580, y: 220 },
             connectsTo: []
         },
+        */
         { 
             key: 'map10', 
             file: 'assets/map-10.json',

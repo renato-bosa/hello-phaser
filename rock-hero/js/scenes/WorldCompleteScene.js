@@ -390,20 +390,26 @@ class WorldCompleteScene extends Phaser.Scene {
         GameData.markWorldComplete(this.worldData.id);
         GameData.unlockCharacter(this.worldData.rescuedCharacter);
 
-        // Verifica se há próximo mundo
+        // Destino após escolher personagem: próximo mundo ou mapa atual
+        let worldId, levelIndex;
         const nextWorldId = this.worldData.id + 1;
         const nextWorld = GameData.WORLDS.find(w => w.id === nextWorldId);
         
         if (nextWorld) {
-            // Vai ao mapa do próximo mundo (primeira fase)
-            GameData.saveMapPosition(nextWorldId, nextWorld.levels[0]);
-            this.scene.start('WorldMapScene', { worldId: nextWorldId, levelIndex: nextWorld.levels[0] });
+            worldId = nextWorldId;
+            levelIndex = nextWorld.levels[0];
+            GameData.saveMapPosition(worldId, levelIndex);
         } else {
-            // Não há próximo mundo - mantém no mundo atual na última fase completada
-            const lastLevelOfWorld = this.worldData.levels[this.worldData.levels.length - 1];
-            GameData.saveMapPosition(this.worldData.id, lastLevelOfWorld);
-            this.scene.start('WorldMapScene', { worldId: this.worldData.id, levelIndex: lastLevelOfWorld });
+            worldId = this.worldData.id;
+            levelIndex = this.worldData.levels[this.worldData.levels.length - 1];
+            GameData.saveMapPosition(worldId, levelIndex);
         }
+
+        // Mostra tela de escolha de personagem antes de seguir
+        this.scene.start('CharacterSelectScene', {
+            returnTo: 'WorldMapScene',
+            returnData: { worldId, levelIndex }
+        });
     }
 }
 

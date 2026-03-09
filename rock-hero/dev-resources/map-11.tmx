@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="19" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="88">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="50" height="19" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="89">
  <editorsettings>
   <export target="../assets/map-11.json" format="json"/>
  </editorsettings>
@@ -93,6 +93,9 @@
  <tileset firstgid="31" name="dark-bricks-super-fuzzy" tilewidth="32" tileheight="32" tilecount="1" columns="1">
   <image source="../assets/spritesheets/dark-bricks-super-fuzzy.png" width="32" height="32"/>
  </tileset>
+ <tileset firstgid="32" name="trampoline-thick" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/trampoline-thick.png" width="32" height="32"/>
+ </tileset>
  <layer id="5" name="bg" width="50" height="19">
   <data encoding="csv">
 31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,
@@ -179,5 +182,6 @@
   <object id="80" gid="20" x="320" y="256" width="32" height="32"/>
   <object id="86" gid="20" x="1184" y="608" width="32" height="32"/>
   <object id="87" gid="20" x="96" y="544" width="32" height="32"/>
+  <object id="88" gid="32" x="896" y="608" width="32" height="32"/>
  </objectgroup>
 </map>

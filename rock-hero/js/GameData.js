@@ -244,7 +244,7 @@ const GameData = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [5, 6, 7, 8], // Índices das fases (sem map9)
+            levels: [5, 6, 7, 8, 9], // 5 fases (map5 a map10)
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             // Visual no WorldMap (tema caverna/noturno)
@@ -256,7 +256,7 @@ const GameData = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [9, 10, 11], // Índices das fases (map10, map11, map12)
+            levels: [10, 11], // 2 fases (map11, map12)
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             // Visual no WorldMap (tema aquático)
@@ -359,7 +359,7 @@ const GameData = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 480, y: 180 },
-            connectsTo: [] // Última fase do mundo 2 (portal para mundo 3 no WorldMap)
+            connectsTo: [9] // Conecta à fase 10 (map10)
         },
         /*
         { 
@@ -379,9 +379,9 @@ const GameData = {
             name: 'Ruínas Submersas',
             zoom: 0.9,
             roundPixels: false,
-            world: 3,
-            mapPosition: { x: 120, y: 200 },
-            connectsTo: [10] // Conecta ao map11 (índice 10)
+            world: 2,
+            mapPosition: { x: 580, y: 220 },
+            connectsTo: [] // Última fase do mundo 2
         },
         { 
             key: 'map11', 
@@ -390,7 +390,7 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 240, y: 180 },
+            mapPosition: { x: 120, y: 200 },
             connectsTo: [11], // Conecta ao map12 (índice 11)
             // Features ativadas automaticamente nesta fase
             features: { doubleJump: true, neonLineTrail: true }

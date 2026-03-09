@@ -270,6 +270,18 @@
                  "width":32,
                  "x":96,
                  "y":544
+                }, 
+                {
+                 "gid":32,
+                 "height":32,
+                 "id":88,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":896,
+                 "y":608
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -278,7 +290,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":88,
+ "nextobjectid":89,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -571,6 +583,19 @@
          "imagewidth":32,
          "margin":0,
          "name":"dark-bricks-super-fuzzy",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":32,
+         "image":"spritesheets\/trampoline-thick.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"trampoline-thick",
          "spacing":0,
          "tilecount":1,
          "tileheight":32,

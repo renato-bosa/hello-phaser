@@ -147,6 +147,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-12.tmx": {
+            "expandedObjectLayers": [
+                8
+            ],
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {

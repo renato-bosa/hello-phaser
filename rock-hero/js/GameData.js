@@ -338,7 +338,7 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 200, y: 160 },
+            mapPosition: { x: 170, y: 160 },
             connectsTo: [7]
         },
         { 
@@ -348,7 +348,7 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 340, y: 210 },
+            mapPosition: { x: 270, y: 210 },
             connectsTo: [8]
         },
         { 
@@ -358,7 +358,7 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 480, y: 180 },
+            mapPosition: { x: 370, y: 180 },
             connectsTo: [9] // Conecta à fase 10 (map10)
         },
         /*
@@ -380,7 +380,7 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 580, y: 220 },
+            mapPosition: { x: 460, y: 220 },
             connectsTo: [] // Última fase do mundo 2
         },
         { 

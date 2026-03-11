@@ -272,7 +272,7 @@ const GameData = {
         { 
             key: 'map0-0', 
             file: 'assets/map0-0.json', 
-            name: 'Fase 0-1',
+            name: 'Primeiros Passos',
             zoom: 1,
             roundPixels: true,
             world: 1,
@@ -283,7 +283,7 @@ const GameData = {
         { 
             key: 'map0-1', 
             file: 'assets/map0-1.json', 
-            name: 'Fase 1',
+            name: 'Descobrindo o mundo',
             zoom: 1.0,
             roundPixels: true,
             world: 1,
@@ -293,7 +293,7 @@ const GameData = {
         { 
             key: 'map2', 
             file: 'assets/map-2--expansion and speed.json', 
-            name: 'Fase 2',
+            name: 'Pulos decisivos',
             zoom: 0.9,
             roundPixels: false,
             world: 1,
@@ -303,7 +303,7 @@ const GameData = {
         { 
             key: 'map3', 
             file: 'assets/map-3--desafio do luigi.json', 
-            name: 'Desafio do Luigi',
+            name: 'Sapos e lava',
             zoom: 0.9,
             roundPixels: false,
             world: 1,
@@ -313,7 +313,7 @@ const GameData = {
         {
             key: 'map4',
             file: 'assets/map-4--big-jumps.json',
-            name: 'Big Jump',
+            name: 'Os Pulos Maiores',
             zoom: 0.9,
             roundPixels: false,
             world: 1,
@@ -324,7 +324,7 @@ const GameData = {
         { 
             key: 'map5', 
             file: 'assets/map-5--caverna.json',
-            name: 'Caverna Sombria',
+            name: 'Cristais Fascinantes',
             zoom: 0.9,
             roundPixels: false,
             world: 2,
@@ -334,7 +334,7 @@ const GameData = {
         { 
             key: 'map6', 
             file: 'assets/map-6--caverna2.json',
-            name: 'Cristais Perigosos',
+            name: 'Ative o turbo!',
             zoom: 0.9,
             roundPixels: false,
             world: 2,
@@ -344,7 +344,7 @@ const GameData = {
         { 
             key: 'map7', 
             file: 'assets/map-7--planicie.json',
-            name: 'Planície',
+            name: 'Caos de anfíbios',
             zoom: 0.9,
             roundPixels: false,
             world: 2,
@@ -354,7 +354,7 @@ const GameData = {
         { 
             key: 'map8', 
             file: 'assets/map-8.json',
-            name: 'O Resgate do Baixista',
+            name: 'Simples',
             zoom: 0.9,
             roundPixels: false,
             world: 2,

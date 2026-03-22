@@ -466,8 +466,9 @@ class MenuScene extends Phaser.Scene {
         }
 
         // Instrução para fechar
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         const closeText = this.add.text(this.centerX, this.centerY + 140, 
-            'Pressione ESC para voltar', {
+            isMobile ? 'Pressione X para voltar' : 'Pressione ESC para voltar', {
             fontSize: '14px',
             fontFamily: 'Arial',
             color: '#aaaaaa'
@@ -684,9 +685,12 @@ class MenuScene extends Phaser.Scene {
             });
         });
 
-        // Instrução para fechar
-        const closeText = this.add.text(this.centerX, this.centerY + 145, 
-            '↑↓: Navegar | Enter: Alternar | ESC: Voltar', {
+        // Instruções (teclado vs mobile)
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const effectsHelp = isMobile
+            ? '←→: Navegar | O: Alternar | X: Voltar'
+            : '↑↓: Navegar | Enter: Alternar | ESC: Voltar';
+        const closeText = this.add.text(this.centerX, this.centerY + 145, effectsHelp, {
             fontSize: '10px',
             fontFamily: 'Arial',
             color: '#aaaaaa'

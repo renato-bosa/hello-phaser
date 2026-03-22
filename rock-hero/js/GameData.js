@@ -84,11 +84,20 @@ const GameData = {
     },
 
     /**
+     * Overrides só na fase atual (GameScene). Não altera FEATURES do menu.
+     * Ex.: { doubleJump: true } na fase 11 — fora da fase volta ao valor do menu.
+     */
+    levelFeatureOverrides: null,
+
+    /**
      * Verifica se uma feature está ativa
      * @param {string} featureName - Nome da feature
      * @returns {boolean}
      */
     isFeatureEnabled(featureName) {
+        if (this.levelFeatureOverrides && Object.prototype.hasOwnProperty.call(this.levelFeatureOverrides, featureName)) {
+            return this.levelFeatureOverrides[featureName] === true;
+        }
         return this.FEATURES[featureName] === true;
     },
 

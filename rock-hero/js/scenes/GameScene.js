@@ -110,15 +110,9 @@ class GameScene extends Phaser.Scene {
         this.overlayElements = [];
         this.keyListeners = [];
 
-        // Aplica features específicas da fase (salva originais para restaurar depois)
+        // Features só desta fase (não muda GameData.FEATURES — preferências do menu permanecem)
         const levelConfig = GameData.LEVELS[this.currentLevel];
-        this.originalFeatures = {};
-        if (levelConfig.features) {
-            for (const [key, value] of Object.entries(levelConfig.features)) {
-                this.originalFeatures[key] = GameData.FEATURES[key];
-                GameData.FEATURES[key] = value;
-            }
-        }
+        GameData.levelFeatureOverrides = levelConfig.features || null;
 
         // Cria o jogo
         this.createMap();
@@ -2410,14 +2404,8 @@ class GameScene extends Phaser.Scene {
     // ==================== CLEANUP ====================
 
     shutdown() {
-        // Restaura features originais (caso a fase tenha sobrescrito)
-        if (this.originalFeatures) {
-            for (const [key, value] of Object.entries(this.originalFeatures)) {
-                GameData.FEATURES[key] = value;
-            }
-            this.originalFeatures = null;
-        }
-        
+        GameData.levelFeatureOverrides = null;
+
         // Limpa listeners
         this.keyListeners.forEach(key => {
             if (key && key.destroy) key.destroy();

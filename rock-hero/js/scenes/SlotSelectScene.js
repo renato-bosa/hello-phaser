@@ -17,6 +17,10 @@ class SlotSelectScene extends Phaser.Scene {
         this.selectedSlot = 0; // Índice do slot selecionado (0-3)
         this.mode = 'select'; // 'select', 'confirm_delete', 'name_input'
         this.deleteConfirmSlot = null;
+        this._slotLongPressTimer = null;
+        this._virtualODeleteTimer = null;
+        this._virtualODeleteTriggered = false;
+        this._jumpWasDownVirtual = false;
     }
 
     create() {
@@ -178,16 +182,57 @@ class SlotSelectScene extends Phaser.Scene {
         bg.setInteractive({ useHandCursor: true })
             .on('pointerover', () => {
                 if (this.mode === 'select') {
+                    if (this.selectedSlot !== index) {
+                        this.cancelVirtualOBtnLongPress();
+                        this._jumpWasDownVirtual = !!this.virtualControls?.jump;
+                    }
                     this.selectedSlot = index;
                     this.highlightSlot(index);
                     SoundManager.play('menuNavigate');
                 }
-            })
-            .on('pointerdown', () => {
+            });
+
+        if (slotData.isEmpty) {
+            bg.on('pointerdown', () => {
                 if (this.mode === 'select') {
                     this.selectSlot(index);
                 }
             });
+        } else {
+            // Slot com dados: toque rápido = jogar | segure ~550ms = apagar (mobile + mouse)
+            bg.on('pointerdown', () => {
+                if (this.mode !== 'select') return;
+                this.cancelSlotLongPress();
+                this._slotLongPressTimer = this.time.delayedCall(550, () => {
+                    this._slotLongPressTimer = null;
+                    if (this.mode === 'select') {
+                        SoundManager.play('menuNavigate');
+                        this.confirmDelete(index);
+                    }
+                });
+            });
+            bg.on('pointerup', () => {
+                if (this._slotLongPressTimer) {
+                    this._slotLongPressTimer.remove();
+                    this._slotLongPressTimer = null;
+                    if (this.mode === 'select') {
+                        this.selectSlot(index);
+                    }
+                }
+            });
+            bg.on('pointerout', () => {
+                if (this._slotLongPressTimer) {
+                    this._slotLongPressTimer.remove();
+                    this._slotLongPressTimer = null;
+                }
+            });
+            bg.on('pointercancel', () => {
+                if (this._slotLongPressTimer) {
+                    this._slotLongPressTimer.remove();
+                    this._slotLongPressTimer = null;
+                }
+            });
+        }
 
         return {
             container,
@@ -228,8 +273,8 @@ class SlotSelectScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // Texto de deletar (só aparece em slots com dados)
-        this.deleteText = this.add.text(this.centerX, panelY + 18, 
-            isMobile ? 'Segure para deletar' : 'DEL  Deletar slot', {
+        this.deleteText = this.add.text(this.centerX, panelY + 18,
+            isMobile ? 'Segure o slot ou O (~0,5s) para resetar' : 'DEL  Resetar slot', {
             fontFamily: 'Arial',
             fontSize: '9px',
             color: '#ff4444'
@@ -258,26 +303,66 @@ class SlotSelectScene extends Phaser.Scene {
     }
 
     update(time) {
+        const vc = this.virtualControls;
+        if (!vc) return;
+
         // Controles virtuais mobile
         if (this.mode === 'select') {
-            // O = confirmar
-            if (this.virtualControls.jumpJustPressed) {
-                this.virtualControls.jumpJustPressed = false;
-                this.selectSlot(this.selectedSlot);
+            const card = this.slotCards[this.selectedSlot];
+            const slotData = card.slotData;
+
+            // Slot vazio: toque rápido em O = novo jogo
+            if (slotData.isEmpty) {
+                this.cancelVirtualOBtnLongPress();
+                if (vc.jumpJustPressed) {
+                    vc.jumpJustPressed = false;
+                    this.selectSlot(this.selectedSlot);
+                }
+                this._jumpWasDownVirtual = !!vc.jump;
+            } else {
+                // Slot com save: O rápido = jogar | O segurado ~550ms = apagar (igual ao card)
+                if (vc.jumpJustPressed) {
+                    vc.jumpJustPressed = false;
+                }
+
+                const jumpDown = !!vc.jump;
+                if (jumpDown && !this._jumpWasDownVirtual) {
+                    this.cancelVirtualOBtnLongPress();
+                    this._virtualODeleteTriggered = false;
+                    this._virtualODeleteTimer = this.time.delayedCall(550, () => {
+                        this._virtualODeleteTimer = null;
+                        this._virtualODeleteTriggered = true;
+                        if (this.mode === 'select') {
+                            SoundManager.play('menuNavigate');
+                            this.confirmDelete(this.selectedSlot);
+                        }
+                    });
+                }
+                if (!jumpDown && this._jumpWasDownVirtual) {
+                    if (this._virtualODeleteTimer) {
+                        this._virtualODeleteTimer.remove();
+                        this._virtualODeleteTimer = null;
+                        if (!this._virtualODeleteTriggered) {
+                            this.selectSlot(this.selectedSlot);
+                        }
+                    }
+                    this._virtualODeleteTriggered = false;
+                }
+                this._jumpWasDownVirtual = jumpDown;
             }
 
             // X = voltar
-            if (this.virtualControls.backJustPressed) {
-                this.virtualControls.backJustPressed = false;
+            if (vc.backJustPressed) {
+                vc.backJustPressed = false;
                 this.goBack();
             }
 
             // Navegação com throttle
             if (time - this.lastNavTime > 200) {
-                if (this.virtualControls.left) {
+                if (vc.left) {
                     this.navigate(-1);
                     this.lastNavTime = time;
-                } else if (this.virtualControls.right) {
+                } else if (vc.right) {
                     this.navigate(1);
                     this.lastNavTime = time;
                 }
@@ -285,11 +370,28 @@ class SlotSelectScene extends Phaser.Scene {
         }
     }
 
+    cancelSlotLongPress() {
+        if (this._slotLongPressTimer) {
+            this._slotLongPressTimer.remove();
+            this._slotLongPressTimer = null;
+        }
+    }
+
+    cancelVirtualOBtnLongPress() {
+        if (this._virtualODeleteTimer) {
+            this._virtualODeleteTimer.remove();
+            this._virtualODeleteTimer = null;
+        }
+        this._virtualODeleteTriggered = false;
+    }
+
     navigate(direction) {
         if (this.mode !== 'select') return;
 
         const newIndex = this.selectedSlot + direction;
         if (newIndex >= 0 && newIndex < GameData.MAX_SLOTS) {
+            this.cancelVirtualOBtnLongPress();
+            this._jumpWasDownVirtual = !!this.virtualControls?.jump;
             this.selectedSlot = newIndex;
             this.highlightSlot(newIndex);
             SoundManager.play('menuNavigate');
@@ -530,6 +632,7 @@ class SlotSelectScene extends Phaser.Scene {
         const slotData = this.slotCards[index].slotData;
         if (slotData.isEmpty) return;
 
+        this.cancelVirtualOBtnLongPress();
         this.mode = 'confirm_delete';
         this.deleteConfirmSlot = index;
 
@@ -620,11 +723,14 @@ class SlotSelectScene extends Phaser.Scene {
         this.highlightSlot(this.selectedSlot);
 
         this.mode = 'select';
+        this.cancelVirtualOBtnLongPress();
+        this._jumpWasDownVirtual = !!this.virtualControls?.jump;
     }
 
     cancelDelete() {
         this.cleanupDeleteConfirm();
         this.mode = 'select';
+        this._jumpWasDownVirtual = !!this.virtualControls?.jump;
         SoundManager.play('menuNavigate');
     }
 
@@ -641,6 +747,8 @@ class SlotSelectScene extends Phaser.Scene {
     }
 
     goBack() {
+        this.cancelSlotLongPress();
+        this.cancelVirtualOBtnLongPress();
         if (this.mode === 'name_input') {
             this.cancelNameInput();
         } else if (this.mode === 'confirm_delete') {

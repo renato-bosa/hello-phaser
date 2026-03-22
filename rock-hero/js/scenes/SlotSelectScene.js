@@ -300,6 +300,10 @@ class SlotSelectScene extends Phaser.Scene {
         // Controles virtuais
         this.virtualControls = GameData.getVirtualControls();
         this.lastNavTime = 0;
+
+        // Sincroniza com o estado atual do botão para não confundir
+        // um "segurar" da cena anterior com um novo toque
+        this._jumpWasDownVirtual = !!(this.virtualControls && this.virtualControls.jump);
     }
 
     update(time) {

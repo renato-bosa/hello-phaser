@@ -398,11 +398,11 @@ class WorldCompleteScene extends Phaser.Scene {
         if (nextWorld) {
             worldId = nextWorldId;
             levelIndex = nextWorld.levels[0];
-            GameData.saveMapPosition(worldId, levelIndex);
+            GameData.saveMapPosition(worldId, levelIndex, 'worldComplete:nextWorld');
         } else {
             worldId = this.worldData.id;
             levelIndex = this.worldData.levels[this.worldData.levels.length - 1];
-            GameData.saveMapPosition(worldId, levelIndex);
+            GameData.saveMapPosition(worldId, levelIndex, 'worldComplete:lastWorld');
         }
 
         // Mostra tela de escolha de personagem antes de seguir

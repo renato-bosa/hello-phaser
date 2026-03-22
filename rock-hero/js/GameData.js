@@ -19,6 +19,32 @@ const GameData = {
         return `${path}?v=${this.VERSION}`;
     },
 
+    /**
+     * Debug do cursor no mapa (ativar com ?mapDebug=true na URL — ver game.js)
+     */
+    DEBUG_MAP_POSITION: false,
+
+    /**
+     * Log condicional para posição do mapa / inconsistências
+     */
+    logMapDebug(message, details = null) {
+        if (!this.DEBUG_MAP_POSITION) return;
+        if (details !== null && typeof details === 'object') {
+            console.log('[MapPos]', message, details);
+        } else {
+            console.log('[MapPos]', message);
+        }
+    },
+
+    logMapWarn(message, details = null) {
+        if (!this.DEBUG_MAP_POSITION) return;
+        if (details !== null && typeof details === 'object') {
+            console.warn('[MapPos]', message, details);
+        } else {
+            console.warn('[MapPos]', message);
+        }
+    },
+
     // ==================== FEATURE FLAGS ====================
     // Sistema para testar novas funcionalidades
     // Pode ser ativado via URL: ?trail=true&particles=true
@@ -1181,18 +1207,42 @@ const GameData = {
     },
 
     /**
-     * Salva a posição do cursor no mapa do slot ativo
+     * Salva a posição do cursor no mapa do slot ativo.
+     * worldId é sempre derivado de levelIndex quando possível (evita { worldId: 1, levelIndex: 5 }).
+     * @param {string} [source] - só para log com ?mapDebug=true (ex.: 'victory:nextLevel', 'worldMap.navigate')
      */
-    saveMapPosition(worldId, levelIndex) {
+    saveMapPosition(worldId, levelIndex, source = '') {
+        const worldForLevel = this.getWorldForLevel(levelIndex);
+        const resolvedWorldId = worldForLevel ? worldForLevel.id : (worldId ?? 1);
+
+        if (this.DEBUG_MAP_POSITION) {
+            const payload = {
+                source: source || '(não informado)',
+                callerWorldId: worldId,
+                levelIndex,
+                resolvedWorldId,
+                levelKey: this.LEVELS[levelIndex]?.key ?? '(inválido)'
+            };
+            if (worldForLevel && worldId != null && Number(worldId) !== Number(resolvedWorldId)) {
+                this.logMapWarn('saveMapPosition: worldId do chamador diferente do mundo da fase (corrigido)', payload);
+            } else if (!worldForLevel && levelIndex != null) {
+                this.logMapWarn('saveMapPosition: getWorldForLevel(levelIndex) null — usando fallback de worldId', payload);
+            } else {
+                this.logMapDebug('saveMapPosition', payload);
+            }
+        }
+
         const slotId = this.getActiveSlot();
         if (slotId) {
             const slot = this.getSlot(slotId);
             if (slot) {
-                slot.mapPosition = { worldId, levelIndex };
+                slot.mapPosition = { worldId: resolvedWorldId, levelIndex };
                 this.saveSlot(slotId, slot);
             }
+        } else if (this.DEBUG_MAP_POSITION) {
+            this.logMapWarn('saveMapPosition: sem slot ativo — state ainda atualizado', { resolvedWorldId, levelIndex });
         }
-        this.state.currentWorld = worldId;
+        this.state.currentWorld = resolvedWorldId;
         this.state.mapCursorLevel = levelIndex;
     },
 
@@ -1201,22 +1251,55 @@ const GameData = {
      */
     loadMapPosition() {
         const slotId = this.getActiveSlot();
-        if (slotId) {
-            const slot = this.getSlot(slotId);
-            if (slot && slot.mapPosition) {
-                const { worldId, levelIndex } = slot.mapPosition;
-                
-                // Valida se a posição é válida
-                const world = this.WORLDS.find(w => w.id === worldId);
-                if (world && this.isWorldUnlocked(worldId)) {
-                    if (this.isLevelUnlocked(levelIndex)) {
-                        return { worldId, levelIndex };
-                    }
-                    return { worldId, levelIndex: this.getNextUnlockedLevel(worldId) };
-                }
-            }
+        if (!slotId) {
+            this.logMapDebug('loadMapPosition: sem slot ativo → padrão', { worldId: 1, levelIndex: 0 });
+            return { worldId: 1, levelIndex: 0 };
         }
-        return { worldId: 1, levelIndex: 0 };
+
+        const slot = this.getSlot(slotId);
+        if (!slot || !slot.mapPosition) {
+            this.logMapDebug('loadMapPosition: slot sem mapPosition → padrão', { slotId, hasSlot: !!slot });
+            return { worldId: 1, levelIndex: 0 };
+        }
+
+        let { worldId, levelIndex } = slot.mapPosition;
+        const rawFromSlot = { worldId, levelIndex };
+
+        const correctWorld = this.getWorldForLevel(levelIndex);
+        if (correctWorld && correctWorld.id !== worldId) {
+            this.logMapWarn('loadMapPosition: INCONSISTÊNCIA slot — worldId não corresponde à fase; corrigindo e salvando', {
+                antes: { ...rawFromSlot },
+                esperadoWorldId: correctWorld.id,
+                levelIndex
+            });
+            worldId = correctWorld.id;
+            slot.mapPosition = { worldId, levelIndex };
+            this.saveSlot(slotId, slot);
+        }
+
+        const world = this.WORLDS.find(w => w.id === worldId);
+        if (!world || !this.isWorldUnlocked(worldId)) {
+            this.logMapWarn('loadMapPosition: mundo bloqueado ou inválido → padrão', {
+                worldId,
+                levelIndex,
+                worldExists: !!world
+            });
+            return { worldId: 1, levelIndex: 0 };
+        }
+
+        if (this.isLevelUnlocked(levelIndex)) {
+            this.logMapDebug('loadMapPosition: ok', { worldId, levelIndex, levelKey: this.LEVELS[levelIndex]?.key });
+            return { worldId, levelIndex };
+        }
+
+        const fallbackLevel = this.getNextUnlockedLevel(worldId);
+        this.logMapWarn('loadMapPosition: fase ainda bloqueada — usando próximo nível desbloqueado do mundo', {
+            worldId,
+            requestedLevelIndex: levelIndex,
+            fallbackLevelIndex: fallbackLevel,
+            reason: 'isLevelUnlocked(levelIndex) === false'
+        });
+        return { worldId, levelIndex: fallbackLevel };
     },
 
     getWorldLevelsWithStatus(worldId) {

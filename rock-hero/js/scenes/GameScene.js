@@ -1980,8 +1980,8 @@ class GameScene extends Phaser.Scene {
 
             // Volta ao mapa do mundo
             const handleContinue = () => {
-                GameData.saveMapPosition(GameData.state.currentWorld, nextLevel);
-                this.scene.start('WorldMapScene');
+                GameData.saveMapPosition(GameData.state.currentWorld, nextLevel, 'victory:nextLevel');
+                this.scene.start('WorldMapScene', {});
             };
 
             this.input.keyboard.once('keydown-SPACE', handleContinue);
@@ -2024,8 +2024,8 @@ class GameScene extends Phaser.Scene {
 
             // Volta ao mapa do mundo (mantém na última fase completada)
             const handleBackToMap = () => {
-                GameData.saveMapPosition(GameData.state.currentWorld, this.currentLevel);
-                this.scene.start('WorldMapScene');
+                GameData.saveMapPosition(GameData.state.currentWorld, this.currentLevel, 'victory:gameComplete');
+                this.scene.start('WorldMapScene', {});
             };
 
             this.input.keyboard.once('keydown-SPACE', handleBackToMap);
@@ -2258,15 +2258,12 @@ class GameScene extends Phaser.Scene {
         this.clearOverlay();
         this.clearPauseListeners();
         
-        // Obtém o mundo atual baseado na fase
         const levelConfig = GameData.LEVELS[this.currentLevel];
         const worldId = levelConfig?.world || 1;
+        // Mantém slot alinhado ao mapa (cursor na fase atual)
+        GameData.saveMapPosition(worldId, this.currentLevel, 'pause:goToWorldMap');
         
-        // Volta ao mapa do mundo na fase atual
-        this.scene.start('WorldMapScene', { 
-            worldId: worldId, 
-            levelIndex: this.currentLevel 
-        });
+        this.scene.start('WorldMapScene', {});
     }
 
     changeCharacter() {

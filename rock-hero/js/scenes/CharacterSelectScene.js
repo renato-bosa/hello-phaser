@@ -339,7 +339,13 @@ class CharacterSelectScene extends Phaser.Scene {
     }
 
     goBack() {
-        this.scene.start(this.returnTo, this.returnData);
+        if (this.returnTo === 'WorldMapScene') {
+            // WorldMapScene usa savedPos (loadMapPosition) — não precisa de dados.
+            // Passar {} limpa o cache de scene data do Phaser (evita stale data).
+            this.scene.start('WorldMapScene', {});
+        } else {
+            this.scene.start(this.returnTo, this.returnData);
+        }
     }
 }
 

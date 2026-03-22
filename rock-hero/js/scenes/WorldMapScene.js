@@ -11,11 +11,36 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     init(data) {
-        // Carrega posição salva ou usa padrão
         const savedPos = GameData.loadMapPosition();
-        this.currentWorldId = data?.worldId || savedPos.worldId;
-        this.cursorLevelIndex = data?.levelIndex ?? savedPos.levelIndex;
-        
+
+        // savedPos é a fonte da verdade (saveMapPosition é sempre chamado antes de entrar aqui).
+        // Ignoramos data do Phaser — pode conter valores stale de cenas anteriores.
+        this.currentWorldId = savedPos.worldId;
+        this.cursorLevelIndex = savedPos.levelIndex;
+
+        if (GameData.DEBUG_MAP_POSITION) {
+            const sceneData = data ? { worldId: data.worldId, levelIndex: data.levelIndex } : null;
+            GameData.logMapDebug('WorldMapScene.init', {
+                sceneData,
+                savedPos,
+                applied: { worldId: this.currentWorldId, levelIndex: this.cursorLevelIndex }
+            });
+            if (sceneData && sceneData.levelIndex != null && sceneData.levelIndex !== savedPos.levelIndex) {
+                GameData.logMapWarn('WorldMapScene.init: sceneData.levelIndex difere de savedPos (stale data ignorada)', {
+                    sceneDataLevelIndex: sceneData.levelIndex,
+                    savedPosLevelIndex: savedPos.levelIndex
+                });
+            }
+            const worldForLevel = GameData.getWorldForLevel(this.cursorLevelIndex);
+            if (worldForLevel && Number(worldForLevel.id) !== Number(this.currentWorldId)) {
+                GameData.logMapWarn('WorldMapScene.init: levelIndex não pertence ao currentWorldId', {
+                    currentWorldId: this.currentWorldId,
+                    cursorLevelIndex: this.cursorLevelIndex,
+                    worldIdEsperadoParaFase: worldForLevel.id
+                });
+            }
+        }
+
         // Carrega personagem selecionado
         GameData.loadSelectedCharacter();
     }
@@ -460,16 +485,35 @@ class WorldMapScene extends Phaser.Scene {
     createPlayerCursor() {
         // Encontra a posição inicial do cursor
         let startNode = this.allNodes.find(n => n.index === this.cursorLevelIndex);
-        
+
         // Se não encontrou (pode ser um portal), usa a primeira fase desbloqueada
         if (!startNode) {
+            if (GameData.DEBUG_MAP_POSITION) {
+                GameData.logMapWarn('createPlayerCursor: sem nó com index === cursorLevelIndex; tentando primeira fase desbloqueada', {
+                    cursorLevelIndex: this.cursorLevelIndex,
+                    levelNodeIndices: this.allNodes.filter(n => n.type === 'level').map(n => n.index)
+                });
+            }
             startNode = this.allNodes.find(n => n.type === 'level' && n.isUnlocked);
         }
         if (!startNode) {
+            if (GameData.DEBUG_MAP_POSITION) {
+                GameData.logMapWarn('createPlayerCursor: nenhuma fase desbloqueada; usando allNodes[0]', {
+                    cursorLevelIndex: this.cursorLevelIndex,
+                    allNodeTypes: this.allNodes.map(n => n.type)
+                });
+            }
             startNode = this.allNodes[0];
         }
-        
+
         this.currentNodeIndex = this.allNodes.indexOf(startNode);
+
+        if (GameData.DEBUG_MAP_POSITION && startNode?.type === 'level' && startNode.index !== this.cursorLevelIndex) {
+            GameData.logMapDebug('createPlayerCursor: cursor efetivo difere de cursorLevelIndex (fallback aplicado)', {
+                cursorLevelIndexSalvo: this.cursorLevelIndex,
+                indiceNoNo: startNode.index
+            });
+        }
         
         const { x, y } = startNode.mapPosition;
         
@@ -703,7 +747,7 @@ class WorldMapScene extends Phaser.Scene {
             // Salva posição se for uma fase
             if (newNode.type === 'level') {
                 this.cursorLevelIndex = newNode.index;
-                GameData.saveMapPosition(this.currentWorldId, newNode.index);
+                GameData.saveMapPosition(this.currentWorldId, newNode.index, 'worldMap.navigate');
             }
         }
     }
@@ -819,12 +863,9 @@ class WorldMapScene extends Phaser.Scene {
         this.time.delayedCall(800, () => {
             // Define a posição inicial no novo mundo
             const firstLevel = targetWorld.levels[0];
-            GameData.saveMapPosition(targetWorld.id, firstLevel);
+            GameData.saveMapPosition(targetWorld.id, firstLevel, 'worldMap.portalTransition');
             
-            this.scene.start('WorldMapScene', {
-                worldId: targetWorld.id,
-                levelIndex: firstLevel
-            });
+            this.scene.start('WorldMapScene', {});
         });
     }
 

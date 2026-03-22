@@ -7,8 +7,9 @@
  * - GameScene.js: Gameplay
  * 
  * Debug:
- * - ?fps=true   → Mostra contador de FPS
- * - ?debug=true → Mostra hitboxes de colisão
+ * - ?fps=true     → Mostra contador de FPS
+ * - ?debug=true   → Mostra hitboxes de colisão
+ * - ?mapDebug=true → Logs no console: cursor do mapa / saveMapPosition / loadMapPosition
  */
 
 // Parâmetros de debug via URL
@@ -18,6 +19,9 @@ const showDebug = urlParams.get('debug') === 'true';
 
 // Inicializa feature flags (funcionalidades experimentais)
 GameData.initFeatureFlags();
+
+// Debug posição do mapa (GameData.logMapDebug / saveMapPosition / loadMapPosition)
+GameData.DEBUG_MAP_POSITION = urlParams.get('mapDebug') === 'true';
 
 const config = {
     type: Phaser.AUTO,

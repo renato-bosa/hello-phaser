@@ -459,7 +459,7 @@ class SlotSelectScene extends Phaser.Scene {
             yoyo: true,
             onComplete: () => {
                 // Vai para o WorldMap
-                this.scene.start('WorldMapScene');
+                this.scene.start('WorldMapScene', {});
             }
         });
     }
@@ -599,7 +599,7 @@ class SlotSelectScene extends Phaser.Scene {
         this.cleanupNameInput();
 
         // Vai para o WorldMap
-        this.scene.start('WorldMapScene');
+        this.scene.start('WorldMapScene', {});
     }
 
     cancelNameInput() {

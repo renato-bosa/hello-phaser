@@ -172,6 +172,7 @@ class GameScene extends Phaser.Scene {
         const stars = [];
         const enemies = [];
         const speedBoosts = [];
+        const extraLives = [];
 
         const gidToTilesetName = {};
         map.tilesets.forEach(ts => {
@@ -216,6 +217,11 @@ class GameScene extends Phaser.Scene {
                      tilesetName.includes('speed') || tilesetName.includes('boost')) {
                 speedBoosts.push({ x: obj.x + 16, y: obj.y - 16 });
             }
+            else if (type === '1up' || type === 'extra_life' ||
+                     tilesetName.includes('1up') || tilesetName.includes('nota') ||
+                     tilesetName.includes('extra-life') || tilesetName.includes('extra_life')) {
+                extraLives.push({ x: obj.x + 16, y: obj.y - 16 });
+            }
         });
 
         this.currentCheckpoint = this.playerSpawn;
@@ -226,6 +232,7 @@ class GameScene extends Phaser.Scene {
         this.createTrampolines(trampolines);
         this.createStars(stars);
         this.createSpeedBoosts(speedBoosts);
+        this.createExtraLives(extraLives);
         this.createWaterZones(map);
     }
 
@@ -289,6 +296,35 @@ class GameScene extends Phaser.Scene {
             boost.body.setOffset(0, GC.SPEED_BOOST.BODY_OFFSET_Y);
             boost.setAlpha(0.9);
             this.speedBoosts.add(boost);
+        });
+    }
+
+    createExtraLives(positions) {
+        this.extraLives = this.physics.add.staticGroup();
+        positions.forEach(pos => {
+            const item = this.extraLives.create(pos.x, pos.y, 'star', 0);
+            item.setTint(0x00ff88);
+            item.setScale(0.9);
+        });
+    }
+
+    collectExtraLife(player, item) {
+        item.disableBody(true, true);
+        SoundManager.play('collectStar');
+        const newLives = GameData.addLife();
+        this.hudManager.updateLives(newLives);
+
+        const text = this.add.text(item.x, item.y - 20, '1UP!', {
+            fontSize: '16px', fontFamily: 'Arial', color: '#00ff88',
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setDepth(GC.DEPTH.HUD);
+
+        this.tweens.add({
+            targets: text,
+            y: text.y - 30,
+            alpha: 0,
+            duration: 800,
+            onComplete: () => text.destroy()
         });
     }
 
@@ -483,6 +519,11 @@ class GameScene extends Phaser.Scene {
                 (p, b) => this.playerController.handleSpeedBoost(p, b), null, this);
         }
 
+        if (this.extraLives && this.extraLives.children.size > 0) {
+            this.physics.add.overlap(player, this.extraLives,
+                (p, item) => this.collectExtraLife(p, item), null, this);
+        }
+
         this.checkpoints.forEach(flag => {
             this.physics.add.overlap(player, flag, () => {
                 if (!flag.activated) {
@@ -633,7 +674,7 @@ class GameScene extends Phaser.Scene {
 
     handleTileCollision(player, tile) {
         if (tile.properties?.jump_back_to_checkpoint) {
-            this.playerController.respawnAtCheckpoint();
+            this.playerController.takeDamage();
         }
     }
 
@@ -642,6 +683,121 @@ class GameScene extends Phaser.Scene {
         this.starsCollected++;
         SoundManager.play('collectStar');
         this.hudManager.updateStarCount(this.starsCollected, this.totalStars);
+    }
+
+    // ==================== VIDAS E GAME OVER ====================
+
+    onPlayerDied() {
+        const pc = this.playerController;
+        pc.isRespawning = true;
+        pc.player.body.enable = false;
+        pc.player.setTint(GC.RESPAWN.HURT_TINT);
+
+        SoundManager.play('death');
+
+        this.tweens.add({
+            targets: pc.player,
+            alpha: 0,
+            y: pc.player.y - 40,
+            duration: 600,
+            ease: 'Sine.easeIn',
+            onComplete: () => {
+                const remainingLives = GameData.loseLife();
+                this.hudManager.updateLives(remainingLives);
+
+                if (remainingLives <= 0) {
+                    this.showGameOverScreen();
+                } else {
+                    this.showLostLifeMessage(remainingLives);
+                }
+            }
+        });
+    }
+
+    showLostLifeMessage(remainingLives) {
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
+
+        const overlay = this.add.rectangle(centerX, centerY, 640, 400, 0x000000, 0.75)
+            .setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY);
+
+        const title = this.add.text(centerX, centerY - 30, `💀 -1 VIDA`, {
+            fontSize: '28px', fontFamily: 'Arial', color: '#ff4444',
+            stroke: '#000000', strokeThickness: 4
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
+
+        const sub = this.add.text(centerX, centerY + 15, `Vidas restantes: ${remainingLives}`, {
+            fontSize: '18px', fontFamily: 'Arial', color: '#ffffff',
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
+
+        this.time.delayedCall(2000, () => {
+            overlay.destroy();
+            title.destroy();
+            sub.destroy();
+            this._restartLevel();
+        });
+    }
+
+    _restartLevel() {
+        this.scene.restart({ level: this.currentLevel });
+    }
+
+    showGameOverScreen() {
+        this.currentView = 'gameover';
+
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
+
+        const overlay = this.add.rectangle(centerX, centerY, 640, 400, 0x000000, 0.9)
+            .setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY);
+        this.overlayElements.push(overlay);
+
+        const title = this.add.text(centerX, centerY - 50, 'GAME OVER', {
+            fontSize: '40px', fontFamily: 'Arial', color: '#ff0000',
+            stroke: '#000000', strokeThickness: 5
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
+        this.overlayElements.push(title);
+
+        const currentWorld = GameData.getCurrentWorld ? GameData.getCurrentWorld() : null;
+        const worldName = currentWorld ? currentWorld.name : '';
+        const desc = this.add.text(centerX, centerY, `Progresso do ${worldName} perdido`, {
+            fontSize: '16px', fontFamily: 'Arial', color: '#aaaaaa',
+            stroke: '#000000', strokeThickness: 2
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
+        this.overlayElements.push(desc);
+
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const continueLabel = isMobile ? 'Pressione O' : 'ENTER';
+        const hint = this.add.text(centerX, centerY + 50, `${continueLabel} para voltar ao mapa`, {
+            fontSize: '14px', fontFamily: 'Arial', color: '#ffffff',
+            stroke: '#000000', strokeThickness: 2
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
+        this.overlayElements.push(hint);
+
+        const handleGameOver = () => {
+            const world = GameData.getCurrentWorld ? GameData.getCurrentWorld() : null;
+            if (world) {
+                GameData.resetWorldProgress(world.id);
+            }
+            this.scene.start('WorldMapScene');
+        };
+
+        this.time.delayedCall(1500, () => {
+            this.input.keyboard.once('keydown-ENTER', handleGameOver);
+            this.input.keyboard.once('keydown-SPACE', handleGameOver);
+
+            this.time.addEvent({
+                delay: 100,
+                loop: true,
+                callback: () => {
+                    if (this.virtualControls.jumpJustPressed) {
+                        this.virtualControls.jumpJustPressed = false;
+                        handleGameOver();
+                    }
+                }
+            });
+        });
     }
 
     // ==================== CLEANUP ====================

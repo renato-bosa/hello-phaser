@@ -24,6 +24,10 @@ class PlayerController {
         this.isInWater = false;
         this.wasInWaterPrev = false;
         this.justEnteredWater = false;
+
+        this.hearts = GC.HEARTS.MAX;
+        this.isInvincible = false;
+        this.invincibleUntil = 0;
     }
 
     create() {
@@ -50,6 +54,17 @@ class PlayerController {
         const player = this.player;
         const scene = this.scene;
         const onGround = player.body.blocked.down;
+        const currentTime = scene.time.now;
+
+        if (this.isInvincible) {
+            if (currentTime >= this.invincibleUntil) {
+                this.isInvincible = false;
+                this.player.clearTint();
+                this.player.setAlpha(1);
+            } else {
+                this.player.setAlpha(Math.sin(currentTime * 0.015) > 0 ? 1 : 0.3);
+            }
+        }
 
         // --- Detecção de água ---
         const inWater = this.isInWater || false;
@@ -280,12 +295,29 @@ class PlayerController {
         }
     }
 
-    // --- Respawn ---
+    // --- Dano e Respawn ---
+
+    takeDamage() {
+        if (this.isRespawning || this.isInvincible) return;
+
+        this.hearts--;
+        this.scene.hudManager.updateHearts(this.hearts);
+        SoundManager.play('damage');
+
+        if (this.hearts <= 0) {
+            this.scene.onPlayerDied();
+            return;
+        }
+
+        this.isInvincible = true;
+        this.invincibleUntil = this.scene.time.now + GC.HEARTS.INVINCIBILITY_MS;
+
+        this.respawnAtCheckpoint();
+    }
 
     respawnAtCheckpoint() {
         if (this.isRespawning) return;
         this.isRespawning = true;
-        SoundManager.play('damage');
 
         const player = this.player;
         player.body.enable = false;

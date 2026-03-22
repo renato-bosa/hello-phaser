@@ -122,6 +122,15 @@ const GC = {
         BODY_OFFSET_Y: 4,
     },
 
+    HEARTS: {
+        MAX: 3,
+        INVINCIBILITY_MS: 1500,
+    },
+
+    LIVES: {
+        INITIAL: 5,
+    },
+
     DEPTH: {
         PLAYER: 10,
         FG_DECORATION: 5,

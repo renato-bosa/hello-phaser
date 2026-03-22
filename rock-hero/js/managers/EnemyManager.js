@@ -164,8 +164,7 @@ class EnemyManager {
             this._killEnemy(enemy);
             player.setVelocityY(GC.PLAYER.STOMP_BOUNCE);
         } else if (!this.scene.playerController.isRespawning) {
-            SoundManager.play('death');
-            this.scene.playerController.respawnAtCheckpoint();
+            this.scene.playerController.takeDamage();
         }
     }
 

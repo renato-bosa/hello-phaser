@@ -481,7 +481,8 @@ const GameData = {
             unlockedCharacters: ['vocalista'],
             selectedCharacter: 'vocalista',
             mapPosition: { worldId: 1, levelIndex: 0 },
-            bestTimes: {} // { levelIndex: time }
+            bestTimes: {}, // { levelIndex: time }
+            lives: 5
         };
     },
 
@@ -1204,6 +1205,71 @@ const GameData = {
 
     isWorldComplete(worldId) {
         return this.getCompletedWorlds().includes(worldId);
+    },
+
+    getCurrentWorld() {
+        const slotId = this.getActiveSlot();
+        if (!slotId) return this.WORLDS[0];
+        const slot = this.getSlot(slotId);
+        const worldId = slot?.mapPosition?.worldId || 1;
+        return this.WORLDS.find(w => w.id === worldId) || this.WORLDS[0];
+    },
+
+    // ==================== VIDAS ====================
+
+    getLives() {
+        const slotId = this.getActiveSlot();
+        if (!slotId) return GC.LIVES.INITIAL;
+        const slot = this.getSlot(slotId);
+        if (!slot) return GC.LIVES.INITIAL;
+        return slot.lives ?? GC.LIVES.INITIAL;
+    },
+
+    setLives(count) {
+        const slotId = this.getActiveSlot();
+        if (!slotId) return;
+        const slot = this.getSlot(slotId);
+        if (!slot) return;
+        slot.lives = Math.max(0, count);
+        this.saveSlot(slotId, slot);
+    },
+
+    addLife() {
+        const lives = this.getLives();
+        this.setLives(lives + 1);
+        return lives + 1;
+    },
+
+    loseLife() {
+        const lives = this.getLives();
+        const newLives = Math.max(0, lives - 1);
+        this.setLives(newLives);
+        return newLives;
+    },
+
+    /**
+     * Reseta o progresso de um mundo: remove fases e o mundo de completedLevels/completedWorlds,
+     * reposiciona o cursor na primeira fase do mundo.
+     */
+    resetWorldProgress(worldId) {
+        const slotId = this.getActiveSlot();
+        if (!slotId) return;
+        const slot = this.getSlot(slotId);
+        if (!slot) return;
+
+        const world = this.WORLDS.find(w => w.id === worldId);
+        if (!world) return;
+
+        const worldLevelSet = new Set(world.levels);
+        slot.completedLevels = (slot.completedLevels || []).filter(l => !worldLevelSet.has(l));
+        slot.completedWorlds = (slot.completedWorlds || []).filter(w => w !== worldId);
+
+        slot.mapPosition = { worldId: worldId, levelIndex: world.levels[0] };
+
+        // Restaura vidas ao valor inicial
+        slot.lives = GC.LIVES.INITIAL;
+
+        this.saveSlot(slotId, slot);
     },
 
     /**

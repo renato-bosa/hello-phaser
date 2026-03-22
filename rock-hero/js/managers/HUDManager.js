@@ -1,6 +1,6 @@
 /**
  * HUDManager - Interface de gameplay
- * Responsável por: timer, melhor tempo, contador de estrelas, debug velocity
+ * Responsável por: timer, melhor tempo, contador de estrelas, corações, vidas, debug velocity
  */
 class HUDManager {
     constructor(scene) {
@@ -10,6 +10,8 @@ class HUDManager {
         this.starHUD = null;
         this.starText = null;
         this.debugVelocityText = null;
+        this.heartTexts = [];
+        this.livesText = null;
     }
 
     create() {
@@ -47,6 +49,9 @@ class HUDManager {
             }).setOrigin(0, 0.5);
             this.starHUD.add([starIcon, this.starText]);
         }
+
+        this._createHeartsDisplay();
+        this._createLivesDisplay();
 
         if (scene.physics.world.drawDebug) {
             this.debugVelocityText = scene.add.text(0, 0, '', {
@@ -98,6 +103,50 @@ class HUDManager {
                 duration: 100,
                 yoyo: true
             });
+        }
+    }
+
+    _createHeartsDisplay() {
+        const scene = this.scene;
+        const cam = scene.cameras.main;
+        const hearts = scene.playerController.hearts;
+        const maxHearts = GC.HEARTS.MAX;
+
+        this.heartTexts = [];
+        for (let i = 0; i < maxHearts; i++) {
+            const heartChar = i < hearts ? '❤️' : '🖤';
+            const ht = scene.add.text(cam.centerX - 30 + i * 22, 6, heartChar, {
+                fontSize: '16px',
+            }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(GC.DEPTH.HUD);
+            this.heartTexts.push(ht);
+        }
+    }
+
+    _createLivesDisplay() {
+        const scene = this.scene;
+        const cam = scene.cameras.main;
+        const lives = GameData.getLives();
+        this.livesText = scene.add.text(cam.centerX, 26, `x${lives}`, {
+            fontSize: '13px',
+            fontFamily: 'monospace',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 2
+        }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(GC.DEPTH.HUD).setAlpha(0.8);
+    }
+
+    updateHearts(current) {
+        const max = GC.HEARTS.MAX;
+        for (let i = 0; i < max; i++) {
+            if (this.heartTexts[i]) {
+                this.heartTexts[i].setText(i < current ? '❤️' : '🖤');
+            }
+        }
+    }
+
+    updateLives(count) {
+        if (this.livesText) {
+            this.livesText.setText(`x${count}`);
         }
     }
 

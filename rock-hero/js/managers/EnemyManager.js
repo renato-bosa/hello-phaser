@@ -1,0 +1,187 @@
+/**
+ * EnemyManager - Gerencia inimigos (sapos)
+ * Responsável por: criação, patrulha, pulo, colisão e morte de inimigos
+ */
+class EnemyManager {
+    constructor(scene) {
+        this.scene = scene;
+        this.enemies = null;
+    }
+
+    create(enemyData) {
+        this.enemies = this.scene.physics.add.group();
+
+        enemyData.forEach(e => {
+            if (e.type === 'sapo-verde') {
+                this._createSapoVerde(e.x, e.y);
+            } else if (e.type === 'sapo') {
+                this._createSapo(e.x, e.y);
+            }
+        });
+    }
+
+    _createSapo(x, y) {
+        const scene = this.scene;
+        const sapo = scene.physics.add.sprite(x, y, 'sapo-tomate');
+
+        sapo.body.setSize(GC.ENEMY.BODY_WIDTH, GC.ENEMY.BODY_HEIGHT);
+        sapo.body.setOffset(GC.ENEMY.BODY_OFFSET_X, 0);
+        sapo.body.allowGravity = true;
+        sapo.body.setCollideWorldBounds(true);
+
+        const cfg = GC.ENEMY.SAPO;
+        sapo.patrolData = {
+            startX: x,
+            leftLimit: x - cfg.PATROL_DISTANCE,
+            rightLimit: x + cfg.PATROL_DISTANCE,
+            speed: cfg.SPEED,
+            direction: 1,
+            lastJumpX: x,
+            jumpDistance: cfg.JUMP_DISTANCE,
+            jumpForce: cfg.JUMP_FORCE
+        };
+
+        sapo.setVelocityX(cfg.SPEED);
+
+        if (!scene.anims.exists('sapo-walk')) {
+            scene.anims.create({
+                key: 'sapo-walk',
+                frames: scene.anims.generateFrameNumbers('sapo-tomate', { start: 0, end: 5 }),
+                frameRate: cfg.ANIM_FPS,
+                repeat: -1
+            });
+        }
+        sapo.anims.play('sapo-walk', true);
+        this.enemies.add(sapo);
+    }
+
+    _createSapoVerde(x, y) {
+        const scene = this.scene;
+        const sapo = scene.physics.add.sprite(x, y, 'sapo-verde');
+
+        sapo.body.setSize(GC.ENEMY.BODY_WIDTH, GC.ENEMY.BODY_HEIGHT);
+        sapo.body.setOffset(GC.ENEMY.BODY_OFFSET_X, 0);
+        sapo.body.allowGravity = true;
+        sapo.body.setCollideWorldBounds(true);
+
+        const cfg = GC.ENEMY.SAPO_VERDE;
+        sapo.patrolData = {
+            type: 'sapo-verde',
+            startX: x,
+            startY: y,
+            speed: 0,
+            direction: 1,
+            jumpForce: cfg.JUMP_FORCE,
+            jumpInterval: cfg.JUMP_INTERVAL_MS,
+            lastJumpTime: 0
+        };
+
+        if (!scene.anims.exists('sapo-verde-idle')) {
+            scene.anims.create({
+                key: 'sapo-verde-idle',
+                frames: scene.anims.generateFrameNumbers('sapo-verde', { start: 0, end: 5 }),
+                frameRate: cfg.ANIM_FPS,
+                repeat: -1
+            });
+        }
+        sapo.anims.play('sapo-verde-idle', true);
+        this.enemies.add(sapo);
+    }
+
+    update(currentTime) {
+        if (!this.enemies) return;
+
+        const player = this.scene.playerController.player;
+
+        this.enemies.children.iterate(enemy => {
+            if (!enemy || !enemy.active || !enemy.patrolData) return;
+
+            const data = enemy.patrolData;
+            const onGround = enemy.body.blocked.down;
+
+            // Sapo verde: fica parado, só pula
+            if (data.type === 'sapo-verde') {
+                if (onGround && currentTime - data.lastJumpTime >= data.jumpInterval) {
+                    enemy.setVelocityY(data.jumpForce);
+                    data.lastJumpTime = currentTime;
+                }
+                enemy.setVelocityX(0);
+
+                if (player && player.active) {
+                    enemy.setFlipX(player.x < enemy.x);
+                }
+                return;
+            }
+
+            // Sapo tomate: patrulha + pula
+            const distanceFromLastJump = Math.abs(enemy.x - data.lastJumpX);
+            if (distanceFromLastJump >= data.jumpDistance && onGround) {
+                enemy.setVelocityY(data.jumpForce);
+                data.lastJumpX = enemy.x;
+            }
+
+            const margin = GC.ENEMY.MAP_EDGE_MARGIN;
+            const mapRightEdge = this.scene.map ? this.scene.map.widthInPixels - margin : 9999;
+
+            const hitRightWall = enemy.body.blocked.right || enemy.x >= mapRightEdge;
+            const hitLeftWall = enemy.body.blocked.left || enemy.x <= margin;
+
+            if (hitRightWall && data.direction === 1) {
+                data.direction = -1;
+                enemy.setVelocityX(data.speed * data.direction);
+                enemy.setFlipX(true);
+                data.rightLimit = Math.min(data.rightLimit, enemy.x - margin);
+            } else if (hitLeftWall && data.direction === -1) {
+                data.direction = 1;
+                enemy.setVelocityX(data.speed * data.direction);
+                enemy.setFlipX(false);
+                data.leftLimit = Math.max(data.leftLimit, enemy.x + margin);
+            } else if (enemy.x >= data.rightLimit && data.direction === 1) {
+                data.direction = -1;
+                enemy.setVelocityX(data.speed * data.direction);
+                enemy.setFlipX(true);
+            } else if (enemy.x <= data.leftLimit && data.direction === -1) {
+                data.direction = 1;
+                enemy.setVelocityX(data.speed * data.direction);
+                enemy.setFlipX(false);
+            }
+
+            if (Math.abs(enemy.body.velocity.x) < data.speed * 0.5 && onGround) {
+                enemy.setVelocityX(data.speed * data.direction);
+            }
+        });
+    }
+
+    handleCollision(player, enemy) {
+        if (!enemy || !enemy.active) return;
+
+        const playerBottom = player.body.bottom;
+        const enemyCenter = enemy.body.center.y;
+        const isStomping = player.body.velocity.y > 0 &&
+                           playerBottom <= enemyCenter + GC.PLAYER.STOMP_TOLERANCE;
+
+        if (isStomping) {
+            this._killEnemy(enemy);
+            player.setVelocityY(GC.PLAYER.STOMP_BOUNCE);
+        } else if (!this.scene.playerController.isRespawning) {
+            SoundManager.play('death');
+            this.scene.playerController.respawnAtCheckpoint();
+        }
+    }
+
+    _killEnemy(enemy) {
+        this.scene.tweens.add({
+            targets: enemy,
+            scaleY: 0.2,
+            scaleX: 1.3,
+            alpha: 0,
+            y: enemy.y + 16,
+            duration: GC.ENEMY.KILL_DURATION_MS,
+            ease: 'Power2',
+            onComplete: () => enemy.destroy()
+        });
+
+        enemy.body.enable = false;
+        SoundManager.play('damage');
+    }
+}

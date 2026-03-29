@@ -434,6 +434,24 @@
                  "width":32,
                  "x":2272,
                  "y":384
+                }, 
+                {
+                 "gid":41,
+                 "height":32,
+                 "id":25,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"vertical-move_downward_in_blocks",
+                         "type":"int",
+                         "value":7
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":1504,
+                 "y":576
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -442,7 +460,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":25,
+ "nextobjectid":26,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -851,6 +869,19 @@
          "imagewidth":32,
          "margin":0,
          "name":"gray-bricks",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":41,
+         "image":"spritesheets\/plataforma-deslisante-v.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"plataforma-deslisante-v",
          "spacing":0,
          "tilecount":1,
          "tileheight":32,

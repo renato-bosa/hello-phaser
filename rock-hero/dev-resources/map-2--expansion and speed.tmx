@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="90" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="25">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="90" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="26">
  <editorsettings>
   <export target="../assets/map-2--expansion and speed.json" format="json"/>
  </editorsettings>
@@ -117,6 +117,9 @@
  </tileset>
  <tileset firstgid="40" name="gray-bricks" tilewidth="32" tileheight="32" tilecount="1" columns="1">
   <image source="../assets/spritesheets/gray-bricks.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="41" name="plataforma-deslisante-v" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/plataforma-deslisante-v.png" width="32" height="32"/>
  </tileset>
  <layer id="5" name="bg" width="90" height="30">
   <data encoding="csv">
@@ -284,5 +287,10 @@
   <object id="22" gid="17" x="858" y="674" width="32" height="32"/>
   <object id="23" gid="17" x="1856" y="896" width="32" height="32"/>
   <object id="24" gid="11" x="2272" y="384" width="32" height="32"/>
+  <object id="25" gid="41" x="1504" y="576" width="32" height="32">
+   <properties>
+    <property name="vertical-move_downward_in_blocks" type="int" value="7"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

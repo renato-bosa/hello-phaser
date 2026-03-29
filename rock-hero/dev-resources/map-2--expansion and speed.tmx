@@ -119,7 +119,7 @@
   <image source="../assets/spritesheets/gray-bricks.png" width="32" height="32"/>
  </tileset>
  <tileset firstgid="41" name="plataforma-deslisante-v" tilewidth="32" tileheight="32" tilecount="1" columns="1">
-  <image source="../assets/spritesheets/plataforma-deslisante-v.png" width="32" height="32"/>
+  <image source="../assets/spritesheets/plataforma-deslizante-v.png" width="32" height="32"/>
  </tileset>
  <layer id="5" name="bg" width="90" height="30">
   <data encoding="csv">

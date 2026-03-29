@@ -28,8 +28,8 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 0,
@@ -156,8 +156,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 530,
-                "y": 570
+                "x": 512,
+                "y": 511
             }
         },
         "dev-resources/map-12.tmx#abstract-blue": {
@@ -271,8 +271,8 @@
             "scale": 0.722890625,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 320.2420836485464,
-                "y": 175.68356208797144
+                "x": 320.24208364854644,
+                "y": 176.37522965524693
             }
         },
         "dev-resources/map-15.tmx#abstract-blue": {
@@ -316,14 +316,14 @@
         },
         "dev-resources/map-16.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 289,
-                "y": 414
+                "x": 321,
+                "y": 1121
             }
         },
         "dev-resources/map-16.tmx#abstract-blue": {
@@ -387,8 +387,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1359,
-                "y": 478
+                "x": 1691,
+                "y": 279
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#abstract-blue": {
@@ -443,7 +443,8 @@
             "scaleInDock": 1
         },
         "dev-resources/map-2--expansion and speed.tmx#plataforma-deslisante-v": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "dev-resources/map-2--expansion and speed.tmx#red-bricks": {
             "scaleInDock": 1
@@ -473,8 +474,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1344,
-                "y": 479
+                "x": 1345,
+                "y": 481
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
@@ -582,8 +583,8 @@
             "scale": 0.75,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1440,
-                "y": 480.66666666666663
+                "x": 1440.6666666666665,
+                "y": 480.6666666666667
             }
         },
         "dev-resources/map-4--big-jumps.tmx#abstract-blue": {
@@ -650,7 +651,7 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 976,
+                "x": 977,
                 "y": 399
             }
         },
@@ -731,7 +732,7 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1120,
+                "x": 1121,
                 "y": 399
             }
         },
@@ -1020,7 +1021,7 @@
             "scale": 1.004921875,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 320.4229184482625,
+                "x": 319.92536733265956,
                 "y": 175.63554380782088
             }
         },
@@ -1256,15 +1257,15 @@
     "project": "rock-hero.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "dev-resources/map-3--desafio do luigi.tmx",
+        "dev-resources/map-4--big-jumps.tmx",
+        "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-6--caverna2.tmx",
+        "dev-resources/map-9.tmx",
+        "dev-resources/map-16.tmx",
+        "dev-resources/map-15.tmx",
         "dev-resources/map-10.tmx",
         "dev-resources/map-12.tmx",
-        "dev-resources/map-15.tmx",
-        "dev-resources/map-16.tmx",
-        "dev-resources/map-9.tmx",
-        "dev-resources/map-6--caverna2.tmx",
-        "dev-resources/map-5--caverna.tmx",
-        "dev-resources/map-4--big-jumps.tmx",
-        "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-2--expansion and speed.tmx",
         "dev-resources/map0-1.tmx",
         "dev-resources/map0-0.tmx"

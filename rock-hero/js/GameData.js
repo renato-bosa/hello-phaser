@@ -291,7 +291,7 @@ const GameData = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [10, 11], // 2 fases (map11, map12)
+            levels: [10, 11, 12], // 3 fases (map11, map12, map16)
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             // Visual no WorldMap (tema aquático)
@@ -438,7 +438,18 @@ const GameData = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 360, y: 210 },
-            connectsTo: []
+            connectsTo: [12]
+        },
+        { 
+            key: 'map16', 
+            file: 'assets/map-16.json',
+            name: 'Ascensão Abissal',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 500, y: 180 },
+            connectsTo: [],
+            features: { doubleJump: true, neonLineTrail: true }
         }
     ],
 

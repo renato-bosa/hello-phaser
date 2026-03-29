@@ -91,14 +91,14 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 652,
-                "y": 326
+                "x": 653,
+                "y": 325
             }
         },
         "dev-resources/map-11.tmx#abstract-blue": {
@@ -156,8 +156,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 512,
-                "y": 511
+                "x": 531,
+                "y": 569
             }
         },
         "dev-resources/map-12.tmx#abstract-blue": {
@@ -224,8 +224,8 @@
             "scale": 1.045,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 319.6172248803828,
-                "y": 176.0765550239235
+                "x": 320.0956937799043,
+                "y": 176.55502392344502
             }
         },
         "dev-resources/map-13.tmx#abstract-blue": {
@@ -265,6 +265,53 @@
             "scaleInDock": 1
         },
         "dev-resources/map-13.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx": {
+            "scale": 0.423046875,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 320.2954755309326,
+                "y": 176.10341643582638
+            }
+        },
+        "dev-resources/map-14.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-14.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
         "dev-resources/map-15.tmx": {
@@ -387,8 +434,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1691,
-                "y": 279
+                "x": 1323,
+                "y": 763
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#abstract-blue": {

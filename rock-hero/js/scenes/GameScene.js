@@ -173,6 +173,7 @@ class GameScene extends Phaser.Scene {
         const enemies = [];
         const speedBoosts = [];
         const extraLives = [];
+        const movingPlatforms = [];
 
         const gidToTilesetName = {};
         map.tilesets.forEach(ts => {
@@ -222,6 +223,20 @@ class GameScene extends Phaser.Scene {
                      tilesetName.includes('extra-life') || tilesetName.includes('extra_life')) {
                 extraLives.push({ x: obj.x + 16, y: obj.y - 16 });
             }
+            else if (tilesetName.includes('plataforma-deslisante') || tilesetName.includes('plataforma-deslizante') ||
+                     tilesetName.includes('plataforma-movel')) {
+                const objProps = {};
+                if (obj.properties) {
+                    obj.properties.forEach(p => { objProps[p.name] = p.value; });
+                }
+                movingPlatforms.push({
+                    x: obj.x + 16,
+                    y: obj.y - 16,
+                    textureKey: tilesetName,
+                    verticalBlocks: objProps['vertical-move_downward_in_blocks'] || 0,
+                    horizontalBlocks: objProps['horizontal-move_right_in_blocks'] || 0,
+                });
+            }
         });
 
         this.currentCheckpoint = this.playerSpawn;
@@ -233,6 +248,7 @@ class GameScene extends Phaser.Scene {
         this.createStars(stars);
         this.createSpeedBoosts(speedBoosts);
         this.createExtraLives(extraLives);
+        this.createMovingPlatforms(movingPlatforms);
         this.createWaterZones(map);
     }
 
@@ -325,6 +341,58 @@ class GameScene extends Phaser.Scene {
             alpha: 0,
             duration: 800,
             onComplete: () => text.destroy()
+        });
+    }
+
+    createMovingPlatforms(positions) {
+        this.movingPlatforms = this.physics.add.group();
+
+        positions.forEach(p => {
+            const vDist = p.verticalBlocks * 32;
+            const hDist = p.horizontalBlocks * 32;
+            const totalDist = Math.max(vDist, hDist);
+            if (totalDist <= 0) return;
+
+            const platform = this.movingPlatforms.create(p.x, p.y, p.textureKey);
+            platform.body.allowGravity = false;
+            platform.body.immovable = true;
+            platform.body.setSize(32, 6);
+            platform.body.setOffset(0, 26);
+            platform.body.checkCollision.down = false;
+            platform.body.checkCollision.left = false;
+            platform.body.checkCollision.right = false;
+
+            const periodMs = 2 * totalDist / GC.MOVING_PLATFORM.SPEED * 1000;
+
+            platform.moveData = {
+                startX: p.x,
+                startY: p.y,
+                distanceY: vDist,
+                distanceX: hDist,
+                phase: 0,
+                periodMs: periodMs,
+            };
+        });
+    }
+
+    updateMovingPlatforms(delta) {
+        if (!this.movingPlatforms) return;
+
+        this.movingPlatforms.children.iterate(platform => {
+            if (!platform || !platform.active || !platform.moveData) return;
+
+            const data = platform.moveData;
+            const omega = (2 * Math.PI) / data.periodMs;
+
+            data.phase += omega * delta;
+            if (data.phase >= 2 * Math.PI) data.phase -= 2 * Math.PI;
+
+            if (data.distanceY > 0) {
+                platform.body.velocity.y = (data.distanceY / 2) * omega * Math.sin(data.phase) * 1000;
+            }
+            if (data.distanceX > 0) {
+                platform.body.velocity.x = (data.distanceX / 2) * omega * Math.sin(data.phase) * 1000;
+            }
         });
     }
 
@@ -524,6 +592,10 @@ class GameScene extends Phaser.Scene {
                 (p, item) => this.collectExtraLife(p, item), null, this);
         }
 
+        if (this.movingPlatforms && this.movingPlatforms.children.size > 0) {
+            this.physics.add.collider(player, this.movingPlatforms);
+        }
+
         this.checkpoints.forEach(flag => {
             this.physics.add.overlap(player, flag, () => {
                 if (!flag.activated) {
@@ -588,6 +660,7 @@ class GameScene extends Phaser.Scene {
             this.pauseMenu.show();
         }
 
+        this.updateMovingPlatforms(delta);
         this.hudManager.updateTimer(this.time.now);
         this.playerController.update(delta);
         this.hudManager.updateDebugVelocity();

@@ -122,6 +122,10 @@ const GC = {
         BODY_OFFSET_Y: 4,
     },
 
+    MOVING_PLATFORM: {
+        SPEED: 80,
+    },
+
     HEARTS: {
         MAX: 3,
         INVINCIBILITY_MS: 1500,

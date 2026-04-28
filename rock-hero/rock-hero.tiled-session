@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map-16.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -97,8 +97,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 653,
-                "y": 325
+                "x": 800,
+                "y": 303
             }
         },
         "dev-resources/map-11.tmx#abstract-blue": {
@@ -156,8 +156,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 531,
-                "y": 569
+                "x": 512,
+                "y": 511
             }
         },
         "dev-resources/map-12.tmx#abstract-blue": {
@@ -224,8 +224,8 @@
             "scale": 1.045,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 320.0956937799043,
-                "y": 176.55502392344502
+                "x": 319.6172248803828,
+                "y": 175.59808612440196
             }
         },
         "dev-resources/map-13.tmx#abstract-blue": {
@@ -271,8 +271,8 @@
             "scale": 0.423046875,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 320.2954755309326,
-                "y": 176.10341643582638
+                "x": 319.11357340720224,
+                "y": 176.10341643582643
             }
         },
         "dev-resources/map-14.tmx#abstract-blue": {
@@ -318,8 +318,8 @@
             "scale": 0.722890625,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 320.24208364854644,
-                "y": 176.37522965524693
+                "x": 319.5504160812709,
+                "y": 176.37522965524695
             }
         },
         "dev-resources/map-15.tmx#abstract-blue": {
@@ -367,10 +367,10 @@
                 8
             ],
             "scale": 0.33,
-            "selectedLayer": 0,
+            "selectedLayer": 4,
             "viewCenter": {
                 "x": 259.090909090909,
-                "y": 1512.121212121212
+                "y": 527.2727272727273
             }
         },
         "dev-resources/map-16.tmx#abstract-blue": {
@@ -418,6 +418,12 @@
         "dev-resources/map-16.tmx#lava-roxa-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-16.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-16.tmx#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-16.tmx#still-hero (2)": {
             "scaleInDock": 1
         },
@@ -434,8 +440,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1323,
-                "y": 763
+                "x": 1440,
+                "y": 479
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#abstract-blue": {

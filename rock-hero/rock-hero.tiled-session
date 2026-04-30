@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-16.tmx",
+    "activeFile": "dev-resources/map-12.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -28,8 +28,8 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.75,
             "selectedLayer": 0,
@@ -91,14 +91,14 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 800,
-                "y": 303
+                "x": 801,
+                "y": 302
             }
         },
         "dev-resources/map-11.tmx#abstract-blue": {
@@ -156,9 +156,12 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 512,
-                "y": 511
+                "x": 263,
+                "y": 510
             }
+        },
+        "dev-resources/map-12.tmx#Cavalo marinho": {
+            "scaleInDock": 1
         },
         "dev-resources/map-12.tmx#abstract-blue": {
             "scaleInDock": 1
@@ -224,8 +227,8 @@
             "scale": 1.045,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 319.6172248803828,
-                "y": 175.59808612440196
+                "x": 320.0956937799043,
+                "y": 176.07655502392345
             }
         },
         "dev-resources/map-13.tmx#abstract-blue": {
@@ -271,8 +274,8 @@
             "scale": 0.423046875,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 319.11357340720224,
-                "y": 176.10341643582643
+                "x": 317.93167128347187,
+                "y": 174.92151431209606
             }
         },
         "dev-resources/map-14.tmx#abstract-blue": {
@@ -318,8 +321,8 @@
             "scale": 0.722890625,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 319.5504160812709,
-                "y": 176.37522965524695
+                "x": 318.85874851399547,
+                "y": 175.68356208797144
             }
         },
         "dev-resources/map-15.tmx#abstract-blue": {
@@ -363,8 +366,8 @@
         },
         "dev-resources/map-16.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.33,
             "selectedLayer": 4,
@@ -440,8 +443,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1440,
-                "y": 479
+                "x": 1441,
+                "y": 478
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#abstract-blue": {
@@ -1309,13 +1312,13 @@
     "property.type": "int",
     "recentFiles": [
         "dev-resources/map-10.tmx",
-        "dev-resources/map-12.tmx",
-        "dev-resources/map-2--expansion and speed.tmx",
-        "dev-resources/map-11.tmx",
-        "dev-resources/map-13.tmx",
-        "dev-resources/map-14.tmx",
-        "dev-resources/map-15.tmx",
         "dev-resources/map-16.tmx",
+        "dev-resources/map-15.tmx",
+        "dev-resources/map-14.tmx",
+        "dev-resources/map-13.tmx",
+        "dev-resources/map-11.tmx",
+        "dev-resources/map-2--expansion and speed.tmx",
+        "dev-resources/map-12.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-4--big-jumps.tmx",
         "dev-resources/map-5--caverna.tmx",

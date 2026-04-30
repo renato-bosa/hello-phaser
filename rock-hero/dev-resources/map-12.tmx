@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="106">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="107">
  <editorsettings>
   <export target="../assets/map-12.json" format="json"/>
  </editorsettings>
@@ -110,6 +110,9 @@
  </tileset>
  <tileset firstgid="42" name="sapo-verde-6fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
   <image source="../assets/spritesheets/sapo-verde-6fps.png" width="64" height="96"/>
+ </tileset>
+ <tileset firstgid="48" name="Cavalo marinho" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/Cavalo marinho.png" width="64" height="96"/>
  </tileset>
  <layer id="5" name="bg" width="32" height="32">
   <data encoding="csv">
@@ -257,5 +260,6 @@
   <object id="103" gid="42" x="320" y="512" width="32" height="32"/>
   <object id="104" gid="42" x="768" y="512" width="32" height="32"/>
   <object id="105" gid="42" x="288" y="224" width="32" height="32"/>
+  <object id="106" gid="48" x="192" y="864" width="32" height="32"/>
  </objectgroup>
 </map>

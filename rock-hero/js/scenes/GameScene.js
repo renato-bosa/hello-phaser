@@ -45,6 +45,24 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('sapo-verde', GameData.assetUrl('assets/spritesheets/sapo-verde-6fps.png'), {
             frameWidth: 32, frameHeight: 32
         });
+        this.load.spritesheet('seahorse', GameData.assetUrl('assets/spritesheets/Cavalo marinho.png'), {
+            frameWidth: 32, frameHeight: 32
+        });
+    }
+
+    _ensureBubbleTexture() {
+        if (this.textures.exists('seahorse-bubble')) return;
+        const size = GC.BUBBLE.SIZE;
+        const r = size / 2 - 1;
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+        g.fillStyle(0xaaeeff, 0.85);
+        g.fillCircle(size / 2, size / 2, r);
+        g.lineStyle(1, 0xffffff, 0.9);
+        g.strokeCircle(size / 2, size / 2, r);
+        g.fillStyle(0xffffff, 0.7);
+        g.fillCircle(size / 2 - 2, size / 2 - 2, 2);
+        g.generateTexture('seahorse-bubble', size, size);
+        g.destroy();
     }
 
     /**
@@ -85,6 +103,7 @@ class GameScene extends Phaser.Scene {
         const levelConfig = GameData.LEVELS[this.currentLevel];
         GameData.levelFeatureOverrides = levelConfig.features || null;
 
+        this._ensureBubbleTexture();
         this.createMap();
 
         this.playerController = new PlayerController(this);
@@ -211,6 +230,15 @@ class GameScene extends Phaser.Scene {
                     x: obj.x + 16,
                     y: obj.y - 16,
                     type: isSapoVerde ? 'sapo-verde' : 'sapo'
+                });
+            }
+            else if (type === 'seahorse' ||
+                     tilesetName.includes('cavalo marinho') || tilesetName.includes('cavalo-marinho') ||
+                     tilesetName.includes('seahorse')) {
+                enemies.push({
+                    x: obj.x + 16,
+                    y: obj.y - 16,
+                    type: 'seahorse'
                 });
             }
             else if (type === 'speed_boost' || type === 'boost' ||
@@ -580,6 +608,13 @@ class GameScene extends Phaser.Scene {
             this.physics.add.collider(this.enemyManager.enemies, this.solidsLayer);
             this.physics.add.overlap(player, this.enemyManager.enemies,
                 (p, e) => this.enemyManager.handleCollision(p, e), null, this);
+        }
+
+        if (this.enemyManager.bubbles) {
+            this.physics.add.collider(this.enemyManager.bubbles, this.solidsLayer,
+                (b) => this.enemyManager.handleBubbleHitTile(b), null, this);
+            this.physics.add.overlap(player, this.enemyManager.bubbles,
+                (p, b) => this.enemyManager.handleBubbleHitPlayer(p, b), null, this);
         }
 
         if (this.speedBoosts && this.speedBoosts.children.size > 0) {

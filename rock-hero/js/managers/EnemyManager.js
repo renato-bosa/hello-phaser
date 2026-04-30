@@ -6,16 +6,20 @@ class EnemyManager {
     constructor(scene) {
         this.scene = scene;
         this.enemies = null;
+        this.bubbles = null;
     }
 
     create(enemyData) {
         this.enemies = this.scene.physics.add.group();
+        this.bubbles = this.scene.physics.add.group();
 
         enemyData.forEach(e => {
             if (e.type === 'sapo-verde') {
                 this._createSapoVerde(e.x, e.y);
             } else if (e.type === 'sapo') {
                 this._createSapo(e.x, e.y);
+            } else if (e.type === 'seahorse') {
+                this._createSeahorse(e.x, e.y);
             }
         });
     }
@@ -88,6 +92,70 @@ class EnemyManager {
         this.enemies.add(sapo);
     }
 
+    _createSeahorse(x, y) {
+        const scene = this.scene;
+        const cfg = GC.ENEMY.SEAHORSE;
+        const seahorse = scene.physics.add.sprite(x, y, 'seahorse');
+
+        seahorse.body.setSize(cfg.BODY_WIDTH, cfg.BODY_HEIGHT);
+        seahorse.body.setOffset(cfg.BODY_OFFSET_X, cfg.BODY_OFFSET_Y);
+        seahorse.body.allowGravity = false;
+        seahorse.body.immovable = true;
+
+        seahorse.patrolData = { type: 'seahorse' };
+
+        if (!scene.anims.exists('seahorse-idle')) {
+            scene.anims.create({
+                key: 'seahorse-idle',
+                frames: scene.anims.generateFrameNumbers('seahorse', { start: 0, end: 4 }),
+                frameRate: cfg.ANIM_FPS,
+                repeat: -1
+            });
+        }
+        seahorse.anims.play('seahorse-idle', true);
+
+        seahorse.on('animationupdate', (anim, frame) => {
+            if (anim.key !== 'seahorse-idle') return;
+            if (frame.index === cfg.BUBBLE_FRAME_INDEX) {
+                this._spawnSeahorseBubble(seahorse);
+            }
+        });
+
+        this.enemies.add(seahorse);
+    }
+
+    _spawnSeahorseBubble(seahorse) {
+        if (!seahorse.active) return;
+        const cfg = GC.ENEMY.SEAHORSE;
+        const facingLeft = !seahorse.flipX;
+        const dir = facingLeft ? -1 : 1;
+        const x = seahorse.x + dir * cfg.MUZZLE_OFFSET_X;
+        const y = seahorse.y + cfg.MUZZLE_OFFSET_Y;
+
+        const bubble = this.bubbles.create(x, y, 'seahorse-bubble');
+        bubble.body.allowGravity = false;
+        bubble.body.setCircle(GC.BUBBLE.BODY_RADIUS,
+            GC.BUBBLE.SIZE / 2 - GC.BUBBLE.BODY_RADIUS,
+            GC.BUBBLE.SIZE / 2 - GC.BUBBLE.BODY_RADIUS);
+        bubble.setVelocityX(dir * GC.BUBBLE.SPEED);
+
+        this.scene.time.delayedCall(GC.BUBBLE.LIFETIME_MS, () => {
+            if (bubble && bubble.active) bubble.destroy();
+        });
+    }
+
+    handleBubbleHitTile(bubble) {
+        if (bubble && bubble.active) bubble.destroy();
+    }
+
+    handleBubbleHitPlayer(player, bubble) {
+        if (!bubble || !bubble.active) return;
+        bubble.destroy();
+        if (!this.scene.playerController.isRespawning) {
+            this.scene.playerController.takeDamage();
+        }
+    }
+
     update(currentTime) {
         if (!this.enemies) return;
 
@@ -109,6 +177,14 @@ class EnemyManager {
 
                 if (player && player.active) {
                     enemy.setFlipX(player.x < enemy.x);
+                }
+                return;
+            }
+
+            // Cavalo marinho: fica parado, vira pra direção do player e cospe bolhas
+            if (data.type === 'seahorse') {
+                if (player && player.active) {
+                    enemy.setFlipX(player.x > enemy.x);
                 }
                 return;
             }
@@ -155,15 +231,22 @@ class EnemyManager {
     handleCollision(player, enemy) {
         if (!enemy || !enemy.active) return;
 
-        const playerBottom = player.body.bottom;
-        const enemyCenter = enemy.body.center.y;
-        const isStomping = player.body.velocity.y > 0 &&
-                           playerBottom <= enemyCenter + GC.PLAYER.STOMP_TOLERANCE;
+        const isStompable = enemy.patrolData?.type !== 'seahorse';
 
-        if (isStomping) {
-            this._killEnemy(enemy);
-            player.setVelocityY(GC.PLAYER.STOMP_BOUNCE);
-        } else if (!this.scene.playerController.isRespawning) {
+        if (isStompable) {
+            const playerBottom = player.body.bottom;
+            const enemyCenter = enemy.body.center.y;
+            const isStomping = player.body.velocity.y > 0 &&
+                               playerBottom <= enemyCenter + GC.PLAYER.STOMP_TOLERANCE;
+
+            if (isStomping) {
+                this._killEnemy(enemy);
+                player.setVelocityY(GC.PLAYER.STOMP_BOUNCE);
+                return;
+            }
+        }
+
+        if (!this.scene.playerController.isRespawning) {
             this.scene.playerController.takeDamage();
         }
     }

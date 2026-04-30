@@ -72,6 +72,23 @@ const GC = {
             JUMP_INTERVAL_MS: 1500,
             ANIM_FPS: 6,
         },
+        SEAHORSE: {
+            BODY_WIDTH: 22,
+            BODY_HEIGHT: 30,
+            BODY_OFFSET_X: 5,
+            BODY_OFFSET_Y: 1,
+            ANIM_FPS: 4,
+            BUBBLE_FRAME_INDEX: 3,
+            MUZZLE_OFFSET_X: 12,
+            MUZZLE_OFFSET_Y: -4,
+        },
+    },
+
+    BUBBLE: {
+        SIZE: 16,
+        BODY_RADIUS: 6,
+        SPEED: 140,
+        LIFETIME_MS: 4000,
     },
 
     TRAIL: {

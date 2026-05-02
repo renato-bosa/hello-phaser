@@ -797,28 +797,79 @@ class GameScene extends Phaser.Scene {
 
     onPlayerDied() {
         const pc = this.playerController;
+        const player = pc.player;
         pc.isRespawning = true;
-        pc.player.body.enable = false;
-        pc.player.setTint(GC.RESPAWN.HURT_TINT);
+        player.body.enable = false;
+        player.anims.stop();
+        player.setVelocity(0, 0);
+        player.setDepth(GC.DEPTH.PLAYER + 5);
 
         SoundManager.play('death');
 
-        this.tweens.add({
-            targets: pc.player,
-            alpha: 0,
-            y: pc.player.y - 40,
-            duration: 600,
-            ease: 'Sine.easeIn',
-            onComplete: () => {
-                const remainingLives = GameData.loseLife();
-                this.hudManager.updateLives(remainingLives);
+        // 1. Flash branco + tremor de câmera (impacto)
+        if (player.setTintFill) {
+            player.setTintFill(0xffffff);
+        } else {
+            player.setTint(0xffffff);
+        }
+        this.cameras.main.shake(140, 0.012);
 
-                if (remainingLives <= 0) {
-                    this.showGameOverScreen();
-                } else {
-                    this.showLostLifeMessage(remainingLives);
+        const startX = player.x;
+        const startY = player.y;
+
+        // 2. Burst de estrelinhas em volta
+        for (let i = 0; i < 10; i++) {
+            const angle = (Math.PI * 2 / 10) * i + Phaser.Math.FloatBetween(-0.2, 0.2);
+            const dist = Phaser.Math.Between(45, 80);
+            const star = this.add.text(startX, startY, '⭐', {
+                fontSize: '16px',
+            }).setOrigin(0.5).setDepth(GC.DEPTH.PLAYER + 6);
+            this.tweens.add({
+                targets: star,
+                x: startX + Math.cos(angle) * dist,
+                y: startY + Math.sin(angle) * dist,
+                alpha: 0,
+                scale: { from: 1.3, to: 0.3 },
+                angle: Phaser.Math.Between(-360, 360),
+                duration: 650,
+                ease: 'Cubic.easeOut',
+                onComplete: () => star.destroy()
+            });
+        }
+
+        // 3. Após flash, vira tom de dano e inicia hop + spin
+        this.time.delayedCall(90, () => {
+            player.setTint(GC.RESPAWN.HURT_TINT);
+
+            // Hop dramático para cima girando
+            this.tweens.add({
+                targets: player,
+                y: startY - 110,
+                angle: 360,
+                duration: 380,
+                ease: 'Cubic.easeOut',
+                onComplete: () => {
+                    // Queda com aceleração + continua girando + fade
+                    this.tweens.add({
+                        targets: player,
+                        y: startY + 320,
+                        angle: player.angle + 540,
+                        alpha: 0,
+                        duration: 620,
+                        ease: 'Cubic.easeIn',
+                        onComplete: () => {
+                            const remainingLives = GameData.loseLife();
+                            this.hudManager.updateLives(remainingLives);
+
+                            if (remainingLives <= 0) {
+                                this.showGameOverScreen();
+                            } else {
+                                this.showLostLifeMessage(remainingLives);
+                            }
+                        }
+                    });
                 }
-            }
+            });
         });
     }
 
@@ -898,50 +949,73 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0.5).setScrollFactor(0).setDepth(DEPTH).setAlpha(0);
         this.tweens.add({ targets: subLabel, alpha: 1, duration: 250, delay: 500 });
 
-        // Notas musicais para representar vidas
-        const noteIcons = [];
-        const totalToShow = remainingLives + 1;
-        const spacing = 28;
-        const startX = centerX - ((totalToShow - 1) * spacing) / 2;
-        for (let i = 0; i < totalToShow; i++) {
-            const isLost = (i === totalToShow - 1);
-            const note = this.add.text(startX + i * spacing, centerY + 95, '🎵', {
-                fontSize: '24px',
-            }).setOrigin(0.5).setScrollFactor(0).setDepth(DEPTH).setAlpha(0).setScale(0);
-            noteIcons.push(note);
-            this.tweens.add({
-                targets: note,
-                alpha: 1,
-                scale: 1,
-                duration: 200,
-                delay: 600 + i * 80,
-                ease: 'Back.easeOut',
-                onComplete: () => {
-                    if (!isLost) return;
-                    this.tweens.add({
-                        targets: note,
-                        scale: { from: 1, to: 1.5 },
-                        duration: 120,
-                        yoyo: true,
-                        ease: 'Sine.easeInOut',
-                        onComplete: () => {
-                            note.setText('🎶');
-                            note.setTint(0x666666);
-                            this.tweens.add({
-                                targets: note,
-                                alpha: 0.2,
-                                angle: -25,
-                                y: note.y + 8,
-                                duration: 350,
-                                ease: 'Cubic.easeIn'
-                            });
-                        }
-                    });
-                }
-            });
-        }
+        // Vidas: x[N] 🎵 (com transição animada do contador)
+        const counterY = centerY + 105;
+        const counterText = this.add.text(0, 0, `x${remainingLives + 1}`, {
+            fontSize: '20px', fontFamily: FONT, color: '#ffffff',
+            stroke: '#000000', strokeThickness: 4
+        }).setOrigin(1, 0.5).setScrollFactor(0).setDepth(DEPTH).setAlpha(0);
 
-        const elements = [overlay, heart, title, subLabel, ...noteIcons];
+        const note = this.add.text(0, 0, '🎵', {
+            fontSize: '48px',
+        }).setOrigin(0, 0.5).setScrollFactor(0).setDepth(DEPTH).setAlpha(0);
+
+        // Posiciona o grupo (multiplicador + nota) centralizado
+        const gap = 10;
+        const totalWidth = counterText.width + gap + note.width;
+        counterText.x = centerX - totalWidth / 2 + counterText.width;
+        note.x = counterText.x + gap;
+        counterText.y = counterY;
+        note.y = counterY;
+
+        // Aparição
+        this.tweens.add({
+            targets: [counterText, note],
+            alpha: 1,
+            duration: 250,
+            delay: 600,
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                // "-1" subindo do contador
+                const minusOne = this.add.text(counterText.x - counterText.width / 2, counterY - 8, '-1', {
+                    fontSize: '14px', fontFamily: FONT, color: '#ff4466',
+                    stroke: '#000000', strokeThickness: 3
+                }).setOrigin(0.5).setScrollFactor(0).setDepth(DEPTH).setAlpha(0);
+                this.tweens.add({
+                    targets: minusOne,
+                    alpha: { from: 1, to: 0 },
+                    y: counterY - 40,
+                    duration: 700,
+                    ease: 'Cubic.easeOut',
+                    onComplete: () => minusOne.destroy()
+                });
+
+                // Contador faz "tick down" com pulso e cor vermelha brevemente
+                this.tweens.add({
+                    targets: counterText,
+                    scale: { from: 1, to: 1.4 },
+                    duration: 140,
+                    yoyo: true,
+                    ease: 'Sine.easeInOut',
+                    onStart: () => {
+                        counterText.setText(`x${remainingLives}`);
+                        counterText.setColor('#ff4466');
+                    },
+                    onComplete: () => counterText.setColor('#ffffff')
+                });
+
+                // Nota balança junto, como se "ressoasse"
+                this.tweens.add({
+                    targets: note,
+                    scale: { from: 1, to: 1.25 },
+                    duration: 140,
+                    yoyo: true,
+                    ease: 'Sine.easeInOut'
+                });
+            }
+        });
+
+        const elements = [overlay, heart, title, subLabel, counterText, note];
 
         const dismiss = () => {
             if (!overlay.active) return;

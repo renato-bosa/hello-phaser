@@ -144,7 +144,7 @@ const GC = {
     },
 
     MUSHROOM: {
-        EFFECT_DURATION_MS: 15000,
+        EFFECT_DURATION_MS: 7000,
         FADE_OUT_MS: 800,
         SHADER_SPEED: 1.5,
         SHADER_AMPLITUDE: 0.025,

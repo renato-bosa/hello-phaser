@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-10.tmx",
+    "activeFile": "dev-resources/map-16.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -34,8 +34,8 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 755.3333333333333,
-                "y": 390.6666666666667
+                "x": 484,
+                "y": 391.33333333333326
             }
         },
         "dev-resources/map-10.tmx#Cavalo marinho": {
@@ -163,6 +163,9 @@
                 "y": 510
             }
         },
+        "dev-resources/map-12.tmx#1up": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-12.tmx#Cavalo marinho": {
             "scaleInDock": 1
         },
@@ -206,6 +209,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-12.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-12.tmx#mushroom-purple": {
             "scaleInDock": 1
         },
         "dev-resources/map-12.tmx#red-bricks": {
@@ -424,6 +430,9 @@
         "dev-resources/map-16.tmx#lava-roxa-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-16.tmx#mushroom-purple": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-16.tmx#sapo-tomate-6fps": {
             "scaleInDock": 1
         },
@@ -500,6 +509,9 @@
         "dev-resources/map-2--expansion and speed.tmx#lava-roxa-animated": {
             "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "dev-resources/map-2--expansion and speed.tmx#mushroom-purple": {
+            "scaleInDock": 1
         },
         "dev-resources/map-2--expansion and speed.tmx#pink-bricks": {
             "scaleInDock": 1
@@ -713,7 +725,7 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1007,
+                "x": 977,
                 "y": 398
             }
         },
@@ -1321,15 +1333,15 @@
     "project": "rock-hero.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "dev-resources/map-10.tmx",
+        "dev-resources/map-12.tmx",
+        "dev-resources/map-2--expansion and speed.tmx",
+        "dev-resources/map-11.tmx",
+        "dev-resources/map-13.tmx",
+        "dev-resources/map-14.tmx",
+        "dev-resources/map-15.tmx",
         "dev-resources/map-5--caverna.tmx",
         "dev-resources/map-16.tmx",
-        "dev-resources/map-15.tmx",
-        "dev-resources/map-14.tmx",
-        "dev-resources/map-13.tmx",
-        "dev-resources/map-11.tmx",
-        "dev-resources/map-2--expansion and speed.tmx",
-        "dev-resources/map-12.tmx",
-        "dev-resources/map-10.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-4--big-jumps.tmx",
         "dev-resources/map-6--caverna2.tmx"

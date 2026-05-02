@@ -556,6 +556,30 @@
                  "width":32,
                  "x":992,
                  "y":704
+                }, 
+                {
+                 "gid":54,
+                 "height":32,
+                 "id":109,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":544,
+                 "y":448
+                }, 
+                {
+                 "gid":55,
+                 "height":32,
+                 "id":110,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":288,
+                 "y":544
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -564,7 +588,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":109,
+ "nextobjectid":111,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -950,6 +974,32 @@
          "name":"Cavalo marinho",
          "spacing":0,
          "tilecount":6,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":54,
+         "image":"spritesheets\/mushroom-purple.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"mushroom-purple",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":55,
+         "image":"spritesheets\/1up.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"1up",
+         "spacing":0,
+         "tilecount":1,
          "tileheight":32,
          "tilewidth":32
         }],

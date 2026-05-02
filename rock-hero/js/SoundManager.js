@@ -176,6 +176,22 @@ const SoundManager = {
             slide: -200,
             sequence: [300, 200, 150, 100] // Descida dramática
         },
+        powerUp: {
+            // Som "trippy" para power-up cogumelo: arpejo ascendente longo + harmonia
+            type: 'square',
+            frequency: 440,
+            duration: 0.6,
+            volume: 0.4,
+            attack: 0.01,
+            decay: 0.5,
+            sequence: [440, 554.37, 659.25, 880, 1108.73, 1318.51, 1760],
+            vibratoDepth: 8,
+            vibratoSpeed: 12,
+            harmony: {
+                sequence: [659.25, 830.61, 987.77, 1318.51, 1661.22, 1975.53, 2637],
+                delayMs: 120
+            }
+        },
         speedBoost: {
             type: 'sawtooth',
             frequency: 200,

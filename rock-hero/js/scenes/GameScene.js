@@ -192,6 +192,7 @@ class GameScene extends Phaser.Scene {
         const enemies = [];
         const speedBoosts = [];
         const extraLives = [];
+        const mushrooms = [];
         const movingPlatforms = [];
 
         const gidToTilesetName = {};
@@ -251,6 +252,9 @@ class GameScene extends Phaser.Scene {
                      tilesetName.includes('extra-life') || tilesetName.includes('extra_life')) {
                 extraLives.push({ x: obj.x + 16, y: obj.y - 16, textureKey: tilesetName });
             }
+            else if (type === 'mushroom' || tilesetName.includes('mushroom') || tilesetName.includes('cogumelo')) {
+                mushrooms.push({ x: obj.x + 16, y: obj.y - 16, textureKey: tilesetName });
+            }
             else if (tilesetName.includes('plataforma-deslisante') || tilesetName.includes('plataforma-deslizante') ||
                      tilesetName.includes('plataforma-movel')) {
                 const objProps = {};
@@ -276,6 +280,7 @@ class GameScene extends Phaser.Scene {
         this.createStars(stars);
         this.createSpeedBoosts(speedBoosts);
         this.createExtraLives(extraLives);
+        this.createMushrooms(mushrooms);
         this.createMovingPlatforms(movingPlatforms);
         this.createWaterZones(map);
     }
@@ -379,6 +384,122 @@ class GameScene extends Phaser.Scene {
             alpha: 0,
             duration: 800,
             onComplete: () => text.destroy()
+        });
+    }
+
+    createMushrooms(positions) {
+        this.mushrooms = this.physics.add.staticGroup();
+        positions.forEach(pos => {
+            const hasTexture = pos.textureKey && this.textures.exists(pos.textureKey);
+            const item = hasTexture
+                ? this.mushrooms.create(pos.x, pos.y, pos.textureKey)
+                : this.mushrooms.create(pos.x, pos.y, 'star', 0).setTint(0xff66ff);
+
+            this.tweens.add({
+                targets: item,
+                y: pos.y - 4,
+                duration: 1100,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+        });
+    }
+
+    collectMushroom(player, item) {
+        item.disableBody(true, true);
+        SoundManager.play('powerUp');
+
+        const text = this.add.text(item.x, item.y - 20, 'TRIPPY!', {
+            fontSize: '14px', fontFamily: '"Press Start 2P", Arial', color: '#ff66ff',
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setDepth(GC.DEPTH.HUD);
+        this.tweens.add({
+            targets: text,
+            y: text.y - 30,
+            alpha: 0,
+            duration: 900,
+            onComplete: () => text.destroy()
+        });
+
+        this._activateOscillationEffect(GC.MUSHROOM.EFFECT_DURATION_MS);
+    }
+
+    _activateOscillationEffect(durationMs) {
+        const cam = this.cameras.main;
+        const renderer = this.game.renderer;
+
+        // Pipeline só funciona em WebGL
+        if (!renderer || !renderer.pipelines || typeof Phaser.Renderer.WebGL === 'undefined') return;
+
+        const PIPELINE_KEY = 'VerticalOscillationPipeline';
+
+        if (!renderer.pipelines.get(PIPELINE_KEY) && typeof VerticalOscillationPipeline !== 'undefined') {
+            renderer.pipelines.addPostPipeline(PIPELINE_KEY, VerticalOscillationPipeline);
+        }
+
+        // Cancela timer anterior caso ainda esteja ativo (re-coleta)
+        if (this._oscillationTimer) {
+            this._oscillationTimer.remove(false);
+            this._oscillationTimer = null;
+        }
+        if (this._oscillationFadeTween) {
+            this._oscillationFadeTween.stop();
+            this._oscillationFadeTween = null;
+        }
+
+        cam.setPostPipeline(PIPELINE_KEY);
+
+        const pipeline = cam.getPostPipeline(PIPELINE_KEY);
+        if (pipeline) {
+            const targetAmp = GC.MUSHROOM.SHADER_AMPLITUDE;
+            const targetHue = GC.MUSHROOM.SHADER_HUE_SPEED;
+            pipeline.speed = GC.MUSHROOM.SHADER_SPEED;
+            pipeline.frequency = GC.MUSHROOM.SHADER_FREQUENCY;
+            pipeline.amplitude = 0;
+            pipeline.hueSpeed = 0;
+
+            // Fade-in suave da amplitude e do hue cycling (~250ms)
+            this._oscillationFadeTween = this.tweens.addCounter({
+                from: 0,
+                to: 1,
+                duration: 250,
+                onUpdate: t => {
+                    const v = t.getValue();
+                    pipeline.amplitude = targetAmp * v;
+                    pipeline.hueSpeed = targetHue * v;
+                }
+            });
+        }
+
+        // Agenda fade-out + remoção ao final
+        const fadeMs = GC.MUSHROOM.FADE_OUT_MS;
+        const sustainMs = Math.max(0, durationMs - fadeMs);
+
+        this._oscillationTimer = this.time.delayedCall(sustainMs, () => {
+            const pipe = cam.getPostPipeline(PIPELINE_KEY);
+            if (pipe) {
+                const startAmp = pipe.amplitude;
+                const startHue = pipe.hueSpeed;
+                this._oscillationFadeTween = this.tweens.addCounter({
+                    from: 1,
+                    to: 0,
+                    duration: fadeMs,
+                    onUpdate: t => {
+                        const v = t.getValue();
+                        pipe.amplitude = startAmp * v;
+                        pipe.hueSpeed = startHue * v;
+                    },
+                    onComplete: () => {
+                        cam.removePostPipeline(PIPELINE_KEY);
+                        this._oscillationTimer = null;
+                        this._oscillationFadeTween = null;
+                    }
+                });
+            } else {
+                cam.removePostPipeline(PIPELINE_KEY);
+                this._oscillationTimer = null;
+            }
         });
     }
 
@@ -635,6 +756,11 @@ class GameScene extends Phaser.Scene {
         if (this.extraLives && this.extraLives.children.size > 0) {
             this.physics.add.overlap(player, this.extraLives,
                 (p, item) => this.collectExtraLife(p, item), null, this);
+        }
+
+        if (this.mushrooms && this.mushrooms.children.size > 0) {
+            this.physics.add.overlap(player, this.mushrooms,
+                (p, item) => this.collectMushroom(p, item), null, this);
         }
 
         if (this.movingPlatforms && this.movingPlatforms.children.size > 0) {
@@ -1121,6 +1247,18 @@ class GameScene extends Phaser.Scene {
 
     shutdown() {
         GameData.levelFeatureOverrides = null;
+
+        if (this._oscillationTimer) {
+            this._oscillationTimer.remove(false);
+            this._oscillationTimer = null;
+        }
+        if (this._oscillationFadeTween) {
+            this._oscillationFadeTween.stop();
+            this._oscillationFadeTween = null;
+        }
+        if (this.cameras && this.cameras.main) {
+            this.cameras.main.removePostPipeline('VerticalOscillationPipeline');
+        }
 
         this.keyListeners.forEach(key => {
             if (key && key.destroy) key.destroy();

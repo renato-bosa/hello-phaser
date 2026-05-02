@@ -143,6 +143,15 @@ const GC = {
         SPEED: 80,
     },
 
+    MUSHROOM: {
+        EFFECT_DURATION_MS: 15000,
+        FADE_OUT_MS: 800,
+        SHADER_SPEED: 1.5,
+        SHADER_AMPLITUDE: 0.025,
+        SHADER_FREQUENCY: 22.0,
+        SHADER_HUE_SPEED: 0.25, // Ciclos completos de matiz por segundo (0 = desliga)
+    },
+
     HEARTS: {
         MAX: 3,
         INVINCIBILITY_MS: 1500,

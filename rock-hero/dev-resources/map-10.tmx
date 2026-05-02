@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="29" height="19" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="84">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="29" height="19" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="85">
  <editorsettings>
   <export target="../assets/map.json" format="json"/>
  </editorsettings>
@@ -105,6 +105,9 @@
  <tileset firstgid="35" name="sapo-tomate-6fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
   <image source="../assets/spritesheets/sapo-tomate-6fps.png" width="64" height="96"/>
  </tileset>
+ <tileset firstgid="41" name="Cavalo marinho" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/Cavalo marinho.png" width="64" height="96"/>
+ </tileset>
  <layer id="5" name="bg" width="29" height="19">
   <data encoding="csv">
 19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,30,30,30,30,30,30,30,30,30,
@@ -200,5 +203,6 @@
   <object id="81" gid="20" x="544" y="64" width="32" height="32"/>
   <object id="82" gid="34" x="544" y="192" width="32" height="32"/>
   <object id="83" gid="35" x="448" y="576" width="32" height="32"/>
+  <object id="84" gid="41" x="800" y="544" width="32" height="32"/>
  </objectgroup>
 </map>

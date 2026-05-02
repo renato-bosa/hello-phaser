@@ -249,7 +249,7 @@ class GameScene extends Phaser.Scene {
             else if (type === '1up' || type === 'extra_life' ||
                      tilesetName.includes('1up') || tilesetName.includes('nota') ||
                      tilesetName.includes('extra-life') || tilesetName.includes('extra_life')) {
-                extraLives.push({ x: obj.x + 16, y: obj.y - 16 });
+                extraLives.push({ x: obj.x + 16, y: obj.y - 16, textureKey: tilesetName });
             }
             else if (tilesetName.includes('plataforma-deslisante') || tilesetName.includes('plataforma-deslizante') ||
                      tilesetName.includes('plataforma-movel')) {
@@ -346,15 +346,25 @@ class GameScene extends Phaser.Scene {
     createExtraLives(positions) {
         this.extraLives = this.physics.add.staticGroup();
         positions.forEach(pos => {
-            const item = this.extraLives.create(pos.x, pos.y, 'star', 0);
-            item.setTint(0x00ff88);
-            item.setScale(0.9);
+            const hasTexture = pos.textureKey && this.textures.exists(pos.textureKey);
+            const item = hasTexture
+                ? this.extraLives.create(pos.x, pos.y, pos.textureKey)
+                : this.extraLives.create(pos.x, pos.y, 'star', 0).setTint(0x00ff88).setScale(0.9);
+
+            this.tweens.add({
+                targets: item,
+                y: pos.y - 4,
+                duration: 1000,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
         });
     }
 
     collectExtraLife(player, item) {
         item.disableBody(true, true);
-        SoundManager.play('collectStar');
+        SoundManager.play('collect1up');
         const newLives = GameData.addLife();
         this.hudManager.updateLives(newLives);
 
@@ -1025,7 +1035,7 @@ class GameScene extends Phaser.Scene {
                 duration: 250,
                 onComplete: () => {
                     elements.forEach(el => el.active && el.destroy());
-                    this._restartLevel();
+                    this._returnToWorldMap();
                 }
             });
         };
@@ -1043,8 +1053,11 @@ class GameScene extends Phaser.Scene {
         this.time.delayedCall(5000, dismiss);
     }
 
-    _restartLevel() {
-        this.scene.restart({ level: this.currentLevel });
+    _returnToWorldMap() {
+        const levelConfig = GameData.LEVELS[this.currentLevel];
+        const worldId = levelConfig?.world || 1;
+        GameData.saveMapPosition(worldId, this.currentLevel, 'lostLife:backToMap');
+        this.scene.start('WorldMapScene', {});
     }
 
     showGameOverScreen() {

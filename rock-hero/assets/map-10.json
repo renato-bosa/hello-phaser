@@ -296,6 +296,18 @@
                  "width":32,
                  "x":448,
                  "y":576
+                }, 
+                {
+                 "gid":41,
+                 "height":32,
+                 "id":84,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":800,
+                 "y":544
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -304,7 +316,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":84,
+ "nextobjectid":85,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -649,6 +661,19 @@
          "imagewidth":64,
          "margin":0,
          "name":"sapo-tomate-6fps",
+         "spacing":0,
+         "tilecount":6,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":2,
+         "firstgid":41,
+         "image":"spritesheets\/Cavalo marinho.png",
+         "imageheight":96,
+         "imagewidth":64,
+         "margin":0,
+         "name":"Cavalo marinho",
          "spacing":0,
          "tilecount":6,
          "tileheight":32,

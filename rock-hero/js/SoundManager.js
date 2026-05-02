@@ -117,6 +117,23 @@ const SoundManager = {
             delay: 0.08,        // Delay curto
             delayFeedback: 0.4  // Eco suave
         },
+        collect1up: {
+            // Mesma base do collectStar, mas com uma cópia da sequência tocada 150ms depois
+            // uma quinta acima (× 1.5 nas frequências)
+            type: 'square',
+            frequency: 880,
+            duration: 0.18,
+            volume: 0.35,
+            attack: 0.005,
+            decay: 0.05,
+            sequence: [880, 1100, 1320],
+            delay: 0.08,
+            delayFeedback: 0.4,
+            harmony: {
+                sequence: [1108.73, 1318.51, 1760], // C#6 - E6 - A6
+                delayMs: 100
+            }
+        },
         checkpoint: {
             type: 'sawtooth',
             frequency: 440,
@@ -222,19 +239,28 @@ const SoundManager = {
         
         // Se tem sequência de notas, toca como arpejo
         if (config.sequence && config.sequence.length > 0) {
-            const noteDelay = config.duration / config.sequence.length;
-            config.sequence.forEach((freq, i) => {
-                this.playSingleTone({
-                    ...config,
-                    frequency: freq,
-                    duration: noteDelay * 1.2, // Pequeno overlap
-                    startTime: now + (i * noteDelay)
-                });
-            });
-            return;
+            this._playSequence(config, config.sequence, now);
+        } else {
+            this.playSingleTone({ ...config, startTime: now });
         }
-        
-        this.playSingleTone({ ...config, startTime: now });
+
+        // Harmonia opcional: outra sequência sobreposta com offset em ms
+        if (config.harmony && config.harmony.sequence && config.harmony.sequence.length > 0) {
+            const offset = (config.harmony.delayMs || 0) / 1000;
+            this._playSequence(config, config.harmony.sequence, now + offset);
+        }
+    },
+
+    _playSequence(baseConfig, sequence, startTime) {
+        const noteDelay = baseConfig.duration / sequence.length;
+        sequence.forEach((freq, i) => {
+            this.playSingleTone({
+                ...baseConfig,
+                frequency: freq,
+                duration: noteDelay * 1.2, // Pequeno overlap
+                startTime: startTime + (i * noteDelay)
+            });
+        });
     },
     
     /**

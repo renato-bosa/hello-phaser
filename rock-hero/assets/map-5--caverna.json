@@ -414,6 +414,18 @@
                  "width":32,
                  "x":1024,
                  "y":160
+                }, 
+                {
+                 "gid":51,
+                 "height":32,
+                 "id":207,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":832,
+                 "y":160
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -422,7 +434,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":207,
+ "nextobjectid":208,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -868,6 +880,19 @@
          "name":"sapo-verde-6fps",
          "spacing":0,
          "tilecount":6,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":51,
+         "image":"spritesheets\/1up.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"1up",
+         "spacing":0,
+         "tilecount":1,
          "tileheight":32,
          "tilewidth":32
         }],

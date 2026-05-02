@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map-12.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -156,8 +156,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 512,
-                "y": 511
+                "x": 377,
+                "y": 510
             }
         },
         "dev-resources/map-12.tmx#Cavalo marinho": {

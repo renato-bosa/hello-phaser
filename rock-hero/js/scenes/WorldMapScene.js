@@ -45,6 +45,11 @@ class WorldMapScene extends Phaser.Scene {
         GameData.loadSelectedCharacter();
     }
 
+    preload() {
+        const selectedId = GameData.state.selectedCharacter || GameData.loadSelectedCharacter();
+        GameData.loadCharacterSprites(this, selectedId);
+    }
+
     create() {
         const { width, height } = this.cameras.main;
         
@@ -524,7 +529,17 @@ class WorldMapScene extends Phaser.Scene {
         const arrow = this.add.triangle(0, 0, 0, 0, 10, -15, -10, -15, 0xff0000);
         arrow.setStrokeStyle(2, 0xffffff);
         this.cursor.add(arrow);
-        
+
+        // Personagem selecionado, abaixo da seta
+        const selectedId = GameData.state.selectedCharacter || GameData.loadSelectedCharacter();
+        const idleKey = GameData.getCharacterTextureKey(selectedId, 'idle');
+        if (this.textures.exists(idleKey)) {
+            GameData.createCharacterAnimations(this, selectedId, 'mapcursor-', true);
+            const charSprite = this.add.sprite(0, 22, idleKey).setOrigin(0.5).setScale(1.5);
+            charSprite.anims.play('mapcursor-idle', true);
+            this.cursor.add(charSprite);
+        }
+
         // Animação de bounce
         this.tweens.add({
             targets: this.cursor,

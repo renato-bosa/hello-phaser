@@ -28,8 +28,8 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 0,
@@ -91,14 +91,14 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 801,
-                "y": 302
+                "x": 800,
+                "y": 303
             }
         },
         "dev-resources/map-11.tmx#abstract-blue": {
@@ -156,8 +156,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 263,
-                "y": 510
+                "x": 512,
+                "y": 511
             }
         },
         "dev-resources/map-12.tmx#Cavalo marinho": {
@@ -227,8 +227,8 @@
             "scale": 1.045,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 320.0956937799043,
-                "y": 176.07655502392345
+                "x": 319.6172248803828,
+                "y": 175.59808612440196
             }
         },
         "dev-resources/map-13.tmx#abstract-blue": {
@@ -274,8 +274,8 @@
             "scale": 0.423046875,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 317.93167128347187,
-                "y": 174.92151431209606
+                "x": 319.11357340720224,
+                "y": 176.10341643582643
             }
         },
         "dev-resources/map-14.tmx#abstract-blue": {
@@ -321,8 +321,8 @@
             "scale": 0.722890625,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 318.85874851399547,
-                "y": 175.68356208797144
+                "x": 319.5504160812709,
+                "y": 176.37522965524695
             }
         },
         "dev-resources/map-15.tmx#abstract-blue": {
@@ -366,14 +366,14 @@
         },
         "dev-resources/map-16.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.33,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 259.090909090909,
-                "y": 527.2727272727273
+                "x": 321.2121212121212,
+                "y": 1119.6969696969697
             }
         },
         "dev-resources/map-16.tmx#abstract-blue": {
@@ -443,8 +443,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1441,
-                "y": 478
+                "x": 1440,
+                "y": 479
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#abstract-blue": {

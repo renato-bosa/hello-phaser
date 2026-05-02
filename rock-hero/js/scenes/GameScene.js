@@ -823,28 +823,150 @@ class GameScene extends Phaser.Scene {
     }
 
     showLostLifeMessage(remainingLives) {
-        const centerX = this.cameras.main.centerX;
-        const centerY = this.cameras.main.centerY;
+        const cam = this.cameras.main;
+        const centerX = cam.centerX;
+        const centerY = cam.centerY;
+        const FONT = '"Press Start 2P", Arial';
+        const DEPTH = GC.DEPTH.OVERLAY_TEXT;
 
-        const overlay = this.add.rectangle(centerX, centerY, 640, 400, 0x000000, 0.75)
+        const overlay = this.add.rectangle(centerX, centerY, cam.width, cam.height, 0x000000, 0)
             .setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY);
+        this.tweens.add({ targets: overlay, fillAlpha: 0.78, duration: 250 });
 
-        const title = this.add.text(centerX, centerY - 30, `💀 -1 VIDA`, {
-            fontSize: '28px', fontFamily: 'Arial', color: '#ff4444',
-            stroke: '#000000', strokeThickness: 4
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
+        cam.shake(220, 0.008);
 
-        const sub = this.add.text(centerX, centerY + 15, `Vidas restantes: ${remainingLives}`, {
-            fontSize: '18px', fontFamily: 'Arial', color: '#ffffff',
-            stroke: '#000000', strokeThickness: 3
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
+        const heart = this.add.text(centerX, centerY - 60, '❤️', {
+            fontSize: '64px',
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(DEPTH);
 
-        this.time.delayedCall(2000, () => {
-            overlay.destroy();
-            title.destroy();
-            sub.destroy();
-            this._restartLevel();
+        // Heartbeat: pulsa, depois quebra
+        this.tweens.add({
+            targets: heart,
+            scale: { from: 1, to: 1.35 },
+            duration: 180,
+            yoyo: true,
+            repeat: 1,
+            ease: 'Sine.easeInOut',
+            onComplete: () => {
+                heart.setText('💔');
+                this.tweens.add({
+                    targets: heart,
+                    angle: { from: -8, to: 8 },
+                    duration: 60,
+                    yoyo: true,
+                    repeat: 4,
+                });
+
+                // Estilhaços
+                for (let i = 0; i < 8; i++) {
+                    const angle = Phaser.Math.DegToRad(Phaser.Math.Between(-180, 0));
+                    const dist = Phaser.Math.Between(60, 120);
+                    const piece = this.add.text(centerX, centerY - 60, '❤', {
+                        fontSize: '20px',
+                        color: '#ff3355',
+                    }).setOrigin(0.5).setScrollFactor(0).setDepth(DEPTH);
+                    this.tweens.add({
+                        targets: piece,
+                        x: centerX + Math.cos(angle) * dist,
+                        y: centerY - 60 + Math.sin(angle) * dist + 80,
+                        angle: Phaser.Math.Between(-360, 360),
+                        alpha: 0,
+                        scale: { from: 1, to: 0.4 },
+                        duration: 700,
+                        ease: 'Cubic.easeIn',
+                        onComplete: () => piece.destroy()
+                    });
+                }
+            }
         });
+
+        const title = this.add.text(centerX, centerY + 20, '-1 VIDA', {
+            fontSize: '22px', fontFamily: FONT, color: '#ff4466',
+            stroke: '#000000', strokeThickness: 5
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(DEPTH).setScale(0);
+        this.tweens.add({
+            targets: title,
+            scale: 1,
+            duration: 350,
+            delay: 280,
+            ease: 'Back.easeOut'
+        });
+
+        const subLabel = this.add.text(centerX, centerY + 60, 'VIDAS RESTANTES', {
+            fontSize: '9px', fontFamily: FONT, color: '#aaaaaa',
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(DEPTH).setAlpha(0);
+        this.tweens.add({ targets: subLabel, alpha: 1, duration: 250, delay: 500 });
+
+        // Notas musicais para representar vidas
+        const noteIcons = [];
+        const totalToShow = remainingLives + 1;
+        const spacing = 28;
+        const startX = centerX - ((totalToShow - 1) * spacing) / 2;
+        for (let i = 0; i < totalToShow; i++) {
+            const isLost = (i === totalToShow - 1);
+            const note = this.add.text(startX + i * spacing, centerY + 95, '🎵', {
+                fontSize: '24px',
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(DEPTH).setAlpha(0).setScale(0);
+            noteIcons.push(note);
+            this.tweens.add({
+                targets: note,
+                alpha: 1,
+                scale: 1,
+                duration: 200,
+                delay: 600 + i * 80,
+                ease: 'Back.easeOut',
+                onComplete: () => {
+                    if (!isLost) return;
+                    this.tweens.add({
+                        targets: note,
+                        scale: { from: 1, to: 1.5 },
+                        duration: 120,
+                        yoyo: true,
+                        ease: 'Sine.easeInOut',
+                        onComplete: () => {
+                            note.setText('🎶');
+                            note.setTint(0x666666);
+                            this.tweens.add({
+                                targets: note,
+                                alpha: 0.2,
+                                angle: -25,
+                                y: note.y + 8,
+                                duration: 350,
+                                ease: 'Cubic.easeIn'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        const elements = [overlay, heart, title, subLabel, ...noteIcons];
+
+        const dismiss = () => {
+            if (!overlay.active) return;
+            this.tweens.add({
+                targets: elements,
+                alpha: 0,
+                duration: 250,
+                onComplete: () => {
+                    elements.forEach(el => el.active && el.destroy());
+                    this._restartLevel();
+                }
+            });
+        };
+
+        // Pular com ENTER ou SPACE (após meio segundo, evita pular acidentalmente)
+        const enableSkip = this.time.delayedCall(500, () => {
+            const enter = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+            const space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+            const skip = () => dismiss();
+            enter.once('down', skip);
+            space.once('down', skip);
+            this.keyListeners.push(enter, space);
+        });
+
+        this.time.delayedCall(5000, dismiss);
     }
 
     _restartLevel() {

@@ -85,7 +85,18 @@ class GameScene extends Phaser.Scene {
 
                 if (ts.image) {
                     const imagePath = 'assets/' + ts.image.replace(/\\/g, '/');
-                    this.load.image(ts.name, GameData.assetUrl(imagePath));
+                    // Tilesets nomeados com sufixo "-Nfps" (e mais de um tile) são carregados
+                    // como spritesheet, permitindo animar sprites criados a partir deles.
+                    // O tilemap continua renderizando normalmente — addTilesetImage usa a textura base.
+                    const isAnimated = /-(\d+)fps$/.test(ts.name) && ts.tilecount > 1;
+                    if (isAnimated) {
+                        this.load.spritesheet(ts.name, GameData.assetUrl(imagePath), {
+                            frameWidth: ts.tilewidth,
+                            frameHeight: ts.tileheight
+                        });
+                    } else {
+                        this.load.image(ts.name, GameData.assetUrl(imagePath));
+                    }
                     if (TILESET_ALIASES[ts.name]) {
                         this.load.image(TILESET_ALIASES[ts.name], GameData.assetUrl(imagePath));
                     }
@@ -356,6 +367,10 @@ class GameScene extends Phaser.Scene {
                 ? this.extraLives.create(pos.x, pos.y, pos.textureKey)
                 : this.extraLives.create(pos.x, pos.y, 'star', 0).setTint(0x00ff88).setScale(0.9);
 
+            if (hasTexture) {
+                this._playTilesetAnimation(item, pos.textureKey);
+            }
+
             this.tweens.add({
                 targets: item,
                 y: pos.y - 4,
@@ -365,6 +380,94 @@ class GameScene extends Phaser.Scene {
                 ease: 'Sine.easeInOut'
             });
         });
+    }
+
+    /**
+     * Se o textureKey termina em "-Nfps", cria (uma vez) e toca uma animação em loop
+     * usando todos os frames não-vazios do spritesheet. Sprites estáticos do Arcade
+     * physics continuam funcionando normalmente — só o frame visual muda.
+     *
+     * Frames totalmente transparentes no final são ignorados — útil para
+     * spritesheets exportados pelo Piskel cujo grid não preenche todas as células
+     * (ex.: 5 frames numa imagem 2×3, com a 6ª célula vazia).
+     */
+    _playTilesetAnimation(sprite, textureKey) {
+        const fpsMatch = textureKey.match(/-(\d+)fps$/);
+        if (!fpsMatch || !this.textures.exists(textureKey)) return;
+
+        const fps = parseInt(fpsMatch[1], 10);
+        const validFrames = this._getNonEmptyFrameCount(textureKey);
+        if (validFrames < 2) return;
+
+        const animKey = textureKey + '-loop';
+        if (!this.anims.exists(animKey)) {
+            this.anims.create({
+                key: animKey,
+                frames: this.anims.generateFrameNumbers(textureKey, { start: 0, end: validFrames - 1 }),
+                frameRate: fps,
+                repeat: -1
+            });
+        }
+        if (sprite.anims) {
+            sprite.anims.play(animKey, true);
+        }
+    }
+
+    /**
+     * Conta quantos frames de um spritesheet contêm pixels não-transparentes,
+     * varrendo do último para o primeiro. Resultado é cacheado por textureKey.
+     */
+    _getNonEmptyFrameCount(textureKey) {
+        if (!this._frameCountCache) this._frameCountCache = {};
+        if (this._frameCountCache[textureKey] !== undefined) {
+            return this._frameCountCache[textureKey];
+        }
+
+        const tex = this.textures.get(textureKey);
+        if (!tex) { this._frameCountCache[textureKey] = 0; return 0; }
+
+        const totalFrames = Math.max(0, tex.frameTotal - 1); // exclui __BASE
+        const sourceImg = tex.source && tex.source[0] && tex.source[0].image;
+        if (!sourceImg || totalFrames < 1) {
+            this._frameCountCache[textureKey] = totalFrames;
+            return totalFrames;
+        }
+
+        try {
+            const firstFrame = tex.get(0);
+            const frameW = firstFrame.width;
+            const frameH = firstFrame.height;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = frameW;
+            canvas.height = frameH;
+            const ctx = canvas.getContext('2d');
+
+            // Varre frames do fim para o início, parando no primeiro não-vazio
+            for (let i = totalFrames - 1; i >= 0; i--) {
+                const frame = tex.get(i);
+                if (!frame) continue;
+
+                ctx.clearRect(0, 0, frameW, frameH);
+                ctx.drawImage(sourceImg,
+                    frame.cutX, frame.cutY, frame.cutWidth, frame.cutHeight,
+                    0, 0, frameW, frameH);
+                const data = ctx.getImageData(0, 0, frameW, frameH).data;
+
+                for (let j = 3; j < data.length; j += 4) {
+                    if (data[j] > 0) {
+                        this._frameCountCache[textureKey] = i + 1;
+                        return i + 1;
+                    }
+                }
+            }
+            this._frameCountCache[textureKey] = 0;
+            return 0;
+        } catch (err) {
+            // CORS ou outro erro de leitura — usa todos os frames como fallback
+            this._frameCountCache[textureKey] = totalFrames;
+            return totalFrames;
+        }
     }
 
     collectExtraLife(player, item) {

@@ -28,8 +28,8 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.75,
             "selectedLayer": 4,
@@ -94,8 +94,8 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.5,
             "selectedLayer": 4,
@@ -375,8 +375,8 @@
         },
         "dev-resources/map-16.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 1.5,
             "selectedLayer": 4,
@@ -386,6 +386,9 @@
             }
         },
         "dev-resources/map-16.tmx#1up": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-16.tmx#1up-animated-4fps": {
             "scaleInDock": 1
         },
         "dev-resources/map-16.tmx#abstract-blue": {
@@ -458,8 +461,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1441,
-                "y": 478
+                "x": 1440,
+                "y": 479
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#1up": {

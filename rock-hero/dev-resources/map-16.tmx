@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="70" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="98">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="70" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="99">
  <editorsettings>
   <export target="../assets/map.json" format="json"/>
  </editorsettings>
@@ -116,6 +116,9 @@
  </tileset>
  <tileset firstgid="49" name="1up" tilewidth="32" tileheight="32" tilecount="1" columns="1">
   <image source="../assets/spritesheets/1up.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="50" name="1up-animated-4fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/1up-animated-4fps.png" width="64" height="96"/>
  </tileset>
  <layer id="5" name="bg" width="20" height="70">
   <data encoding="csv">
@@ -370,6 +373,6 @@
   <object id="94" gid="36" x="64" y="544" width="32" height="32"/>
   <object id="95" gid="42" x="288" y="192" width="32" height="32"/>
   <object id="96" gid="48" x="96" y="1536" width="32" height="32"/>
-  <object id="97" gid="49" x="608" y="1408" width="32" height="32"/>
+  <object id="98" gid="50" x="608" y="1408" width="32" height="32"/>
  </objectgroup>
 </map>

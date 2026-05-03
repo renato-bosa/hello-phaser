@@ -569,9 +569,9 @@
                  "y":1536
                 }, 
                 {
-                 "gid":49,
+                 "gid":50,
                  "height":32,
-                 "id":97,
+                 "id":98,
                  "name":"",
                  "rotation":0,
                  "type":"",
@@ -587,7 +587,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":98,
+ "nextobjectid":99,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -987,6 +987,19 @@
          "name":"1up",
          "spacing":0,
          "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":2,
+         "firstgid":50,
+         "image":"spritesheets\/1up-animated-4fps.png",
+         "imageheight":96,
+         "imagewidth":64,
+         "margin":0,
+         "name":"1up-animated-4fps",
+         "spacing":0,
+         "tilecount":6,
          "tileheight":32,
          "tilewidth":32
         }],

@@ -28,8 +28,8 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.75,
             "selectedLayer": 4,
@@ -94,8 +94,8 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.5,
             "selectedLayer": 4,
@@ -456,8 +456,8 @@
         },
         "dev-resources/map-17.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.5,
             "selectedLayer": 2,

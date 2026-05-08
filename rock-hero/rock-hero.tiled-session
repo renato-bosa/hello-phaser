@@ -28,8 +28,8 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 4,
@@ -94,14 +94,14 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 800,
-                "y": 302
+                "y": 303
             }
         },
         "dev-resources/map-11.tmx#abstract-blue": {
@@ -236,8 +236,8 @@
             "scale": 1.045,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 515.7894736842106,
-                "y": 176.07655502392345
+                "x": 319.6172248803828,
+                "y": 175.59808612440196
             }
         },
         "dev-resources/map-13.tmx#abstract-blue": {
@@ -283,8 +283,8 @@
             "scale": 0.423046875,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 801.3296398891966,
-                "y": 174.92151431209606
+                "x": 319.11357340720224,
+                "y": 176.10341643582643
             }
         },
         "dev-resources/map-14.tmx#abstract-blue": {
@@ -330,8 +330,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 257.5,
-                "y": 192
+                "x": 320,
+                "y": 175.5
             }
         },
         "dev-resources/map-15.tmx#abstract-blue": {
@@ -456,14 +456,14 @@
         },
         "dev-resources/map-17.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
-            "scale": 0.125,
-            "selectedLayer": 3,
+            "scale": 0.5,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 12,
-                "y": 1128
+                "x": 419,
+                "y": 1746
             }
         },
         "dev-resources/map-17.tmx#1up": {

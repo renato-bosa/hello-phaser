@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="70" height="70" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="195">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="70" height="70" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="203">
  <editorsettings>
   <export target="../assets/map-17.json" format="json"/>
  </editorsettings>
@@ -452,5 +452,13 @@
   <object id="184" gid="57" x="768" y="544" width="32" height="32"/>
   <object id="185" gid="57" x="224" y="928" width="32" height="32"/>
   <object id="186" gid="57" x="64" y="576" width="32" height="32"/>
+  <object id="195" gid="33" x="224" y="960" width="32" height="32"/>
+  <object id="196" gid="33" x="64" y="608" width="32" height="32"/>
+  <object id="197" gid="33" x="768" y="576" width="32" height="32"/>
+  <object id="198" gid="33" x="416" y="1792" width="32" height="32"/>
+  <object id="199" gid="33" x="512" y="1952" width="32" height="32"/>
+  <object id="200" gid="33" x="384" y="2112" width="32" height="32"/>
+  <object id="201" gid="33" x="896" y="2176" width="32" height="32"/>
+  <object id="202" gid="33" x="1248" y="2016" width="32" height="32"/>
  </objectgroup>
 </map>

@@ -291,7 +291,7 @@ const GameData = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [10, 11, 12], // 3 fases (map11, map12, map16)
+            levels: [10, 11, 12, 13], // 4 fases (map11, map12, map16, map17)
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             // Visual no WorldMap (tema aquático)
@@ -448,6 +448,17 @@ const GameData = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 500, y: 180 },
+            connectsTo: [13],
+            features: { doubleJump: true, neonLineTrail: true }
+        },
+        {
+            key: 'map17',
+            file: 'assets/map-17.json',
+            name: 'Areia e Profundezas',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 600, y: 230 },
             connectsTo: [],
             features: { doubleJump: true, neonLineTrail: true }
         }

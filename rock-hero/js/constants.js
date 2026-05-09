@@ -77,7 +77,7 @@ const GC = {
             BODY_HEIGHT: 30,
             BODY_OFFSET_X: 5,
             BODY_OFFSET_Y: 1,
-            ANIM_FPS: 4,
+            ANIM_FPS: 2.5,
             BUBBLE_FRAME_INDEX: 3,
             MUZZLE_OFFSET_X: 12,
             MUZZLE_OFFSET_Y: -4,

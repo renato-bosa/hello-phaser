@@ -291,7 +291,7 @@ const GameData = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [10, 11, 12, 13], // 4 fases (map11, map12, map16, map17)
+            levels: [10, 11, 12, 13, 14], // 5 fases (map11, map12, map16, map17, map18)
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             // Visual no WorldMap (tema aquático)
@@ -425,7 +425,7 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 120, y: 200 },
+            mapPosition: { x: 85, y: 200 },
             connectsTo: [11], // Conecta ao map12 (índice 11)
             // Features ativadas automaticamente nesta fase
             features: { doubleJump: true, neonLineTrail: true }
@@ -437,7 +437,7 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 360, y: 210 },
+            mapPosition: { x: 195, y: 215 },
             connectsTo: [12]
         },
         { 
@@ -447,7 +447,7 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 500, y: 180 },
+            mapPosition: { x: 305, y: 185 },
             connectsTo: [13],
             features: { doubleJump: true, neonLineTrail: true }
         },
@@ -458,7 +458,18 @@ const GameData = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 600, y: 230 },
+            mapPosition: { x: 415, y: 215 },
+            connectsTo: [14],
+            features: { doubleJump: true, neonLineTrail: true }
+        },
+        {
+            key: 'map18',
+            file: 'assets/map-18.json',
+            name: 'Abismo Final',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 515, y: 195 },
             connectsTo: [],
             features: { doubleJump: true, neonLineTrail: true }
         }

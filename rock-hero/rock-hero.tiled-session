@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-17.tmx",
+    "activeFile": "dev-resources/map-18.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -462,8 +462,8 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 841,
-                "y": 1804
+                "x": 1120,
+                "y": 1121
             }
         },
         "dev-resources/map-17.tmx#1up": {
@@ -539,6 +539,93 @@
             "scaleInDock": 1
         },
         "dev-resources/map-17.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx": {
+            "expandedObjectLayers": [
+                8,
+                10
+            ],
+            "scale": 0.25,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1110,
+                "y": 744
+            }
+        },
+        "dev-resources/map-18.tmx#1up": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#Areia": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#grama noturna": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#green-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-18.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
         "dev-resources/map-2--expansion and speed.tmx": {
@@ -1420,7 +1507,7 @@
         "dev-resources/map-13.tmx",
         "dev-resources/map-14.tmx",
         "dev-resources/map-15.tmx",
-        "dev-resources/map-17.tmx",
+        "dev-resources/map-18.tmx",
         "dev-resources/map-5--caverna.tmx"
     ],
     "project": "rock-hero.tiled-project",
@@ -1434,10 +1521,10 @@
         "dev-resources/map-14.tmx",
         "dev-resources/map-15.tmx",
         "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-18.tmx",
         "dev-resources/map-17.tmx",
         "dev-resources/map-16.tmx",
-        "dev-resources/map-3--desafio do luigi.tmx",
-        "dev-resources/map-4--big-jumps.tmx"
+        "dev-resources/map-3--desafio do luigi.tmx"
     ],
     "tileset.embedInMap": true
 }

@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map-17.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -460,10 +460,10 @@
                 10
             ],
             "scale": 0.5,
-            "selectedLayer": 4,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 1120,
-                "y": 1121
+                "x": 841,
+                "y": 1804
             }
         },
         "dev-resources/map-17.tmx#1up": {

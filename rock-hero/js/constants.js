@@ -87,8 +87,8 @@ const GC = {
     BUBBLE: {
         SIZE: 16,
         BODY_RADIUS: 6,
-        SPEED: 140,
-        LIFETIME_MS: 4000,
+        SPEED: 45,
+        LIFETIME_MS: 3000,
     },
 
     TRAIL: {

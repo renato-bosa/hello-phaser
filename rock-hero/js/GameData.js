@@ -309,7 +309,7 @@ const GameData = {
             id: 4,
             name: 'Mundo 4',
             subtitle: 'Mecânicas Experimentais',
-            levels: [15, 16],
+            levels: [15, 16, 17],
             rescuedCharacter: 'vocalista',
             celebrationMessage: 'Mecânicas dominadas!',
             theme: 'special',
@@ -508,9 +508,19 @@ const GameData = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 400, y: 200 },
-            connectsTo: [],
+            mapPosition: { x: 370, y: 200 },
+            connectsTo: [17],
             features: { autoScroll: true }
+        },
+        {
+            key: 'map21',
+            file: 'assets/map-21-nuvens.json',
+            name: 'Entre Nuvens',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 4,
+            mapPosition: { x: 560, y: 200 },
+            connectsTo: []
         }
     ],
 

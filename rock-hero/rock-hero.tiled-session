@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-20-auto-rolagem.tmx",
+    "activeFile": "dev-resources/map-21-nuvens.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
@@ -729,8 +729,8 @@
             "scale": 0.25,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1046,
-                "y": 336
+                "x": 1120,
+                "y": 286
             }
         },
         "dev-resources/map-20-auto-rolagem.tmx#1up": {
@@ -806,6 +806,102 @@
             "scaleInDock": 1
         },
         "dev-resources/map-20-auto-rolagem.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx": {
+            "expandedObjectLayers": [
+                8,
+                10
+            ],
+            "scale": 0.75,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 1806,
+                "y": 282.6666666666667
+            }
+        },
+        "dev-resources/map-21-nuvens.tmx#1up": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#Areia": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#grama noturna": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#green-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#nuvem-continuacao": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#nuvem-sorriso": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#nuvemzita": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx": {
@@ -1594,7 +1690,7 @@
         "dev-resources/map-13.tmx",
         "dev-resources/map-14.tmx",
         "dev-resources/map-15.tmx",
-        "dev-resources/map-20-auto-rolagem.tmx",
+        "dev-resources/map-21-nuvens.tmx",
         "dev-resources/map-5--caverna.tmx"
     ],
     "project": "rock-hero.tiled-project",
@@ -1608,10 +1704,10 @@
         "dev-resources/map-14.tmx",
         "dev-resources/map-15.tmx",
         "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-21-nuvens.tmx",
         "dev-resources/map-20-auto-rolagem.tmx",
         "dev-resources/map-18.tmx",
-        "dev-resources/map-17.tmx",
-        "dev-resources/map-16.tmx"
+        "dev-resources/map-17.tmx"
     ],
     "tileset.embedInMap": true
 }

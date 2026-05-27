@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-18.tmx",
+    "activeFile": "dev-resources/map-20-auto-rolagem.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -549,8 +549,8 @@
             "scale": 0.25,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1110,
-                "y": 744
+                "x": 1120,
+                "y": 638
             }
         },
         "dev-resources/map-18.tmx#1up": {
@@ -719,6 +719,93 @@
             "scaleInDock": 1
         },
         "dev-resources/map-2--expansion and speed.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx": {
+            "expandedObjectLayers": [
+                8,
+                10
+            ],
+            "scale": 0.25,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 1046,
+                "y": 336
+            }
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#1up": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#Areia": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#grama noturna": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#green-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx": {
@@ -1507,7 +1594,7 @@
         "dev-resources/map-13.tmx",
         "dev-resources/map-14.tmx",
         "dev-resources/map-15.tmx",
-        "dev-resources/map-18.tmx",
+        "dev-resources/map-20-auto-rolagem.tmx",
         "dev-resources/map-5--caverna.tmx"
     ],
     "project": "rock-hero.tiled-project",
@@ -1521,10 +1608,10 @@
         "dev-resources/map-14.tmx",
         "dev-resources/map-15.tmx",
         "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-20-auto-rolagem.tmx",
         "dev-resources/map-18.tmx",
         "dev-resources/map-17.tmx",
-        "dev-resources/map-16.tmx",
-        "dev-resources/map-3--desafio do luigi.tmx"
+        "dev-resources/map-16.tmx"
     ],
     "tileset.embedInMap": true
 }

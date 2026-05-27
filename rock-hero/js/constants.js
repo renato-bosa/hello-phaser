@@ -18,6 +18,7 @@ const GC = {
         BODY_HEIGHT: 30,
         BODY_OFFSET_X: 9,
         BODY_OFFSET_Y: 2,
+        BODY_SPRITE_HEIGHT: 32,  // altura total do frame do sprite (para calcular offset invertido)
         DOUBLE_JUMP_FORCE: -400,
         STOMP_BOUNCE: -400,
         STOMP_TOLERANCE: 8,
@@ -141,6 +142,13 @@ const GC = {
 
     MOVING_PLATFORM: {
         SPEED: 80,
+    },
+
+    AUTO_SCROLL: {
+        SPEED: 80,                      // pixels por segundo
+        LEFT_MARGIN: 16,                // distância mínima do player à borda esquerda da câmera
+        PUSH_VELOCITY_FACTOR: 3,        // velocidade do empurrão = SPEED × fator (fecha o gap mais rápido)
+        SPAWN_CAMERA_OFFSET_RATIO: 0.25,// checkpoint fica a 25% da tela a partir da esquerda
     },
 
     MUSHROOM: {

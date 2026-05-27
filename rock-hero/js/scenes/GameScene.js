@@ -117,6 +117,10 @@ class GameScene extends Phaser.Scene {
         this._ensureBubbleTexture();
         this.createMap();
 
+        if (GameData.isFeatureEnabled('upsideDown')) {
+            this.physics.world.gravity.y = -800;
+        }
+
         this.playerController = new PlayerController(this);
         this.enemyManager = new EnemyManager(this);
         this.effectsManager = new EffectsManager(this);
@@ -891,7 +895,16 @@ class GameScene extends Phaser.Scene {
             });
         }
 
-        this.cameras.main.startFollow(player, true, 0.1, 0.1);
+        if (GameData.isFeatureEnabled('autoScroll')) {
+            const cam = this.cameras.main;
+            const zoom = cam.zoom;
+            cam.scrollX = Math.max(0, player.x - cam.width / (2 * zoom));
+            cam.scrollY = Math.max(0, player.y - cam.height / (2 * zoom));
+            this.autoScrollMinX = cam.scrollX;
+            this._autoScrollWasRespawning = false;
+        } else {
+            this.cameras.main.startFollow(player, true, 0.1, 0.1);
+        }
     }
 
     setupControls() {
@@ -916,6 +929,67 @@ class GameScene extends Phaser.Scene {
         this.virtualControls = GameData.getVirtualControls();
     }
 
+    // ==================== AUTO-SCROLL ====================
+
+    _updateAutoScroll(delta) {
+        const cam = this.cameras.main;
+        const pc = this.playerController;
+        const player = pc.player;
+        const dt = delta / 1000;
+        const bounds = this.physics.world.bounds;
+        const zoom = cam.zoom;
+        const visibleW = cam.width / zoom;
+        const visibleH = cam.height / zoom;
+        const maxScrollX = Math.max(0, bounds.width - visibleW);
+        const maxScrollY = Math.max(0, bounds.height - visibleH);
+        const isRespawning = pc.isRespawning;
+
+        // Detecta início do respawn: recua o ponto mínimo de scroll até o checkpoint
+        if (!this._autoScrollWasRespawning && isRespawning) {
+            const cp = this.currentCheckpoint;
+            this.autoScrollMinX = Math.max(0, cp.x - visibleW * GC.AUTO_SCROLL.SPAWN_CAMERA_OFFSET_RATIO);
+        }
+        this._autoScrollWasRespawning = isRespawning;
+
+        if (isRespawning) {
+            // Durante respawn: câmera acompanha o jogador (animação de arco) e recua suavemente
+            const targetX = Phaser.Math.Clamp(player.x - visibleW / 2, this.autoScrollMinX, maxScrollX);
+            cam.scrollX = Phaser.Math.Linear(cam.scrollX, targetX, 0.08);
+            const playerCenteredY = player.y - visibleH / 2;
+            cam.scrollY = Phaser.Math.Linear(cam.scrollY, playerCenteredY, 0.1);
+            cam.scrollY = Phaser.Math.Clamp(cam.scrollY, 0, maxScrollY);
+            return;
+        }
+
+        // Avança o scroll automaticamente
+        this.autoScrollMinX += GC.AUTO_SCROLL.SPEED * dt;
+
+        // Câmera X: player pode ir à frente, mas nunca fica atrás do mínimo
+        const playerCenteredX = player.x - visibleW / 2;
+        cam.scrollX = Phaser.Math.Clamp(Math.max(this.autoScrollMinX, playerCenteredX), 0, maxScrollX);
+
+        // Câmera Y: segue o jogador com lerp suave
+        const playerCenteredY = player.y - visibleH / 2;
+        cam.scrollY = Phaser.Math.Linear(cam.scrollY, playerCenteredY, 0.1);
+        cam.scrollY = Phaser.Math.Clamp(cam.scrollY, 0, maxScrollY);
+
+        // Borda esquerda: o centro do jogador nunca deve ficar à esquerda deste ponto
+        const leftBoundary = cam.scrollX + GC.AUTO_SCROLL.LEFT_MARGIN;
+
+        if (player.x < leftBoundary) {
+            // Bloqueado à direita com a borda esquerda pressionando → jogador espremido → dano
+            if (player.body.blocked.right && !pc.isInvincible) {
+                pc.takeDamage();
+                return;
+            }
+            // Empurra via velocidade: a física resolve colisões com paredes naturalmente,
+            // sem teleportar o corpo para dentro de tiles sólidos.
+            // Factor > 1 para fechar a distância acumulada mais rápido que a rolagem.
+            const pushVelocity = GC.AUTO_SCROLL.SPEED * GC.AUTO_SCROLL.PUSH_VELOCITY_FACTOR;
+            player.body.velocity.x = Math.max(player.body.velocity.x, pushVelocity);
+        }
+    }
+
     // ==================== UPDATE ====================
 
     update(time, delta) {
@@ -937,6 +1011,10 @@ class GameScene extends Phaser.Scene {
         this.updateMovingPlatforms(delta);
         this.hudManager.updateTimer(this.time.now);
         this.playerController.update(delta);
+        // Auto-scroll roda APÓS o playerController para sobrescrever o input com o empurrão
+        if (GameData.isFeatureEnabled('autoScroll')) {
+            this._updateAutoScroll(delta);
+        }
         this.hudManager.updateDebugVelocity();
         this.enemyManager.update(this.time.now);
         this.effectsManager.update(this.time.now);
@@ -1349,6 +1427,7 @@ class GameScene extends Phaser.Scene {
     // ==================== CLEANUP ====================
 
     shutdown() {
+        this.physics.world.gravity.y = 800;
         GameData.levelFeatureOverrides = null;
 
         if (this._oscillationTimer) {

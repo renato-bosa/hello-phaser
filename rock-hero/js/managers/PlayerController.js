@@ -42,7 +42,18 @@ class PlayerController {
         this.player.setBounce(0);
         this.player.body.setMaxVelocity(GC.PLAYER.MAX_VELOCITY_X, GC.PLAYER.MAX_VELOCITY_Y);
         this.player.body.setSize(GC.PLAYER.BODY_WIDTH, GC.PLAYER.BODY_HEIGHT);
-        this.player.body.setOffset(GC.PLAYER.BODY_OFFSET_X, GC.PLAYER.BODY_OFFSET_Y);
+
+        if (GameData.isFeatureEnabled('upsideDown')) {
+            // Com gravidade invertida o jogador pousa no teto (blocked.up).
+            // Espelha o offset vertical para que a hitbox fique no topo do sprite
+            // (que visualmente exibe os pés nessa direção com flipY).
+            const flipOffsetY = GC.PLAYER.BODY_SPRITE_HEIGHT - GC.PLAYER.BODY_HEIGHT - GC.PLAYER.BODY_OFFSET_Y;
+            this.player.body.setOffset(GC.PLAYER.BODY_OFFSET_X, flipOffsetY);
+            this.player.setFlipY(true);
+        } else {
+            this.player.body.setOffset(GC.PLAYER.BODY_OFFSET_X, GC.PLAYER.BODY_OFFSET_Y);
+        }
+
         this.player.setCollideWorldBounds(true);
         this.player.setDepth(GC.DEPTH.PLAYER);
 
@@ -53,7 +64,8 @@ class PlayerController {
     update(delta) {
         const player = this.player;
         const scene = this.scene;
-        const onGround = player.body.blocked.down;
+        const upsideDown = GameData.isFeatureEnabled('upsideDown');
+        const onGround = upsideDown ? player.body.blocked.up : player.body.blocked.down;
         const currentTime = scene.time.now;
 
         if (this.isInvincible) {
@@ -81,7 +93,9 @@ class PlayerController {
         const waterMul = inWater ? GC.WATER.SPEED_MULTIPLIER : 1.0;
         const minSpeed = GC.PLAYER.MIN_SPEED * waterMul;
         const maxSpeed = GC.PLAYER.MAX_SPEED * waterMul;
-        const jumpForce = inWater ? GC.WATER.JUMP_FORCE : GC.PLAYER.JUMP_FORCE;
+        // Ponta-cabeça inverte a força de pulo (positiva = empurra para baixo = longe do teto)
+        const baseJump = upsideDown ? -GC.PLAYER.JUMP_FORCE : GC.PLAYER.JUMP_FORCE;
+        const jumpForce = inWater ? GC.WATER.JUMP_FORCE : baseJump;
         const fallGravExtra = inWater ? GC.WATER.FALL_GRAVITY_EXTRA : GC.PLAYER.FALL_GRAVITY_EXTRA;
         const dt = delta / 1000;
 
@@ -147,24 +161,28 @@ class PlayerController {
             SoundManager.play('jump');
         }
 
-        if (!jumpHeld && this.isJumping && player.body.velocity.y < 0) {
+        // Ponta-cabeça: "subindo" é velocidade positiva (afastando do teto)
+        const isAscending = upsideDown ? player.body.velocity.y > 0 : player.body.velocity.y < 0;
+        if (!jumpHeld && this.isJumping && isAscending) {
             player.setVelocityY(player.body.velocity.y * GC.PLAYER.JUMP_CUT_MULTIPLIER);
             this.isJumping = false;
             SoundManager.stop('jump');
         }
 
         // --- Gravidade extra na queda ---
-        if (!onGround && player.body.velocity.y > 0) {
+        // Ponta-cabeça: "caindo" é velocidade negativa (em direção ao teto pela gravidade invertida)
+        const isFalling = upsideDown ? player.body.velocity.y < 0 : player.body.velocity.y > 0;
+        if (!onGround && isFalling) {
             const extraGravity = scene.physics.world.gravity.y * fallGravExtra * dt;
             player.setVelocityY(player.body.velocity.y + extraGravity);
 
-            if (inWater && player.body.velocity.y > GC.WATER.MAX_FALL_SPEED) {
+            if (!upsideDown && inWater && player.body.velocity.y > GC.WATER.MAX_FALL_SPEED) {
                 player.setVelocityY(GC.WATER.MAX_FALL_SPEED);
             }
         }
 
-        // --- Física de água ---
-        if (inWater && GameData.isFeatureEnabled('waterPhysics')) {
+        // --- Física de água (incompatível com ponta-cabeça) ---
+        if (inWater && GameData.isFeatureEnabled('waterPhysics') && !upsideDown) {
             player.body.gravity.y = GC.WATER.BODY_GRAVITY_OFFSET;
 
             if (player.body.velocity.y >= 0) {
@@ -185,7 +203,8 @@ class PlayerController {
                 this.hasDoubleJumped = false;
             }
             if (jumpJustPressed && !onGround && !this.hasDoubleJumped) {
-                player.setVelocityY(GC.PLAYER.DOUBLE_JUMP_FORCE);
+                const djForce = upsideDown ? -GC.PLAYER.DOUBLE_JUMP_FORCE : GC.PLAYER.DOUBLE_JUMP_FORCE;
+                player.setVelocityY(djForce);
                 this.hasDoubleJumped = true;
                 this.isJumping = true;
                 SoundManager.play('jump');
@@ -198,14 +217,18 @@ class PlayerController {
             const charData = GameData.getCharacter(this.selectedCharacter);
             const jumpSprite = charData.sprites.jump;
 
+            // Ponta-cabeça: "subindo" (longe do teto) é velocidade positiva
+            const isGoingUp = upsideDown ? player.body.velocity.y > 0 : player.body.velocity.y < 0;
             if (jumpSprite && jumpSprite.key === 'hero-jump') {
-                player.setTexture('hero-jump', player.body.velocity.y < 0 ? 1 : 2);
+                player.setTexture('hero-jump', isGoingUp ? 1 : 2);
             } else if (jumpSprite) {
                 player.setTexture(jumpSprite.key, 0);
             } else {
                 const idleKey = GameData.getCharacterTextureKey(this.selectedCharacter, 'idle');
                 player.setTexture(idleKey, 0);
             }
+            // Mantém o flip vertical no modo ponta-cabeça após mudança de textura
+            if (upsideDown) player.setFlipY(true);
         }
     }
 

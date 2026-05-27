@@ -81,6 +81,12 @@ const GameData = {
         
         // Física de água: gravidade e movimento reduzidos
         waterPhysics: true,
+
+        // Auto-rolagem: câmera avança automaticamente, jogador deve acompanhar
+        autoScroll: false,
+
+        // Ponta-cabeça: gravidade invertida, jogador caminha no teto
+        upsideDown: false,
     },
 
     /**
@@ -298,8 +304,18 @@ const GameData = {
             theme: 'water',
             bgColor: 0x0a2a4a, // Azul profundo
             pathColor: 0x2288aa // Azul água
+        },
+        {
+            id: 4,
+            name: 'Mundo 4',
+            subtitle: 'Mecânicas Experimentais',
+            levels: [15, 16],
+            rescuedCharacter: 'vocalista',
+            celebrationMessage: 'Mecânicas dominadas!',
+            theme: 'special',
+            bgColor: 0x1a0a2e,
+            pathColor: 0x8844aa
         }
-        // Futuros mundos: Mundo 4 (Tecladista)...
     ],
 
     // Configuração das fases
@@ -472,6 +488,29 @@ const GameData = {
             mapPosition: { x: 515, y: 195 },
             connectsTo: [],
             features: { doubleJump: true, neonLineTrail: true }
+        },
+        // ==================== MUNDO 4 — Mecânicas Experimentais ====================
+        {
+            key: 'map19',
+            file: 'assets/map-19-upsidedown.json',
+            name: 'Ponta-Cabeça',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 4,
+            mapPosition: { x: 120, y: 200 },
+            connectsTo: [16],
+            features: { upsideDown: true }
+        },
+        {
+            key: 'map20',
+            file: 'assets/map-20-auto-rolagem.json',
+            name: 'Sem Parar!',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 4,
+            mapPosition: { x: 400, y: 200 },
+            connectsTo: [],
+            features: { autoScroll: true }
         }
     ],
 

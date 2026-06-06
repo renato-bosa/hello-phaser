@@ -445,7 +445,9 @@ class GameScene extends Phaser.Scene {
             const canvas = document.createElement('canvas');
             canvas.width = frameW;
             canvas.height = frameH;
-            const ctx = canvas.getContext('2d');
+            // willReadFrequently: hint para o browser alocar o canvas na CPU,
+            // já que vamos chamar getImageData() em loop (uma vez por frame do spritesheet)
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
             // Varre frames do fim para o início, parando no primeiro não-vazio
             for (let i = totalFrames - 1; i >= 0; i--) {

@@ -189,25 +189,24 @@ Cada fase é **mergeable independentemente**: termine, comite, teste o jogo, pro
 ---
 
 ### Fase 5 — Extrair `ProgressTracker`
-- [ ] Criar `js/data/ProgressTracker.js` com:
-  - **Fases**: `markLevelComplete`, `getCompletedLevels`, `isLevelComplete`, `isLevelUnlocked`, `getNextUnlockedLevel`
-  - **Mundos**: `markWorldComplete`, `getCompletedWorlds`, `isWorldComplete`, `isWorldUnlocked`, `checkWorldCompletion`, `resetWorldProgress`, `getCurrentWorld`, `getWorldForLevel`, `getWorldLevelsWithStatus`
-  - **Personagens**: `unlockCharacter`, `getUnlockedCharacters`, `isCharacterUnlocked`, `getAvailableCharacters`, `saveSelectedCharacter`, `loadSelectedCharacter`, `getCharacter`
+- [x] Criar `js/data/ProgressTracker.js` com (todos os métodos com slot recebem `slotId` explícito):
+  - **Fases**: `markLevelComplete`, `getCompletedLevels`, `isLevelComplete`, `isLevelUnlocked`, `getNextUnlockedLevel`, `hasProgress`, `clearProgress`
+  - **Mundos**: `markWorldComplete`, `getCompletedWorlds`, `isWorldComplete`, `isWorldUnlocked`, `checkWorldCompletion` (puro), `resetWorldProgress`, `getCurrentWorld`, `getWorldForLevel` (puro), `getWorldLevelsWithStatus`
+  - **Personagens**: `unlockCharacter`, `getUnlockedCharacters`, `isCharacterUnlocked`, `getAvailableCharacters`, `loadSelectedCharacter`, `getCharacter` (puro). (`saveSelectedCharacter` segue em SaveManager.)
   - **Vidas**: `getLives`, `setLives`, `addLife`, `loseLife`
   - **Recordes**: `saveRecord`, `getBestTime`, `getTotalBestTime`, `getTopRecords`
-  - **Mapa**: `saveMapPosition`, `loadMapPosition` (preservar lógica de auto-correção)
+  - **Mapa**: `saveMapPosition`, `loadMapPosition` (auto-correção e logs preservados; agora chama `MapDebug.log/warn` direto)
   - **Nome**: `savePlayerName`, `loadPlayerName`
-  - **Compat**: `saveProgress`, `loadProgress`, `hasProgress`, `clearProgress`
-- [ ] Atualizar `index.html`
-- [ ] Em `GameData.js`: substituir todos os métodos por delegação
-- [ ] **Smoke test extenso**:
-  - [ ] Criar slot novo, completar fase 1, voltar mapa, ver fase 2 desbloqueada
-  - [ ] Completar mundo 1, ver tela de World Complete (resgata baterista)
-  - [ ] Trocar personagem, voltar para fase, sprite trocado
-  - [ ] Morrer 5x, ver game over, voltar ao mapa com mundo reiniciado
-  - [ ] Coletar 1up
-  - [ ] Bater recorde de tempo
-  - [ ] Rodar com `?mapDebug=true` e verificar logs
+- [x] Atualizar `index.html`
+- [x] Em `GameData.js`: substituir todos os métodos por delegação. Wrappers que tocam `state.X` sincronizam após chamada. `clearProgress`, `savePlayerName`, `saveMapPosition`, `loadSelectedCharacter` mantêm responsabilidade de atualizar `state` em `GameData`.
+- [x] **Smoke test extenso**:
+  - [x] Criar slot novo, completar fase 1, voltar mapa, ver fase 2 desbloqueada
+  - [x] Completar mundo 1, ver tela de World Complete (resgata baterista)
+  - [x] Trocar personagem, voltar para fase, sprite trocado
+  - [x] Morrer 5x, ver game over, voltar ao mapa com mundo reiniciado
+  - [x] Coletar 1up
+  - [x] Bater recorde de tempo
+  - [x] Rodar com `?mapDebug=true` e verificar logs
 
 **Esforço**: 4-6h · **Risco**: 🟡 Médio (módulo grande, muita regra de domínio)
 
@@ -306,6 +305,16 @@ Cada fase é **mergeable independentemente**: termine, comite, teste o jogo, pro
 - **Localização em `js/data/`**: `FeatureFlags` não persiste em `localStorage` (toggles não sobrevivem ao refresh), então tecnicamente não é "data". Mas conceitualmente é "runtime configuration state" — não cabe em `core/` (que é estritamente imutável) nem em `loaders/` (que é Phaser-specific). Manter em `data/` por consistência com a estrutura proposta no plano.
 - **6 call sites externos preservados**: `MenuScene`, `EffectsManager`, `game.js`, `GameScene`, `PlayerController` continuam usando `GameData.FEATURES.X`, `GameData.isFeatureEnabled(...)`, `GameData.initFeatureFlags()`, `GameData.levelFeatureOverrides = ...` sem qualquer mudança.
 
+### Fase 5
+- **`slotId` é parâmetro explícito em TODOS os métodos com slot**: `ProgressTracker.markLevelComplete(slotId, idx)`, `ProgressTracker.getLives(slotId)`, etc. Isso mantém o módulo 100% puro (sem acoplamento com cache `state.activeSlot`) e o torna testável isoladamente. Os wrappers em `GameData` resolvem `this.getActiveSlot()` e passam adiante. Mesmo padrão adotado em `SaveManager`.
+- **Métodos PUROS (sem slot) também moraram aqui por agrupamento semântico**: `getCharacter(id)`, `getWorldForLevel(idx)`, `checkWorldCompletion(idx)`. Tecnicamente poderiam ir para `GameConfig` (são lookups na sua própria data), mas ficaria estranho ter "métodos" em `GameConfig` que prefere ser uma estrutura de dados pura. Manter em `ProgressTracker` agrupa todas operações relacionadas a "progresso/personagens/mundos" em um lugar.
+- **`loadSelectedCharacter` retorna `null` em vez de fallback 'vocalista'**: o comportamento original "não tocar `state.selectedCharacter` se não havia match válido" precisa de uma sinalização. ProgressTracker retorna `characterId | null`; o wrapper em `GameData` aplica o fallback 'vocalista' SEM tocar `state` quando recebe `null`, preservando o comportamento exato do original.
+- **`saveMapPosition` retorna `{worldId, levelIndex}` resolvido**: a auto-correção (worldId derivado de `getWorldForLevel(levelIndex)` quando inconsistente) acontece em `ProgressTracker`; o resultado resolvido é retornado para que o wrapper em `GameData` possa atualizar `state.currentWorld`/`state.mapCursorLevel` corretamente. Antes era acoplado.
+- **Logs `MapDebug` migrados de "via fachada" para chamada direta**: `ProgressTracker.saveMapPosition`/`loadMapPosition` chamam `MapDebug.log(...)`/`MapDebug.warn(...)` em vez do antigo `this.logMapDebug/this.logMapWarn` (que delegavam para `MapDebug`). Mais direto, mesmo comportamento.
+- **`saveRecord` ignora `playerName` e `topN`**: a assinatura original `saveRecord(level, time, playerName, topN=4)` mantinha esses parâmetros por compat com algum código mais antigo, mas a implementação atual nunca usou. ProgressTracker.saveRecord aceita só `(slotId, level, time)`. O wrapper em `GameData` mantém os 4 parâmetros na assinatura (com `_` underscore para indicar não usados) — preserva 100% a API externa.
+- **Liquidou a dívida técnica da Fase 3**: nenhum `this.getSlot()` ou `this.saveSlot()` restou em `GameData.js`. Tudo agora vai por `ProgressTracker` → `SaveManager`. Cadeia limpa.
+- **Redução massiva (–351 linhas em uma fase)**: `GameData.js` foi de 695 → 344 (–50%). Acumulado: 1386 → 344 (**–75%**). Esta fase sozinha removeu mais código do GameData do que as Fases 1-4 combinadas.
+
 ---
 
 ## Histórico de progresso
@@ -316,7 +325,7 @@ Cada fase é **mergeable independentemente**: termine, comite, teste o jogo, pro
 | 2 — SpriteLoader | ✅ **Concluído** | 06/06/2026 | GameData: 975 → 855 linhas (-12%, -120 total). SpriteLoader.js: 151 linhas. Smoke test no browser ✅ validado. |
 | 3 — SaveManager | ✅ **Concluído** | 06/06/2026 | GameData: 855 → 768 linhas (-10%, -618 total / -44%). SaveManager.js: 167 linhas. Smoke test no browser ✅ validado. |
 | 4 — FeatureFlags | ✅ **Concluído** | 06/06/2026 | GameData: 768 → 695 linhas (-9.5%, -691 total / -49.9%). FeatureFlags.js: 84 linhas. Resolveu duplicação `FEATURES_DEFAULTS` da Fase 1. Smoke test no browser ✅ validado. |
-| 5 — ProgressTracker | ⏳ Pendente | — | — |
+| 5 — ProgressTracker | ✅ **Concluído** | 06/06/2026 | GameData: 695 → 344 linhas (-50%, -1042 total / -75%). ProgressTracker.js: 439 linhas (25 métodos). Liquidou dívida técnica da Fase 3 (zero `this.getSlot/saveSlot`). Smoke test no browser ✅ validado. **Bônus**: corrigido aviso Canvas2D `willReadFrequently` em GameScene._getNonEmptyFrameCount (não-refactor, fora de escopo). |
 | 6 — GameState | ⏳ Pendente | — | — |
 | 7 — Finalizar fachada | ⏳ Pendente | — | — |
 | 8 — Migrar call sites (opcional) | ⏳ Pendente | — | — |

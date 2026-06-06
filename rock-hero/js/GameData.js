@@ -203,245 +203,89 @@ const GameData = {
     },
 
     // ==================== PROGRESSO (usa slot ativo) ====================
-    
-    /**
-     * Salva o nome do jogador no slot ativo
-     */
+    // Wrappers finos que resolvem o slot ativo e delegam para ProgressTracker.
+    // Métodos que também sincronizam `state` fazem isso APÓS a chamada.
+
     savePlayerName(playerName) {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return;
-        
-        const slot = this.getSlot(slotId);
-        if (slot) {
-            slot.playerName = playerName;
-            this.saveSlot(slotId, slot);
-        }
+        ProgressTracker.savePlayerName(this.getActiveSlot(), playerName);
         this.state.playerName = playerName;
     },
 
-    /**
-     * Carrega o nome do jogador do slot ativo
-     */
     loadPlayerName() {
-        const slotId = this.getActiveSlot();
-        if (slotId) {
-            const slot = this.getSlot(slotId);
-            if (slot) {
-                return slot.playerName || 'Anônimo';
-            }
-        }
-        return 'Anônimo';
+        return ProgressTracker.loadPlayerName(this.getActiveSlot());
     },
 
-    /**
-     * Marca uma fase como completa no slot ativo
-     */
     markLevelComplete(levelIndex) {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return;
-        
-        const slot = this.getSlot(slotId);
-        if (!slot) return;
-        
-        if (!slot.completedLevels) slot.completedLevels = [];
-        
-        if (!slot.completedLevels.includes(levelIndex)) {
-            slot.completedLevels.push(levelIndex);
-            slot.completedLevels.sort((a, b) => a - b);
-            this.saveSlot(slotId, slot);
-        }
+        ProgressTracker.markLevelComplete(this.getActiveSlot(), levelIndex);
     },
 
-    /**
-     * Retorna lista de fases completadas do slot ativo
-     */
     getCompletedLevels() {
-        const slotId = this.getActiveSlot();
-        if (slotId) {
-            const slot = this.getSlot(slotId);
-            if (slot && slot.completedLevels) {
-                return [...slot.completedLevels];
-            }
-        }
-        return [];
+        return ProgressTracker.getCompletedLevels(this.getActiveSlot());
     },
 
-    /**
-     * Verifica se uma fase foi completada
-     */
     isLevelComplete(levelIndex) {
-        return this.getCompletedLevels().includes(levelIndex);
+        return ProgressTracker.isLevelComplete(this.getActiveSlot(), levelIndex);
     },
 
-    /**
-     * Verifica se uma fase está desbloqueada
-     */
     isLevelUnlocked(levelIndex) {
-        if (levelIndex === 0) return true;
-        
-        const level = this.LEVELS[levelIndex];
-        if (!level) return false;
-        
-        const world = this.getWorldForLevel(levelIndex);
-        if (!world) return false;
-        
-        const levelIndexInWorld = world.levels.indexOf(levelIndex);
-        if (levelIndexInWorld === 0) {
-            return this.isWorldUnlocked(world.id);
-        }
-        
-        const previousLevelIndex = world.levels[levelIndexInWorld - 1];
-        return this.isLevelComplete(previousLevelIndex);
+        return ProgressTracker.isLevelUnlocked(this.getActiveSlot(), levelIndex);
     },
 
-    /**
-     * Verifica se um mundo está desbloqueado
-     */
     isWorldUnlocked(worldId) {
-        if (worldId === 1) return true;
-        
-        const previousWorld = this.WORLDS.find(w => w.id === worldId - 1);
-        return previousWorld ? this.isWorldComplete(previousWorld.id) : false;
+        return ProgressTracker.isWorldUnlocked(this.getActiveSlot(), worldId);
     },
 
-    /**
-     * Retorna a próxima fase não-completa de um mundo
-     */
     getNextUnlockedLevel(worldId) {
-        const world = this.WORLDS.find(w => w.id === worldId);
-        if (!world) return 0;
-        
-        for (const levelIndex of world.levels) {
-            if (!this.isLevelComplete(levelIndex)) {
-                return levelIndex;
-            }
-        }
-        
-        return world.levels[world.levels.length - 1];
+        return ProgressTracker.getNextUnlockedLevel(this.getActiveSlot(), worldId);
     },
 
-    /**
-     * Verifica se há progresso salvo no slot ativo
-     */
     hasProgress() {
-        return this.getCompletedLevels().length > 0;
+        return ProgressTracker.hasProgress(this.getActiveSlot());
     },
 
-    /**
-     * Limpa o progresso do slot ativo (usado apenas internamente)
-     */
     clearProgress() {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return;
-        
-        const slot = this.getSlot(slotId);
-        if (slot) {
-            slot.completedLevels = [];
-            slot.completedWorlds = [];
-            slot.unlockedCharacters = ['vocalista'];
-            slot.selectedCharacter = 'vocalista';
-            slot.mapPosition = { worldId: 1, levelIndex: 0 };
-            slot.bestTimes = {};
-            this.saveSlot(slotId, slot);
-        }
-        
+        ProgressTracker.clearProgress(this.getActiveSlot());
         this.state.currentLevel = 0;
         this.state.currentWorld = 1;
         this.state.mapCursorLevel = 0;
     },
 
-    /**
-     * Compatibilidade: saveProgress
-     */
+    /** Compat: API antiga usada por código legado */
     saveProgress(level, playerName) {
         this.savePlayerName(playerName);
         this.state.currentLevel = level;
         this.updateLastPlayed();
     },
 
-    /**
-     * Compatibilidade: loadProgress
-     */
+    /** Compat: API antiga usada por código legado */
     loadProgress() {
         const playerName = this.loadPlayerName();
         const completedLevels = this.getCompletedLevels();
-        const nextLevel = completedLevels.length > 0 
-            ? Math.max(...completedLevels) + 1 
+        const nextLevel = completedLevels.length > 0
+            ? Math.max(...completedLevels) + 1
             : 0;
-        
         return {
-            level: Math.min(nextLevel, this.LEVELS.length - 1),
-            playerName: playerName
+            level: Math.min(nextLevel, GameConfig.LEVELS.length - 1),
+            playerName
         };
     },
 
     // ==================== RANKINGS (por slot) ====================
 
     getTopRecords(level, limit = 4) {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return [];
-        
-        const slot = this.getSlot(slotId);
-        if (!slot || !slot.bestTimes) return [];
-        
-        // Para compatibilidade, retorna no formato de array
-        const time = slot.bestTimes[level];
-        if (time !== undefined) {
-            return [{
-                time: time,
-                playerName: slot.playerName,
-                date: slot.lastPlayedAt
-            }];
-        }
-        return [];
+        return ProgressTracker.getTopRecords(this.getActiveSlot(), level, limit);
     },
 
-    /**
-     * Salva um tempo no slot ativo
-     */
-    saveRecord(level, time, playerName, topN = 4) {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return { saved: false, position: 0, isRecord: false };
-        
-        const slot = this.getSlot(slotId);
-        if (!slot) return { saved: false, position: 0, isRecord: false };
-        
-        if (!slot.bestTimes) slot.bestTimes = {};
-        
-        const previousBest = slot.bestTimes[level];
-        const isNewRecord = previousBest === undefined || time < previousBest;
-        
-        if (isNewRecord) {
-            slot.bestTimes[level] = time;
-            this.saveSlot(slotId, slot);
-        }
-        
-        return {
-            saved: isNewRecord,
-            position: 1,
-            isRecord: isNewRecord
-        };
+    saveRecord(level, time, _playerName, _topN = 4) {
+        return ProgressTracker.saveRecord(this.getActiveSlot(), level, time);
     },
 
     getBestTime(level) {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return null;
-        
-        const slot = this.getSlot(slotId);
-        if (slot && slot.bestTimes) {
-            return slot.bestTimes[level] ?? null;
-        }
-        return null;
+        return ProgressTracker.getBestTime(this.getActiveSlot(), level);
     },
 
     getTotalBestTime() {
-        let total = 0;
-        for (let i = 0; i < this.LEVELS.length; i++) {
-            const best = this.getBestTime(i);
-            if (best === null) return null;
-            total += best;
-        }
-        return total;
+        return ProgressTracker.getTotalBestTime(this.getActiveSlot());
     },
 
     // ==================== FORMATAÇÃO ====================
@@ -452,62 +296,23 @@ const GameData = {
     formatDateShort(dateString) { return TimeFormatter.dateShort(dateString); },
 
     // ==================== MUNDOS E PERSONAGENS ====================
+    // Lookups PUROS (sem slot): checkWorldCompletion, getWorldForLevel, getCharacter
+    // Lookups COM slot: unlockCharacter, getUnlockedCharacters, isCharacterUnlocked
 
-    checkWorldCompletion(levelIndex) {
-        for (const world of this.WORLDS) {
-            const lastLevelOfWorld = Math.max(...world.levels);
-            if (levelIndex === lastLevelOfWorld) {
-                return world;
-            }
-        }
-        return null;
-    },
+    checkWorldCompletion(levelIndex) { return ProgressTracker.checkWorldCompletion(levelIndex); },
+    getWorldForLevel(levelIndex)     { return ProgressTracker.getWorldForLevel(levelIndex); },
+    getCharacter(characterId)        { return ProgressTracker.getCharacter(characterId); },
 
-    getWorldForLevel(levelIndex) {
-        return this.WORLDS.find(w => w.levels.includes(levelIndex)) || null;
-    },
-
-    /**
-     * Desbloqueia um personagem no slot ativo
-     */
     unlockCharacter(characterId) {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return;
-        
-        const slot = this.getSlot(slotId);
-        if (!slot) return;
-        
-        if (!slot.unlockedCharacters) slot.unlockedCharacters = ['vocalista'];
-        
-        if (!slot.unlockedCharacters.includes(characterId)) {
-            slot.unlockedCharacters.push(characterId);
-            this.saveSlot(slotId, slot);
-        }
+        ProgressTracker.unlockCharacter(this.getActiveSlot(), characterId);
     },
 
-    /**
-     * Retorna lista de personagens desbloqueados do slot ativo
-     */
     getUnlockedCharacters() {
-        const slotId = this.getActiveSlot();
-        if (slotId) {
-            const slot = this.getSlot(slotId);
-            if (slot && slot.unlockedCharacters) {
-                return [...slot.unlockedCharacters];
-            }
-        }
-        return ['vocalista'];
+        return ProgressTracker.getUnlockedCharacters(this.getActiveSlot());
     },
 
     isCharacterUnlocked(characterId) {
-        const character = this.CHARACTERS.find(c => c.id === characterId);
-        if (!character) return false;
-        if (character.unlockedByDefault) return true;
-        return this.getUnlockedCharacters().includes(characterId);
-    },
-
-    getCharacter(characterId) {
-        return this.CHARACTERS.find(c => c.id === characterId) || this.CHARACTERS[0];
+        return ProgressTracker.isCharacterUnlocked(this.getActiveSlot(), characterId);
     },
 
     // ==================== SPRITE LOADING UTILITIES ====================
@@ -542,232 +347,57 @@ const GameData = {
     },
 
     /**
-     * Carrega o personagem selecionado do slot ativo
+     * Carrega o personagem selecionado do slot ativo + atualiza state se válido.
+     * (ProgressTracker retorna null se inválido/inexistente; aqui aplicamos fallback
+     * 'vocalista' SEM tocar `state`, preservando o comportamento original.)
      */
     loadSelectedCharacter() {
-        const slotId = this.getActiveSlot();
-        if (slotId) {
-            const slot = this.getSlot(slotId);
-            if (slot && slot.selectedCharacter && this.isCharacterUnlocked(slot.selectedCharacter)) {
-                this.state.selectedCharacter = slot.selectedCharacter;
-                return slot.selectedCharacter;
-            }
+        const characterId = ProgressTracker.loadSelectedCharacter(this.getActiveSlot());
+        if (characterId) {
+            this.state.selectedCharacter = characterId;
+            return characterId;
         }
         return 'vocalista';
     },
 
     getAvailableCharacters() {
-        return this.CHARACTERS.filter(c => this.isCharacterUnlocked(c.id));
+        return ProgressTracker.getAvailableCharacters(this.getActiveSlot());
     },
 
-    /**
-     * Marca um mundo como completado no slot ativo
-     */
-    markWorldComplete(worldId) {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return;
-        
-        const slot = this.getSlot(slotId);
-        if (!slot) return;
-        
-        if (!slot.completedWorlds) slot.completedWorlds = [];
-        
-        if (!slot.completedWorlds.includes(worldId)) {
-            slot.completedWorlds.push(worldId);
-            this.saveSlot(slotId, slot);
-        }
-    },
-
-    getCompletedWorlds() {
-        const slotId = this.getActiveSlot();
-        if (slotId) {
-            const slot = this.getSlot(slotId);
-            if (slot && slot.completedWorlds) {
-                return [...slot.completedWorlds];
-            }
-        }
-        return [];
-    },
-
-    isWorldComplete(worldId) {
-        return this.getCompletedWorlds().includes(worldId);
-    },
-
-    getCurrentWorld() {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return this.WORLDS[0];
-        const slot = this.getSlot(slotId);
-        const worldId = slot?.mapPosition?.worldId || 1;
-        return this.WORLDS.find(w => w.id === worldId) || this.WORLDS[0];
-    },
+    markWorldComplete(worldId)  { ProgressTracker.markWorldComplete(this.getActiveSlot(), worldId); },
+    getCompletedWorlds()        { return ProgressTracker.getCompletedWorlds(this.getActiveSlot()); },
+    isWorldComplete(worldId)    { return ProgressTracker.isWorldComplete(this.getActiveSlot(), worldId); },
+    getCurrentWorld()           { return ProgressTracker.getCurrentWorld(this.getActiveSlot()); },
 
     // ==================== VIDAS ====================
 
-    getLives() {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return GC.LIVES.INITIAL;
-        const slot = this.getSlot(slotId);
-        if (!slot) return GC.LIVES.INITIAL;
-        return slot.lives ?? GC.LIVES.INITIAL;
-    },
+    getLives()      { return ProgressTracker.getLives(this.getActiveSlot()); },
+    setLives(count) { ProgressTracker.setLives(this.getActiveSlot(), count); },
+    addLife()       { return ProgressTracker.addLife(this.getActiveSlot()); },
+    loseLife()      { return ProgressTracker.loseLife(this.getActiveSlot()); },
 
-    setLives(count) {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return;
-        const slot = this.getSlot(slotId);
-        if (!slot) return;
-        slot.lives = Math.max(0, count);
-        this.saveSlot(slotId, slot);
-    },
-
-    addLife() {
-        const lives = this.getLives();
-        this.setLives(lives + 1);
-        return lives + 1;
-    },
-
-    loseLife() {
-        const lives = this.getLives();
-        const newLives = Math.max(0, lives - 1);
-        this.setLives(newLives);
-        return newLives;
-    },
-
-    /**
-     * Reseta o progresso de um mundo: remove fases e o mundo de completedLevels/completedWorlds,
-     * reposiciona o cursor na primeira fase do mundo.
-     */
     resetWorldProgress(worldId) {
-        const slotId = this.getActiveSlot();
-        if (!slotId) return;
-        const slot = this.getSlot(slotId);
-        if (!slot) return;
-
-        const world = this.WORLDS.find(w => w.id === worldId);
-        if (!world) return;
-
-        const worldLevelSet = new Set(world.levels);
-        slot.completedLevels = (slot.completedLevels || []).filter(l => !worldLevelSet.has(l));
-        slot.completedWorlds = (slot.completedWorlds || []).filter(w => w !== worldId);
-
-        slot.mapPosition = { worldId: worldId, levelIndex: world.levels[0] };
-
-        // Restaura vidas ao valor inicial
-        slot.lives = GC.LIVES.INITIAL;
-
-        this.saveSlot(slotId, slot);
+        ProgressTracker.resetWorldProgress(this.getActiveSlot(), worldId);
     },
 
+    // ==================== MAP POSITION ====================
+
     /**
-     * Salva a posição do cursor no mapa do slot ativo.
-     * worldId é sempre derivado de levelIndex quando possível (evita { worldId: 1, levelIndex: 5 }).
-     * @param {string} [source] - só para log com ?mapDebug=true (ex.: 'victory:nextLevel', 'worldMap.navigate')
+     * Salva a posição do cursor do mapa e sincroniza state.
+     * ProgressTracker faz auto-correção do worldId baseada em getWorldForLevel(levelIndex).
      */
     saveMapPosition(worldId, levelIndex, source = '') {
-        const worldForLevel = this.getWorldForLevel(levelIndex);
-        const resolvedWorldId = worldForLevel ? worldForLevel.id : (worldId ?? 1);
-
-        if (this.DEBUG_MAP_POSITION) {
-            const payload = {
-                source: source || '(não informado)',
-                callerWorldId: worldId,
-                levelIndex,
-                resolvedWorldId,
-                levelKey: this.LEVELS[levelIndex]?.key ?? '(inválido)'
-            };
-            if (worldForLevel && worldId != null && Number(worldId) !== Number(resolvedWorldId)) {
-                this.logMapWarn('saveMapPosition: worldId do chamador diferente do mundo da fase (corrigido)', payload);
-            } else if (!worldForLevel && levelIndex != null) {
-                this.logMapWarn('saveMapPosition: getWorldForLevel(levelIndex) null — usando fallback de worldId', payload);
-            } else {
-                this.logMapDebug('saveMapPosition', payload);
-            }
-        }
-
-        const slotId = this.getActiveSlot();
-        if (slotId) {
-            const slot = this.getSlot(slotId);
-            if (slot) {
-                slot.mapPosition = { worldId: resolvedWorldId, levelIndex };
-                this.saveSlot(slotId, slot);
-            }
-        } else if (this.DEBUG_MAP_POSITION) {
-            this.logMapWarn('saveMapPosition: sem slot ativo — state ainda atualizado', { resolvedWorldId, levelIndex });
-        }
-        this.state.currentWorld = resolvedWorldId;
-        this.state.mapCursorLevel = levelIndex;
+        const resolved = ProgressTracker.saveMapPosition(this.getActiveSlot(), worldId, levelIndex, source);
+        this.state.currentWorld = resolved.worldId;
+        this.state.mapCursorLevel = resolved.levelIndex;
     },
 
-    /**
-     * Carrega a posição do cursor no mapa do slot ativo
-     */
     loadMapPosition() {
-        const slotId = this.getActiveSlot();
-        if (!slotId) {
-            this.logMapDebug('loadMapPosition: sem slot ativo → padrão', { worldId: 1, levelIndex: 0 });
-            return { worldId: 1, levelIndex: 0 };
-        }
-
-        const slot = this.getSlot(slotId);
-        if (!slot || !slot.mapPosition) {
-            this.logMapDebug('loadMapPosition: slot sem mapPosition → padrão', { slotId, hasSlot: !!slot });
-            return { worldId: 1, levelIndex: 0 };
-        }
-
-        let { worldId, levelIndex } = slot.mapPosition;
-        const rawFromSlot = { worldId, levelIndex };
-
-        const correctWorld = this.getWorldForLevel(levelIndex);
-        if (correctWorld && correctWorld.id !== worldId) {
-            this.logMapWarn('loadMapPosition: INCONSISTÊNCIA slot — worldId não corresponde à fase; corrigindo e salvando', {
-                antes: { ...rawFromSlot },
-                esperadoWorldId: correctWorld.id,
-                levelIndex
-            });
-            worldId = correctWorld.id;
-            slot.mapPosition = { worldId, levelIndex };
-            this.saveSlot(slotId, slot);
-        }
-
-        const world = this.WORLDS.find(w => w.id === worldId);
-        if (!world || !this.isWorldUnlocked(worldId)) {
-            this.logMapWarn('loadMapPosition: mundo bloqueado ou inválido → padrão', {
-                worldId,
-                levelIndex,
-                worldExists: !!world
-            });
-            return { worldId: 1, levelIndex: 0 };
-        }
-
-        if (this.isLevelUnlocked(levelIndex)) {
-            this.logMapDebug('loadMapPosition: ok', { worldId, levelIndex, levelKey: this.LEVELS[levelIndex]?.key });
-            return { worldId, levelIndex };
-        }
-
-        const fallbackLevel = this.getNextUnlockedLevel(worldId);
-        this.logMapWarn('loadMapPosition: fase ainda bloqueada — usando próximo nível desbloqueado do mundo', {
-            worldId,
-            requestedLevelIndex: levelIndex,
-            fallbackLevelIndex: fallbackLevel,
-            reason: 'isLevelUnlocked(levelIndex) === false'
-        });
-        return { worldId, levelIndex: fallbackLevel };
+        return ProgressTracker.loadMapPosition(this.getActiveSlot());
     },
 
     getWorldLevelsWithStatus(worldId) {
-        const world = this.WORLDS.find(w => w.id === worldId);
-        if (!world) return [];
-        
-        return world.levels.map(levelIndex => {
-            const level = this.LEVELS[levelIndex];
-            return {
-                ...level,
-                index: levelIndex,
-                isComplete: this.isLevelComplete(levelIndex),
-                isUnlocked: this.isLevelUnlocked(levelIndex),
-                bestTime: this.getBestTime(levelIndex)
-            };
-        });
+        return ProgressTracker.getWorldLevelsWithStatus(this.getActiveSlot(), worldId);
     },
 
     // ==================== CONTROLES VIRTUAIS ====================

@@ -207,10 +207,21 @@
     <!-- Phaser 3 via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
     
-    <!-- Game Scripts (ordem: dados → sons → constantes → managers → cenas → inicialização) -->
+    <!-- Game Scripts (ordem: core → dados → sons → constantes → managers → cenas → inicialização) -->
     <script>
         // Carrega scripts com cache-busting automático baseado na versão
         [
+            // Core: módulos puros sem dependências (Fase 1 da refatoração de GameData)
+            'js/core/GameConfig.js',
+            'js/core/TimeFormatter.js',
+            'js/core/MapDebug.js',
+            // Loaders: helpers Phaser que dependem de GameConfig (Fase 2)
+            'js/loaders/SpriteLoader.js',
+            // Data: persistência (localStorage) que depende de GameConfig (Fase 3)
+            'js/data/SaveManager.js',
+            // Data: feature flags runtime + overrides por fase (Fase 4)
+            'js/data/FeatureFlags.js',
+            // Fachada (depende de core/*, loaders/* e data/*)
             'js/GameData.js',
             'js/SoundManager.js',
             'js/constants.js',

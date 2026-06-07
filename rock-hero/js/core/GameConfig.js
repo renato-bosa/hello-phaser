@@ -397,7 +397,7 @@ const GameConfig = {
         // ==================== MUNDO 4 — Mecânicas Experimentais ====================
         {
             key: 'map19',
-            file: 'assets/map-19-upsidedown.json',
+            file: 'assets/map-19.json',
             name: 'Ponta-Cabeça',
             zoom: 1.0,
             roundPixels: true,

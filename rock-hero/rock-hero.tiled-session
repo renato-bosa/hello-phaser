@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map-19.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -28,8 +28,8 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 4,
@@ -94,8 +94,8 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.5,
             "selectedLayer": 4,
@@ -629,11 +629,11 @@
             "scaleInDock": 1
         },
         "dev-resources/map-19.tmx": {
-            "scale": 1,
-            "selectedLayer": 0,
+            "scale": 0.33,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 75.5,
-                "y": 77
+                "x": 1112.1212121212122,
+                "y": 281.81818181818176
             }
         },
         "dev-resources/map-19.tmx#1up": {
@@ -806,14 +806,14 @@
         },
         "dev-resources/map-20-auto-rolagem.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.33,
-            "selectedLayer": 4,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 1346.969696969697,
-                "y": 924.2424242424242
+                "x": 1054.5454545454545,
+                "y": 736.3636363636364
             }
         },
         "dev-resources/map-20-auto-rolagem.tmx#1up": {
@@ -876,6 +876,15 @@
         "dev-resources/map-20-auto-rolagem.tmx#mushroom-purple": {
             "scaleInDock": 1
         },
+        "dev-resources/map-20-auto-rolagem.tmx#nuvem-continuacao": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#nuvem-sorriso": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-20-auto-rolagem.tmx#nuvemzita": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-20-auto-rolagem.tmx#sapo-tomate-6fps": {
             "scaleInDock": 1
         },
@@ -893,14 +902,14 @@
         },
         "dev-resources/map-21-nuvens.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
-            "scale": 0.75,
+            "scale": 0.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1727.333333333333,
-                "y": 282.6666666666667
+                "x": 1432,
+                "y": 238
             }
         },
         "dev-resources/map-21-nuvens.tmx#1up": {

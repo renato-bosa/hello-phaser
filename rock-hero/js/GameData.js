@@ -1,27 +1,28 @@
 /**
- * GAME DATA - Fachada centralizada (em refatoração — ver REFACTOR-GameData.md)
+ * GAME DATA - Fachada centralizada (refatoração — ver REFACTOR-GameData.md)
  *
- * Em transição para uma arquitetura modular. Atualmente delega para:
- * - GameConfig    (constantes estáticas: CHARACTERS, WORLDS, LEVELS, DEFAULTS, ...)
- * - TimeFormatter (formatação de tempo/data)
- * - MapDebug      (logs condicionais para debug do mapa)
+ * Após Fase 6, este arquivo é apenas uma camada de delegação para módulos especializados:
+ * - GameConfig      → constantes estáticas (CHARACTERS, WORLDS, LEVELS, DEFAULTS, ...)
+ * - TimeFormatter   → formatação de tempo/data
+ * - MapDebug        → logs condicionais para debug do mapa
+ * - SpriteLoader    → helpers Phaser de sprites de personagens
+ * - SaveManager     → CRUD de slots em localStorage
+ * - FeatureFlags    → feature flags + overrides por fase
+ * - ProgressTracker → progresso do jogador no slot (fases/mundos/personagens/vidas/recordes/mapa)
+ * - GameState       → state runtime em memória + VERSION + assetUrl + virtualControls
  *
- * Em fases futuras serão extraídos:
- * - SaveManager     (sistema de slots / localStorage)
- * - ProgressTracker (regras de progresso: fases, mundos, personagens, vidas, recordes)
- * - FeatureFlags    (feature flags + overrides por fase)
- * - SpriteLoader    (helpers de sprites Phaser)
- * - GameState       (state runtime + VERSION + virtualControls)
+ * O método `getActiveSlot()` mantém um cache local de `state.activeSlot` para
+ * evitar reler localStorage a cada chamada — é por isso que orquestradores como
+ * `createNewGame`, `deleteSlot`, `setActiveSlot`, `loadSlotIntoState` ainda
+ * vivem aqui (em vez de SaveManager): eles sincronizam o cache com storage.
  */
 
 const GameData = {
-    // ==================== VERSÃO ====================
-    VERSION: `v${window.GAME_VERSION || '0.0'}`,
+    // ==================== VERSÃO + ASSETS ====================
+    // Delegam para GameState
 
-    // Helper para cache-busting em caminhos de assets
-    assetUrl(path) {
-        return `${path}?v=${this.VERSION}`;
-    },
+    get VERSION() { return GameState.VERSION; },
+    assetUrl(path) { return GameState.assetUrl(path); },
 
     /**
      * Debug do cursor no mapa (ativar com ?mapDebug=true na URL — ver game.js).
@@ -69,19 +70,10 @@ const GameData = {
     // Delega para GameConfig.DEFAULTS
     get DEFAULTS() { return GameConfig.DEFAULTS; },
 
-    // Estado atual do jogo (em memória, não localStorage)
-    state: {
-        currentLevel: 0,
-        currentWorld: 1,
-        playerName: 'Anônimo',
-        isPaused: false,
-        elapsedTime: 0,
-        selectedCharacter: 'vocalista',
-        mapCursorLevel: 0, // Posição do cursor no WorldMap
-        activeSlot: null, // Slot ativo (1-4)
-        // Referência à cena do jogo (para resume)
-        gameSceneRef: null
-    },
+    // ==================== STATE RUNTIME ====================
+    // Getter retorna a referência viva de GameState.state, então mutações em
+    // `GameData.state.X = Y` continuam funcionando transparentemente.
+    get state() { return GameState.state; },
 
     // ==================== SISTEMA DE SLOTS ====================
     // CRUD puro de localStorage delega para SaveManager.
@@ -89,25 +81,7 @@ const GameData = {
     // loadSlotIntoState) ficam aqui porque mantêm o cache `state.activeSlot`
     // e populam state em memória. Migrarão para GameState na Fase 6.
 
-    createEmptySlot(slotId) {
-        return SaveManager.createEmptySlot(slotId);
-    },
-
-    getAllSlots() {
-        return SaveManager.getAllSlots();
-    },
-
-    saveAllSlots(slots) {
-        SaveManager.saveAllSlots(slots);
-    },
-
-    getSlot(slotId) {
-        return SaveManager.getSlot(slotId);
-    },
-
-    saveSlot(slotId, slotData) {
-        SaveManager.saveSlot(slotId, slotData);
-    },
+    getSlot(slotId) { return SaveManager.getSlot(slotId); },
 
     /**
      * Cria um novo jogo em um slot: monta o slot, persiste,
@@ -174,33 +148,9 @@ const GameData = {
         this.state.activeSlot = slot.id;
     },
 
-    /**
-     * Carrega o slot ativo (se existir) para o state em memória.
-     * @returns {boolean} true se algum slot foi carregado.
-     */
-    loadActiveSlotIntoState() {
-        const slotId = this.getActiveSlot();
-        if (slotId) {
-            const slot = SaveManager.getSlot(slotId);
-            if (slot) {
-                this.loadSlotIntoState(slot);
-                return true;
-            }
-        }
-        return false;
-    },
-
-    updateLastPlayed() {
-        SaveManager.updateLastPlayed(this.getActiveSlot());
-    },
-
-    hasAnyProgress() {
-        return SaveManager.hasAnyProgress();
-    },
-
-    getSlotSummary(slotId) {
-        return SaveManager.getSlotSummary(slotId);
-    },
+    updateLastPlayed()    { SaveManager.updateLastPlayed(this.getActiveSlot()); },
+    hasAnyProgress()      { return SaveManager.hasAnyProgress(); },
+    getSlotSummary(slotId){ return SaveManager.getSlotSummary(slotId); },
 
     // ==================== PROGRESSO (usa slot ativo) ====================
     // Wrappers finos que resolvem o slot ativo e delegam para ProgressTracker.
@@ -250,24 +200,14 @@ const GameData = {
         this.state.mapCursorLevel = 0;
     },
 
-    /** Compat: API antiga usada por código legado */
+    /**
+     * Compat: API antiga ainda usada por PauseMenu (salva nome + level atual + timestamp).
+     * Pode virar inline futuramente quando PauseMenu for atualizado.
+     */
     saveProgress(level, playerName) {
         this.savePlayerName(playerName);
         this.state.currentLevel = level;
         this.updateLastPlayed();
-    },
-
-    /** Compat: API antiga usada por código legado */
-    loadProgress() {
-        const playerName = this.loadPlayerName();
-        const completedLevels = this.getCompletedLevels();
-        const nextLevel = completedLevels.length > 0
-            ? Math.max(...completedLevels) + 1
-            : 0;
-        return {
-            level: Math.min(nextLevel, GameConfig.LEVELS.length - 1),
-            playerName
-        };
     },
 
     // ==================== RANKINGS (por slot) ====================
@@ -401,17 +341,10 @@ const GameData = {
     },
 
     // ==================== CONTROLES VIRTUAIS ====================
+    // Delega para GameState
 
     getVirtualControls() {
-        return window.virtualControls || {
-            left: false,
-            right: false,
-            jump: false,
-            jumpHeld: false,
-            jumpJustPressed: false,
-            back: false,
-            backJustPressed: false
-        };
+        return GameState.getVirtualControls();
     }
 };
 

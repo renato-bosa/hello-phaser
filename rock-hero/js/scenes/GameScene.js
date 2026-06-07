@@ -21,7 +21,6 @@ class GameScene extends Phaser.Scene {
 
         GameData.state.currentLevel = this.currentLevel;
         GameData.state.playerName = this.playerName;
-        GameData.state.gameSceneRef = this;
     }
 
     preload() {
@@ -1450,6 +1449,5 @@ class GameScene extends Phaser.Scene {
         this.pauseMenu.clearListeners();
         if (this.effectsManager) this.effectsManager.destroy();
         if (this.playerController) this.playerController.destroy();
-        GameData.state.gameSceneRef = null;
     }
 }

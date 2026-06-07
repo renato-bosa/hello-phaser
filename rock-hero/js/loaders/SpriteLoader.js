@@ -9,7 +9,7 @@
  *
  * Depende de:
  * - GameConfig (para lista CHARACTERS)
- * - GameData.assetUrl() (cache-busting) — será movido para GameState na Fase 6
+ * - GameState (assetUrl para cache-busting)
  *
  * Uso:
  *   SpriteLoader.loadCharacterSprites(this);                    // todos
@@ -59,7 +59,7 @@ const SpriteLoader = {
                 if (!sprite || loadedKeys.has(sprite.key)) return;
                 loadedKeys.add(sprite.key);
 
-                scene.load.spritesheet(sprite.key, GameData.assetUrl(sprite.file), {
+                scene.load.spritesheet(sprite.key, GameState.assetUrl(sprite.file), {
                     frameWidth: sprite.frameWidth,
                     frameHeight: sprite.frameHeight
                 });

@@ -213,11 +213,12 @@ Cada fase é **mergeable independentemente**: termine, comite, teste o jogo, pro
 ---
 
 ### Fase 6 — Extrair `GameState`
-- [ ] Criar `js/core/GameState.js` com `state`, `VERSION`, `assetUrl()`, `getVirtualControls()`
-- [ ] **Remover** `state.gameSceneRef` (anti-pattern, verificar se algo usa antes — `Grep` no projeto)
-- [ ] Atualizar `index.html`
-- [ ] Em `GameData.js`: `get state()`, `get VERSION()`, `assetUrl`, `getVirtualControls`
-- [ ] **Smoke test**: jogo carrega, versão aparece no canto, controles virtuais funcionam em mobile
+- [x] Criar `js/core/GameState.js` com `state`, `VERSION`, `assetUrl()`, `getVirtualControls()`
+- [x] **Remover** `state.gameSceneRef` (confirmado dead code: 2 writes em GameScene, **zero leituras** no projeto)
+- [x] Atualizar `index.html`
+- [x] Em `GameData.js`: `get state()` (retorna ref viva), `get VERSION()`, `assetUrl`, `getVirtualControls`
+- [x] **Bônus**: `SpriteLoader.loadCharacterSprites` migrado de `GameData.assetUrl` para `GameState.assetUrl` — eliminou a dependência cruzada lazy documentada na Fase 2
+- [x] **Smoke test**: jogo carrega, versão aparece no canto, controles virtuais funcionam em mobile
 
 **Esforço**: 1-2h · **Risco**: 🟢 Baixo
 
@@ -315,6 +316,29 @@ Cada fase é **mergeable independentemente**: termine, comite, teste o jogo, pro
 - **Liquidou a dívida técnica da Fase 3**: nenhum `this.getSlot()` ou `this.saveSlot()` restou em `GameData.js`. Tudo agora vai por `ProgressTracker` → `SaveManager`. Cadeia limpa.
 - **Redução massiva (–351 linhas em uma fase)**: `GameData.js` foi de 695 → 344 (–50%). Acumulado: 1386 → 344 (**–75%**). Esta fase sozinha removeu mais código do GameData do que as Fases 1-4 combinadas.
 
+### Fase 6
+- **`gameSceneRef` era dead code 100% confirmado**: `Grep` no projeto inteiro encontrou apenas 2 ocorrências, ambas WRITES em `GameScene.js` (`init()` setava `this`, `shutdown()` setava `null`). Nenhuma leitura. Remoção segura, sem comportamento alterado. Documentado no JSDoc do `GameState.js`.
+- **`get state()` retorna referência viva**: igual ao que foi feito com `FEATURES` na Fase 4. Todos os call sites como `GameData.state.X = Y` (escrita) e `const x = GameData.state.X` (leitura) continuam funcionando — porque o getter retorna o MESMO objeto a cada chamada, mutações via índice/propriedade vazam corretamente para `GameState.state`.
+- **Resolveu a dep cruzada da Fase 2**: `SpriteLoader.loadCharacterSprites` agora chama `GameState.assetUrl()` direto (era `GameData.assetUrl()` lazy). Como `GameState` é carregado ANTES de `SpriteLoader` em `index.html`, a referência é resolvida imediatamente — sem mais "lazy lookup" no protótipo do GameData. Cadeia de deps `loaders/* → core/*` é estritamente unidirecional agora.
+- **`VERSION` virou getter (era propriedade direta)**: antes, `GameData.VERSION` era avaliado uma vez no carregamento do módulo (`v${window.GAME_VERSION || '0.0'}`). Agora, com getter, sempre lê `GameState.VERSION`. Mesma string, leitura preguiçosa via fachada. (`GameState.VERSION` em si continua sendo avaliado uma vez no load do módulo — semântica preservada.)
+- **Header comment do GameData reescrito**: documenta os 8 módulos da arquitetura final e justifica por que orquestradores como `setActiveSlot`/`createNewGame` ainda vivem em `GameData` (gerenciam o cache `state.activeSlot`).
+- **Redução pequena, ganho semântico grande**: GameData saiu de 344 → 329 linhas (–15). A maior parte foi conversão de propriedades diretas (`state: {...}`) para getters (`get state()`), que tem pouco impacto em linhas. Mas o estado runtime agora vive num módulo dedicado, possibilitando futuras migrações (Fase 8 — chamar `GameState.X` direto) ou observabilidade (Phase futura — listeners de mudança).
+- **Estrutura final dos módulos** (após Fase 6):
+  ```
+  core/
+    GameConfig.js       (estático puro)
+    TimeFormatter.js    (estático puro)
+    MapDebug.js         (estático puro)
+    GameState.js        (runtime + utils globais)
+  loaders/
+    SpriteLoader.js     (helpers Phaser, depende de GameConfig + GameState)
+  data/
+    SaveManager.js      (storage puro, depende de GameConfig)
+    FeatureFlags.js     (runtime, depende de GameConfig)
+    ProgressTracker.js  (storage + logic, depende de SaveManager + GameConfig + MapDebug)
+  GameData.js           (fachada de delegação)
+  ```
+
 ---
 
 ## Histórico de progresso
@@ -326,6 +350,6 @@ Cada fase é **mergeable independentemente**: termine, comite, teste o jogo, pro
 | 3 — SaveManager | ✅ **Concluído** | 06/06/2026 | GameData: 855 → 768 linhas (-10%, -618 total / -44%). SaveManager.js: 167 linhas. Smoke test no browser ✅ validado. |
 | 4 — FeatureFlags | ✅ **Concluído** | 06/06/2026 | GameData: 768 → 695 linhas (-9.5%, -691 total / -49.9%). FeatureFlags.js: 84 linhas. Resolveu duplicação `FEATURES_DEFAULTS` da Fase 1. Smoke test no browser ✅ validado. |
 | 5 — ProgressTracker | ✅ **Concluído** | 06/06/2026 | GameData: 695 → 344 linhas (-50%, -1042 total / -75%). ProgressTracker.js: 439 linhas (25 métodos). Liquidou dívida técnica da Fase 3 (zero `this.getSlot/saveSlot`). Smoke test no browser ✅ validado. **Bônus**: corrigido aviso Canvas2D `willReadFrequently` em GameScene._getNonEmptyFrameCount (não-refactor, fora de escopo). |
-| 6 — GameState | ⏳ Pendente | — | — |
+| 6 — GameState | ✅ **Concluído** | 07/06/2026 | GameData: 344 → 329 linhas (-4%, -1057 total / -76%). GameState.js: 77 linhas. Removeu `state.gameSceneRef` (dead code, 2 writes em GameScene removidos). **Bônus**: SpriteLoader agora chama `GameState.assetUrl` direto (elimina dep cruzada da Fase 2). Smoke test no browser ✅ validado. |
 | 7 — Finalizar fachada | ⏳ Pendente | — | — |
 | 8 — Migrar call sites (opcional) | ⏳ Pendente | — | — |

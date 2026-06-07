@@ -57,7 +57,7 @@ const config = {
     },
     
     // Ordem: MenuScene primeiro (cena inicial)
-    scene: [MenuScene, SlotSelectScene, WorldMapScene, CharacterSelectScene, GameScene, WorldCompleteScene],
+    scene: [MenuScene, SlotSelectScene, CutsceneScene, WorldMapScene, CharacterSelectScene, GameScene, WorldCompleteScene],
     
     // Callbacks para debug de FPS
     callbacks: {

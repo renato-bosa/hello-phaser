@@ -48,6 +48,20 @@ class WorldMapScene extends Phaser.Scene {
     preload() {
         const selectedId = GameData.state.selectedCharacter || GameData.loadSelectedCharacter();
         GameData.loadCharacterSprites(this, selectedId);
+
+        // Pré-carrega a imagem de fundo do mundo atual, se configurada.
+        // Mundos sem `bgImage` continuam usando a decoração procedural (fallback).
+        const worldData = GameData.WORLDS.find(w => w.id === this.currentWorldId);
+        if (worldData && worldData.bgImage) {
+            const key = this._worldBgKey(this.currentWorldId);
+            if (!this.textures.exists(key)) {
+                this.load.image(key, GameData.assetUrl(worldData.bgImage));
+            }
+        }
+    }
+
+    _worldBgKey(worldId) {
+        return `worldmap-bg-${worldId}`;
     }
 
     create() {
@@ -88,11 +102,28 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     createBackground(width, height) {
-        // Fundo com cor do tema do mundo
+        // Cor base sempre desenhada por trás (evita "vazamento" caso a imagem
+        // tenha aspecto diferente do canvas, e serve como fallback se a textura falhar).
         const bgColor = this.worldData?.bgColor || 0x87CEEB;
         this.add.rectangle(0, 0, width, height, bgColor).setOrigin(0);
-        
-        // Decoração: nuvens ou elementos do tema
+
+        const bgKey = this._worldBgKey(this.currentWorldId);
+        const hasBgImage = this.worldData?.bgImage && this.textures.exists(bgKey);
+
+        if (hasBgImage) {
+            // Imagem pré-renderizada como fundo: aplica "cover" (preserva
+            // proporção e preenche o canvas, recortando excedente se necessário).
+            const img = this.add.image(width / 2, height / 2, bgKey).setOrigin(0.5);
+            const src = img.texture.getSourceImage();
+            const scale = Math.max(width / src.width, height / src.height);
+            img.setScale(scale);
+
+            // Arte não-pixel: filtro linear para suavizar o upscale/downscale.
+            this.textures.get(bgKey).setFilter(Phaser.Textures.FilterMode.LINEAR);
+            return;
+        }
+
+        // Fallback procedural (mundos sem bgImage configurada)
         this.createBackgroundDecoration(width, height);
     }
 
@@ -209,24 +240,41 @@ class WorldMapScene extends Phaser.Scene {
     createTitle(width) {
         // Nome do mundo
         const titleY = 35;
-        
+        const rectWidth = 400;
+        const rectHalfWidth = rectWidth / 2;
+
         // Fundo do título
-        this.add.rectangle(width / 2, titleY, 400, 50, 0x000000, 0.6)
+        this.add.rectangle(width / 2, titleY, rectWidth, 50, 0x000000, 0.6)
             .setStrokeStyle(2, 0xffffff);
-        
+
         // Texto do título
         this.add.text(width / 2, titleY - 8, this.worldData?.name || 'Mundo', {
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '16px',
             color: '#ffffff'
         }).setOrigin(0.5);
-        
+
         // Subtítulo
         this.add.text(width / 2, titleY + 12, this.worldData?.subtitle || '', {
             fontFamily: 'Arial',
             fontSize: '11px',
             color: '#cccccc'
         }).setOrigin(0.5);
+
+        // Contador de vidas (dentro do retângulo, lado direito).
+        // No WorldMap as vidas não mudam, mas guardamos a referência para
+        // facilitar futuras mecânicas (extra-life no mapa, portais, etc.).
+        const lives = GameData.getLives();
+        this.livesText = this.add.text(
+            width / 2 + rectHalfWidth - 12, titleY, `🎵 x${lives}`,
+            {
+                fontFamily: '"Press Start 2P", monospace',
+                fontSize: '15px',
+                color: '#ffffff',
+                stroke: '#000000',
+                strokeThickness: 2
+            }
+        ).setOrigin(1, 0.5);
     }
 
     createPaths() {
@@ -616,23 +664,31 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     createInfoPanel(width, height) {
-        // Painel de informações da fase selecionada
-        const panelX = width - 120;
-        const panelY = 120;
-        
+        // Painel de informações da fase selecionada.
+        // Posicionado horizontalmente centralizado, logo abaixo do retângulo do título
+        // (título ocupa y=10..60, então deixamos ~6px de respiro antes do painel).
+        const panelWidth = 280;
+        const panelHeight = 60;
+        const panelX = width / 2;
+        const panelY = 66 + panelHeight / 2; // top do painel em y=66
+
         // Fundo
-        this.infoPanelBg = this.add.rectangle(panelX, panelY, 200, 100, 0x000000, 0.8)
+        this.infoPanelBg = this.add.rectangle(panelX, panelY, panelWidth, panelHeight, 0x000000, 0.8)
             .setStrokeStyle(2, 0x666666);
-        
+
+        // Espaçamento vertical entre linhas (mais apertado que o original de 25/30px
+        // para acomodar a altura reduzida sem sobreposição).
+        const rowGap = 20;
+
         // Nome da fase
-        this.infoLevelName = this.add.text(panelX, panelY - 30, '', {
+        this.infoLevelName = this.add.text(panelX, panelY - rowGap, '', {
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '11px',
             color: '#ffffff',
             align: 'center',
-            wordWrap: { width: 180 }
+            wordWrap: { width: panelWidth - 20 }
         }).setOrigin(0.5);
-        
+
         // Status
         this.infoStatus = this.add.text(panelX, panelY, '', {
             fontFamily: 'Arial',
@@ -640,9 +696,9 @@ class WorldMapScene extends Phaser.Scene {
             color: '#aaaaaa',
             align: 'center'
         }).setOrigin(0.5);
-        
+
         // Melhor tempo
-        this.infoBestTime = this.add.text(panelX, panelY + 25, '', {
+        this.infoBestTime = this.add.text(panelX, panelY + rowGap, '', {
             fontFamily: 'monospace',
             fontSize: '12px',
             color: '#00ffff',

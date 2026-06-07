@@ -596,14 +596,17 @@ class SlotSelectScene extends Phaser.Scene {
         
         // Cria o novo jogo
         GameData.createNewGame(this.newGameSlotId, name);
-        
+
         SoundManager.play('menuSelect');
 
         // Remove input overlay
         this.cleanupNameInput();
 
-        // Vai para o WorldMap
-        this.scene.start('WorldMapScene', {});
+        // Vai para a cutscene de abertura, que ao final encaminha para o WorldMap
+        this.scene.start('CutsceneScene', {
+            cutsceneId: 'opening',
+            next: { scene: 'WorldMapScene', data: {} }
+        });
     }
 
     cancelNameInput() {

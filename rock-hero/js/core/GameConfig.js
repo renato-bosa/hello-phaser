@@ -182,8 +182,9 @@ const GameConfig = {
             celebrationMessage: 'Você resgatou o Baterista!',
             // Visual no WorldMap
             theme: 'grass',
-            bgColor: 0x87CEEB, // Azul céu
-            pathColor: 0x8B4513 // Marrom terra
+            bgColor: 0x87CEEB, // Azul céu (fallback caso bgImage não carregue)
+            pathColor: 0x8B4513, // Marrom terra
+            bgImage: 'assets/spritesheets/worldmap-backgrounds/world1.png'
         },
         {
             id: 2,
@@ -427,6 +428,33 @@ const GameConfig = {
             connectsTo: []
         }
     ],
+
+    // ==================== CUTSCENES ====================
+    // Sequências de imagens pré-renderizadas exibidas via CutsceneScene.
+    //
+    // Cada cutscene tem:
+    // - frames: array de { file } — caminho da imagem pré-renderizada
+    // - unlockMs: ms mínimos antes de liberar avanço manual em cada frame
+    // - fadeMs: duração do crossfade entre frames
+    // - bgColor: cor de fundo (letterbox se imagem não cobrir o canvas)
+    //
+    // Para adicionar uma nova cutscene: criar nova entrada + chamar
+    //   scene.start('CutsceneScene', { cutsceneId: 'X', next: { scene: 'Y', data: {} } })
+    CUTSCENES: {
+        opening: {
+            frames: [
+                { file: 'assets/spritesheets/cutscenes/cut-scene1-abertura-1-6.png' },
+                { file: 'assets/spritesheets/cutscenes/cut-scene1-abertura-2-6.png' },
+                { file: 'assets/spritesheets/cutscenes/cut-scene1-abertura-3-6.png' },
+                { file: 'assets/spritesheets/cutscenes/cut-scene1-abertura-4-6.png' },
+                { file: 'assets/spritesheets/cutscenes/cut-scene1-abertura-5-6.png' },
+                { file: 'assets/spritesheets/cutscenes/cut-scene1-abertura-6-6.png' }
+            ],
+            unlockMs: 2000,
+            fadeMs: 600,
+            bgColor: 0x000000
+        }
+    },
 
     // ==================== VALORES PADRÃO ====================
     DEFAULTS: {

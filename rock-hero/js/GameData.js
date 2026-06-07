@@ -1,20 +1,29 @@
 /**
- * GAME DATA - Fachada centralizada (refatoração — ver REFACTOR-GameData.md)
+ * GAME DATA - Fachada centralizada
  *
- * Após Fase 6, este arquivo é apenas uma camada de delegação para módulos especializados:
- * - GameConfig      → constantes estáticas (CHARACTERS, WORLDS, LEVELS, DEFAULTS, ...)
- * - TimeFormatter   → formatação de tempo/data
- * - MapDebug        → logs condicionais para debug do mapa
- * - SpriteLoader    → helpers Phaser de sprites de personagens
- * - SaveManager     → CRUD de slots em localStorage
- * - FeatureFlags    → feature flags + overrides por fase
- * - ProgressTracker → progresso do jogador no slot (fases/mundos/personagens/vidas/recordes/mapa)
- * - GameState       → state runtime em memória + VERSION + assetUrl + virtualControls
+ * Refatoração concluída (ver REFACTOR-GameData.md): de 1386 → 242 linhas (-82.5%).
+ * O arquivo é uma camada de delegação para os 8 módulos especializados abaixo.
+ * Toda lógica de negócio vive nos módulos; aqui só permanecem:
  *
- * O método `getActiveSlot()` mantém um cache local de `state.activeSlot` para
- * evitar reler localStorage a cada chamada — é por isso que orquestradores como
- * `createNewGame`, `deleteSlot`, `setActiveSlot`, `loadSlotIntoState` ainda
- * vivem aqui (em vez de SaveManager): eles sincronizam o cache com storage.
+ *   1) Getters/delegações de 1 linha que preservam a API pública existente.
+ *   2) Orquestradores finos (createNewGame, deleteSlot, setActiveSlot,
+ *      getActiveSlot, loadSlotIntoState, saveProgress) que mantêm o cache
+ *      `state.activeSlot` sincronizado com storage e atualizam `state` em
+ *      memória após operações em data modules.
+ *
+ * Mapa de delegação:
+ *   - GameConfig      → constantes estáticas (CHARACTERS, WORLDS, LEVELS, DEFAULTS, ...)
+ *   - TimeFormatter   → formatTime / formatDate / formatDateShort
+ *   - MapDebug        → logs condicionais (ativar com ?mapDebug=true na URL)
+ *   - SpriteLoader    → loadCharacterSprites / createCharacterAnimations / texture filters
+ *   - SaveManager     → CRUD de slots em localStorage
+ *   - FeatureFlags    → FEATURES + overrides por fase + init via URL
+ *   - ProgressTracker → progresso do jogador (fases, mundos, personagens, vidas, recordes, mapa)
+ *   - GameState       → state runtime + VERSION + assetUrl + virtualControls
+ *
+ * Os call sites externos (cenas, managers) seguem usando `GameData.X(...)`.
+ * A migração opcional para `Module.X(...)` direto está documentada como Fase 8
+ * no plano — sem ganho funcional, só estilístico.
  */
 
 const GameData = {
@@ -76,10 +85,9 @@ const GameData = {
     get state() { return GameState.state; },
 
     // ==================== SISTEMA DE SLOTS ====================
-    // CRUD puro de localStorage delega para SaveManager.
     // Orquestradores (createNewGame, deleteSlot, setActiveSlot, getActiveSlot,
-    // loadSlotIntoState) ficam aqui porque mantêm o cache `state.activeSlot`
-    // e populam state em memória. Migrarão para GameState na Fase 6.
+    // loadSlotIntoState) mantêm o cache `state.activeSlot` sincronizado com
+    // SaveManager (storage). Compõem múltiplos módulos numa operação atômica.
 
     getSlot(slotId) { return SaveManager.getSlot(slotId); },
 
@@ -161,37 +169,14 @@ const GameData = {
         this.state.playerName = playerName;
     },
 
-    loadPlayerName() {
-        return ProgressTracker.loadPlayerName(this.getActiveSlot());
-    },
-
-    markLevelComplete(levelIndex) {
-        ProgressTracker.markLevelComplete(this.getActiveSlot(), levelIndex);
-    },
-
-    getCompletedLevels() {
-        return ProgressTracker.getCompletedLevels(this.getActiveSlot());
-    },
-
-    isLevelComplete(levelIndex) {
-        return ProgressTracker.isLevelComplete(this.getActiveSlot(), levelIndex);
-    },
-
-    isLevelUnlocked(levelIndex) {
-        return ProgressTracker.isLevelUnlocked(this.getActiveSlot(), levelIndex);
-    },
-
-    isWorldUnlocked(worldId) {
-        return ProgressTracker.isWorldUnlocked(this.getActiveSlot(), worldId);
-    },
-
-    getNextUnlockedLevel(worldId) {
-        return ProgressTracker.getNextUnlockedLevel(this.getActiveSlot(), worldId);
-    },
-
-    hasProgress() {
-        return ProgressTracker.hasProgress(this.getActiveSlot());
-    },
+    loadPlayerName()                { return ProgressTracker.loadPlayerName(this.getActiveSlot()); },
+    markLevelComplete(levelIndex)   { ProgressTracker.markLevelComplete(this.getActiveSlot(), levelIndex); },
+    getCompletedLevels()            { return ProgressTracker.getCompletedLevels(this.getActiveSlot()); },
+    isLevelComplete(levelIndex)     { return ProgressTracker.isLevelComplete(this.getActiveSlot(), levelIndex); },
+    isLevelUnlocked(levelIndex)     { return ProgressTracker.isLevelUnlocked(this.getActiveSlot(), levelIndex); },
+    isWorldUnlocked(worldId)        { return ProgressTracker.isWorldUnlocked(this.getActiveSlot(), worldId); },
+    getNextUnlockedLevel(worldId)   { return ProgressTracker.getNextUnlockedLevel(this.getActiveSlot(), worldId); },
+    hasProgress()                   { return ProgressTracker.hasProgress(this.getActiveSlot()); },
 
     clearProgress() {
         ProgressTracker.clearProgress(this.getActiveSlot());
@@ -212,21 +197,10 @@ const GameData = {
 
     // ==================== RANKINGS (por slot) ====================
 
-    getTopRecords(level, limit = 4) {
-        return ProgressTracker.getTopRecords(this.getActiveSlot(), level, limit);
-    },
-
-    saveRecord(level, time, _playerName, _topN = 4) {
-        return ProgressTracker.saveRecord(this.getActiveSlot(), level, time);
-    },
-
-    getBestTime(level) {
-        return ProgressTracker.getBestTime(this.getActiveSlot(), level);
-    },
-
-    getTotalBestTime() {
-        return ProgressTracker.getTotalBestTime(this.getActiveSlot());
-    },
+    getTopRecords(level, limit = 4)                  { return ProgressTracker.getTopRecords(this.getActiveSlot(), level, limit); },
+    saveRecord(level, time, _playerName, _topN = 4)  { return ProgressTracker.saveRecord(this.getActiveSlot(), level, time); },
+    getBestTime(level)                               { return ProgressTracker.getBestTime(this.getActiveSlot(), level); },
+    getTotalBestTime()                               { return ProgressTracker.getTotalBestTime(this.getActiveSlot()); },
 
     // ==================== FORMATAÇÃO ====================
     // Delegam para TimeFormatter
@@ -243,40 +217,18 @@ const GameData = {
     getWorldForLevel(levelIndex)     { return ProgressTracker.getWorldForLevel(levelIndex); },
     getCharacter(characterId)        { return ProgressTracker.getCharacter(characterId); },
 
-    unlockCharacter(characterId) {
-        ProgressTracker.unlockCharacter(this.getActiveSlot(), characterId);
-    },
-
-    getUnlockedCharacters() {
-        return ProgressTracker.getUnlockedCharacters(this.getActiveSlot());
-    },
-
-    isCharacterUnlocked(characterId) {
-        return ProgressTracker.isCharacterUnlocked(this.getActiveSlot(), characterId);
-    },
+    unlockCharacter(characterId)     { ProgressTracker.unlockCharacter(this.getActiveSlot(), characterId); },
+    getUnlockedCharacters()          { return ProgressTracker.getUnlockedCharacters(this.getActiveSlot()); },
+    isCharacterUnlocked(characterId) { return ProgressTracker.isCharacterUnlocked(this.getActiveSlot(), characterId); },
 
     // ==================== SPRITE LOADING UTILITIES ====================
     // Delegam para SpriteLoader (helpers Phaser para sprites de personagens)
 
-    loadCharacterSprites(scene, characterIds = null) {
-        SpriteLoader.loadCharacterSprites(scene, characterIds);
-    },
-
-    createCharacterAnimations(scene, characterId, prefix = '', recreate = false) {
-        SpriteLoader.createCharacterAnimations(scene, characterId, prefix, recreate);
-    },
-
-    getCharacterTextureKey(characterId, state = 'idle') {
-        return SpriteLoader.getCharacterTextureKey(characterId, state);
-    },
-
-    applyPixelArtFilter(scene, characterIds = null) {
-        SpriteLoader.applyPixelArtFilter(scene, characterIds);
-    },
-
-    applyLinearFilter(scene, characterIds = null) {
-        SpriteLoader.applyLinearFilter(scene, characterIds);
-    },
+    loadCharacterSprites(scene, characterIds = null)                       { SpriteLoader.loadCharacterSprites(scene, characterIds); },
+    createCharacterAnimations(scene, characterId, prefix='', recreate=false) { SpriteLoader.createCharacterAnimations(scene, characterId, prefix, recreate); },
+    getCharacterTextureKey(characterId, state = 'idle')                    { return SpriteLoader.getCharacterTextureKey(characterId, state); },
+    applyPixelArtFilter(scene, characterIds = null)                        { SpriteLoader.applyPixelArtFilter(scene, characterIds); },
+    applyLinearFilter(scene, characterIds = null)                          { SpriteLoader.applyLinearFilter(scene, characterIds); },
 
     /**
      * Salva o personagem selecionado no slot ativo + atualiza state em memória.
@@ -300,9 +252,7 @@ const GameData = {
         return 'vocalista';
     },
 
-    getAvailableCharacters() {
-        return ProgressTracker.getAvailableCharacters(this.getActiveSlot());
-    },
+    getAvailableCharacters()    { return ProgressTracker.getAvailableCharacters(this.getActiveSlot()); },
 
     markWorldComplete(worldId)  { ProgressTracker.markWorldComplete(this.getActiveSlot(), worldId); },
     getCompletedWorlds()        { return ProgressTracker.getCompletedWorlds(this.getActiveSlot()); },
@@ -316,9 +266,7 @@ const GameData = {
     addLife()       { return ProgressTracker.addLife(this.getActiveSlot()); },
     loseLife()      { return ProgressTracker.loseLife(this.getActiveSlot()); },
 
-    resetWorldProgress(worldId) {
-        ProgressTracker.resetWorldProgress(this.getActiveSlot(), worldId);
-    },
+    resetWorldProgress(worldId) { ProgressTracker.resetWorldProgress(this.getActiveSlot(), worldId); },
 
     // ==================== MAP POSITION ====================
 
@@ -332,20 +280,12 @@ const GameData = {
         this.state.mapCursorLevel = resolved.levelIndex;
     },
 
-    loadMapPosition() {
-        return ProgressTracker.loadMapPosition(this.getActiveSlot());
-    },
-
-    getWorldLevelsWithStatus(worldId) {
-        return ProgressTracker.getWorldLevelsWithStatus(this.getActiveSlot(), worldId);
-    },
+    loadMapPosition()                 { return ProgressTracker.loadMapPosition(this.getActiveSlot()); },
+    getWorldLevelsWithStatus(worldId) { return ProgressTracker.getWorldLevelsWithStatus(this.getActiveSlot(), worldId); },
 
     // ==================== CONTROLES VIRTUAIS ====================
-    // Delega para GameState
 
-    getVirtualControls() {
-        return GameState.getVirtualControls();
-    }
+    getVirtualControls() { return GameState.getVirtualControls(); }
 };
 
 // Exporta globalmente

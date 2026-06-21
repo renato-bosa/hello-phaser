@@ -35,7 +35,7 @@
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 484,
-                "y": 390.6666666666667
+                "y": 391.33333333333326
             }
         },
         "dev-resources/map-10.tmx#Cavalo marinho": {
@@ -101,7 +101,7 @@
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 800,
-                "y": 302
+                "y": 303
             }
         },
         "dev-resources/map-11.tmx#abstract-blue": {
@@ -160,7 +160,7 @@
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 512,
-                "y": 510
+                "y": 511
             }
         },
         "dev-resources/map-12.tmx#1up": {
@@ -635,8 +635,8 @@
             "scale": 0.33,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1112.1212121212122,
-                "y": 281.81818181818176
+                "x": 1121.2121212121212,
+                "y": 289.3939393939394
             }
         },
         "dev-resources/map-19.tmx#1up": {
@@ -722,7 +722,7 @@
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 1440,
-                "y": 478
+                "y": 479
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#1up": {
@@ -815,8 +815,8 @@
             "scale": 0.33,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1054.5454545454545,
-                "y": 736.3636363636364
+                "x": 1121.2121212121212,
+                "y": 289.3939393939394
             }
         },
         "dev-resources/map-20-auto-rolagem.tmx#1up": {
@@ -911,8 +911,8 @@
             "scale": 0.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1251,
-                "y": 238
+                "x": 1120,
+                "y": 287
             }
         },
         "dev-resources/map-21-nuvens.tmx#1up": {
@@ -1184,7 +1184,7 @@
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 976,
-                "y": 398
+                "y": 399
             }
         },
         "dev-resources/map-5--caverna.tmx#1up": {
@@ -1351,14 +1351,14 @@
         },
         "dev-resources/map-7--planicie.tmx": {
             "expandedObjectLayers": [
-                11,
-                8
+                8,
+                11
             ],
             "scale": 0.25,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1122,
-                "y": 316
+                "x": 1120,
+                "y": 318
             }
         },
         "dev-resources/map-7--planicie.tmx#abstract-blue": {
@@ -1511,7 +1511,8 @@
             "scaleInDock": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#lava-roxa": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#lava-roxa-animated": {
             "scaleInDock": 1
@@ -1532,7 +1533,8 @@
             "scaleInDock": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#spikes": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#starry-sky": {
             "scaleInDock": 1
@@ -1559,8 +1561,8 @@
             "scale": 1.004921875,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 319.92536733265956,
-                "y": 175.13799269221798
+                "x": 320.4229184482625,
+                "y": 175.63554380782088
             }
         },
         "dev-resources/map-9.tmx#abstract-blue": {
@@ -1794,7 +1796,7 @@
         "dev-resources/map-8--o-resgate-do-baixista.tmx"
     ],
     "project": "rock-hero.tiled-project",
-    "property.type": "int",
+    "property.type": "bool",
     "recentFiles": [
         "dev-resources/map-10.tmx",
         "dev-resources/map-12.tmx",

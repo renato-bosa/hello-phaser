@@ -986,6 +986,17 @@
          "imagewidth":32,
          "margin":0,
          "name":"spikes",
+         "properties":[
+                {
+                 "name":"collider",
+                 "type":"bool",
+                 "value":true
+                }, 
+                {
+                 "name":"jump_back_to_checkpoint",
+                 "type":"bool",
+                 "value":true
+                }],
          "spacing":0,
          "tilecount":1,
          "tileheight":32,

@@ -219,28 +219,31 @@ class GameScene extends Phaser.Scene {
         objectsLayer.objects.forEach(obj => {
             const type = obj.properties?.find(p => p.name === 'type')?.value;
             const tilesetName = gidToTilesetName[obj.gid] || '';
+            const transform = this._extractTilesetTransform(obj);
 
             if (type === 'player_spawn' || type === 'player-spawn' ||
                 tilesetName.includes('still-hero') || tilesetName.includes('still hero')) {
+                // Spawn não usa transform — o sprite do jogador tem orientação própria (flipX dinâmico pela direção do movimento).
                 this.playerSpawn = { x: obj.x + 16, y: obj.y - 16 };
             }
             else if (type === 'goal' ||
                      tilesetName.includes('green-flag') || tilesetName.includes('green flag')) {
-                this.goalPosition = { x: obj.x + 16, y: obj.y - 16 };
+                this.goalPosition = { x: obj.x + 16, y: obj.y - 16, transform };
             }
             else if (type === 'checkpoint' ||
                      tilesetName.includes('yellow-flag') || tilesetName.includes('yellow flag')) {
-                this.checkpointPositions.push({ x: obj.x + 16, y: obj.y - 16 });
+                this.checkpointPositions.push({ x: obj.x + 16, y: obj.y - 16, transform });
             }
             else if (type === 'trampoline' || tilesetName.includes('trampoline')) {
-                trampolines.push({ x: obj.x + 16, y: obj.y - 16 });
+                trampolines.push({ x: obj.x + 16, y: obj.y - 16, transform });
             }
             else if (type === 'star' || tilesetName.includes('star') || tilesetName.includes('estrela')) {
-                stars.push({ x: obj.x + 16, y: obj.y - 16 });
+                stars.push({ x: obj.x + 16, y: obj.y - 16, transform });
             }
             else if (type === 'enemy' || type === 'sapo' ||
                      tilesetName.includes('sapo') || tilesetName.includes('frog')) {
                 const isSapoVerde = tilesetName.includes('sapo-verde') || tilesetName.includes('verde');
+                // Inimigos com patrulha/AI ignoram transform — `flipX` é controlado pelo EnemyManager em runtime.
                 enemies.push({
                     x: obj.x + 16,
                     y: obj.y - 16,
@@ -259,15 +262,15 @@ class GameScene extends Phaser.Scene {
             else if (type === 'speed_boost' || type === 'boost' ||
                      tilesetName.includes('setas') || tilesetName.includes('velocidade') ||
                      tilesetName.includes('speed') || tilesetName.includes('boost')) {
-                speedBoosts.push({ x: obj.x + 16, y: obj.y - 16 });
+                speedBoosts.push({ x: obj.x + 16, y: obj.y - 16, transform });
             }
             else if (type === '1up' || type === 'extra_life' ||
                      tilesetName.includes('1up') || tilesetName.includes('nota') ||
                      tilesetName.includes('extra-life') || tilesetName.includes('extra_life')) {
-                extraLives.push({ x: obj.x + 16, y: obj.y - 16, textureKey: tilesetName });
+                extraLives.push({ x: obj.x + 16, y: obj.y - 16, textureKey: tilesetName, transform });
             }
             else if (type === 'mushroom' || tilesetName.includes('mushroom') || tilesetName.includes('cogumelo')) {
-                mushrooms.push({ x: obj.x + 16, y: obj.y - 16, textureKey: tilesetName });
+                mushrooms.push({ x: obj.x + 16, y: obj.y - 16, textureKey: tilesetName, transform });
             }
             else if (tilesetName.includes('plataforma-deslisante') || tilesetName.includes('plataforma-deslizante') ||
                      tilesetName.includes('plataforma-movel')) {
@@ -281,6 +284,7 @@ class GameScene extends Phaser.Scene {
                     textureKey: tilesetName,
                     verticalBlocks: objProps['vertical-move_downward_in_blocks'] || 0,
                     horizontalBlocks: objProps['horizontal-move_right_in_blocks'] || 0,
+                    transform
                 });
             }
         });
@@ -297,6 +301,37 @@ class GameScene extends Phaser.Scene {
         this.createMushrooms(mushrooms);
         this.createMovingPlatforms(movingPlatforms);
         this.createWaterZones(map);
+    }
+
+    /**
+     * Extrai flip/rotação de um objeto Tiled após o parser do Phaser.
+     *
+     * O Tiled codifica flips nos 3 bits altos do `gid` (0x80000000=H, 0x40000000=V, 0x20000000=anti-diag).
+     * O Phaser parseia isso em runtime: mascara o gid e expõe `flippedHorizontal`/`flippedVertical`/`rotation`
+     * como propriedades top-level do objeto. Aqui só consolidamos em uma estrutura uniforme.
+     *
+     * @returns {{ flipX: boolean, flipY: boolean, rotation: number }} rotation em graus
+     */
+    _extractTilesetTransform(obj) {
+        return {
+            flipX: !!obj.flippedHorizontal,
+            flipY: !!obj.flippedVertical,
+            rotation: obj.rotation || 0
+        };
+    }
+
+    /**
+     * Aplica o transform extraído de um objeto Tiled a um sprite criado a partir dele.
+     * Afeta apenas a aparência (flipX/flipY/angle) — não muda a hitbox de física,
+     * que continua centrada na orientação base do sprite.
+     *
+     * No-op se sprite ou transform forem nulos.
+     */
+    _applyTilesetTransform(sprite, transform) {
+        if (!sprite || !transform) return;
+        if (transform.flipX) sprite.setFlipX(true);
+        if (transform.flipY) sprite.setFlipY(true);
+        if (transform.rotation) sprite.setAngle(transform.rotation);
     }
 
     createWaterZones(map) {
@@ -319,6 +354,7 @@ class GameScene extends Phaser.Scene {
         this.goal = this.physics.add.staticSprite(this.goalPosition.x, this.goalPosition.y, 'green-flag');
         this.goal.body.setSize(GC.GOAL.BODY_WIDTH, GC.GOAL.BODY_HEIGHT);
         this.goal.body.setOffset(GC.GOAL.BODY_OFFSET_X, GC.GOAL.BODY_OFFSET_Y);
+        this._applyTilesetTransform(this.goal, this.goalPosition.transform);
     }
 
     createCheckpoints() {
@@ -327,6 +363,7 @@ class GameScene extends Phaser.Scene {
             const flag = this.physics.add.staticSprite(cp.x, cp.y, 'yellow-flag');
             flag.checkpointPos = cp;
             flag.activated = false;
+            this._applyTilesetTransform(flag, cp.transform);
             this.checkpoints.push(flag);
         });
     }
@@ -337,6 +374,7 @@ class GameScene extends Phaser.Scene {
             const trampoline = this.physics.add.staticSprite(t.x, t.y, 'trampoline');
             trampoline.body.setSize(GC.TRAMPOLINE.BODY_WIDTH, GC.TRAMPOLINE.BODY_HEIGHT);
             trampoline.body.setOffset(0, GC.TRAMPOLINE.BODY_OFFSET_Y);
+            this._applyTilesetTransform(trampoline, t.transform);
             this.trampolines.add(trampoline);
         });
     }
@@ -346,6 +384,7 @@ class GameScene extends Phaser.Scene {
         positions.forEach(s => {
             const star = this.stars.create(s.x, s.y, 'star');
             star.body.allowGravity = false;
+            this._applyTilesetTransform(star, s.transform);
         });
         this.starsCollected = 0;
         this.totalStars = positions.length;
@@ -358,6 +397,7 @@ class GameScene extends Phaser.Scene {
             boost.body.setSize(GC.SPEED_BOOST.BODY_WIDTH, GC.SPEED_BOOST.BODY_HEIGHT);
             boost.body.setOffset(0, GC.SPEED_BOOST.BODY_OFFSET_Y);
             boost.setAlpha(0.9);
+            this._applyTilesetTransform(boost, pos.transform);
             this.speedBoosts.add(boost);
         });
     }
@@ -373,6 +413,7 @@ class GameScene extends Phaser.Scene {
             if (hasTexture) {
                 this._playTilesetAnimation(item, pos.textureKey);
             }
+            this._applyTilesetTransform(item, pos.transform);
 
             this.tweens.add({
                 targets: item,
@@ -503,6 +544,8 @@ class GameScene extends Phaser.Scene {
                 ? this.mushrooms.create(pos.x, pos.y, pos.textureKey)
                 : this.mushrooms.create(pos.x, pos.y, 'star', 0).setTint(0xff66ff);
 
+            this._applyTilesetTransform(item, pos.transform);
+
             this.tweens.add({
                 targets: item,
                 y: pos.y - 4,
@@ -628,6 +671,7 @@ class GameScene extends Phaser.Scene {
             platform.body.checkCollision.down = false;
             platform.body.checkCollision.left = false;
             platform.body.checkCollision.right = false;
+            this._applyTilesetTransform(platform, p.transform);
 
             const periodMs = 2 * totalDist / GC.MOVING_PLATFORM.SPEED * 1000;
 

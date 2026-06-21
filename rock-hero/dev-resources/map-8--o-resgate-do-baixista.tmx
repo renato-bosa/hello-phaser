@@ -161,6 +161,12 @@
    <property name="jump_back_to_checkpoint" type="bool" value="true"/>
   </properties>
   <image source="../assets/spritesheets/spikes.png" width="32" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+    <property name="jump_back_to_checkpoint" type="bool" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <layer id="5" name="bg" width="70" height="20">
   <data encoding="csv">

@@ -118,8 +118,10 @@ class CharacterSelectScene extends Phaser.Scene {
             const spriteY = -40;
             
             if (isUnlocked) {
-                // Sprite do personagem (usa key centralizada do GameData)
-                const textureKey = GameData.getCharacterTextureKey(character.id, 'idle');
+                // Personagens que definem `showcase` (pose de vitrine) usam essa
+                // pose no card; os demais caem em `idle`.
+                const showcaseState = GameData.getCharacterShowcaseState(character.id);
+                const textureKey = GameData.getCharacterTextureKey(character.id, showcaseState);
                 const sprite = this.add.sprite(0, spriteY, textureKey);
                 sprite.setScale(2.5);
                 container.add(sprite);
@@ -127,6 +129,7 @@ class CharacterSelectScene extends Phaser.Scene {
                 // Guarda referência para animação
                 container.setData('sprite', sprite);
                 container.setData('characterId', character.id);
+                container.setData('showcaseState', showcaseState);
             } else {
                 // Silhueta (personagem bloqueado)
                 const silhouette = this.add.rectangle(0, spriteY, 50, 70, 0x333333);
@@ -217,13 +220,14 @@ class CharacterSelectScene extends Phaser.Scene {
             GameData.createCharacterAnimations(this, character.id, `char-${character.id}-`);
         });
         
-        // Inicia animações nos sprites
+        // Inicia animações nos sprites (pose showcase quando disponível)
         this.characterCards.forEach(card => {
             if (card.isUnlocked) {
                 const sprite = card.container.getData('sprite');
                 const charId = card.container.getData('characterId');
+                const showcaseState = card.container.getData('showcaseState') || 'idle';
                 if (sprite && charId) {
-                    sprite.play(`char-${charId}-idle`);
+                    sprite.play(`char-${charId}-${showcaseState}`);
                 }
             }
         });

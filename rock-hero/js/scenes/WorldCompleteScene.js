@@ -175,18 +175,19 @@ class WorldCompleteScene extends Phaser.Scene {
         const nameY = height * 0.60;        // 58% - nome
         const instrumentY = height * 0.65;  // 65% - instrumento
         
-        // Usa dados centralizados do GameData
-        const idleSprite = character.sprites.idle;
-        const spriteKey = idleSprite.key;
-        const frameRate = idleSprite.frameRate;
-        const endFrame = idleSprite.endFrame;
-        
-        // Cria animação do personagem
-        const animKey = `rescued-${character.id}-idle`;
+        // Usa a pose showcase (vitrine) quando o personagem define uma;
+        // caso contrário, cai no idle.
+        const showcaseState = GameData.getCharacterShowcaseState(character.id);
+        const showcaseSprite = character.sprites[showcaseState];
+        const spriteKey = showcaseSprite.key;
+        const frameRate = showcaseSprite.frameRate;
+        const endFrame = showcaseSprite.endFrame;
+
+        const animKey = `rescued-${character.id}-${showcaseState}`;
         if (!this.anims.exists(animKey)) {
             this.anims.create({
                 key: animKey,
-                frames: this.anims.generateFrameNumbers(spriteKey, { start: idleSprite.startFrame, end: endFrame }),
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: showcaseSprite.startFrame, end: endFrame }),
                 frameRate: frameRate,
                 repeat: -1
             });

@@ -227,6 +227,7 @@ const GameData = {
     loadCharacterSprites(scene, characterIds = null)                       { SpriteLoader.loadCharacterSprites(scene, characterIds); },
     createCharacterAnimations(scene, characterId, prefix='', recreate=false) { SpriteLoader.createCharacterAnimations(scene, characterId, prefix, recreate); },
     getCharacterTextureKey(characterId, state = 'idle')                    { return SpriteLoader.getCharacterTextureKey(characterId, state); },
+    getCharacterShowcaseState(characterId)                                 { return SpriteLoader.getCharacterShowcaseState(characterId); },
     applyPixelArtFilter(scene, characterIds = null)                        { SpriteLoader.applyPixelArtFilter(scene, characterIds); },
     applyLinearFilter(scene, characterIds = null)                          { SpriteLoader.applyLinearFilter(scene, characterIds); },
 

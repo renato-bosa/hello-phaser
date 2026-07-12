@@ -129,6 +129,23 @@ const SpriteLoader = {
     },
 
     /**
+     * Retorna o nome do estado a usar em telas de destaque (WorldComplete,
+     * CharacterSelect, WorldMap). Personagens que definem um sprite `showcase`
+     * usam essa pose diferenciada; os demais caem no `idle` comum.
+     *
+     * Combine com `getCharacterTextureKey(id, state)` para a textura e com
+     * `createCharacterAnimations` (que gera uma anim por estado) para a key
+     * da animação (`prefix + state`).
+     *
+     * @param {string} characterId
+     * @returns {string} - 'showcase' ou 'idle'
+     */
+    getCharacterShowcaseState(characterId) {
+        const character = this._getCharacter(characterId);
+        return character?.sprites?.showcase ? 'showcase' : 'idle';
+    },
+
+    /**
      * Aplica um filtro Phaser (NEAREST ou LINEAR) em todas as texturas
      * dos personagens especificados.
      *

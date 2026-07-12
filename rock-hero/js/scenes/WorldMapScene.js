@@ -584,13 +584,15 @@ class WorldMapScene extends Phaser.Scene {
         arrow.setStrokeStyle(2, 0xffffff);
         this.cursor.add(arrow);
 
-        // Personagem selecionado, abaixo da seta
+        // Personagem selecionado, abaixo da seta. Usa a pose `showcase` quando
+        // o personagem define uma (guitarrista, ...); demais caem em `idle`.
         const selectedId = GameData.state.selectedCharacter || GameData.loadSelectedCharacter();
-        const idleKey = GameData.getCharacterTextureKey(selectedId, 'idle');
-        if (this.textures.exists(idleKey)) {
+        const showcaseState = GameData.getCharacterShowcaseState(selectedId);
+        const textureKey = GameData.getCharacterTextureKey(selectedId, showcaseState);
+        if (this.textures.exists(textureKey)) {
             GameData.createCharacterAnimations(this, selectedId, 'mapcursor-', true);
-            const charSprite = this.add.sprite(0, 22, idleKey).setOrigin(0.5).setScale(1.5);
-            charSprite.anims.play('mapcursor-idle', true);
+            const charSprite = this.add.sprite(0, 22, textureKey).setOrigin(0.5).setScale(1.5);
+            charSprite.anims.play(`mapcursor-${showcaseState}`, true);
             this.cursor.add(charSprite);
         }
 

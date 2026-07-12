@@ -148,6 +148,16 @@ const GameConfig = {
             sprites: {
                 idle: {
                     key: 'guitarrista-idle',
+                    file: 'assets/spritesheets/Guitarrista-idle-animado-6fps.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6
+                },
+                // Pose de vitrine — usada em telas onde o personagem é o centro
+                // das atenções (WorldComplete, CharacterSelect, WorldMap). Cai
+                // no fallback do idle quando um personagem não define showcase.
+                showcase: {
+                    key: 'guitarrista-showcase',
                     file: 'assets/spritesheets/Guitarrista-parado-2-animado3-6fps.png',
                     frameWidth: 32, frameHeight: 32,
                     startFrame: 0, endFrame: 3,

@@ -150,7 +150,7 @@ const GameConfig = {
                     key: 'guitarrista-idle',
                     file: 'assets/spritesheets/Guitarrista-idle-animado-6fps.png',
                     frameWidth: 32, frameHeight: 32,
-                    startFrame: 0, endFrame: 3,
+                    startFrame: 0, endFrame: 10, // O spritesheet tem 9 frames, então o correto seria o intervalo 0-9, mas fiz um hack colocando dois frames extras no final. Ele prossegue repetindo os dois primeiros antes de reiniciar o ciclo completo.
                     frameRate: 6
                 },
                 // Pose de vitrine — usada em telas onde o personagem é o centro
@@ -160,7 +160,7 @@ const GameConfig = {
                     key: 'guitarrista-showcase',
                     file: 'assets/spritesheets/Guitarrista-parado-2-animado3-6fps.png',
                     frameWidth: 32, frameHeight: 32,
-                    startFrame: 0, endFrame: 3,
+                    startFrame: 0, endFrame: 4,
                     frameRate: 6
                 },
                 walk: {

@@ -17,6 +17,7 @@ class PauseMenu {
 
         scene.physics.pause();
         scene.pausedAtTime = scene.time.now;
+        MusicManager.pause();
 
         const centerX = scene.cameras.main.centerX;
         const centerY = scene.cameras.main.centerY;
@@ -169,6 +170,7 @@ class PauseMenu {
 
         scene.physics.resume();
         scene.currentView = 'gameplay';
+        MusicManager.resume();
         this._clearOverlay();
         this.clearListeners();
     }

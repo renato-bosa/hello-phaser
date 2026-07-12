@@ -47,6 +47,9 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('seahorse', GameData.assetUrl('assets/spritesheets/Cavalo marinho.png'), {
             frameWidth: 32, frameHeight: 32
         });
+
+        // Trilha sonora — registra faixas MP3 no cache do Phaser
+        MusicManager.preload(this);
     }
 
     _ensureBubbleTexture() {
@@ -144,6 +147,11 @@ class GameScene extends Phaser.Scene {
         } else {
             this.currentView = 'gameplay';
         }
+
+        // Trilha sonora — sorteia e toca uma faixa; se ela terminar antes do
+        // fim da fase, o MusicManager encadeia automaticamente. Paramos em
+        // `shutdown()`, cobrindo saídas por vitória, morte, game over e pause.
+        MusicManager.startGameplay(this, this.currentLevel);
     }
 
     // ==================== MAPA ====================
@@ -1472,6 +1480,7 @@ class GameScene extends Phaser.Scene {
     // ==================== CLEANUP ====================
 
     shutdown() {
+        MusicManager.stop();
         this.physics.world.gravity.y = 800;
         GameData.levelFeatureOverrides = null;
 

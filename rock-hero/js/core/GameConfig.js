@@ -243,6 +243,45 @@ const GameConfig = {
         }
     ],
 
+    // ==================== TRILHA SONORA ====================
+    //
+    // Pool global de faixas disponíveis. Cada faixa vira uma entrada no cache
+    // de áudio do Phaser (via `MusicManager.preload`). Para adicionar uma nova
+    // faixa, basta colocar o arquivo em `assets/mp3/` e adicionar aqui.
+    MUSIC_TRACKS: [
+        { key: 'rock-theme1', file: 'assets/mp3/rock-theme1.mp3', title: 'Rock Theme 1' },
+        { key: 'theme2', file: 'assets/mp3/theme2.mp3', title: 'Theme 2' },
+        { key: 'theme3', file: 'assets/mp3/theme3.mp3', title: 'Theme 3' },
+        { key: 'theme4', file: 'assets/mp3/theme4.mp3', title: 'Theme 4' },
+        { key: 'theme5', file: 'assets/mp3/theme5.mp3', title: 'Theme 5' },
+        { key: 'theme6', file: 'assets/mp3/theme6.mp3', title: 'Theme 6' },
+        { key: 'theme7', file: 'assets/mp3/theme7.mp3', title: 'Theme 7' },
+        { key: 'theme8', file: 'assets/mp3/theme8.mp3', title: 'Theme 8' },
+        { key: 'theme9', file: 'assets/mp3/theme9.mp3', title: 'Theme 9' },
+        { key: 'theme10', file: 'assets/mp3/theme10.mp3', title: 'Theme 10' }
+    ],
+
+    // Roteamento de trilha por contexto. Vazio hoje = sorteio em toda a pool
+    // global. No futuro, popule `byLevel` ou `byWorld` para direcionar faixas
+    // específicas. Cada valor pode ser uma string (uma faixa) ou array de
+    // strings (pool restrita). Resolução: byLevel > byWorld > default > global.
+    //
+    // Exemplos futuros:
+    //   MUSIC: {
+    //       gameplay: {
+    //           byLevel: { 0: 'rock-theme1', 14: ['boss1', 'boss2'] },
+    //           byWorld: { 2: ['theme2', 'theme3'], 3: 'theme4' },
+    //           default: null
+    //       }
+    //   }
+    MUSIC: {
+        gameplay: {
+            byLevel: {},
+            byWorld: {},
+            default: null
+        }
+    },
+
     // ==================== FASES ====================
     LEVELS: [
         {

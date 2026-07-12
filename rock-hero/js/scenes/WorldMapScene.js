@@ -626,12 +626,15 @@ class WorldMapScene extends Phaser.Scene {
             { key: '← →', action: 'Navegar' },
             { key: 'ENTER', action: 'Selecionar' },
             { key: 'P', action: 'Personagem' },
+            { key: 'R', action: 'Tempos' },
             { key: 'ESC', action: 'Menu' }
         ];
-        
-        const startX = 60;
-        const spacing = 150;
-        
+
+        // Espaça os controles uniformemente pelo canvas (evita corte quando há
+        // muitos itens, como no modo desktop com 5 controles).
+        const spacing = (width - 40) / controls.length;
+        const startX = 20 + spacing / 2;
+
         controls.forEach((ctrl, i) => {
             const x = startX + (i * spacing);
             
@@ -992,6 +995,12 @@ class WorldMapScene extends Phaser.Scene {
         // Seleção de personagem
         this.input.keyboard.on('keydown-P', () => {
             if (this.currentView === 'map') this.openCharacterSelect();
+        });
+
+        // R: atalho para "Ver meus tempos" (equivalente a tocar/clicar no cartão 🏆).
+        // Mantém a operabilidade completa via teclado sem depender de mouse/touch.
+        this.input.keyboard.on('keydown-R', () => {
+            if (this.currentView === 'map') this.showRanking();
         });
 
         // ESC: fecha overlay se aberto, senão volta ao menu.

@@ -310,7 +310,9 @@ class SlotSelectScene extends Phaser.Scene {
         const vc = this.virtualControls;
         if (!vc) return;
 
-        // Controles virtuais mobile
+        // Controles virtuais mobile — três modos: select, confirm_delete, name_input.
+        // Cada modo consome vc.jumpJustPressed e vc.backJustPressed relevantes para si
+        // (e sempre limpa o flag, mesmo quando ignorado, para não vazar entre modos).
         if (this.mode === 'select') {
             const card = this.slotCards[this.selectedSlot];
             const slotData = card.slotData;
@@ -370,6 +372,28 @@ class SlotSelectScene extends Phaser.Scene {
                     this.navigate(1);
                     this.lastNavTime = time;
                 }
+            }
+        } else if (this.mode === 'confirm_delete') {
+            // O = confirma deletar (equivalente a Y no teclado)
+            if (vc.jumpJustPressed) {
+                vc.jumpJustPressed = false;
+                this.executeDelete();
+            }
+            // X = cancela (equivalente a N/ESC no teclado)
+            if (vc.backJustPressed) {
+                vc.backJustPressed = false;
+                this.cancelDelete();
+            }
+        } else if (this.mode === 'name_input') {
+            // No name_input o <input> HTML tem foco e recebe as teclas reais. Aqui só
+            // tratamos o botão X do overlay mobile (cancelar). Não interpretamos O
+            // para não competir com o "Go/Done" do teclado virtual do sistema.
+            if (vc.jumpJustPressed) {
+                vc.jumpJustPressed = false; // consome para não vazar ao modo select
+            }
+            if (vc.backJustPressed) {
+                vc.backJustPressed = false;
+                this.cancelNameInput();
             }
         }
     }
@@ -582,11 +606,17 @@ class SlotSelectScene extends Phaser.Scene {
     }
 
     handleInputKeydown(event) {
+        // stopPropagation evita que o mesmo keydown bubble para o handler global
+        // do Phaser (`keydown-ESC` chama goBack()), o que — como cancelNameInput()
+        // já mudou this.mode para 'select' — faria goBack cair no else e navegar
+        // para o menu principal em vez de só fechar o overlay.
         if (event.key === 'Enter') {
             event.preventDefault();
+            event.stopPropagation();
             this.confirmNewGame();
         } else if (event.key === 'Escape') {
             event.preventDefault();
+            event.stopPropagation();
             this.cancelNameInput();
         }
     }

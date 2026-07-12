@@ -768,122 +768,282 @@ class WorldMapScene extends Phaser.Scene {
         container.add(label);
     }
 
+    /**
+     * Overlay "Ver meus tempos" — carrossel exibindo um mundo por vez.
+     *
+     * Estrutura:
+     *   - `rankingOverlayElements`: shell (fundo, título, setas, dots, hint) —
+     *     destruído em `closeRankingOverlay()`.
+     *   - `rankingWorldElements`  : conteúdo específico do mundo atual (nome,
+     *     subtítulo, lista de fases, tempo total). Destruído tanto ao trocar
+     *     de mundo quanto ao fechar.
+     *
+     * Navegação (todas com wrap-around):
+     *   - Setas ‹ › na tela (mouse/touch)
+     *   - ← / → no teclado
+     *   - D-Pad ← / → no mobile
+     *   - Toque nos dots de página (pula direto para o mundo)
+     */
     showRanking() {
         if (this.currentView === 'ranking') return;
         this.currentView = 'ranking';
         this.rankingOverlayElements = [];
+        this.rankingWorldElements = [];
 
         const { width, height } = this.cameras.main;
         const centerX = width / 2;
-        const centerY = height / 2;
 
-        // Overlay escuro em cima de todo o mapa. Depth 200 fica acima dos
-        // elementos do mapa (nós, portais, HUD superior, tudo ≤ 10).
-        // setInteractive() sem callback faz o overlay "engolir" cliques,
-        // evitando que os cartões-botão (depth 10) recebam eventos por baixo.
-        const overlay = this.add.rectangle(centerX, centerY, width, height, 0x000000, 0.95)
+        // Mundo inicial = o mundo em que o cursor do mapa está.
+        this.rankingWorldIdx = GameData.WORLDS.findIndex(w => w.id === this.currentWorldId);
+        if (this.rankingWorldIdx < 0) this.rankingWorldIdx = 0;
+
+        // Overlay escuro em cima de todo o mapa. setInteractive() sem callback
+        // faz o overlay "engolir" cliques, evitando que os cartões-botão
+        // (depth 10) recebam eventos por baixo.
+        const overlay = this.add.rectangle(centerX, height / 2, width, height, 0x000000, 0.95)
             .setDepth(200)
             .setInteractive();
         this.rankingOverlayElements.push(overlay);
 
         // Título
-        const title = this.add.text(centerX, 40, '🏆 MEUS TEMPOS 🏆', {
-            fontSize: '20px',
-            fontFamily: 'Arial',
-            color: '#ffd700',
-            stroke: '#000000',
-            strokeThickness: 4
+        const title = this.add.text(centerX, 25, '🏆 MEUS TEMPOS 🏆', {
+            fontSize: '18px', fontFamily: 'Arial', color: '#ffd700',
+            stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5).setDepth(201);
         this.rankingOverlayElements.push(title);
 
-        // Subtítulo: nome do jogador da partida ativa (chegamos aqui sempre com
-        // slot ativo, então não precisamos do fallback "nenhuma partida" que o
-        // MenuScene tinha).
-        const subtitle = this.add.text(centerX, 65, `Partida: ${GameData.loadPlayerName()}`, {
-            fontSize: '12px',
-            fontFamily: 'Arial',
-            color: '#888888'
+        // Nome do jogador (chegamos aqui sempre com slot ativo)
+        const subtitle = this.add.text(centerX, 46, `Partida: ${GameData.loadPlayerName()}`, {
+            fontSize: '11px', fontFamily: 'Arial', color: '#888888'
         }).setOrigin(0.5).setDepth(201);
         this.rankingOverlayElements.push(subtitle);
 
-        this.renderBestTimes(centerX, centerY);
+        // Setas laterais, page dots e hint de fechar (elementos "shell")
+        this._createRankingArrows(width);
+        this._createRankingPageDots(centerX, height);
+        this._createRankingHint(centerX, height);
 
-        // Instrução de fechar
-        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        const closeText = this.add.text(centerX, centerY + 140,
-            isMobile ? 'Pressione X para voltar' : 'Pressione ESC para voltar', {
-            fontSize: '14px',
-            fontFamily: 'Arial',
-            color: '#aaaaaa'
-        }).setOrigin(0.5).setDepth(201);
-        this.rankingOverlayElements.push(closeText);
+        // Conteúdo do mundo atual
+        this._renderRankingWorld();
 
         SoundManager.play('menuSelect');
     }
 
-    renderBestTimes(centerX, centerY) {
-        const startY = 90;
-        const colWidth = 150;
-        const startX = centerX - (GameData.WORLDS.length * colWidth) / 2 + colWidth / 2;
+    _createRankingArrows(width) {
+        // Setas grandes nas laterais — alvos de toque generosos (~48px).
+        // Posicionadas verticalmente próximas ao meio da lista de fases.
+        const arrowY = 170;
 
-        GameData.WORLDS.forEach((world, worldIndex) => {
-            const x = startX + worldIndex * colWidth;
+        const makeArrow = (x, glyph, direction) => {
+            const arrow = this.add.text(x, arrowY, glyph, {
+                fontSize: '48px', fontFamily: 'Arial', color: '#ffffff',
+                stroke: '#000000', strokeThickness: 3
+            }).setOrigin(0.5).setDepth(201).setInteractive({ useHandCursor: true });
 
-            const worldTitle = this.add.text(x, startY, world.name, {
-                fontSize: '14px',
-                fontFamily: 'Arial',
-                color: '#00ffff',
-                fontStyle: 'bold'
-            }).setOrigin(0.5).setDepth(201);
-            this.rankingOverlayElements.push(worldTitle);
-
-            let y = startY + 25;
-            world.levels.forEach(levelIndex => {
-                const level = GameData.LEVELS[levelIndex];
-                const bestTime = GameData.getBestTime(levelIndex);
-                const isComplete = GameData.isLevelComplete(levelIndex);
-
-                const levelName = this.add.text(x - 50, y, level.name, {
-                    fontSize: '11px',
-                    fontFamily: 'Arial',
-                    color: isComplete ? '#ffffff' : '#666666'
-                }).setOrigin(0, 0.5).setDepth(201);
-                this.rankingOverlayElements.push(levelName);
-
-                const timeText = bestTime !== null
-                    ? GameData.formatTime(bestTime)
-                    : '--:--.---';
-                const timeDisplay = this.add.text(x + 50, y, timeText, {
-                    fontSize: '11px',
-                    fontFamily: 'monospace',
-                    color: bestTime !== null ? '#00ff00' : '#444444'
-                }).setOrigin(1, 0.5).setDepth(201);
-                this.rankingOverlayElements.push(timeDisplay);
-
-                y += 20;
+            arrow.on('pointerdown', () => this._navigateRankingWorld(direction));
+            arrow.on('pointerover', () => {
+                if (this.currentView !== 'ranking') return;
+                arrow.setColor('#ffff00');
+                this.tweens.killTweensOf(arrow);
+                this.tweens.add({ targets: arrow, scale: 1.2, duration: 120 });
             });
+            arrow.on('pointerout', () => {
+                arrow.setColor('#ffffff');
+                this.tweens.killTweensOf(arrow);
+                this.tweens.add({ targets: arrow, scale: 1, duration: 120 });
+            });
+            return arrow;
+        };
+
+        const leftArrow = makeArrow(28, '‹', -1);
+        const rightArrow = makeArrow(width - 28, '›', 1);
+        this.rankingOverlayElements.push(leftArrow, rightArrow);
+    }
+
+    _createRankingPageDots(centerX, height) {
+        this.rankingDots = [];
+        const dotY = height - 42;
+        const dotSpacing = 18;
+        const count = GameData.WORLDS.length;
+        const totalWidth = (count - 1) * dotSpacing;
+        const startX = centerX - totalWidth / 2;
+
+        for (let i = 0; i < count; i++) {
+            const dot = this.add.circle(startX + i * dotSpacing, dotY, 5, 0xffffff, 0.4)
+                .setDepth(201)
+                .setInteractive({ useHandCursor: true });
+            dot.on('pointerdown', () => {
+                if (this.currentView !== 'ranking' || this.rankingWorldIdx === i) return;
+                this.rankingWorldIdx = i;
+                this._renderRankingWorld();
+                SoundManager.play('menuNavigate');
+            });
+            this.rankingDots.push(dot);
+            this.rankingOverlayElements.push(dot);
+        }
+    }
+
+    _createRankingHint(centerX, height) {
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const text = isMobile
+            ? 'X: Voltar   |   ← →: Trocar mundo'
+            : 'ESC: Voltar   |   ← →: Trocar mundo';
+        const hint = this.add.text(centerX, height - 15, text, {
+            fontSize: '11px', fontFamily: 'Arial', color: '#aaaaaa'
+        }).setOrigin(0.5).setDepth(201);
+        this.rankingOverlayElements.push(hint);
+    }
+
+    _renderRankingWorld() {
+        // Destroi conteúdo do mundo anterior (mantém shell intacto)
+        this.rankingWorldElements.forEach(el => el && el.destroy && el.destroy());
+        this.rankingWorldElements = [];
+
+        const world = GameData.WORLDS[this.rankingWorldIdx];
+        if (!world) return;
+
+        // Mundo bloqueado → não revela nada além do estado "🔒 Bloqueado".
+        // Mantém consistência com o mapa, que não mostra fases de mundos futuros
+        // e usa portal com cadeado para o próximo mundo.
+        if (!GameData.isWorldUnlocked(world.id)) {
+            this._renderRankingLockedWorld(world);
+            this._updateRankingPageDots();
+            return;
+        }
+
+        const { width } = this.cameras.main;
+        const centerX = width / 2;
+
+        // Cabeçalho do mundo
+        const worldName = this.add.text(centerX, 80, world.name, {
+            fontSize: '18px', fontFamily: '"Press Start 2P", monospace',
+            color: '#00ffff', stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setDepth(201);
+        this.rankingWorldElements.push(worldName);
+
+        if (world.subtitle) {
+            const worldSubtitle = this.add.text(centerX, 105, world.subtitle, {
+                fontSize: '11px', fontFamily: 'Arial', color: '#cccccc',
+                fontStyle: 'italic'
+            }).setOrigin(0.5).setDepth(201);
+            this.rankingWorldElements.push(worldSubtitle);
+        }
+
+        // Lista de fases (nome à esquerda, tempo à direita, com folga entre eles)
+        const rowSpacing = 22;
+        const leftX = centerX - 200;
+        const rightX = centerX + 200;
+        let y = 135;
+
+        world.levels.forEach((levelIndex, i) => {
+            const level = GameData.LEVELS[levelIndex];
+            if (!level) return;
+            const bestTime = GameData.getBestTime(levelIndex);
+            const isComplete = GameData.isLevelComplete(levelIndex);
+
+            const nameText = this.add.text(leftX, y, `${i + 1}. ${level.name}`, {
+                fontSize: '13px', fontFamily: 'Arial',
+                color: isComplete ? '#ffffff' : '#666666'
+            }).setOrigin(0, 0.5).setDepth(201);
+            this.rankingWorldElements.push(nameText);
+
+            const timeStr = bestTime !== null ? GameData.formatTime(bestTime) : '--:--.---';
+            const timeText = this.add.text(rightX, y, timeStr, {
+                fontSize: '13px', fontFamily: 'monospace',
+                color: bestTime !== null ? '#00ff00' : '#444444'
+            }).setOrigin(1, 0.5).setDepth(201);
+            this.rankingWorldElements.push(timeText);
+
+            y += rowSpacing;
         });
 
-        // Tempo total (só aparece se todas as fases tiverem bestTime)
-        const totalTime = GameData.getTotalBestTime();
-        if (totalTime !== null) {
-            const totalText = this.add.text(centerX, centerY + 100,
-                `⏱️ Tempo Total: ${GameData.formatTime(totalTime)}`, {
-                fontSize: '16px',
-                fontFamily: 'Arial',
-                color: '#ffd700',
-                fontStyle: 'bold'
-            }).setOrigin(0.5).setDepth(201);
-            this.rankingOverlayElements.push(totalText);
+        // Tempo total do mundo (só se todas as fases do mundo têm bestTime)
+        let worldTotal = 0;
+        let allComplete = true;
+        for (const levelIndex of world.levels) {
+            const bt = GameData.getBestTime(levelIndex);
+            if (bt === null) { allComplete = false; break; }
+            worldTotal += bt;
         }
+        if (allComplete) {
+            const totalText = this.add.text(centerX, y + 12,
+                `⏱ Total do mundo: ${GameData.formatTime(worldTotal)}`, {
+                fontSize: '13px', fontFamily: 'Arial', color: '#ffd700',
+                fontStyle: 'bold', stroke: '#000000', strokeThickness: 2
+            }).setOrigin(0.5).setDepth(201);
+            this.rankingWorldElements.push(totalText);
+        }
+
+        this._updateRankingPageDots();
+    }
+
+    /**
+     * Página do carrossel para um mundo ainda não desbloqueado.
+     * Não revela nome do mundo, subtítulo, nem nomes/tempos das fases.
+     * A dica de desbloqueio só cita o mundo anterior pelo nome quando esse
+     * mundo já é conhecido do jogador (i.e. desbloqueado); caso contrário,
+     * usa uma mensagem genérica para não vazar informação.
+     */
+    _renderRankingLockedWorld(world) {
+        const { width } = this.cameras.main;
+        const centerX = width / 2;
+
+        const lockIcon = this.add.text(centerX, 105, '🔒', {
+            fontSize: '56px'
+        }).setOrigin(0.5).setDepth(201);
+        this.rankingWorldElements.push(lockIcon);
+
+        const lockedTitle = this.add.text(centerX, 165, 'Mundo Bloqueado', {
+            fontSize: '18px', fontFamily: '"Press Start 2P", monospace',
+            color: '#888888', stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setDepth(201);
+        this.rankingWorldElements.push(lockedTitle);
+
+        const previousWorld = GameData.WORLDS.find(w => w.id === world.id - 1);
+        const previousKnown = previousWorld && GameData.isWorldUnlocked(previousWorld.id);
+        const hintText = previousKnown
+            ? `Complete o ${previousWorld.name} para revelar`
+            : 'Continue jogando para revelar este mundo';
+
+        const hint = this.add.text(centerX, 205, hintText, {
+            fontSize: '12px', fontFamily: 'Arial', color: '#aaaaaa',
+            fontStyle: 'italic', align: 'center', wordWrap: { width: width - 80 }
+        }).setOrigin(0.5).setDepth(201);
+        this.rankingWorldElements.push(hint);
+    }
+
+    _updateRankingPageDots() {
+        if (!this.rankingDots) return;
+        this.rankingDots.forEach((dot, i) => {
+            const world = GameData.WORLDS[i];
+            const unlocked = world ? GameData.isWorldUnlocked(world.id) : false;
+            const active = i === this.rankingWorldIdx;
+
+            // Cor cinza para bloqueado, branco para desbloqueado.
+            // Alpha destaca o atual em qualquer caso.
+            const color = unlocked ? 0xffffff : 0x666666;
+            const alpha = active ? 1 : (unlocked ? 0.4 : 0.5);
+            dot.setFillStyle(color, alpha);
+            dot.setScale(active ? 1.3 : 1);
+        });
+    }
+
+    _navigateRankingWorld(direction) {
+        if (this.currentView !== 'ranking') return;
+        const count = GameData.WORLDS.length;
+        // Wrap-around modular (funciona pra qualquer direção positiva/negativa)
+        this.rankingWorldIdx = ((this.rankingWorldIdx + direction) % count + count) % count;
+        this._renderRankingWorld();
+        SoundManager.play('menuNavigate');
     }
 
     closeRankingOverlay() {
         if (this.currentView !== 'ranking') return;
-        this.rankingOverlayElements.forEach(el => {
-            if (el && el.destroy) el.destroy();
-        });
+        this.rankingOverlayElements.forEach(el => el && el.destroy && el.destroy());
         this.rankingOverlayElements = [];
+        this.rankingWorldElements.forEach(el => el && el.destroy && el.destroy());
+        this.rankingWorldElements = [];
+        this.rankingDots = null;
         this.currentView = 'map';
         SoundManager.play('menuNavigate');
     }
@@ -976,12 +1136,15 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     setupControls() {
-        // Navegação — só quando não há overlay aberto.
+        // Navegação: no mapa muda o nó selecionado; no overlay de tempos, troca
+        // o mundo exibido no carrossel.
         this.input.keyboard.on('keydown-LEFT', () => {
             if (this.currentView === 'map') this.navigateNode(-1);
+            else if (this.currentView === 'ranking') this._navigateRankingWorld(-1);
         });
         this.input.keyboard.on('keydown-RIGHT', () => {
             if (this.currentView === 'map') this.navigateNode(1);
+            else if (this.currentView === 'ranking') this._navigateRankingWorld(1);
         });
 
         // Selecionar
@@ -1036,14 +1199,25 @@ class WorldMapScene extends Phaser.Scene {
             }
         }
 
-        // Navegação com throttle — só no mapa
-        if (this.currentView === 'map' && time - this.lastNavTime > 200) {
-            if (this.virtualControls.left) {
-                this.navigateNode(-1);
-                this.lastNavTime = time;
-            } else if (this.virtualControls.right) {
-                this.navigateNode(1);
-                this.lastNavTime = time;
+        // Navegação com throttle. No mapa move o cursor entre nós; no overlay
+        // de tempos, o D-Pad ← / → troca o mundo do carrossel.
+        if (time - this.lastNavTime > 200) {
+            if (this.currentView === 'map') {
+                if (this.virtualControls.left) {
+                    this.navigateNode(-1);
+                    this.lastNavTime = time;
+                } else if (this.virtualControls.right) {
+                    this.navigateNode(1);
+                    this.lastNavTime = time;
+                }
+            } else if (this.currentView === 'ranking') {
+                if (this.virtualControls.left) {
+                    this._navigateRankingWorld(-1);
+                    this.lastNavTime = time;
+                } else if (this.virtualControls.right) {
+                    this._navigateRankingWorld(1);
+                    this.lastNavTime = time;
+                }
             }
         }
     }

@@ -219,10 +219,15 @@ class PlayerController {
 
             // Ponta-cabeça: "subindo" (longe do teto) é velocidade positiva
             const isGoingUp = upsideDown ? player.body.velocity.y > 0 : player.body.velocity.y < 0;
-            if (jumpSprite && jumpSprite.key === 'hero-jump') {
-                player.setTexture('hero-jump', isGoingUp ? 1 : 2);
-            } else if (jumpSprite) {
-                player.setTexture(jumpSprite.key, 0);
+            if (jumpSprite) {
+                // Se o sprite declarar frames direcionais (upFrame/downFrame), usa-os
+                // como poses estáticas de subida/queda. Caso contrário, cai no frame 0.
+                const hasDirectionalFrames = jumpSprite.upFrame !== undefined
+                                          && jumpSprite.downFrame !== undefined;
+                const frame = hasDirectionalFrames
+                    ? (isGoingUp ? jumpSprite.upFrame : jumpSprite.downFrame)
+                    : 0;
+                player.setTexture(jumpSprite.key, frame);
             } else {
                 const idleKey = GameData.getCharacterTextureKey(this.selectedCharacter, 'idle');
                 player.setTexture(idleKey, 0);

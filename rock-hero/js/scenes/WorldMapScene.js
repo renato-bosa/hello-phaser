@@ -626,7 +626,7 @@ class WorldMapScene extends Phaser.Scene {
             { key: '← →', action: 'Navegar' },
             { key: 'ENTER', action: 'Selecionar' },
             { key: 'P', action: 'Personagem' },
-            { key: 'R', action: 'Tempos' },
+            { key: 'T', action: 'Tempos' },
             { key: 'ESC', action: 'Menu' }
         ];
 
@@ -778,7 +778,7 @@ class WorldMapScene extends Phaser.Scene {
      *     subtítulo, lista de fases, tempo total). Destruído tanto ao trocar
      *     de mundo quanto ao fechar.
      *
-     * Navegação (todas com wrap-around):
+     * Navegação (com clamp nos extremos — sem wrap-around):
      *   - Setas ‹ › na tela (mouse/touch)
      *   - ← / → no teclado
      *   - D-Pad ← / → no mobile
@@ -840,14 +840,20 @@ class WorldMapScene extends Phaser.Scene {
                 stroke: '#000000', strokeThickness: 3
             }).setOrigin(0.5).setDepth(201).setInteractive({ useHandCursor: true });
 
+            // Guarda a direção pra `_updateRankingArrows` decidir se a seta
+            // está disponível (i.e. há mundo naquela direção).
+            arrow.setData('direction', direction);
+
             arrow.on('pointerdown', () => this._navigateRankingWorld(direction));
             arrow.on('pointerover', () => {
                 if (this.currentView !== 'ranking') return;
+                if (arrow.getData('disabled')) return;
                 arrow.setColor('#ffff00');
                 this.tweens.killTweensOf(arrow);
                 this.tweens.add({ targets: arrow, scale: 1.2, duration: 120 });
             });
             arrow.on('pointerout', () => {
+                if (arrow.getData('disabled')) return;
                 arrow.setColor('#ffffff');
                 this.tweens.killTweensOf(arrow);
                 this.tweens.add({ targets: arrow, scale: 1, duration: 120 });
@@ -855,9 +861,35 @@ class WorldMapScene extends Phaser.Scene {
             return arrow;
         };
 
-        const leftArrow = makeArrow(28, '‹', -1);
-        const rightArrow = makeArrow(width - 28, '›', 1);
-        this.rankingOverlayElements.push(leftArrow, rightArrow);
+        this.rankingLeftArrow = makeArrow(28, '‹', -1);
+        this.rankingRightArrow = makeArrow(width - 28, '›', 1);
+        this.rankingOverlayElements.push(this.rankingLeftArrow, this.rankingRightArrow);
+    }
+
+    /**
+     * Atualiza aparência das setas de acordo com a posição no carrossel.
+     * Nos extremos, a seta correspondente fica dimmed e sem hover (mas ainda
+     * é setInteractive, para não quebrar o pipeline; o clique não faz nada
+     * porque `_navigateRankingWorld` já rejeita índices inválidos).
+     */
+    _updateRankingArrows() {
+        if (!this.rankingLeftArrow || !this.rankingRightArrow) return;
+        const count = GameData.WORLDS.length;
+        const canLeft = this.rankingWorldIdx > 0;
+        const canRight = this.rankingWorldIdx < count - 1;
+
+        const applyState = (arrow, enabled) => {
+            arrow.setData('disabled', !enabled);
+            this.tweens.killTweensOf(arrow);
+            arrow.setScale(1);
+            if (enabled) {
+                arrow.setColor('#ffffff').setAlpha(1);
+            } else {
+                arrow.setColor('#555555').setAlpha(0.4);
+            }
+        };
+        applyState(this.rankingLeftArrow, canLeft);
+        applyState(this.rankingRightArrow, canRight);
     }
 
     _createRankingPageDots(centerX, height) {
@@ -908,6 +940,7 @@ class WorldMapScene extends Phaser.Scene {
         if (!GameData.isWorldUnlocked(world.id)) {
             this._renderRankingLockedWorld(world);
             this._updateRankingPageDots();
+            this._updateRankingArrows();
             return;
         }
 
@@ -975,6 +1008,7 @@ class WorldMapScene extends Phaser.Scene {
         }
 
         this._updateRankingPageDots();
+        this._updateRankingArrows();
     }
 
     /**
@@ -1031,8 +1065,12 @@ class WorldMapScene extends Phaser.Scene {
     _navigateRankingWorld(direction) {
         if (this.currentView !== 'ranking') return;
         const count = GameData.WORLDS.length;
-        // Wrap-around modular (funciona pra qualquer direção positiva/negativa)
-        this.rankingWorldIdx = ((this.rankingWorldIdx + direction) % count + count) % count;
+        // Clamp nos extremos — sem wrap. Retorna cedo se o movimento seria a
+        // um índice inválido, evitando o som e o re-render desnecessário
+        // (feedback: as setas em `_updateRankingArrows` já ficam dimmed).
+        const target = this.rankingWorldIdx + direction;
+        if (target < 0 || target >= count) return;
+        this.rankingWorldIdx = target;
         this._renderRankingWorld();
         SoundManager.play('menuNavigate');
     }
@@ -1044,6 +1082,8 @@ class WorldMapScene extends Phaser.Scene {
         this.rankingWorldElements.forEach(el => el && el.destroy && el.destroy());
         this.rankingWorldElements = [];
         this.rankingDots = null;
+        this.rankingLeftArrow = null;
+        this.rankingRightArrow = null;
         this.currentView = 'map';
         SoundManager.play('menuNavigate');
     }
@@ -1160,9 +1200,9 @@ class WorldMapScene extends Phaser.Scene {
             if (this.currentView === 'map') this.openCharacterSelect();
         });
 
-        // R: atalho para "Ver meus tempos" (equivalente a tocar/clicar no cartão 🏆).
+        // T: atalho para "Ver meus tempos" (equivalente a tocar/clicar no cartão 🏆).
         // Mantém a operabilidade completa via teclado sem depender de mouse/touch.
-        this.input.keyboard.on('keydown-R', () => {
+        this.input.keyboard.on('keydown-T', () => {
             if (this.currentView === 'map') this.showRanking();
         });
 

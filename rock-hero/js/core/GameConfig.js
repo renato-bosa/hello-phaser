@@ -70,7 +70,9 @@ const GameConfig = {
                     file: 'assets/spritesheets/jumping-hero.png',
                     frameWidth: 32, frameHeight: 32,
                     startFrame: 0, endFrame: 3,
-                    frameRate: 6
+                    frameRate: 6,
+                    // Frames estáticos usados no ar (PlayerController): 1 = subindo, 2 = caindo.
+                    upFrame: 1, downFrame: 2
                 }
                 // Vocalista não tem walk-left separado, usa flip
             }
@@ -165,7 +167,15 @@ const GameConfig = {
                     startFrame: 0, endFrame: 3,
                     frameRate: 6
                 },
-                jump: null // TODO: criar sprite de pulo (usa idle por enquanto)
+                jump: {
+                    key: 'guitarrista-jump',
+                    file: 'assets/spritesheets/Guitarrista-pulando.png',
+                    frameWidth: 32, frameHeight: 32,
+                    startFrame: 0, endFrame: 3,
+                    frameRate: 6,
+                    // Frames estáticos usados no ar (PlayerController): 1 = subindo, 2 = caindo.
+                    upFrame: 1, downFrame: 2
+                }
             }
         }
         // Futuros personagens: tecladista...

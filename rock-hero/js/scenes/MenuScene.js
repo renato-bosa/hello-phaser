@@ -27,7 +27,7 @@ class MenuScene extends Phaser.Scene {
         this.centerY = this.cameras.main.centerY;
         
         // Estado da cena
-        this.currentView = 'menu'; // 'menu', 'ranking'
+        this.currentView = 'menu'; // 'menu', 'effects'
         this.selectedIndex = 0;
         this.menuButtons = [];
         
@@ -69,7 +69,7 @@ class MenuScene extends Phaser.Scene {
         // X = voltar (mesmo que ESC)
         if (this.virtualControls.backJustPressed) {
             this.virtualControls.backJustPressed = false;
-            if (this.currentView === 'ranking' || this.currentView === 'effects') {
+            if (this.currentView === 'effects') {
                 SoundManager.play('menuNavigate');
                 this.closeOverlay();
             }
@@ -214,26 +214,19 @@ class MenuScene extends Phaser.Scene {
         this.menuButtons.push(this.playBtn);
         yOffset += 35;
 
-        // Botão "Ranking"
-        this.rankingBtn = this.createButton(
-            this.centerX, 
-            this.centerY + yOffset, 
-            '🏆 RANKING',
-            '#ffd700',
-            () => this.showRanking()
-        );
-        this.menuButtons.push(this.rankingBtn);
-        yOffset += 35;
-
-        // Botão "Configs"
-        this.effectsBtn = this.createButton(
-            this.centerX, 
-            this.centerY + yOffset, 
-            '⚙ CONFIGS',
-            '#00ffaa',
-            () => this.showEffectsMenu()
-        );
-        this.menuButtons.push(this.effectsBtn);
+        // Botão "DEV OPTIONS" — só aparece com ?dev=true na URL.
+        // Segue o padrão do projeto para flags de desenvolvimento (?fps, ?debug, ?mapDebug).
+        const devMode = new URLSearchParams(window.location.search).get('dev') === 'true';
+        if (devMode) {
+            this.effectsBtn = this.createButton(
+                this.centerX,
+                this.centerY + yOffset,
+                '⚙ DEV OPTIONS',
+                '#00ffaa',
+                () => this.showEffectsMenu()
+            );
+            this.menuButtons.push(this.effectsBtn);
+        }
 
         // Cursor de seleção (posicionado à esquerda dos botões)
         this.cursor = this.add.text(this.centerX - 170, this.menuButtons[0].y, '▶', {
@@ -383,7 +376,7 @@ class MenuScene extends Phaser.Scene {
 
         // ESC para voltar
         escKey.on('down', () => {
-            if (this.currentView === 'ranking' || this.currentView === 'effects') {
+            if (this.currentView === 'effects') {
                 SoundManager.play('menuNavigate');
                 this.closeOverlay();
             }
@@ -421,122 +414,6 @@ class MenuScene extends Phaser.Scene {
         });
     }
 
-    showRanking() {
-        this.currentView = 'ranking';
-        this.overlayElements = [];
-
-        // Overlay
-        const overlay = this.add.rectangle(
-            this.centerX, this.centerY, 640, 352, 0x000000, 0.95
-        ).setDepth(100);
-        this.overlayElements.push(overlay);
-
-        // Título
-        const title = this.add.text(this.centerX, 40, '🏆 RANKING DE HI-SCORES 🏆', {
-            fontSize: '20px',
-            fontFamily: 'Arial',
-            color: '#ffd700',
-            stroke: '#000000',
-            strokeThickness: 4
-        }).setOrigin(0.5).setDepth(101);
-        this.overlayElements.push(title);
-
-        // Subtítulo
-        const subtitle = this.add.text(this.centerX, 65, 
-            GameData.getActiveSlot() 
-                ? `Partida: ${GameData.loadPlayerName()}`
-                : 'Nenhuma partida selecionada', {
-            fontSize: '12px',
-            fontFamily: 'Arial',
-            color: '#888888'
-        }).setOrigin(0.5).setDepth(101);
-        this.overlayElements.push(subtitle);
-
-        // Renderiza melhores tempos
-        if (GameData.getActiveSlot()) {
-            this.renderBestTimes();
-        } else {
-            const noData = this.add.text(this.centerX, this.centerY, 
-                'Selecione uma partida para ver seus tempos', {
-                fontSize: '14px',
-                fontFamily: 'Arial',
-                color: '#666666'
-            }).setOrigin(0.5).setDepth(101);
-            this.overlayElements.push(noData);
-        }
-
-        // Instrução para fechar
-        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        const closeText = this.add.text(this.centerX, this.centerY + 140, 
-            isMobile ? 'Pressione X para voltar' : 'Pressione ESC para voltar', {
-            fontSize: '14px',
-            fontFamily: 'Arial',
-            color: '#aaaaaa'
-        }).setOrigin(0.5).setDepth(101);
-        this.overlayElements.push(closeText);
-    }
-
-    renderBestTimes() {
-        const startY = 90;
-        const colWidth = 150;
-        const startX = this.centerX - (GameData.WORLDS.length * colWidth) / 2 + colWidth / 2;
-
-        GameData.WORLDS.forEach((world, worldIndex) => {
-            const x = startX + worldIndex * colWidth;
-            
-            // Título do mundo
-            const worldTitle = this.add.text(x, startY, world.name, {
-                fontSize: '14px',
-                fontFamily: 'Arial',
-                color: '#00ffff',
-                fontStyle: 'bold'
-            }).setOrigin(0.5).setDepth(101);
-            this.overlayElements.push(worldTitle);
-
-            // Fases do mundo
-            let y = startY + 25;
-            world.levels.forEach(levelIndex => {
-                const level = GameData.LEVELS[levelIndex];
-                const bestTime = GameData.getBestTime(levelIndex);
-                const isComplete = GameData.isLevelComplete(levelIndex);
-                
-                // Nome da fase
-                const levelName = this.add.text(x - 50, y, level.name, {
-                    fontSize: '11px',
-                    fontFamily: 'Arial',
-                    color: isComplete ? '#ffffff' : '#666666'
-                }).setOrigin(0, 0.5).setDepth(101);
-                this.overlayElements.push(levelName);
-
-                // Tempo
-                const timeText = bestTime !== null 
-                    ? GameData.formatTime(bestTime) 
-                    : '--:--.---';
-                const timeDisplay = this.add.text(x + 50, y, timeText, {
-                    fontSize: '11px',
-                    fontFamily: 'monospace',
-                    color: bestTime !== null ? '#00ff00' : '#444444'
-                }).setOrigin(1, 0.5).setDepth(101);
-                this.overlayElements.push(timeDisplay);
-
-                y += 20;
-            });
-        });
-
-        // Tempo total (se todas fases completas)
-        const totalTime = GameData.getTotalBestTime();
-        if (totalTime !== null) {
-            const totalText = this.add.text(this.centerX, this.centerY + 100, 
-                `⏱️ Tempo Total: ${GameData.formatTime(totalTime)}`, {
-                fontSize: '16px',
-                fontFamily: 'Arial',
-                color: '#ffd700',
-                fontStyle: 'bold'
-            }).setOrigin(0.5).setDepth(101);
-            this.overlayElements.push(totalText);
-        }
-    }
-
     closeOverlay() {
         // Remove elementos visuais
         if (this.overlayElements) {
@@ -552,7 +429,7 @@ class MenuScene extends Phaser.Scene {
         this.currentView = 'menu';
     }
 
-    // ==================== MENU DE CONFIGURAÇÕES ====================
+    // ==================== MENU DE DEV OPTIONS ====================
 
     showEffectsMenu() {
         this.currentView = 'effects';
@@ -567,7 +444,7 @@ class MenuScene extends Phaser.Scene {
         this.overlayElements.push(overlay);
 
         // Título
-        const title = this.add.text(this.centerX, 35, '⚙ CONFIGURAÇÕES ⚙', {
+        const title = this.add.text(this.centerX, 35, '⚙ DEV OPTIONS ⚙', {
             fontSize: '20px',
             fontFamily: '"Press Start 2P", Arial',
             color: '#00ffaa',

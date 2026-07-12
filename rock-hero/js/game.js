@@ -7,9 +7,10 @@
  * - GameScene.js: Gameplay
  * 
  * Debug:
- * - ?fps=true     → Mostra contador de FPS
- * - ?debug=true   → Mostra hitboxes de colisão
+ * - ?fps=true      → Mostra contador de FPS
+ * - ?debug=true    → Mostra hitboxes de colisão
  * - ?mapDebug=true → Logs no console: cursor do mapa / saveMapPosition / loadMapPosition
+ * - ?dev=true      → Exibe o botão "DEV OPTIONS" no menu principal (toggles de efeitos/mecânicas)
  */
 
 // Parâmetros de debug via URL

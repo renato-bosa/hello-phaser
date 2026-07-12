@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-8--o-resgate-do-baixista.tmx",
+    "activeFile": "dev-resources/map-12.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -156,11 +156,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.5,
+            "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 512,
-                "y": 511
+                "x": 548,
+                "y": 656
             }
         },
         "dev-resources/map-12.tmx#1up": {
@@ -1790,7 +1790,6 @@
         "dev-resources/map-21-nuvens.tmx",
         "dev-resources/map-5--caverna.tmx",
         "dev-resources/map-20-auto-rolagem.tmx",
-        "dev-resources/map-19.tmx",
         "dev-resources/map-7--planicie.tmx",
         "dev-resources/map-9.tmx",
         "dev-resources/map-8--o-resgate-do-baixista.tmx"
@@ -1798,17 +1797,17 @@
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "dev-resources/map-19.tmx",
         "dev-resources/map-10.tmx",
-        "dev-resources/map-12.tmx",
-        "dev-resources/map-2--expansion and speed.tmx",
-        "dev-resources/map-11.tmx",
-        "dev-resources/map-21-nuvens.tmx",
-        "dev-resources/map-5--caverna.tmx",
-        "dev-resources/map-20-auto-rolagem.tmx",
-        "dev-resources/map-7--planicie.tmx",
-        "dev-resources/map-9.tmx",
         "dev-resources/map-8--o-resgate-do-baixista.tmx",
+        "dev-resources/map-9.tmx",
+        "dev-resources/map-7--planicie.tmx",
+        "dev-resources/map-20-auto-rolagem.tmx",
+        "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-21-nuvens.tmx",
+        "dev-resources/map-11.tmx",
+        "dev-resources/map-2--expansion and speed.tmx",
+        "dev-resources/map-12.tmx",
+        "dev-resources/map-19.tmx",
         "dev-resources/map-13.tmx"
     ],
     "tileset.embedInMap": true

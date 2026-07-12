@@ -77,6 +77,11 @@ class WorldMapScene extends Phaser.Scene {
         
         // Todos os nós navegáveis (fases + portais)
         this.allNodes = [];
+
+        // Estado da cena: 'map' (navegação normal) ou 'ranking' (overlay de tempos aberto).
+        // Gates de input em setupControls()/update() consultam este flag.
+        this.currentView = 'map';
+        this.rankingOverlayElements = [];
         
         // Cria elementos visuais
         this.createBackground(width, height);
@@ -87,6 +92,7 @@ class WorldMapScene extends Phaser.Scene {
         this.createPlayerCursor();
         this.createUI(width, height);
         this.createCharacterButton(width, height);
+        this.createRankingButton(width, height);
         this.createInfoPanel(width, height);
         
         // Setup de controles
@@ -645,22 +651,238 @@ class WorldMapScene extends Phaser.Scene {
         });
     }
 
+    /**
+     * Constrói um "cartão-botão" (container com sombra + fundo + stroke + conteúdo).
+     * Compartilhado entre o botão de personagem (canto sup. esq.) e o de ranking
+     * (canto sup. dir.) para garantir simetria visual e comportamento consistente
+     * de hover/click.
+     *
+     * @param {number} cx           centro X do cartão
+     * @param {number} cy           centro Y do cartão
+     * @param {number} btnW         largura
+     * @param {number} btnH         altura
+     * @param {number} strokeColor  cor do stroke em estado normal
+     * @param {number} strokeHover  cor do stroke em hover
+     * @param {Function} onClick    callback do pointerdown
+     * @returns {Phaser.GameObjects.Container}
+     */
+    _createCardButton(cx, cy, btnW, btnH, strokeColor, strokeHover, onClick) {
+        const container = this.add.container(cx, cy).setDepth(10);
+
+        // Sombra deslocada para profundidade
+        const shadow = this.add.rectangle(3, 3, btnW, btnH, 0x000000, 0.5);
+        container.add(shadow);
+
+        // Fundo principal
+        const bg = this.add.rectangle(0, 0, btnW, btnH, 0x1a1a2e, 0.9)
+            .setStrokeStyle(2, strokeColor);
+        container.add(bg);
+
+        // Hit-test no fundo (ícone/label ficam por cima, não interativos, e não bloqueiam)
+        bg.setInteractive({ useHandCursor: true });
+
+        bg.on('pointerover', () => {
+            if (this.currentView !== 'map') return;
+            bg.setStrokeStyle(2, strokeHover);
+            bg.setFillStyle(0x2a2a4e, 0.95);
+            this.tweens.killTweensOf(container);
+            this.tweens.add({ targets: container, scale: 1.06, duration: 120, ease: 'Power1' });
+        });
+        bg.on('pointerout', () => {
+            bg.setStrokeStyle(2, strokeColor);
+            bg.setFillStyle(0x1a1a2e, 0.9);
+            this.tweens.killTweensOf(container);
+            this.tweens.add({ targets: container, scale: 1, duration: 120, ease: 'Power1' });
+        });
+        bg.on('pointerdown', () => {
+            if (this.currentView !== 'map') return;
+            onClick();
+        });
+
+        // Expõe o bg para permitir que o chamador adicione filhos por cima
+        container.bg = bg;
+        return container;
+    }
+
     createCharacterButton(width, height) {
-        // Botão de trocar personagem (canto superior esquerdo)
-        const charBtn = this.add.text(20, 15, '🎸', {
-            fontSize: '24px',
-        }).setInteractive({ useHandCursor: true }).setDepth(10);
-        
-        // Label
-        const charLabel = this.add.text(48, 20, GameData.loadSelectedCharacter(), {
+        // Cartão-botão de trocar personagem (canto superior esquerdo).
+        // Ícone (🎸) empilhado sobre o nome do personagem selecionado.
+        const btnW = 100;
+        const btnH = 44;
+        const cx = 10 + btnW / 2;
+        const cy = 12 + btnH / 2;
+
+        const container = this._createCardButton(
+            cx, cy, btnW, btnH,
+            0xffcc55, 0xffe088,
+            () => this.openCharacterSelect()
+        );
+
+        // Ícone do instrumento
+        const icon = this.add.text(0, -10, '🎸', { fontSize: '18px' }).setOrigin(0.5);
+        container.add(icon);
+
+        // Nome amigável do personagem (usa o display name de GameConfig, não o id).
+        const characterId = GameData.loadSelectedCharacter();
+        const characterName = GameData.getCharacter(characterId)?.name || characterId;
+        const label = this.add.text(0, 11, characterName, {
+            fontFamily: 'Arial',
+            fontSize: '11px',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 2,
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        container.add(label);
+    }
+
+    createRankingButton(width, height) {
+        // Cartão-botão "Ver meus tempos" (canto superior direito, espelhando o
+        // botão de personagem à esquerda). Fica na coluna livre entre o retângulo
+        // do título (que termina em x≈520) e a borda direita do canvas.
+        const btnW = 110;
+        const btnH = 44;
+        const cx = width - 5 - btnW / 2;
+        const cy = 12 + btnH / 2;
+
+        const container = this._createCardButton(
+            cx, cy, btnW, btnH,
+            0xffd700, 0xfff099,
+            () => this.showRanking()
+        );
+
+        const icon = this.add.text(0, -10, '🏆', { fontSize: '18px' }).setOrigin(0.5);
+        container.add(icon);
+
+        const label = this.add.text(0, 11, 'Ver meus tempos', {
             fontFamily: 'Arial',
             fontSize: '10px',
-            color: '#aaaaaa'
-        }).setDepth(10);
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 2,
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        container.add(label);
+    }
 
-        charBtn.on('pointerdown', () => {
-            this.openCharacterSelect();
+    showRanking() {
+        if (this.currentView === 'ranking') return;
+        this.currentView = 'ranking';
+        this.rankingOverlayElements = [];
+
+        const { width, height } = this.cameras.main;
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        // Overlay escuro em cima de todo o mapa. Depth 200 fica acima dos
+        // elementos do mapa (nós, portais, HUD superior, tudo ≤ 10).
+        // setInteractive() sem callback faz o overlay "engolir" cliques,
+        // evitando que os cartões-botão (depth 10) recebam eventos por baixo.
+        const overlay = this.add.rectangle(centerX, centerY, width, height, 0x000000, 0.95)
+            .setDepth(200)
+            .setInteractive();
+        this.rankingOverlayElements.push(overlay);
+
+        // Título
+        const title = this.add.text(centerX, 40, '🏆 MEUS TEMPOS 🏆', {
+            fontSize: '20px',
+            fontFamily: 'Arial',
+            color: '#ffd700',
+            stroke: '#000000',
+            strokeThickness: 4
+        }).setOrigin(0.5).setDepth(201);
+        this.rankingOverlayElements.push(title);
+
+        // Subtítulo: nome do jogador da partida ativa (chegamos aqui sempre com
+        // slot ativo, então não precisamos do fallback "nenhuma partida" que o
+        // MenuScene tinha).
+        const subtitle = this.add.text(centerX, 65, `Partida: ${GameData.loadPlayerName()}`, {
+            fontSize: '12px',
+            fontFamily: 'Arial',
+            color: '#888888'
+        }).setOrigin(0.5).setDepth(201);
+        this.rankingOverlayElements.push(subtitle);
+
+        this.renderBestTimes(centerX, centerY);
+
+        // Instrução de fechar
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const closeText = this.add.text(centerX, centerY + 140,
+            isMobile ? 'Pressione X para voltar' : 'Pressione ESC para voltar', {
+            fontSize: '14px',
+            fontFamily: 'Arial',
+            color: '#aaaaaa'
+        }).setOrigin(0.5).setDepth(201);
+        this.rankingOverlayElements.push(closeText);
+
+        SoundManager.play('menuSelect');
+    }
+
+    renderBestTimes(centerX, centerY) {
+        const startY = 90;
+        const colWidth = 150;
+        const startX = centerX - (GameData.WORLDS.length * colWidth) / 2 + colWidth / 2;
+
+        GameData.WORLDS.forEach((world, worldIndex) => {
+            const x = startX + worldIndex * colWidth;
+
+            const worldTitle = this.add.text(x, startY, world.name, {
+                fontSize: '14px',
+                fontFamily: 'Arial',
+                color: '#00ffff',
+                fontStyle: 'bold'
+            }).setOrigin(0.5).setDepth(201);
+            this.rankingOverlayElements.push(worldTitle);
+
+            let y = startY + 25;
+            world.levels.forEach(levelIndex => {
+                const level = GameData.LEVELS[levelIndex];
+                const bestTime = GameData.getBestTime(levelIndex);
+                const isComplete = GameData.isLevelComplete(levelIndex);
+
+                const levelName = this.add.text(x - 50, y, level.name, {
+                    fontSize: '11px',
+                    fontFamily: 'Arial',
+                    color: isComplete ? '#ffffff' : '#666666'
+                }).setOrigin(0, 0.5).setDepth(201);
+                this.rankingOverlayElements.push(levelName);
+
+                const timeText = bestTime !== null
+                    ? GameData.formatTime(bestTime)
+                    : '--:--.---';
+                const timeDisplay = this.add.text(x + 50, y, timeText, {
+                    fontSize: '11px',
+                    fontFamily: 'monospace',
+                    color: bestTime !== null ? '#00ff00' : '#444444'
+                }).setOrigin(1, 0.5).setDepth(201);
+                this.rankingOverlayElements.push(timeDisplay);
+
+                y += 20;
+            });
         });
+
+        // Tempo total (só aparece se todas as fases tiverem bestTime)
+        const totalTime = GameData.getTotalBestTime();
+        if (totalTime !== null) {
+            const totalText = this.add.text(centerX, centerY + 100,
+                `⏱️ Tempo Total: ${GameData.formatTime(totalTime)}`, {
+                fontSize: '16px',
+                fontFamily: 'Arial',
+                color: '#ffd700',
+                fontStyle: 'bold'
+            }).setOrigin(0.5).setDepth(201);
+            this.rankingOverlayElements.push(totalText);
+        }
+    }
+
+    closeRankingOverlay() {
+        if (this.currentView !== 'ranking') return;
+        this.rankingOverlayElements.forEach(el => {
+            if (el && el.destroy) el.destroy();
+        });
+        this.rankingOverlayElements = [];
+        this.currentView = 'map';
+        SoundManager.play('menuNavigate');
     }
 
     createInfoPanel(width, height) {
@@ -751,40 +973,62 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     setupControls() {
-        // Navegação
-        this.input.keyboard.on('keydown-LEFT', () => this.navigateNode(-1));
-        this.input.keyboard.on('keydown-RIGHT', () => this.navigateNode(1));
-        
+        // Navegação — só quando não há overlay aberto.
+        this.input.keyboard.on('keydown-LEFT', () => {
+            if (this.currentView === 'map') this.navigateNode(-1);
+        });
+        this.input.keyboard.on('keydown-RIGHT', () => {
+            if (this.currentView === 'map') this.navigateNode(1);
+        });
+
         // Selecionar
-        this.input.keyboard.on('keydown-ENTER', () => this.selectNode());
-        this.input.keyboard.on('keydown-SPACE', () => this.selectNode());
-        
+        this.input.keyboard.on('keydown-ENTER', () => {
+            if (this.currentView === 'map') this.selectNode();
+        });
+        this.input.keyboard.on('keydown-SPACE', () => {
+            if (this.currentView === 'map') this.selectNode();
+        });
+
         // Seleção de personagem
-        this.input.keyboard.on('keydown-P', () => this.openCharacterSelect());
-        
-        // Voltar ao menu
-        this.input.keyboard.on('keydown-ESC', () => this.backToMenu());
-        
+        this.input.keyboard.on('keydown-P', () => {
+            if (this.currentView === 'map') this.openCharacterSelect();
+        });
+
+        // ESC: fecha overlay se aberto, senão volta ao menu.
+        this.input.keyboard.on('keydown-ESC', () => {
+            if (this.currentView === 'ranking') {
+                this.closeRankingOverlay();
+            } else {
+                this.backToMenu();
+            }
+        });
+
         // Suporte a controles virtuais (mobile)
         this.virtualControls = GameData.getVirtualControls();
         this.lastNavTime = 0;
     }
 
     update(time) {
-        // O = selecionar
+        // O = selecionar (só no mapa; no overlay não faz nada)
         if (this.virtualControls.jumpJustPressed) {
             this.virtualControls.jumpJustPressed = false;
-            this.selectNode();
+            if (this.currentView === 'map') {
+                this.selectNode();
+            }
         }
 
-        // X = voltar ao menu
+        // X = fecha overlay se aberto, senão volta ao menu
         if (this.virtualControls.backJustPressed) {
             this.virtualControls.backJustPressed = false;
-            this.backToMenu();
+            if (this.currentView === 'ranking') {
+                this.closeRankingOverlay();
+            } else {
+                this.backToMenu();
+            }
         }
-        
-        // Navegação com throttle
-        if (time - this.lastNavTime > 200) {
+
+        // Navegação com throttle — só no mapa
+        if (this.currentView === 'map' && time - this.lastNavTime > 200) {
             if (this.virtualControls.left) {
                 this.navigateNode(-1);
                 this.lastNavTime = time;

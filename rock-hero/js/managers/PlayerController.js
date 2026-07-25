@@ -414,6 +414,11 @@ class PlayerController {
 
     takeDamage() {
         if (this.isRespawning || this.isInvincible) return;
+        // A fase já foi ganha: durante a celebração o update() está parado, mas
+        // a física e os colliders seguem ativos. Sem esta guarda, cair num
+        // espinho após tocar a bandeira dispararia onPlayerDied() por cima da
+        // tela de vitória.
+        if (this.scene.hasWon) return;
 
         this.hearts--;
         this.scene.hudManager.updateHearts(this.hearts);

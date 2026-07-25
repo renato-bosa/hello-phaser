@@ -125,9 +125,127 @@ class EffectsManager {
             cfg.HALO_SCALE, cfg.HALO_DURATION_MS, depth + 1
         );
 
-        for (let i = 0; i < cfg.SPARKLE_COUNT; i++) {
-            this._createStarSparkle(x, y, i, depth + 1);
+        this._createSparkleBurst(x, y, depth + 1, this._sparkleOptions(cfg));
+    }
+
+    /**
+     * Celebração ao completar a fase, disparada na posição da bandeira:
+     * auréola dourada + faíscas + confete + punch de câmera. Quando há recorde,
+     * usa contagens/cores reforçadas e adiciona uma 2ª pulsação sincronizada
+     * com o som 'newRecord'.
+     *
+     * Disparado por evento (VictoryScreen), não pelo update(). Ao contrário de
+     * createStarCollectGlow, a feature flag é checada por quem chama, porque lá
+     * ela também decide se existe o respiro antes do overlay.
+     */
+    createVictoryBurst(x, y, isRecord) {
+        const scene = this.scene;
+        const cfg = GC.VICTORY;
+        const depth = GC.DEPTH.PLAYER + 1;
+
+        this._createExpandingGlow(
+            x, y, cfg.GLOW_RADIUS, cfg.GLOW_COLOR, cfg.GLOW_ALPHA,
+            cfg.GLOW_SCALE, cfg.GLOW_DURATION_MS, depth
+        );
+
+        this._createSparkleBurst(x, y, depth + 1, this._sparkleOptions(cfg, isRecord ? {
+            count: cfg.SPARKLE_COUNT_RECORD,
+            colors: cfg.SPARKLE_COLORS_RECORD
+        } : {}));
+
+        this._createVictoryConfetti(
+            x, y, isRecord ? cfg.CONFETTI_COUNT_RECORD : cfg.CONFETTI_COUNT, depth
+        );
+
+        this._punchCamera(cfg.CAMERA_PUNCH_SCALE, cfg.CAMERA_PUNCH_MS);
+
+        if (isRecord) {
+            scene.time.delayedCall(cfg.RECORD_PULSE_DELAY_MS, () => {
+                this._createExpandingGlow(
+                    x, y, cfg.GLOW_RADIUS, cfg.RECORD_GLOW_COLOR, cfg.GLOW_ALPHA,
+                    cfg.GLOW_SCALE * cfg.RECORD_GLOW_SCALE_BOOST, cfg.GLOW_DURATION_MS, depth
+                );
+            });
         }
+    }
+
+    /**
+     * Zoom rápido de ida e volta. Usa o zoom atual como base porque cada fase
+     * tem o seu (GameConfig.LEVELS[].zoom), e o restaura no fim para evitar
+     * acúmulo de erro de ponto flutuante.
+     */
+    _punchCamera(scaleFactor, durationMs) {
+        const cam = this.scene.cameras.main;
+        const baseZoom = cam.zoom;
+
+        this.scene.tweens.add({
+            targets: cam,
+            zoom: baseZoom * scaleFactor,
+            duration: durationMs,
+            yoyo: true,
+            ease: 'Sine.easeOut',
+            onComplete: () => { cam.zoom = baseZoom; }
+        });
+    }
+
+    _createVictoryConfetti(x, y, count, depth) {
+        const scene = this.scene;
+        const cfg = GC.VICTORY;
+
+        for (let i = 0; i < count; i++) {
+            const piece = scene.add.rectangle(
+                x, y,
+                Phaser.Math.Between(3, 5),
+                Phaser.Math.Between(5, 8),
+                Phaser.Math.RND.pick(cfg.CONFETTI_COLORS)
+            );
+            piece.setDepth(depth);
+            piece.angle = Phaser.Math.Between(0, 360);
+
+            const startY = y;
+            const spread = Phaser.Math.Between(-cfg.CONFETTI_SPREAD_X, cfg.CONFETTI_SPREAD_X);
+            const rise = Phaser.Math.Between(cfg.CONFETTI_MIN_RISE, cfg.CONFETTI_MAX_RISE);
+            const fall = Phaser.Math.Between(cfg.CONFETTI_MIN_FALL, cfg.CONFETTI_MAX_FALL);
+            const spin = Phaser.Math.Between(-cfg.CONFETTI_SPIN, cfg.CONFETTI_SPIN);
+
+            scene.tweens.add({
+                targets: piece,
+                x: x + spread,
+                alpha: { from: 1, to: 0, ease: 'Quad.easeIn' },
+                duration: Phaser.Math.Between(cfg.CONFETTI_MIN_DURATION_MS, cfg.CONFETTI_MAX_DURATION_MS),
+                ease: 'Sine.easeOut',
+                onUpdate: (tween) => {
+                    // Arco senoidal na subida + queda acelerada, mesmo idioma
+                    // usado no respawn do jogador
+                    const p = tween.progress;
+                    piece.y = startY - Math.sin(p * Math.PI) * rise + (p * p) * fall;
+                    piece.angle += spin;
+                },
+                onComplete: () => piece.destroy()
+            });
+        }
+    }
+
+    /**
+     * Traduz um bloco de constantes com prefixo SPARKLE_ para as opções de
+     * `_createSparkleBurst`. `overrides` permite variar contagem/cores sem
+     * duplicar o bloco (usado no reforço de recorde).
+     */
+    _sparkleOptions(cfg, overrides = {}) {
+        return {
+            count: cfg.SPARKLE_COUNT,
+            minSize: cfg.SPARKLE_MIN_SIZE,
+            maxSize: cfg.SPARKLE_MAX_SIZE,
+            minDistance: cfg.SPARKLE_MIN_DISTANCE,
+            maxDistance: cfg.SPARKLE_MAX_DISTANCE,
+            rise: cfg.SPARKLE_RISE,
+            angleJitter: cfg.SPARKLE_ANGLE_JITTER,
+            minDuration: cfg.SPARKLE_MIN_DURATION_MS,
+            maxDuration: cfg.SPARKLE_MAX_DURATION_MS,
+            stagger: cfg.SPARKLE_STAGGER_MS,
+            colors: cfg.SPARKLE_COLORS,
+            ...overrides
+        };
     }
 
     _createExpandingGlow(x, y, radius, color, alpha, targetScale, duration, depth) {
@@ -144,33 +262,38 @@ class EffectsManager {
         });
     }
 
-    _createStarSparkle(x, y, index, depth) {
+    /**
+     * Faíscas radiais que sobem e se dissipam em tempos diferentes.
+     * Compartilhado pelo brilho da estrela e pela celebração de vitória — as
+     * durações aleatórias e o `stagger` são o que faz dissipar em vez de estourar.
+     */
+    _createSparkleBurst(x, y, depth, opts) {
         const scene = this.scene;
-        const cfg = GC.STAR_COLLECT;
 
-        const baseAngle = (Math.PI * 2 / cfg.SPARKLE_COUNT) * index;
-        const angle = baseAngle + Phaser.Math.FloatBetween(
-            -cfg.SPARKLE_ANGLE_JITTER, cfg.SPARKLE_ANGLE_JITTER
-        );
-        const distance = Phaser.Math.Between(cfg.SPARKLE_MIN_DISTANCE, cfg.SPARKLE_MAX_DISTANCE);
-        const size = Phaser.Math.Between(cfg.SPARKLE_MIN_SIZE, cfg.SPARKLE_MAX_SIZE);
+        for (let i = 0; i < opts.count; i++) {
+            // Jitter no ângulo: sem ele N faíscas formam um anel perfeito
+            const baseAngle = (Math.PI * 2 / opts.count) * i;
+            const angle = baseAngle + Phaser.Math.FloatBetween(-opts.angleJitter, opts.angleJitter);
+            const distance = Phaser.Math.Between(opts.minDistance, opts.maxDistance);
+            const size = Phaser.Math.Between(opts.minSize, opts.maxSize);
 
-        const sparkle = scene.add.circle(
-            x, y, size, Phaser.Math.RND.pick(cfg.SPARKLE_COLORS), 0.95
-        );
-        sparkle.setDepth(depth);
+            const sparkle = scene.add.circle(
+                x, y, size, Phaser.Math.RND.pick(opts.colors), 0.95
+            );
+            sparkle.setDepth(depth);
 
-        scene.tweens.add({
-            targets: sparkle,
-            x: x + Math.cos(angle) * distance,
-            y: y + Math.sin(angle) * distance - cfg.SPARKLE_RISE,
-            scale: 0,
-            alpha: 0,
-            duration: Phaser.Math.Between(cfg.SPARKLE_MIN_DURATION_MS, cfg.SPARKLE_MAX_DURATION_MS),
-            delay: Phaser.Math.Between(0, cfg.SPARKLE_STAGGER_MS),
-            ease: 'Sine.easeOut',
-            onComplete: () => sparkle.destroy()
-        });
+            scene.tweens.add({
+                targets: sparkle,
+                x: x + Math.cos(angle) * distance,
+                y: y + Math.sin(angle) * distance - opts.rise,
+                scale: 0,
+                alpha: 0,
+                duration: Phaser.Math.Between(opts.minDuration, opts.maxDuration),
+                delay: Phaser.Math.Between(0, opts.stagger),
+                ease: 'Sine.easeOut',
+                onComplete: () => sparkle.destroy()
+            });
+        }
     }
 
     _createNeonDustParticle(x, y, colors, options = {}) {

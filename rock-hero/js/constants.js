@@ -175,6 +175,60 @@ const GC = {
         SPARKLE_COLORS: [0xffffe0, 0xffe9a3, 0xffd447, 0xfff6d0],
     },
 
+    // Celebração ao completar a fase, disparada na bandeira.
+    VICTORY: {
+        // Respiro entre tocar a bandeira e o overlay aparecer. É o pré-requisito
+        // de tudo: sem ele a celebração acontece atrás do retângulo preto, no
+        // mesmo frame. No recorde a janela é maior para caber a 2ª pulsação.
+        OVERLAY_DELAY_MS: 800,
+        OVERLAY_DELAY_RECORD_MS: 1150,
+
+        FLAG_POP_SCALE: 1.35,
+        FLAG_POP_MS: 140,
+
+        CAMERA_PUNCH_SCALE: 1.06,
+        CAMERA_PUNCH_MS: 120,
+
+        GLOW_RADIUS: 12,
+        GLOW_SCALE: 5,
+        GLOW_COLOR: 0xffd447,
+        GLOW_ALPHA: 0.5,
+        GLOW_DURATION_MS: 540,
+
+        // Durações fecham antes do overlay para as faíscas não serem cortadas
+        SPARKLE_COUNT: 14,
+        SPARKLE_COUNT_RECORD: 24,
+        SPARKLE_MIN_SIZE: 1,
+        SPARKLE_MAX_SIZE: 4,
+        SPARKLE_MIN_DISTANCE: 20,
+        SPARKLE_MAX_DISTANCE: 60,
+        SPARKLE_RISE: 18,
+        SPARKLE_ANGLE_JITTER: 0.35,
+        SPARKLE_MIN_DURATION_MS: 420,
+        SPARKLE_MAX_DURATION_MS: 700,
+        SPARKLE_STAGGER_MS: 80,
+        SPARKLE_COLORS: [0xffffff, 0xffe9a3, 0xffd447, 0x9be7ff],
+        SPARKLE_COLORS_RECORD: [0xffffff, 0xfff3b0, 0xffd447, 0x7ef0c0],
+
+        CONFETTI_COUNT: 14,
+        CONFETTI_COUNT_RECORD: 24,
+        CONFETTI_COLORS: [0xff4d6d, 0x4ecdc4, 0xffd447, 0xa855f7, 0x00ff88],
+        CONFETTI_SPREAD_X: 90,
+        CONFETTI_MIN_RISE: 40,
+        CONFETTI_MAX_RISE: 90,
+        CONFETTI_MIN_FALL: 90,
+        CONFETTI_MAX_FALL: 170,
+        CONFETTI_SPIN: 12,
+        CONFETTI_MIN_DURATION_MS: 550,
+        CONFETTI_MAX_DURATION_MS: 780,
+
+        // 2ª pulsação do recorde. Compartilha o valor com o disparo do som
+        // 'newRecord' em VictoryScreen, para os dois ficarem sincronizados.
+        RECORD_PULSE_DELAY_MS: 500,
+        RECORD_GLOW_COLOR: 0xfff6d0,
+        RECORD_GLOW_SCALE_BOOST: 1.3,
+    },
+
     RESPAWN: {
         ARC_HEIGHT: 150,
         MIN_DURATION_MS: 400,

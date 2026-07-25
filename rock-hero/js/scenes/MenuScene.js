@@ -498,6 +498,7 @@ class MenuScene extends Phaser.Scene {
                     { key: 'jumpNeonBurst', name: 'Burst Pular', desc: 'Partículas neon ao pular' },
                     { key: 'landNeonBurst', name: 'Burst Pousar', desc: 'Partículas neon ao pousar' },
                     { key: 'starParticles', name: 'Brilho Estrela', desc: 'Faíscas ao coletar estrela' },
+                    { key: 'victoryCelebration', name: 'Festa Vitória', desc: 'Brilho e confete na bandeira' },
                 ]
             },
             {
@@ -514,9 +515,10 @@ class MenuScene extends Phaser.Scene {
         ];
 
         const startY = 80;
-        // 46 é o teto: com 5 itens numa coluna, valores maiores fazem o último
-        // toggle colidir com o texto de instruções no rodapé.
-        const spacing = 46;
+        // Com 6 itens numa coluna, 38 é o teto antes do último toggle colidir
+        // com o texto de instruções no rodapé. A coluna está na capacidade
+        // máxima: um 7º item exige repaginar (3ª coluna não cabe em 640px).
+        const spacing = 38;
         let globalIndex = 0;
 
         columns.forEach((column) => {

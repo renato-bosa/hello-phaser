@@ -34,6 +34,7 @@ const GameConfig = {
         jumpNeonBurst: false,
         landNeonBurst: false,
         neonLineTrail: false,
+        victoryCelebration: true,
         screenShake: false,
         victorySlowMo: false,
 

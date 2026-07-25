@@ -31,10 +31,51 @@ class VictoryScreen {
         const result = GameData.saveRecord(scene.currentLevel, finalTime, scene.playerName);
 
         if (result.isRecord) {
-            scene.time.delayedCall(500, () => SoundManager.play('newRecord'));
+            scene.time.delayedCall(
+                GC.VICTORY.RECORD_PULSE_DELAY_MS, () => SoundManager.play('newRecord')
+            );
         }
 
-        this._showVictoryOverlay(finalTime, result);
+        this._celebrate(result.isRecord, () => this._showVictoryOverlay(finalTime, result));
+    }
+
+    /**
+     * Batida de celebração antes do overlay, e só então `onDone`.
+     *
+     * O respiro é o ponto central: sem ele, o overlay cobria a tela no mesmo
+     * frame do contato com a bandeira e nenhum efeito seria visto. O jogador
+     * já está congelado aqui porque `GameScene.update()` retorna cedo com
+     * `hasWon`, mas a física segue rodando — se ele tocou a bandeira no ar,
+     * cai e pousa naturalmente durante a celebração.
+     */
+    _celebrate(isRecord, onDone) {
+        const scene = this.scene;
+
+        if (!GameData.isFeatureEnabled('victoryCelebration')) {
+            onDone();
+            return;
+        }
+
+        const cfg = GC.VICTORY;
+        const goal = scene.goal;
+        const origin = goal || scene.playerController.player;
+
+        if (goal) {
+            // Seguro tweenar escala: _applyTilesetTransform usa flipX/angle,
+            // nunca scale, então não há flip para desfazer aqui.
+            scene.tweens.add({
+                targets: goal,
+                scale: { from: goal.scale, to: goal.scale * cfg.FLAG_POP_SCALE },
+                duration: cfg.FLAG_POP_MS,
+                yoyo: true,
+                ease: 'Back.easeOut'
+            });
+        }
+
+        scene.effectsManager.createVictoryBurst(origin.x, origin.y, isRecord);
+
+        const delay = isRecord ? cfg.OVERLAY_DELAY_RECORD_MS : cfg.OVERLAY_DELAY_MS;
+        scene.time.delayedCall(delay, onDone);
     }
 
     _showStarsWarning() {

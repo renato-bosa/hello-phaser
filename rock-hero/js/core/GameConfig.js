@@ -18,7 +18,9 @@ const GameConfig = {
     MAX_SLOTS: 4,
     STORAGE_KEYS: {
         SLOTS: 'rockHero_slots',
-        ACTIVE: 'rockHero_activeSlot'
+        ACTIVE: 'rockHero_activeSlot',
+        // Preferências globais (não por slot) — ver js/data/Settings.js
+        SETTINGS: 'rockHero_settings'
     },
 
     // ==================== FEATURE FLAGS DEFAULTS ====================

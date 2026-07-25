@@ -25,6 +25,12 @@ class PlayerController {
         this.wasInWaterPrev = false;
         this.justEnteredWater = false;
 
+        this.wasOnGround = true;
+        this.lastDescentSpeed = 0;
+        this.suppressLandingSound = false;
+        this.nextFootstepTime = 0;
+        this.footstepFoot = 0;
+
         this.hearts = GC.HEARTS.MAX;
         this.isInvincible = false;
         this.invincibleUntil = 0;
@@ -235,6 +241,86 @@ class PlayerController {
             // Mantém o flip vertical no modo ponta-cabeça após mudança de textura
             if (upsideDown) player.setFlipY(true);
         }
+
+        this._updateGroundSounds(onGround, upsideDown, inWater, currentTime);
+    }
+
+    // --- Sons de contato com o chão ---
+
+    _updateGroundSounds(onGround, upsideDown, inWater, currentTime) {
+        if (this.isRespawning) {
+            this.wasOnGround = onGround;
+            return;
+        }
+
+        if (!onGround) {
+            // O Arcade zera velocity.y no frame do pouso, então a velocidade do
+            // impacto precisa ser guardada enquanto o jogador ainda está no ar.
+            const velocityY = this.player.body.velocity.y;
+            this.lastDescentSpeed = Math.max(0, upsideDown ? -velocityY : velocityY);
+            this.suppressLandingSound = false;
+            this.wasOnGround = false;
+            return;
+        }
+
+        if (this.wasOnGround) {
+            this._updateFootsteps(inWater, currentTime);
+        } else {
+            this._playLandingSound(inWater);
+            // Segura o primeiro passo para ele não colar no baque do pouso
+            this.nextFootstepTime = currentTime + GC.FOOTSTEP.INTERVAL_SLOW_MS;
+        }
+
+        this.wasOnGround = true;
+    }
+
+    _playLandingSound(inWater) {
+        // O trampolim toca o próprio som no mesmo frame do contato
+        if (this.suppressLandingSound) {
+            this.suppressLandingSound = false;
+            return;
+        }
+
+        if (inWater) return;
+        if (this.lastDescentSpeed < GC.LANDING.MIN_IMPACT_SPEED) return;
+
+        const impact = Phaser.Math.Clamp(
+            (this.lastDescentSpeed - GC.LANDING.MIN_IMPACT_SPEED) /
+            (GC.LANDING.MAX_IMPACT_SPEED - GC.LANDING.MIN_IMPACT_SPEED),
+            0, 1
+        );
+
+        SoundManager.play('land', {
+            volume: Phaser.Math.Linear(GC.LANDING.MIN_VOLUME, GC.LANDING.MAX_VOLUME, impact)
+        });
+    }
+
+    _updateFootsteps(inWater, currentTime) {
+        if (inWater) return;
+        if (currentTime < this.nextFootstepTime) return;
+
+        const speed = Math.abs(this.player.body.velocity.x);
+        if (speed < GC.FOOTSTEP.MIN_SPEED) {
+            // Parado: o próximo passo sai assim que voltar a andar
+            this.nextFootstepTime = currentTime;
+            return;
+        }
+
+        const speedRatio = Phaser.Math.Clamp(
+            (speed - GC.PLAYER.MIN_SPEED) / (GC.PLAYER.MAX_SPEED - GC.PLAYER.MIN_SPEED),
+            0, 1
+        );
+
+        this.footstepFoot = 1 - this.footstepFoot;
+
+        SoundManager.play('footstep', {
+            volume: GC.FOOTSTEP.VOLUME,
+            frequency: GC.FOOTSTEP.FREQUENCY * (this.footstepFoot ? 1 : GC.FOOTSTEP.ALT_FOOT_PITCH)
+        });
+
+        this.nextFootstepTime = currentTime + Phaser.Math.Linear(
+            GC.FOOTSTEP.INTERVAL_SLOW_MS, GC.FOOTSTEP.INTERVAL_FAST_MS, speedRatio
+        );
     }
 
     _playWalkAnimation(direction, onGround) {
@@ -256,6 +342,7 @@ class PlayerController {
         if (player.body.velocity.y >= 0 && !trampoline.justBounced) {
             player.setVelocityY(GC.TRAMPOLINE.BOUNCE_FORCE);
             this.isJumping = true;
+            this.suppressLandingSound = true;
             SoundManager.play('jumpTrampoline');
 
             trampoline.justBounced = true;

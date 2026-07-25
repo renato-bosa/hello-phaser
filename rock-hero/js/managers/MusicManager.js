@@ -68,6 +68,11 @@ const MusicManager = {
     _activeSounds: [],
     _scheduledCrossfadeTimer: null,   // TimerEvent que dispara o crossfade
 
+    // Contexto de gameplay preservado enquanto a música está desligada, para
+    // que religar pelo menu volte a tocar a fase atual em vez de esperar a
+    // próxima. Ver setEnabled().
+    _suspendedContext: null,
+
     // ==================== API PÚBLICA ====================
 
     /**
@@ -94,10 +99,14 @@ const MusicManager = {
     startGameplay(scene, levelIndex) {
         this._ensureInit();
         if (!this.enabled) {
+            // Guarda o contexto mesmo desligado: se o jogador religar a música
+            // no menu de pausa desta fase, setEnabled() sabe o que tocar.
+            this._suspendedContext = { scene, levelIndex };
             console.warn(`MusicManager: startGameplay(level=${levelIndex}) ignorado — enabled=false.`);
             return;
         }
 
+        this._suspendedContext = null;
         this.scene = scene;
         this.contextType = 'gameplay';
         this.contextData = { levelIndex };
@@ -186,18 +195,59 @@ const MusicManager = {
         }
     },
 
+    /**
+     * Liga/desliga a BGM. Desligar para tudo; religar retoma a fase corrente
+     * (do início da faixa, já que o sound anterior foi destruído) em vez de
+     * ficar em silêncio até a próxima fase.
+     */
     setEnabled(b) {
-        this.enabled = !!b;
-        if (!this.enabled) this.stop();
+        this._ensureInit();
+
+        const next = !!b;
+        if (next === this.enabled) return;
+
+        if (!next) {
+            // `stop()` limpa scene/contextData, então preserva antes.
+            this._suspendedContext = this.contextType === 'gameplay' && this.scene
+                ? { scene: this.scene, levelIndex: this.contextData?.levelIndex }
+                : null;
+            this.enabled = false;
+            this.stop();
+            return;
+        }
+
+        this.enabled = true;
+
+        const suspended = this._suspendedContext;
+        this._suspendedContext = null;
+
+        // Só retoma se a cena guardada ainda estiver viva (o jogador pode ter
+        // voltado ao mapa ou ao menu enquanto a música estava desligada).
+        if (suspended && suspended.scene && suspended.scene.sys && suspended.scene.sys.isActive()) {
+            this.startGameplay(suspended.scene, suspended.levelIndex);
+        }
     },
 
-    isEnabled() { return this.enabled; },
+    isEnabled() {
+        this._ensureInit();
+        return this.enabled;
+    },
 
     // ==================== INTERNAL ====================
 
     _ensureInit() {
         if (this._initialized) return;
         this._initialized = true;
+
+        // Preferência persistida do jogador (menu principal / menu de pausa).
+        // As flags de URL abaixo têm precedência, por serem ferramenta de dev.
+        try {
+            if (typeof Settings !== 'undefined') {
+                this.enabled = Settings.get('musicEnabled') !== false;
+            }
+        } catch (e) {
+            // storage indisponível — mantém o default
+        }
 
         // URL flags — lidas uma única vez no primeiro uso.
         try {

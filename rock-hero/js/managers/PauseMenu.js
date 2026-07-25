@@ -34,16 +34,21 @@ class PauseMenu {
 
         this.selectedIndex = 0;
         this.buttons = [];
+        this.musicBtn = null;
 
         const buttonConfigs = [
             { text: '▶ Continuar Jogando', color: '#00ff00', action: () => this.resume() },
             { text: '🗺 Voltar ao Mapa', color: '#4ecdc4', action: () => this._goToWorldMap() },
             { text: '👤 Trocar Personagem', color: '#a855f7', action: () => this._changeCharacter() },
+            {
+                text: this._getMusicLabel(), color: this._getMusicColor(),
+                action: () => this._toggleMusic(), isMusicToggle: true
+            },
             { text: '🚪 Sair do Jogo', color: '#ff6b6b', action: () => this._goToMenu() }
         ];
 
-        const startY = centerY - 40;
-        const spacing = 38;
+        const startY = centerY - 55;
+        const spacing = 36;
 
         buttonConfigs.forEach((config, index) => {
             const btn = scene.add.text(centerX, startY + (index * spacing), config.text, {
@@ -63,6 +68,8 @@ class PauseMenu {
                 SoundManager.play('menuSelect');
                 config.action();
             });
+
+            if (config.isMusicToggle) this.musicBtn = btn;
 
             this.buttons.push(btn);
             scene.overlayElements.push(btn);
@@ -145,6 +152,29 @@ class PauseMenu {
         });
 
         this.keyListeners = [upKey, downKey, enterKey];
+    }
+
+    // ==================== MÚSICA ====================
+
+    _getMusicLabel() {
+        return GameData.isMusicEnabled() ? '♫ Música: ON' : '♫ Música: OFF';
+    }
+
+    _getMusicColor() {
+        return GameData.isMusicEnabled() ? '#ffcc00' : '#888888';
+    }
+
+    /**
+     * Alterna a música sem sair da pausa. Religar retoma a faixa desta fase
+     * (do início), porque o sound anterior foi destruído ao desligar.
+     */
+    _toggleMusic() {
+        GameData.setMusicEnabled(!GameData.isMusicEnabled());
+
+        if (!this.musicBtn) return;
+        this.musicBtn.setText(this._getMusicLabel());
+        this.musicBtn.defaultColor = this._getMusicColor();
+        this._updateStyles();
     }
 
     _updateStyles() {

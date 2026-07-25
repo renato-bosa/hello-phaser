@@ -214,6 +214,17 @@ class MenuScene extends Phaser.Scene {
         this.menuButtons.push(this.playBtn);
         yOffset += 35;
 
+        // Botão de música — alterna no lugar, sem abrir submenu
+        this.musicBtn = this.createButton(
+            this.centerX,
+            this.centerY + yOffset,
+            this.getMusicLabel(),
+            this.getMusicColor(),
+            () => this.toggleMusic()
+        );
+        this.menuButtons.push(this.musicBtn);
+        yOffset += 35;
+
         // Botão "DEV OPTIONS" — só aparece com ?dev=true na URL.
         // Segue o padrão do projeto para flags de desenvolvimento (?fps, ?debug, ?mapDebug).
         const devMode = new URLSearchParams(window.location.search).get('dev') === 'true';
@@ -412,6 +423,28 @@ class MenuScene extends Phaser.Scene {
         this.scene.start('SlotSelectScene', {
             returnTo: 'MenuScene'
         });
+    }
+
+    // ==================== MÚSICA ====================
+
+    getMusicLabel() {
+        return GameData.isMusicEnabled() ? '♫ MÚSICA: ON' : '♫ MÚSICA: OFF';
+    }
+
+    getMusicColor() {
+        return GameData.isMusicEnabled() ? '#ffcc00' : '#888888';
+    }
+
+    /**
+     * Alterna a música e reflete o novo estado no próprio botão.
+     * Não toca SFX de confirmação: o efeito já é audível por si só.
+     */
+    toggleMusic() {
+        GameData.setMusicEnabled(!GameData.isMusicEnabled());
+
+        this.musicBtn.setText(this.getMusicLabel());
+        this.musicBtn.defaultColor = this.getMusicColor();
+        this.updateButtonStyles();
     }
 
     closeOverlay() {

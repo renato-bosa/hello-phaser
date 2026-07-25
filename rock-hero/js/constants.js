@@ -24,6 +24,25 @@ const GC = {
         STOMP_TOLERANCE: 8,
     },
 
+    // Passo e pouso são ruído filtrado, não oscilador. O filtro descarta a
+    // maior parte do espectro do ruído, então estes volumes precisam ser bem
+    // mais altos que os dos sons tonais para soarem equivalentes.
+    FOOTSTEP: {
+        FREQUENCY: 1400,          // corte do bandpass do passo
+        ALT_FOOT_PITCH: 0.85,     // pé alternado soa mais grave
+        INTERVAL_SLOW_MS: 290,    // cadência em MIN_SPEED
+        INTERVAL_FAST_MS: 170,    // cadência em MAX_SPEED
+        VOLUME: 0.32,
+        MIN_SPEED: 40,            // abaixo disso conta como parado
+    },
+
+    LANDING: {
+        MIN_IMPACT_SPEED: 150,    // quedas mais leves não soam
+        MAX_IMPACT_SPEED: 750,    // satura o volume
+        MIN_VOLUME: 0.3,
+        MAX_VOLUME: 0.9,
+    },
+
     WATER: {
         SPEED_MULTIPLIER: 0.5,
         JUMP_FORCE: -150,

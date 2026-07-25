@@ -16,18 +16,22 @@ const SoundManager = {
     enabled: true,
     initialized: false,
     audioContext: null,
+    _noiseBuffer: null,
     
     // ==================== DEFINIÇÃO DOS SONS ====================
     
     /**
      * Configuração de cada som
      * - type: 'sine', 'square', 'sawtooth', 'triangle', 'noise'
-     * - frequency: frequência inicial em Hz
+     * - frequency: frequência inicial em Hz. Em 'noise', é o corte do filtro
      * - duration: duração em segundos
      * - volume: volume relativo (0-1)
      * - attack: tempo de attack em segundos
      * - decay: tempo de decay em segundos
-     * - slide: variação de frequência (positivo = sobe, negativo = desce)
+     * - slide: variação de frequência (positivo = sobe, negativo = desce).
+     *          Em 'noise', varre o corte do filtro
+     * - filterType: só em 'noise' — 'lowpass', 'bandpass' ou 'highpass'
+     * - filterQ: só em 'noise' — ressonância do filtro
      * - vibratoDepth: profundidade do vibrato
      * - vibratoSpeed: velocidade do vibrato
      * - delay: tempo do delay/eco em segundos
@@ -105,6 +109,33 @@ const SoundManager = {
             attack: 0.01,
             decay: 0.2,
             slide: 600
+        },
+        land: {
+            // Pouso em terra fofa: superfície que absorve, não que ressoa.
+            // Sem `slide` de propósito — qualquer varredura de frequência dá
+            // altura definida ao baque e ele passa a soar como bumbo ou tábua.
+            // Volume real vem do disparo (GC.LANDING), proporcional à queda.
+            type: 'noise',
+            filterType: 'lowpass',
+            filterQ: 0.5,       // abaixo de Butterworth: sem pico, joelho suave
+            frequency: 500,
+            duration: 0.1,
+            volume: 0.6,
+            attack: 0.018,
+            decay: 0.082
+        },
+        footstep: {
+            // Toca dezenas de vezes por fase: curto e discreto de propósito.
+            // Volume real vem do disparo (GC.FOOTSTEP.VOLUME).
+            type: 'noise',
+            filterType: 'bandpass',
+            filterQ: 1.2,
+            frequency: 1400,
+            duration: 0.05,
+            volume: 0.32,
+            attack: 0.002,
+            decay: 0.045,
+            slide: -500
         },
         collectStar: {
             type: 'square',
@@ -280,33 +311,69 @@ const SoundManager = {
     },
     
     /**
+     * Gera (uma vez) um buffer de ruído branco reaproveitado pelos sons percussivos
+     */
+    _getNoiseBuffer() {
+        if (this._noiseBuffer) return this._noiseBuffer;
+
+        const ctx = this.audioContext;
+        const length = Math.floor(ctx.sampleRate * 0.5);
+        const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+
+        for (let i = 0; i < length; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        this._noiseBuffer = buffer;
+        return buffer;
+    },
+
+    /**
      * Toca um único tom
      */
     playSingleTone(config) {
         const ctx = this.audioContext;
         const startTime = config.startTime || ctx.currentTime;
+        const isNoise = config.type === 'noise';
         
-        // Oscilador
-        const osc = ctx.createOscillator();
-        osc.type = config.type || 'square';
-        osc.frequency.setValueAtTime(config.frequency, startTime);
+        // Fonte: oscilador tonal ou ruído branco (sons percussivos)
+        let source;
+        let filter = null;
+
+        if (isNoise) {
+            source = ctx.createBufferSource();
+            source.buffer = this._getNoiseBuffer();
+            source.loop = true;
+
+            // No ruído é o filtro que define o timbre — sem ele soa como estática
+            filter = ctx.createBiquadFilter();
+            filter.type = config.filterType || 'lowpass';
+            filter.frequency.setValueAtTime(config.frequency, startTime);
+            if (config.filterQ) filter.Q.value = config.filterQ;
+        } else {
+            source = ctx.createOscillator();
+            source.type = config.type || 'square';
+            source.frequency.setValueAtTime(config.frequency, startTime);
+        }
         
-        // Slide de frequência
+        // Slide de frequência (no ruído, varre o corte do filtro)
         if (config.slide) {
-            osc.frequency.linearRampToValueAtTime(
-                config.frequency + config.slide,
+            const target = isNoise ? filter.frequency : source.frequency;
+            target.linearRampToValueAtTime(
+                Math.max(20, config.frequency + config.slide),
                 startTime + config.duration
             );
         }
         
-        // Vibrato
-        if (config.vibratoDepth && config.vibratoSpeed) {
+        // Vibrato (só faz sentido em fontes tonais)
+        if (!isNoise && config.vibratoDepth && config.vibratoSpeed) {
             const vibrato = ctx.createOscillator();
             const vibratoGain = ctx.createGain();
             vibrato.frequency.value = config.vibratoSpeed;
             vibratoGain.gain.value = config.vibratoDepth;
             vibrato.connect(vibratoGain);
-            vibratoGain.connect(osc.frequency);
+            vibratoGain.connect(source.frequency);
             vibrato.start(startTime);
             vibrato.stop(startTime + config.duration);
         }
@@ -321,8 +388,13 @@ const SoundManager = {
         gainNode.gain.linearRampToValueAtTime(volume, startTime + attack);
         gainNode.gain.linearRampToValueAtTime(0, startTime + attack + decay);
         
-        // Conecta oscilador ao gain
-        osc.connect(gainNode);
+        // Conecta a fonte ao gain, passando pelo filtro quando houver
+        if (filter) {
+            source.connect(filter);
+            filter.connect(gainNode);
+        } else {
+            source.connect(gainNode);
+        }
         
         // Delay (eco)
         if (config.delay && config.delay > 0) {
@@ -345,8 +417,8 @@ const SoundManager = {
             gainNode.connect(ctx.destination);
         }
         
-        osc.start(startTime);
-        osc.stop(startTime + config.duration + 0.1);
+        source.start(startTime);
+        source.stop(startTime + config.duration + 0.1);
     },
     
     // ==================== REPRODUÇÃO ====================
@@ -354,7 +426,7 @@ const SoundManager = {
     /**
      * Toca um efeito sonoro
      * @param {string} soundKey - Nome do som (ex: 'jump', 'menuSelect')
-     * @param {object} options - Opções adicionais { volume }
+     * @param {object} options - Opções adicionais { volume, frequency }
      */
     play(soundKey, options = {}) {
         if (!this.enabled) return;
@@ -375,10 +447,13 @@ const SoundManager = {
             return;
         }
         
-        // Aplica volume customizado se fornecido
+        // Aplica overrides por disparo (ex: volume do pouso, tom do passo)
         const config = { ...soundConfig };
         if (options.volume !== undefined) {
             config.volume = options.volume;
+        }
+        if (options.frequency !== undefined) {
+            config.frequency = options.frequency;
         }
         
         this.generateAndPlay(config);

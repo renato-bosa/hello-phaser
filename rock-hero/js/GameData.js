@@ -284,6 +284,18 @@ const GameData = {
     loadMapPosition()                 { return ProgressTracker.loadMapPosition(this.getActiveSlot()); },
     getWorldLevelsWithStatus(worldId) { return ProgressTracker.getWorldLevelsWithStatus(this.getActiveSlot(), worldId); },
 
+    // ==================== ÁUDIO ====================
+    // Settings guarda a preferência; MusicManager aplica no áudio. A leitura
+    // vem do MusicManager porque ele é a verdade em runtime (respeita também
+    // o override ?music=false da URL).
+
+    isMusicEnabled() { return MusicManager.isEnabled(); },
+
+    setMusicEnabled(enabled) {
+        Settings.set('musicEnabled', enabled);
+        MusicManager.setEnabled(enabled);
+    },
+
     // ==================== CONTROLES VIRTUAIS ====================
 
     getVirtualControls() { return GameState.getVirtualControls(); }

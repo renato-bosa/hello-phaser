@@ -210,8 +210,8 @@ const GC = {
         SPARKLE_COLORS: [0xffffff, 0xffe9a3, 0xffd447, 0x9be7ff],
         SPARKLE_COLORS_RECORD: [0xffffff, 0xfff3b0, 0xffd447, 0x7ef0c0],
 
-        CONFETTI_COUNT: 14,
-        CONFETTI_COUNT_RECORD: 24,
+        CONFETTI_COUNT: 21,
+        CONFETTI_COUNT_RECORD: 42,
         CONFETTI_COLORS: [0xff4d6d, 0x4ecdc4, 0xffd447, 0xa855f7, 0x00ff88],
         CONFETTI_SPREAD_X: 90,
         CONFETTI_MIN_RISE: 40,

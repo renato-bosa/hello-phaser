@@ -1157,6 +1157,7 @@ class GameScene extends Phaser.Scene {
     }
 
     collectStar(player, star) {
+        this.effectsManager.createStarCollectGlow(star.x, star.y);
         star.disableBody(true, true);
         this.starsCollected++;
         SoundManager.play('collectStar');

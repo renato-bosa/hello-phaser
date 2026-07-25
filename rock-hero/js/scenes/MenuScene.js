@@ -497,6 +497,7 @@ class MenuScene extends Phaser.Scene {
                     { key: 'neonLineTrail', name: 'Linha Neon', desc: 'Linha brilhante na trajetória' },
                     { key: 'jumpNeonBurst', name: 'Burst Pular', desc: 'Partículas neon ao pular' },
                     { key: 'landNeonBurst', name: 'Burst Pousar', desc: 'Partículas neon ao pousar' },
+                    { key: 'starParticles', name: 'Brilho Estrela', desc: 'Faíscas ao coletar estrela' },
                 ]
             },
             {
@@ -513,7 +514,9 @@ class MenuScene extends Phaser.Scene {
         ];
 
         const startY = 80;
-        const spacing = 55;
+        // 46 é o teto: com 5 itens numa coluna, valores maiores fazem o último
+        // toggle colidir com o texto de instruções no rodapé.
+        const spacing = 46;
         let globalIndex = 0;
 
         columns.forEach((column) => {

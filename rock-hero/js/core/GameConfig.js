@@ -29,7 +29,7 @@ const GameConfig = {
     FEATURES_DEFAULTS: {
         // ===== EFEITOS VISUAIS =====
         playerTrail: true,
-        starParticles: false,
+        starParticles: true,
         dustEffect: false,
         jumpNeonBurst: false,
         landNeonBurst: false,

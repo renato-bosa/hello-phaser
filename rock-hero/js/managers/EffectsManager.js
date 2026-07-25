@@ -101,6 +101,78 @@ class EffectsManager {
         this.wasOnGround = onGround;
     }
 
+    /**
+     * Brilho mágico ao coletar uma estrela: núcleo claro + auréola dourada que
+     * expandem e apagam, mais faíscas que sobem e se dissipam em tempos
+     * diferentes.
+     *
+     * Disparado por evento (GameScene.collectStar), não pelo update() — por
+     * isso é público e checa a própria feature flag.
+     */
+    createStarCollectGlow(x, y) {
+        if (!GameData.isFeatureEnabled('starParticles')) return;
+
+        const cfg = GC.STAR_COLLECT;
+        // Acima do jogador: o brilho não deve ficar escondido atrás dele
+        const depth = GC.DEPTH.PLAYER + 1;
+
+        this._createExpandingGlow(
+            x, y, cfg.GLOW_RADIUS, cfg.GLOW_COLOR, cfg.GLOW_ALPHA,
+            cfg.GLOW_SCALE, cfg.GLOW_DURATION_MS, depth
+        );
+        this._createExpandingGlow(
+            x, y, cfg.HALO_RADIUS, cfg.HALO_COLOR, cfg.HALO_ALPHA,
+            cfg.HALO_SCALE, cfg.HALO_DURATION_MS, depth + 1
+        );
+
+        for (let i = 0; i < cfg.SPARKLE_COUNT; i++) {
+            this._createStarSparkle(x, y, i, depth + 1);
+        }
+    }
+
+    _createExpandingGlow(x, y, radius, color, alpha, targetScale, duration, depth) {
+        const glow = this.scene.add.circle(x, y, radius, color, alpha);
+        glow.setDepth(depth);
+
+        this.scene.tweens.add({
+            targets: glow,
+            scale: targetScale,
+            alpha: 0,
+            duration: duration,
+            ease: 'Cubic.easeOut',
+            onComplete: () => glow.destroy()
+        });
+    }
+
+    _createStarSparkle(x, y, index, depth) {
+        const scene = this.scene;
+        const cfg = GC.STAR_COLLECT;
+
+        const baseAngle = (Math.PI * 2 / cfg.SPARKLE_COUNT) * index;
+        const angle = baseAngle + Phaser.Math.FloatBetween(
+            -cfg.SPARKLE_ANGLE_JITTER, cfg.SPARKLE_ANGLE_JITTER
+        );
+        const distance = Phaser.Math.Between(cfg.SPARKLE_MIN_DISTANCE, cfg.SPARKLE_MAX_DISTANCE);
+        const size = Phaser.Math.Between(cfg.SPARKLE_MIN_SIZE, cfg.SPARKLE_MAX_SIZE);
+
+        const sparkle = scene.add.circle(
+            x, y, size, Phaser.Math.RND.pick(cfg.SPARKLE_COLORS), 0.95
+        );
+        sparkle.setDepth(depth);
+
+        scene.tweens.add({
+            targets: sparkle,
+            x: x + Math.cos(angle) * distance,
+            y: y + Math.sin(angle) * distance - cfg.SPARKLE_RISE,
+            scale: 0,
+            alpha: 0,
+            duration: Phaser.Math.Between(cfg.SPARKLE_MIN_DURATION_MS, cfg.SPARKLE_MAX_DURATION_MS),
+            delay: Phaser.Math.Between(0, cfg.SPARKLE_STAGGER_MS),
+            ease: 'Sine.easeOut',
+            onComplete: () => sparkle.destroy()
+        });
+    }
+
     _createNeonDustParticle(x, y, colors, options = {}) {
         const scene = this.scene;
         const player = scene.playerController.player;

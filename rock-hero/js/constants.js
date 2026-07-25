@@ -144,6 +144,37 @@ const GC = {
         PLAYER_OFFSET_Y: 14,
     },
 
+    // Brilho ao coletar estrela. Duração longa e easing suave de propósito:
+    // é o que separa "magia se dissipando" de "explosão".
+    STAR_COLLECT: {
+        // Núcleo claro que estoura e apaga rápido
+        HALO_RADIUS: 5,
+        HALO_SCALE: 3.2,
+        HALO_COLOR: 0xfffef0,
+        HALO_ALPHA: 0.05,
+        HALO_DURATION_MS: 340,
+
+        // Auréola dourada, maior e mais fraca — dá o "glow" em volta do núcleo
+        GLOW_RADIUS: 10,
+        GLOW_SCALE: 4.2,
+        GLOW_COLOR: 0xffd447,
+        GLOW_ALPHA: 0.15,
+        GLOW_DURATION_MS: 520,
+
+        // Faíscas que sobem e se apagam em tempos diferentes
+        SPARKLE_COUNT: 30,
+        SPARKLE_MIN_SIZE: 1,
+        SPARKLE_MAX_SIZE: 1,
+        SPARKLE_MIN_DISTANCE: 55,
+        SPARKLE_MAX_DISTANCE: 85,
+        SPARKLE_RISE: 12,             // deriva para cima: magia sobe
+        SPARKLE_ANGLE_JITTER: 0.35,   // radianos, para não formar anel perfeito
+        SPARKLE_MIN_DURATION_MS: 620,
+        SPARKLE_MAX_DURATION_MS: 780,
+        SPARKLE_STAGGER_MS: 220,       // dissipa aos poucos, não tudo de uma vez
+        SPARKLE_COLORS: [0xffffe0, 0xffe9a3, 0xffd447, 0xfff6d0],
+    },
+
     RESPAWN: {
         ARC_HEIGHT: 150,
         MIN_DURATION_MS: 400,

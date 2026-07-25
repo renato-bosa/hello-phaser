@@ -506,6 +506,8 @@ class MenuScene extends Phaser.Scene {
                 items: [
                     { key: 'doubleJump', name: 'Double-Jump', desc: 'Pular novamente no ar' },
                     { key: 'waterPhysics', name: 'Física de Água', desc: 'Gravidade e movimento reduzidos' },
+                    { key: 'autoScroll', name: 'Auto-Scroll', desc: 'Câmera avança sozinha' },
+                    { key: 'upsideDown', name: 'Ponta-Cabeça', desc: 'Gravidade invertida' },
                 ]
             }
         ];

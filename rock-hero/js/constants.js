@@ -266,19 +266,17 @@ const GC = {
         PERIOD_S: 20,               // ciclo completo (~10s soprando cada lado)
         INDICATOR_BARS: 3,
 
-        // Poeira: rajada forte na troca de direção + fluxo contínuo mais suave
-        DIR_FLIP_DEADZONE: 0.12,    // |sample| abaixo disso = neutro (evita flicker)
-        DUST_COOLDOWN_MS: 1200,     // mínimo entre rajadas de transição
-        DUST_COUNT: 22,             // partículas na rajada de transição
+        // Poeira: fluxo contínuo cuja opacidade e densidade acompanham a
+        // intensidade do vento (|sample|). Densa/opaca no pico, some na calmaria.
+        DIR_FLIP_DEADZONE: 0.12,    // |sample| abaixo disso = neutro (segura o último lado)
+        DUST_MIN_INTENSITY: 0.15,   // abaixo disso não gera poeira (perto do zero)
         DUST_MIN_SIZE: 2,
         DUST_MAX_SIZE: 8,
         DUST_DURATION_MS: 1000,
-        DUST_STAGGER_MS: 28,
         DUST_Y_DRIFT: 18,
-        DUST_ALPHA: 0.5,            // opacidade da rajada de transição
-        DUST_AMBIENT_ALPHA: 0.18,   // opacidade do fluxo contínuo
-        DUST_AMBIENT_INTERVAL_MS: 70, // base entre partículas (÷ intensity)
-        DUST_AMBIENT_PER_TICK: 1,   // partículas por tick do fluxo
+        DUST_MAX_ALPHA: 0.5,        // opacidade no pico do vento (intensity = 1)
+        DUST_INTERVAL_MS: 70,       // base entre partículas (÷ intensity: mais forte = mais densa)
+        DUST_PER_TICK: 1,           // partículas por tick
         DUST_COLORS: [0xc4b59a, 0xd4c4a8, 0xb8a890, 0xe8dcc8],
         DUST_DEPTH: 50,             // acima do gameplay, abaixo do HUD
     },

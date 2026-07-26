@@ -8,10 +8,12 @@
  *   force      = sample × MAX_SPEED
  *
  * Ciclo completo = PERIOD_S (~10s cada lado com PERIOD_S=20).
- * Fase φ aleatória por run. No cruzamento do zero o vento acalma e
- * depois cresce no outro lado — dispara a rajada de poeira.
+ * Fase φ aleatória por run.
  *
- * Visual: poeira contínua (opacidade baixa) + rajada na inversão.
+ * Visual: poeira contínua na direção do vento, com opacidade e densidade
+ * proporcionais à intensidade — densa/opaca no pico, some na calmaria
+ * (perto do cruzamento do zero). Sem rajada especial na inversão, já que
+ * ali a intensidade é mínima por definição.
  *
  * Não afeta inimigos. A aplicação no player fica no PlayerController
  * (vento no ar e ao andar; no chão parado a força é ignorada).
@@ -26,17 +28,15 @@ class WindSystem {
         this.omega = (Math.PI * 2) / cfg.PERIOD_S;
         this.maxSpeed = cfg.MAX_SPEED;
         this.flipDeadzone = cfg.DIR_FLIP_DEADZONE;
-        this.dustCooldownMs = cfg.DUST_COOLDOWN_MS;
 
         this.startTime = scene.time.now;
         this.direction = 0;   // sample assinado (−1…+1)
         this.intensity = 0;   // |sample|
         this.force = 0;
 
-        // Sinal estável da direção (−1 / 0 / +1) para detectar inversões
+        // Sinal estável da direção (−1 / 0 / +1); segura o último lado na deadzone
         this._dirSign = 0;
-        this._lastBurstTime = -Infinity;
-        this._lastAmbientTime = 0;
+        this._lastDustTime = 0;
     }
 
     /**
@@ -52,64 +52,50 @@ class WindSystem {
         this.intensity = Math.abs(sample);
         this.force = sample * this.maxSpeed;
 
-        this._checkDirectionFlip(time);
-        this._updateAmbientDust(time);
+        this._updateDirSign();
+        this._updateDust(time);
     }
 
     /**
-     * Detecta inversão de polaridade com histerese (deadzone) e dispara rajada.
+     * Atualiza o lado do vento com histerese: só troca quando ultrapassa a
+     * deadzone, evitando flicker perto do zero.
      */
-    _checkDirectionFlip(time) {
-        let newSign = this._dirSign;
+    _updateDirSign() {
         if (this.direction > this.flipDeadzone) {
-            newSign = 1;
+            this._dirSign = 1;
         } else if (this.direction < -this.flipDeadzone) {
-            newSign = -1;
-        }
-
-        if (newSign !== 0 && this._dirSign !== 0 && newSign !== this._dirSign) {
-            if (time - this._lastBurstTime >= this.dustCooldownMs) {
-                this._lastBurstTime = time;
-                this._spawnDustCloud(newSign, { burst: true });
-            }
-        }
-
-        if (newSign !== 0) {
-            this._dirSign = newSign;
+            this._dirSign = -1;
         }
     }
 
     /**
-     * Fluxo contínuo de poeira na direção estável atual (opacidade menor).
-     * Cadência sobe com a intensidade (|sample|).
+     * Fluxo de poeira na direção atual. Cadência e opacidade sobem com a
+     * intensidade; abaixo de DUST_MIN_INTENSITY não gera nada.
      */
-    _updateAmbientDust(time) {
+    _updateDust(time) {
         if (this._dirSign === 0) return;
 
         const cfg = GC.WIND;
-        const interval = cfg.DUST_AMBIENT_INTERVAL_MS / Math.max(this.intensity, 0.15);
-        if (time - this._lastAmbientTime < interval) return;
+        if (this.intensity < cfg.DUST_MIN_INTENSITY) return;
 
-        this._lastAmbientTime = time;
-        this._spawnDustCloud(this._dirSign, {
-            burst: false,
-            count: cfg.DUST_AMBIENT_PER_TICK
-        });
+        const interval = cfg.DUST_INTERVAL_MS / this.intensity;
+        if (time - this._lastDustTime < interval) return;
+
+        this._lastDustTime = time;
+        this._spawnDust(this._dirSign, this.intensity, cfg.DUST_PER_TICK);
     }
 
     /**
-     * Nuvem de poeira em espaço de tela, varrendo no sentido do sopro.
+     * Emite partículas de poeira varrendo a tela no sentido do sopro.
      * @param {number} sign +1 → direita, −1 → esquerda
-     * @param {{ burst?: boolean, count?: number }} opts
+     * @param {number} intensity 0…1, escala a opacidade
+     * @param {number} count quantidade de partículas
      */
-    _spawnDustCloud(sign, opts = {}) {
+    _spawnDust(sign, intensity, count) {
         const scene = this.scene;
         const cam = scene.cameras.main;
         const cfg = GC.WIND;
-        const burst = opts.burst === true;
-        const count = opts.count ?? (burst ? cfg.DUST_COUNT : cfg.DUST_AMBIENT_PER_TICK);
-        const baseAlpha = burst ? cfg.DUST_ALPHA : cfg.DUST_AMBIENT_ALPHA;
-        const stagger = burst ? cfg.DUST_STAGGER_MS : 0;
+        const baseAlpha = cfg.DUST_MAX_ALPHA * intensity;
 
         const fromLeft = sign > 0;
         const startX = fromLeft ? -30 : cam.width + 30;
@@ -126,7 +112,9 @@ class WindSystem {
                 .setDepth(cfg.DUST_DEPTH);
 
             const drift = Phaser.Math.Between(-cfg.DUST_Y_DRIFT, cfg.DUST_Y_DRIFT);
-            const duration = cfg.DUST_DURATION_MS * Phaser.Math.FloatBetween(0.75, 1.15);
+            // Vento mais forte varre a poeira mais rápido pela tela
+            const duration = (cfg.DUST_DURATION_MS / Math.max(intensity, 0.3))
+                * Phaser.Math.FloatBetween(0.75, 1.15);
 
             scene.tweens.add({
                 targets: particle,
@@ -135,7 +123,6 @@ class WindSystem {
                 alpha: 0,
                 scale: Phaser.Math.FloatBetween(0.4, 1.1),
                 duration,
-                delay: i * stagger,
                 ease: 'Sine.easeOut',
                 onComplete: () => particle.destroy()
             });

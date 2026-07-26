@@ -111,7 +111,7 @@ class PlayerController {
         let direction = moveLeft ? -1 : (moveRight ? 1 : 0);
 
         if (this.speedBoostActive && this.speedBoostSpeed && direction !== 0) {
-            player.setVelocityX(direction * this.speedBoostSpeed);
+            player.setVelocityX(direction * this.speedBoostSpeed + this._getWindForce(onGround, direction, inWater));
             this._playWalkAnimation(direction, onGround);
         } else {
             if (this.speedBoostActive && direction === 0) {
@@ -125,10 +125,11 @@ class PlayerController {
 
             if (direction !== 0) {
                 this.currentSpeed = Math.min(this.currentSpeed + GC.PLAYER.ACCELERATION * dt, maxSpeed);
-                player.setVelocityX(direction * this.currentSpeed);
+                player.setVelocityX(direction * this.currentSpeed + this._getWindForce(onGround, direction, inWater));
                 this._playWalkAnimation(direction, onGround);
             } else {
-                player.setVelocityX(0);
+                // No chão parado: sem vento. No ar: deriva com o vento.
+                player.setVelocityX(this._getWindForce(onGround, 0, inWater));
                 if (onGround) player.anims.play('idle', true);
             }
         }
@@ -495,6 +496,18 @@ class PlayerController {
             delay: 800,
             onComplete: () => text.destroy()
         });
+    }
+
+    /**
+     * Força horizontal do vento (px/s).
+     * Zero quando: sistema ausente/inativo, na água, ou no chão parado.
+     */
+    _getWindForce(onGround, direction, inWater) {
+        const wind = this.scene.windSystem;
+        if (!wind || !wind.isActive()) return 0;
+        if (inWater) return 0;
+        if (onGround && direction === 0) return 0;
+        return wind.getForce();
     }
 
     freeze() {

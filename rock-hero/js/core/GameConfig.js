@@ -43,6 +43,9 @@ const GameConfig = {
         waterPhysics: true,
         autoScroll: false,
         upsideDown: false,
+        // Vento horizontal variável (curvas de direção/intensidade). Desligado
+        // automaticamente em fases com water-zone ou auto-scroll.
+        wind: false,
     },
 
     // ==================== PERSONAGENS ====================

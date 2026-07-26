@@ -510,6 +510,7 @@ class MenuScene extends Phaser.Scene {
                     { key: 'waterPhysics', name: 'Física de Água', desc: 'Gravidade e movimento reduzidos' },
                     { key: 'autoScroll', name: 'Auto-Scroll', desc: 'Câmera avança sozinha' },
                     { key: 'upsideDown', name: 'Ponta-Cabeça', desc: 'Gravidade invertida' },
+                    { key: 'wind', name: 'Vento', desc: 'Empurrão horizontal variável' },
                 ]
             }
         ];

@@ -1,6 +1,7 @@
 /**
  * HUDManager - Interface de gameplay
- * Responsável por: timer, melhor tempo, contador de estrelas, corações, vidas, debug velocity
+ * Responsável por: timer, melhor tempo, contador de estrelas, corações, vidas,
+ * indicador de vento, debug velocity
  */
 class HUDManager {
     constructor(scene) {
@@ -12,6 +13,9 @@ class HUDManager {
         this.debugVelocityText = null;
         this.heartTexts = [];
         this.livesText = null;
+        this.windContainer = null;
+        this.windArrow = null;
+        this.windBars = [];
     }
 
     create() {
@@ -52,6 +56,7 @@ class HUDManager {
 
         this._createHeartsDisplay();
         this._createLivesDisplay();
+        this._createWindIndicator();
 
         if (scene.physics.world.drawDebug) {
             this.debugVelocityText = scene.add.text(0, 0, '', {
@@ -62,6 +67,60 @@ class HUDManager {
                 strokeThickness: 2
             }).setOrigin(0, 1).setDepth(GC.DEPTH.DEBUG);
         }
+    }
+
+    /**
+     * Indicador canto inferior esquerdo: seta de direção + barras de intensidade.
+     * Só é criado quando a fase tem WindSystem ativo.
+     */
+    _createWindIndicator() {
+        const scene = this.scene;
+        if (!scene.windSystem) return;
+
+        const cam = scene.cameras.main;
+        const barCount = GC.WIND.INDICATOR_BARS;
+        this.windContainer = scene.add.container(18, cam.height - 22)
+            .setScrollFactor(0)
+            .setDepth(GC.DEPTH.HUD)
+            .setAlpha(0.85);
+
+        this.windArrow = scene.add.text(0, 0, '→', {
+            fontSize: '18px',
+            fontFamily: 'monospace',
+            color: '#a8d4ff',
+            stroke: '#000000',
+            strokeThickness: 3
+        }).setOrigin(0, 0.5);
+        this.windContainer.add(this.windArrow);
+
+        this.windBars = [];
+        for (let i = 0; i < barCount; i++) {
+            const bar = scene.add.rectangle(22 + i * 8, 0, 5, 4 + i * 3, 0x4a6a8a, 1)
+                .setOrigin(0, 0.5)
+                .setStrokeStyle(1, 0x000000);
+            this.windContainer.add(bar);
+            this.windBars.push(bar);
+        }
+    }
+
+    updateWindIndicator() {
+        if (!this.windContainer || !this.scene.windSystem) return;
+
+        const wind = this.scene.windSystem;
+        const dir = wind.direction;
+        const intensity = wind.intensity;
+
+        this.windArrow.setText(dir >= 0 ? '→' : '←');
+
+        const lit = Math.round(intensity * this.windBars.length);
+        this.windBars.forEach((bar, i) => {
+            const on = i < lit;
+            bar.setFillStyle(on ? 0xa8d4ff : 0x2a3a4a, on ? 1 : 0.5);
+        });
+
+        // Some levemente quando o vento está quase nulo
+        const strength = Math.abs(wind.force) / GC.WIND.MAX_SPEED;
+        this.windContainer.setAlpha(0.35 + 0.55 * strength);
     }
 
     showLevelName(name) {

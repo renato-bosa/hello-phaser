@@ -11,6 +11,7 @@
  * - ?debug=true       → Mostra hitboxes de colisão
  * - ?mapDebug=true    → Logs no console: cursor do mapa / saveMapPosition / loadMapPosition
  * - ?dev=true         → Exibe o botão "DEV OPTIONS" no menu principal (toggles de efeitos/mecânicas)
+ * - ?wind=true        → Ativa vento horizontal variável (desliga sozinho em água/auto-scroll)
  * - ?music=false      → Desliga a trilha sonora (BGM) — útil durante desenvolvimento
  * - ?musicVolume=0.6  → Volume inicial da trilha sonora (0..1). Default: 0.4
  * - ?crossfadeMs=1500 → Duração do cross-fade entre faixas (ms). Default: 2000. Zero = corte seco.

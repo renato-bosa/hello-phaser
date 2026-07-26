@@ -186,8 +186,8 @@ const GC = {
         FLAG_POP_SCALE: 1.35,
         FLAG_POP_MS: 140,
 
-        CAMERA_PUNCH_SCALE: 1.06,
-        CAMERA_PUNCH_MS: 120,
+        CAMERA_PUNCH_SCALE: 2.5,
+        CAMERA_PUNCH_MS: 400,
 
         GLOW_RADIUS: 12,
         GLOW_SCALE: 5,
@@ -253,6 +253,34 @@ const GC = {
         LEFT_MARGIN: 16,                // distância mínima do player à borda esquerda da câmera
         PUSH_VELOCITY_FACTOR: 3,        // velocidade do empurrão = SPEED × fator (fecha o gap mais rápido)
         SPAWN_CAMERA_OFFSET_RATIO: 0.25,// checkpoint fica a 25% da tela a partir da esquerda
+    },
+
+    // Vento horizontal (WindSystem): uma senoide controla tudo.
+    // sample = sin(ωt + φ) ∈ [-1, 1]
+    //   polaridade (sign) → direção
+    //   |sample|          → intensidade
+    //   force = sample × MAX_SPEED
+    // PERIOD_S = ciclo completo (ida+volta). Cada lado dura ~PERIOD_S/2.
+    WIND: {
+        MAX_SPEED: 70,              // px/s no pico (|sample| = 1)
+        PERIOD_S: 20,               // ciclo completo (~10s soprando cada lado)
+        INDICATOR_BARS: 3,
+
+        // Poeira: rajada forte na troca de direção + fluxo contínuo mais suave
+        DIR_FLIP_DEADZONE: 0.12,    // |sample| abaixo disso = neutro (evita flicker)
+        DUST_COOLDOWN_MS: 1200,     // mínimo entre rajadas de transição
+        DUST_COUNT: 22,             // partículas na rajada de transição
+        DUST_MIN_SIZE: 2,
+        DUST_MAX_SIZE: 8,
+        DUST_DURATION_MS: 1000,
+        DUST_STAGGER_MS: 28,
+        DUST_Y_DRIFT: 18,
+        DUST_ALPHA: 0.5,            // opacidade da rajada de transição
+        DUST_AMBIENT_ALPHA: 0.18,   // opacidade do fluxo contínuo
+        DUST_AMBIENT_INTERVAL_MS: 70, // base entre partículas (÷ intensity)
+        DUST_AMBIENT_PER_TICK: 1,   // partículas por tick do fluxo
+        DUST_COLORS: [0xc4b59a, 0xd4c4a8, 0xb8a890, 0xe8dcc8],
+        DUST_DEPTH: 50,             // acima do gameplay, abaixo do HUD
     },
 
     MUSHROOM: {

@@ -123,9 +123,12 @@ class VictoryScreen {
         const hasNextLevel = nextLevel < GameData.LEVELS.length;
         const completedWorld = GameData.checkWorldCompletion(scene.currentLevel);
 
-        const overlay = scene.add.rectangle(centerX, centerY, 640, 400, 0x000000, 0.8)
+        const overlay = scene.add.rectangle(centerX, centerY, 640, 400, 0x000000, 0.82)
             .setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY);
         scene.overlayElements.push(overlay);
+
+        this._spawnOverlaySparkles(centerX, centerY);
+        this._spawnOverlayConfetti();
 
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         const continueLabel = isMobile ? 'Pressione O' : 'ENTER';
@@ -144,9 +147,13 @@ class VictoryScreen {
         }
 
         if (hasNextLevel) {
-            this._addOverlayText(centerX, centerY - 60, '✅ FASE COMPLETA!', '32px', '#00ff00', 4);
-            this._addOverlayText(centerX, centerY - 15, `⏱ Tempo: ${GameData.formatTime(finalTime)}${rankLabel}`, '20px', timeColor, 3, 'monospace');
-            this._addOverlayText(centerX, centerY + 55, `${continueLabel} para continuar`, '16px', '#ffffff');
+            this._buildPhaseCompletePanel(centerX, centerY, {
+                finalTime,
+                rankLabel,
+                timeColor,
+                continueText: `${continueLabel} para continuar`,
+                continueY: centerY + 88
+            });
 
             const handleContinue = () => {
                 GameData.saveMapPosition(GameData.state.currentWorld, nextLevel, 'victory:nextLevel');
@@ -155,15 +162,27 @@ class VictoryScreen {
 
             this._bindContinueInput(handleContinue);
         } else {
-            this._addOverlayText(centerX, centerY - 80, '🎉 VOCÊ ZEROU O JOGO! 🎉', '28px', '#ffff00', 4);
-            this._addOverlayText(centerX, centerY - 35, `⏱ Fase: ${GameData.formatTime(finalTime)}${rankLabel}`, '18px', timeColor, 2, 'monospace');
-
-            const totalBest = GameData.getTotalBestTime();
-            if (totalBest !== null) {
-                this._addOverlayText(centerX, centerY + 5, `🏅 Tempo Total: ${GameData.formatTime(totalBest)}`, '22px', '#00ffff', 3, 'monospace');
-            }
-
-            this._addOverlayText(centerX, centerY + 55, `${continueLabel} para voltar ao mapa`, '16px', '#ffffff');
+            this._buildPhaseCompletePanel(centerX, centerY, {
+                title: '🎉 VOCÊ ZEROU O JOGO! 🎉',
+                titleColor: '#ffff00',
+                titleSize: '26px',
+                finalTime,
+                rankLabel,
+                timeColor,
+                continueText: `${continueLabel} para voltar ao mapa`,
+                continueY: centerY + 110,
+                extra: () => {
+                    const totalBest = GameData.getTotalBestTime();
+                    if (totalBest !== null) {
+                        const total = this._addOverlayText(
+                            centerX, centerY + 68,
+                            `🏅 Tempo Total: ${GameData.formatTime(totalBest)}`,
+                            '20px', '#7ef0c0', 3, 'monospace'
+                        );
+                        this._popIn(total, 280);
+                    }
+                }
+            });
 
             const handleBackToMap = () => {
                 GameData.saveMapPosition(GameData.state.currentWorld, scene.currentLevel, 'victory:gameComplete');
@@ -174,26 +193,249 @@ class VictoryScreen {
         }
     }
 
+    /**
+     * Layout compartilhado da tela de fase completa:
+     * nome da fase → título (pill) → estrelas → tempo → (extra) → continue.
+     */
+    _buildPhaseCompletePanel(centerX, centerY, opts) {
+        const scene = this.scene;
+        const levelName = GameData.LEVELS[scene.currentLevel]?.name || `Fase ${scene.currentLevel + 1}`;
+
+        const nameText = this._addOverlayText(
+            centerX, centerY - 108,
+            levelName,
+            '14px', '#aaaaaa', 2
+        );
+        this._popIn(nameText, 40);
+
+        // Faixa decorativa atrás do título (pill: radius = 50% da altura)
+        const bannerW = 380;
+        const bannerH = 44;
+        const bannerR = bannerH / 2;
+        const banner = scene.add.graphics()
+            .setScrollFactor(0)
+            .setDepth(GC.DEPTH.OVERLAY)
+            .setPosition(centerX, centerY - 78)
+            .setScale(0.6)
+            .setAlpha(0);
+        banner.fillStyle(0x1a3a1a, 0.9);
+        banner.fillRoundedRect(-bannerW / 2, -bannerH / 2, bannerW, bannerH, bannerR);
+        banner.lineStyle(2, 0x44cc66, 1);
+        banner.strokeRoundedRect(-bannerW / 2, -bannerH / 2, bannerW, bannerH, bannerR);
+        scene.overlayElements.push(banner);
+        scene.tweens.add({
+            targets: banner,
+            scaleX: 1, scaleY: 1, alpha: 1,
+            duration: 280,
+            ease: 'Back.easeOut'
+        });
+
+        const title = this._addOverlayText(
+            centerX, centerY - 78,
+            opts.title || '✅ FASE COMPLETA!',
+            opts.titleSize || '28px',
+            opts.titleColor || '#66ff88',
+            4
+        );
+        this._popIn(title, 100);
+
+        const starsY = centerY - 12;
+        this._addStarsRow(centerX, starsY);
+
+        const timeText = this._addOverlayText(
+            centerX, centerY + 36,
+            `⏱ ${GameData.formatTime(opts.finalTime)}${opts.rankLabel || ''}`,
+            '20px', opts.timeColor || '#ffffff', 3, 'monospace'
+        );
+        this._popIn(timeText, 220);
+
+        if (typeof opts.extra === 'function') {
+            opts.extra();
+        }
+
+        const continueText = this._addOverlayText(
+            centerX, opts.continueY || centerY + 88,
+            opts.continueText,
+            '15px', '#ffffff', 2
+        );
+        this._popIn(continueText, 360);
+        scene.tweens.add({
+            targets: continueText,
+            alpha: { from: 1, to: 0.45 },
+            duration: 700,
+            yoyo: true,
+            repeat: -1,
+            delay: 500
+        });
+    }
+
+    /**
+     * Fila de sprites de estrela + contador "coletadas/total".
+     * Cada estrela entra com pop escalonado.
+     */
+    _addStarsRow(centerX, y) {
+        const scene = this.scene;
+        const collected = scene.starsCollected || 0;
+        const total = scene.totalStars || 0;
+
+        if (total <= 0) {
+            const seal = this._addOverlayText(centerX, y, '★ CONCLUÍDA ★', '16px', '#ffd700', 3);
+            this._popIn(seal, 140);
+            return;
+        }
+
+        const spacing = 36;
+        const countGap = 28;
+        const countApproxWidth = 48;
+        const starsWidth = (total - 1) * spacing;
+        const groupWidth = starsWidth + countGap + countApproxWidth;
+        const groupStartX = centerX - groupWidth / 2;
+
+        for (let i = 0; i < total; i++) {
+            const star = scene.add.sprite(groupStartX + i * spacing, y, 'star', 0)
+                .setScrollFactor(0)
+                .setDepth(GC.DEPTH.OVERLAY_TEXT)
+                .setScale(0)
+                .setAlpha(0);
+
+            if (i < collected) {
+                star.setTint(0xffffff);
+                if (scene.anims.exists('star-spin')) {
+                    star.anims.play('star-spin', true);
+                }
+            } else {
+                star.setTint(0x444444);
+            }
+
+            scene.overlayElements.push(star);
+            scene.tweens.add({
+                targets: star,
+                scale: { from: 0, to: 1.15 },
+                alpha: i < collected ? 1 : 0.35,
+                duration: 320,
+                delay: 120 + i * 90,
+                ease: 'Back.easeOut',
+                onComplete: () => {
+                    if (i < collected) {
+                        scene.tweens.add({
+                            targets: star,
+                            scale: 1,
+                            duration: 120
+                        });
+                    }
+                }
+            });
+        }
+
+        const countLabel = this._addOverlayText(
+            groupStartX + starsWidth + countGap,
+            y,
+            `${collected}/${total}`,
+            '18px', '#ffd700', 3, 'monospace'
+        );
+        countLabel.setOrigin(0, 0.5);
+        this._popIn(countLabel, 120 + total * 90);
+    }
+
+    /** Partículas de brilho fixas no overlay (espaço de tela). */
+    _spawnOverlaySparkles(centerX, centerY) {
+        const scene = this.scene;
+        const colors = [0xffd447, 0xffffff, 0x66ff88, 0x9be7ff];
+
+        for (let i = 0; i < 18; i++) {
+            const x = centerX + Phaser.Math.Between(-280, 280);
+            const y = centerY + Phaser.Math.Between(-140, 140);
+            const size = Phaser.Math.Between(1, 3);
+            const spark = scene.add.circle(x, y, size, Phaser.Math.RND.pick(colors), 0)
+                .setScrollFactor(0)
+                .setDepth(GC.DEPTH.OVERLAY);
+
+            scene.overlayElements.push(spark);
+            scene.tweens.add({
+                targets: spark,
+                alpha: { from: 0, to: Phaser.Math.FloatBetween(0.35, 0.9) },
+                scale: { from: 0.5, to: 1.4 },
+                duration: Phaser.Math.Between(600, 1400),
+                yoyo: true,
+                repeat: -1,
+                delay: Phaser.Math.Between(0, 800)
+            });
+        }
+    }
+
+    /** Confete caindo pela tela do overlay. */
+    _spawnOverlayConfetti() {
+        const scene = this.scene;
+        const cam = scene.cameras.main;
+        const colors = GC.VICTORY.CONFETTI_COLORS;
+
+        for (let i = 0; i < 28; i++) {
+            const x = Phaser.Math.Between(20, cam.width - 20);
+            const piece = scene.add.rectangle(
+                x,
+                Phaser.Math.Between(-40, -8),
+                Phaser.Math.Between(3, 5),
+                Phaser.Math.Between(5, 9),
+                Phaser.Math.RND.pick(colors)
+            ).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY).setAlpha(0.85);
+
+            scene.overlayElements.push(piece);
+            scene.tweens.add({
+                targets: piece,
+                y: cam.height + 20,
+                x: x + Phaser.Math.Between(-40, 40),
+                angle: Phaser.Math.Between(-360, 360),
+                alpha: 0,
+                duration: Phaser.Math.Between(2200, 4200),
+                delay: Phaser.Math.Between(0, 900),
+                ease: 'Sine.easeIn'
+            });
+        }
+    }
+
+    _popIn(target, delay = 0) {
+        if (!target) return;
+        target.setScale(0.5).setAlpha(0);
+        this.scene.tweens.add({
+            targets: target,
+            scale: 1,
+            alpha: 1,
+            duration: 280,
+            delay,
+            ease: 'Back.easeOut'
+        });
+    }
+
     _showWorldCompleteTransition(centerX, centerY, finalTime, rankLabel, timeColor, world, continueLabel) {
         const scene = this.scene;
 
-        this._addOverlayText(centerX, centerY - 70, '✅ FASE COMPLETA!', '28px', '#00ff00', 4);
-        this._addOverlayText(centerX, centerY - 30, `⏱ Tempo: ${GameData.formatTime(finalTime)}${rankLabel}`, '18px', timeColor, 3, 'monospace');
-
-        const worldText = scene.add.text(centerX, centerY + 20, `🌟 ${world.name.toUpperCase()} COMPLETO! 🌟`, {
-            fontSize: '20px', fontFamily: 'Arial', color: '#ffd700',
-            stroke: '#000000', strokeThickness: 3
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
-
-        scene.tweens.add({
-            targets: worldText,
-            scale: { from: 1, to: 1.1 },
-            duration: 400,
-            yoyo: true,
-            repeat: -1
+        this._buildPhaseCompletePanel(centerX, centerY - 10, {
+            finalTime,
+            rankLabel,
+            timeColor,
+            continueText: `${continueLabel} para ver a recompensa!`,
+            continueY: centerY + 100,
+            extra: () => {
+                const worldText = scene.add.text(
+                    centerX, centerY + 58,
+                    `🌟 ${world.name.toUpperCase()} COMPLETO! 🌟`,
+                    {
+                        fontSize: '18px', fontFamily: 'Arial', color: '#ffd700',
+                        stroke: '#000000', strokeThickness: 3
+                    }
+                ).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
+                scene.overlayElements.push(worldText);
+                this._popIn(worldText, 280);
+                scene.tweens.add({
+                    targets: worldText,
+                    scale: { from: 1, to: 1.08 },
+                    duration: 450,
+                    yoyo: true,
+                    repeat: -1,
+                    delay: 400
+                });
+            }
         });
-
-        this._addOverlayText(centerX, centerY + 65, `${continueLabel} para ver a recompensa!`, '14px', '#ffffff');
 
         const handleWorldComplete = () => {
             scene.scene.start('WorldCompleteScene', {
@@ -310,6 +552,7 @@ class VictoryScreen {
             fontSize, fontFamily, color,
             stroke: '#000000', strokeThickness: strokeThickness
         }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
+        this.scene.overlayElements.push(text);
         return text;
     }
 

@@ -8,6 +8,7 @@
  * - HUDManager: timer, estrelas, debug
  * - PauseMenu: overlay de pausa e navegação
  * - VictoryScreen: vitória, ranking, mundo completo
+ * - WindSystem: vento horizontal variável (feature flag `wind`)
  */
 
 class GameScene extends Phaser.Scene {
@@ -129,6 +130,7 @@ class GameScene extends Phaser.Scene {
         this.hudManager = new HUDManager(this);
         this.pauseMenu = new PauseMenu(this);
         this.victoryScreen = new VictoryScreen(this);
+        this.windSystem = this._createWindSystem();
 
         this.playerController.create();
         this.enemyManager.create(this._enemyData);
@@ -356,6 +358,32 @@ class GameScene extends Phaser.Scene {
             zone.body.setSize(obj.width, obj.height);
             this.waterZones.push(zone);
         });
+    }
+
+    /**
+     * True se o mapa tem ao menos uma water-zone com objetos (camada vazia não conta).
+     */
+    _mapHasWater(map) {
+        const layer = map.getObjectLayer('water-zone');
+        return !!(layer && layer.objects && layer.objects.length > 0);
+    }
+
+    /**
+     * Cria WindSystem apenas se a flag `wind` está on e a fase não tem
+     * água nem auto-scroll. Caso contrário retorna null (zero overhead).
+     */
+    _createWindSystem() {
+        if (!GameData.isFeatureEnabled('wind')) return null;
+        if (GameData.isFeatureEnabled('autoScroll')) {
+            console.log('🌬️ Wind desativado: fase com auto-scroll');
+            return null;
+        }
+        if (this._mapHasWater(this.map)) {
+            console.log('🌬️ Wind desativado: fase com água');
+            return null;
+        }
+        console.log('🌬️ Wind ativo nesta fase');
+        return new WindSystem(this);
     }
 
     createGoal() {
@@ -1063,11 +1091,15 @@ class GameScene extends Phaser.Scene {
 
         this.updateMovingPlatforms(delta);
         this.hudManager.updateTimer(this.time.now);
+        if (this.windSystem) {
+            this.windSystem.update(this.time.now);
+        }
         this.playerController.update(delta);
         // Auto-scroll roda APÓS o playerController para sobrescrever o input com o empurrão
         if (GameData.isFeatureEnabled('autoScroll')) {
             this._updateAutoScroll(delta);
         }
+        this.hudManager.updateWindIndicator();
         this.hudManager.updateDebugVelocity();
         this.enemyManager.update(this.time.now);
         this.effectsManager.update(this.time.now);

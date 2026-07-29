@@ -43,8 +43,10 @@ const GameConfig = {
         waterPhysics: true,
         autoScroll: false,
         upsideDown: false,
-        // Vento horizontal variável (curvas de direção/intensidade). Desligado
-        // automaticamente em fases com water-zone ou auto-scroll.
+        // Vento: default off. Ative por fase com features: { wind: true }
+        // em GameConfig.LEVELS (mesmo padrão do doubleJump). Também via
+        // ?wind=true / DEV OPTIONS (liga em todas as fases elegíveis).
+        // Sempre bloqueado em fases com water-zone ou auto-scroll.
         wind: false,
     },
 
@@ -469,7 +471,7 @@ const GameConfig = {
             world: 4,
             mapPosition: { x: 120, y: 200 },
             connectsTo: [16],
-            features: { upsideDown: true }
+            features: { upsideDown: true, wind: true }
         },
         {
             key: 'map20',
@@ -490,7 +492,8 @@ const GameConfig = {
             roundPixels: true,
             world: 4,
             mapPosition: { x: 560, y: 200 },
-            connectsTo: []
+            connectsTo: [],
+            features: { wind: true }
         }
     ],
 

@@ -369,8 +369,11 @@ class GameScene extends Phaser.Scene {
     }
 
     /**
-     * Cria WindSystem apenas se a flag `wind` está on e a fase não tem
-     * água nem auto-scroll. Caso contrário retorna null (zero overhead).
+     * Cria WindSystem se a flag `wind` está on (global ou override da fase)
+     * e a fase não tem água nem auto-scroll. Caso contrário retorna null.
+     *
+     * Para ligar vento numa fase específica, adicione em GameConfig.LEVELS:
+     *   features: { wind: true }
      */
     _createWindSystem() {
         if (!GameData.isFeatureEnabled('wind')) return null;

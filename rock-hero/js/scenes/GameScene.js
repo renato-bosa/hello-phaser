@@ -193,6 +193,17 @@ class GameScene extends Phaser.Scene {
         this.solidsLayer.setCollisionByProperty({ collider: true });
         this.solidsLayer.setCollisionByExclusion([-1, 0]);
 
+        // Arcade debug não desenha tiles — renderDebug mostra os colliders da layer
+        if (this.physics.world.drawDebug) {
+            const g = this.add.graphics().setDepth(GC.DEPTH.DEBUG - 1).setAlpha(0.85);
+            this.solidsLayer.renderDebug(g, {
+                tileColor: null, // não-colidíveis: invisíveis
+                collidingTileColor: new Phaser.Display.Color(40, 120, 255, 90),
+                faceColor: new Phaser.Display.Color(80, 200, 255, 220)
+            });
+            this._solidsDebugGraphics = g;
+        }
+
         const fgDecoLayer = map.getLayer('fg_decoration');
         if (fgDecoLayer) {
             this.fgDecorationLayer = map.createLayer('fg_decoration', allTilesets);

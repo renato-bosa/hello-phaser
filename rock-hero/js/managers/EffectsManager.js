@@ -170,6 +170,37 @@ class EffectsManager {
     }
 
     /**
+     * Estouro do boneco na 2ª pisada: flash + faíscas radiais coloridas.
+     */
+    createEnemyPopBurst(x, y) {
+        const cfg = GC.ENEMY.BONECO;
+        const depth = GC.DEPTH.PLAYER + 2;
+
+        this._createExpandingGlow(
+            x, y, cfg.POP_GLOW_RADIUS, 0xffffff, 0.9,
+            cfg.POP_GLOW_SCALE * 0.6, cfg.POP_GLOW_MS * 0.6, depth + 1
+        );
+        this._createExpandingGlow(
+            x, y, cfg.POP_GLOW_RADIUS, 0xffd447, 0.7,
+            cfg.POP_GLOW_SCALE, cfg.POP_GLOW_MS, depth
+        );
+
+        this._createSparkleBurst(x, y, depth + 1, {
+            count: cfg.POP_SPARKLE_COUNT,
+            minSize: cfg.POP_SPARKLE_MIN_SIZE,
+            maxSize: cfg.POP_SPARKLE_MAX_SIZE,
+            minDistance: cfg.POP_SPARKLE_MIN_DIST,
+            maxDistance: cfg.POP_SPARKLE_MAX_DIST,
+            rise: 8,
+            angleJitter: 0.4,
+            minDuration: cfg.POP_SPARKLE_MS * 0.7,
+            maxDuration: cfg.POP_SPARKLE_MS,
+            stagger: 40,
+            colors: cfg.POP_COLORS
+        });
+    }
+
+    /**
      * Zoom rápido de ida e volta. Usa o zoom atual como base porque cada fase
      * tem o seu (GameConfig.LEVELS[].zoom), e o restaura no fim para evitar
      * acúmulo de erro de ponto flutuante.

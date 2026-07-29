@@ -110,6 +110,18 @@ const GC = {
             FRAME_END: 6,           // frames 0–6 preenchidos no sheet
             VULNERABLE_FRAMES: { start: 1, end: 2 },
             VULNERABLE_MS: 1000,
+            // Estouro na 2ª pisada
+            POP_DURATION_MS: 180,
+            POP_GLOW_RADIUS: 10,
+            POP_GLOW_SCALE: 5,
+            POP_GLOW_MS: 280,
+            POP_SPARKLE_COUNT: 18,
+            POP_SPARKLE_MIN_SIZE: 2,
+            POP_SPARKLE_MAX_SIZE: 6,
+            POP_SPARKLE_MIN_DIST: 28,
+            POP_SPARKLE_MAX_DIST: 70,
+            POP_SPARKLE_MS: 420,
+            POP_COLORS: [0xff4d4d, 0xffd447, 0xffffff, 0xff8844, 0xff66aa],
         },
     },
 

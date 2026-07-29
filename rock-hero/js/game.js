@@ -8,7 +8,7 @@
  * 
  * Debug:
  * - ?fps=true         → Mostra contador de FPS
- * - ?debug=true       → Mostra hitboxes de colisão
+ * - ?debug=true       → Mostra hitboxes (bodies + tiles da layer solids)
  * - ?mapDebug=true    → Logs no console: cursor do mapa / saveMapPosition / loadMapPosition
  * - ?dev=true         → Exibe o botão "DEV OPTIONS" no menu principal (toggles de efeitos/mecânicas)
  * - ?wind=true        → Ativa vento horizontal variável (desliga sozinho em água/auto-scroll)

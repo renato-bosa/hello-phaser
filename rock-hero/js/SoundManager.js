@@ -197,6 +197,18 @@ const SoundManager = {
             vibratoDepth: 30,
             vibratoSpeed: 20
         },
+        // Estouro do boneco (2ª pisada) — bang percussivo maior que o damage
+        enemyPop: {
+            type: 'noise',
+            filterType: 'bandpass',
+            filterQ: 0.7,
+            frequency: 1400,
+            duration: 0.4,
+            volume: 0.75,
+            attack: 0.004,
+            decay: 0.36,
+            slide: -1100
+        },
         death: {
             type: 'square',
             frequency: 300,

@@ -333,7 +333,7 @@ class EnemyManager {
             if (isStomping) {
                 if (enemy.patrolData?.type === 'boneco') {
                     if (enemy.patrolData.state === 'vulnerable') {
-                        this._killEnemy(enemy);
+                        this._killBoneco(enemy);
                     } else {
                         this._stunBoneco(enemy);
                     }
@@ -359,6 +359,30 @@ class EnemyManager {
         enemy.setVelocityX(0);
         enemy.anims.play('boneco-vulnerable', true);
         SoundManager.play('damage');
+    }
+
+    /**
+     * Morte do boneco (2ª pisada): estouro sonoro + visual, some rápido.
+     * Origin nos pés → centro do sprite em y - displayHeight/2.
+     */
+    _killBoneco(enemy) {
+        const cfg = GC.ENEMY.BONECO;
+        const cx = enemy.x;
+        const cy = enemy.y - enemy.displayHeight / 2;
+
+        this.scene.effectsManager.createEnemyPopBurst(cx, cy);
+        SoundManager.play('enemyPop');
+
+        enemy.body.enable = false;
+        this.scene.tweens.add({
+            targets: enemy,
+            scaleX: enemy.scaleX * 1.5,
+            scaleY: enemy.scaleY * 1.5,
+            alpha: 0,
+            duration: cfg.POP_DURATION_MS,
+            ease: 'Cubic.easeOut',
+            onComplete: () => enemy.destroy()
+        });
     }
 
     _killEnemy(enemy) {

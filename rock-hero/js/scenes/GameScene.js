@@ -48,6 +48,9 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('seahorse', GameData.assetUrl('assets/spritesheets/Cavalo marinho.png'), {
             frameWidth: 32, frameHeight: 32
         });
+        this.load.spritesheet('boneco', GameData.assetUrl('assets/spritesheets/Boneco-14fps.png'), {
+            frameWidth: 32, frameHeight: 32
+        });
 
         // Trilha sonora — registra faixas MP3 no cache do Phaser
         MusicManager.preload(this);
@@ -249,6 +252,13 @@ class GameScene extends Phaser.Scene {
             }
             else if (type === 'star' || tilesetName.includes('star') || tilesetName.includes('estrela')) {
                 stars.push({ x: obj.x + 16, y: obj.y - 16, transform });
+            }
+            else if (type === 'boneco' || tilesetName.includes('boneco')) {
+                enemies.push({
+                    x: obj.x + 16,
+                    y: obj.y - 16,
+                    type: 'boneco'
+                });
             }
             else if (type === 'enemy' || type === 'sapo' ||
                      tilesetName.includes('sapo') || tilesetName.includes('frog')) {

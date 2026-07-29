@@ -102,6 +102,15 @@ const GC = {
             MUZZLE_OFFSET_X: 12,
             MUZZLE_OFFSET_Y: -4,
         },
+        BONECO: {
+            SCALE: 2,               // mesmo sprite 32×32, só ampliado na tela
+            PATROL_DISTANCE: 32,    // 1 bloco para cada lado
+            SPEED: 40,
+            ANIM_FPS: 14,
+            FRAME_END: 6,           // frames 0–6 preenchidos no sheet
+            VULNERABLE_FRAMES: { start: 1, end: 2 },
+            VULNERABLE_MS: 1000,
+        },
     },
 
     BUBBLE: {

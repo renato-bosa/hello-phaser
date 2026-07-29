@@ -1,5 +1,5 @@
 /**
- * EnemyManager - Gerencia inimigos (sapos)
+ * EnemyManager - Gerencia inimigos (sapos, seahorse, boneco)
  * Responsável por: criação, patrulha, pulo, colisão e morte de inimigos
  */
 class EnemyManager {
@@ -20,6 +20,8 @@ class EnemyManager {
                 this._createSapo(e.x, e.y);
             } else if (e.type === 'seahorse') {
                 this._createSeahorse(e.x, e.y);
+            } else if (e.type === 'boneco') {
+                this._createBoneco(e.x, e.y);
             }
         });
     }
@@ -124,6 +126,68 @@ class EnemyManager {
         this.enemies.add(seahorse);
     }
 
+    /**
+     * Boneco de posto: patrulha 1 bloco ± spawn; 2 stomps para matar
+     * (1º → vulnerável 1s com frames 1–2 e patrulha pausada; 2º → morte).
+     *
+     * Escala a partir dos pés (origin bottom) para não enterrar no chão.
+     * setSize usa medidas do frame; o Arcade multiplica pela scale do sprite.
+     */
+    _createBoneco(x, y) {
+        const scene = this.scene;
+        const cfg = GC.ENEMY.BONECO;
+        const scale = cfg.SCALE;
+        // Spawn Tiled (x,y) é o centro de um tile 32×32 — pés ficavam em y+16.
+        const feetY = y + 16;
+        const boneco = scene.physics.add.sprite(x, feetY, 'boneco');
+
+        boneco.setOrigin(0.5, 1);
+        boneco.setScale(scale);
+        // NÃO multiplicar por scale: Phaser já aplica scaleX/scaleY no body.
+        boneco.body.setSize(GC.ENEMY.BODY_WIDTH, GC.ENEMY.BODY_HEIGHT);
+        boneco.body.setOffset(GC.ENEMY.BODY_OFFSET_X, 0);
+        boneco.body.allowGravity = true;
+        boneco.body.setCollideWorldBounds(true);
+
+        boneco.patrolData = {
+            type: 'boneco',
+            state: 'normal',
+            vulnerableUntil: 0,
+            startX: x,
+            leftLimit: x - cfg.PATROL_DISTANCE,
+            rightLimit: x + cfg.PATROL_DISTANCE,
+            speed: cfg.SPEED,
+            direction: 1
+        };
+
+        boneco.setVelocityX(cfg.SPEED);
+
+        if (!scene.anims.exists('boneco-idle')) {
+            scene.anims.create({
+                key: 'boneco-idle',
+                frames: scene.anims.generateFrameNumbers('boneco', {
+                    start: 0,
+                    end: cfg.FRAME_END
+                }),
+                frameRate: cfg.ANIM_FPS,
+                repeat: -1
+            });
+        }
+        if (!scene.anims.exists('boneco-vulnerable')) {
+            scene.anims.create({
+                key: 'boneco-vulnerable',
+                frames: scene.anims.generateFrameNumbers('boneco', {
+                    start: cfg.VULNERABLE_FRAMES.start,
+                    end: cfg.VULNERABLE_FRAMES.end
+                }),
+                frameRate: cfg.ANIM_FPS,
+                repeat: -1
+            });
+        }
+        boneco.anims.play('boneco-idle', true);
+        this.enemies.add(boneco);
+    }
+
     _spawnSeahorseBubble(seahorse) {
         if (!seahorse.active) return;
         const cfg = GC.ENEMY.SEAHORSE;
@@ -189,43 +253,70 @@ class EnemyManager {
                 return;
             }
 
+            // Boneco: vulnerável pausa patrulha; timeout volta ao normal
+            if (data.type === 'boneco') {
+                if (data.state === 'vulnerable') {
+                    enemy.setVelocityX(0);
+                    if (currentTime >= data.vulnerableUntil) {
+                        data.state = 'normal';
+                        data.vulnerableUntil = 0;
+                        enemy.anims.play('boneco-idle', true);
+                        enemy.setVelocityX(data.speed * data.direction);
+                        enemy.setFlipX(data.direction === -1);
+                    }
+                    return;
+                }
+                this._updatePatrol(enemy, data, onGround, { jump: false });
+                return;
+            }
+
             // Sapo tomate: patrulha + pula
+            this._updatePatrol(enemy, data, onGround, { jump: true });
+        });
+    }
+
+    /**
+     * Patrulha horizontal compartilhada (sapo / boneco).
+     * @param {{ jump?: boolean }} opts jump=true aplica pulos periódicos do sapo
+     */
+    _updatePatrol(enemy, data, onGround, opts = {}) {
+        if (opts.jump) {
             const distanceFromLastJump = Math.abs(enemy.x - data.lastJumpX);
             if (distanceFromLastJump >= data.jumpDistance && onGround) {
                 enemy.setVelocityY(data.jumpForce);
                 data.lastJumpX = enemy.x;
             }
+        }
 
-            const margin = GC.ENEMY.MAP_EDGE_MARGIN;
-            const mapRightEdge = this.scene.map ? this.scene.map.widthInPixels - margin : 9999;
+        const margin = GC.ENEMY.MAP_EDGE_MARGIN;
+        const mapRightEdge = this.scene.map ? this.scene.map.widthInPixels - margin : 9999;
 
-            const hitRightWall = enemy.body.blocked.right || enemy.x >= mapRightEdge;
-            const hitLeftWall = enemy.body.blocked.left || enemy.x <= margin;
+        const hitRightWall = enemy.body.blocked.right || enemy.x >= mapRightEdge;
+        const hitLeftWall = enemy.body.blocked.left || enemy.x <= margin;
 
-            if (hitRightWall && data.direction === 1) {
-                data.direction = -1;
-                enemy.setVelocityX(data.speed * data.direction);
-                enemy.setFlipX(true);
-                data.rightLimit = Math.min(data.rightLimit, enemy.x - margin);
-            } else if (hitLeftWall && data.direction === -1) {
-                data.direction = 1;
-                enemy.setVelocityX(data.speed * data.direction);
-                enemy.setFlipX(false);
-                data.leftLimit = Math.max(data.leftLimit, enemy.x + margin);
-            } else if (enemy.x >= data.rightLimit && data.direction === 1) {
-                data.direction = -1;
-                enemy.setVelocityX(data.speed * data.direction);
-                enemy.setFlipX(true);
-            } else if (enemy.x <= data.leftLimit && data.direction === -1) {
-                data.direction = 1;
-                enemy.setVelocityX(data.speed * data.direction);
-                enemy.setFlipX(false);
-            }
+        if (hitRightWall && data.direction === 1) {
+            data.direction = -1;
+            enemy.setVelocityX(data.speed * data.direction);
+            enemy.setFlipX(true);
+            data.rightLimit = Math.min(data.rightLimit, enemy.x - margin);
+        } else if (hitLeftWall && data.direction === -1) {
+            data.direction = 1;
+            enemy.setVelocityX(data.speed * data.direction);
+            enemy.setFlipX(false);
+            data.leftLimit = Math.max(data.leftLimit, enemy.x + margin);
+        } else if (enemy.x >= data.rightLimit && data.direction === 1) {
+            data.direction = -1;
+            enemy.setVelocityX(data.speed * data.direction);
+            enemy.setFlipX(true);
+        } else if (enemy.x <= data.leftLimit && data.direction === -1) {
+            data.direction = 1;
+            enemy.setVelocityX(data.speed * data.direction);
+            enemy.setFlipX(false);
+        }
 
-            if (Math.abs(enemy.body.velocity.x) < data.speed * 0.5 && onGround) {
-                enemy.setVelocityX(data.speed * data.direction);
-            }
-        });
+        if (Math.abs(enemy.body.velocity.x) < data.speed * 0.5 && onGround) {
+            enemy.setVelocityX(data.speed * data.direction);
+        }
     }
 
     handleCollision(player, enemy) {
@@ -240,7 +331,15 @@ class EnemyManager {
                                playerBottom <= enemyCenter + GC.PLAYER.STOMP_TOLERANCE;
 
             if (isStomping) {
-                this._killEnemy(enemy);
+                if (enemy.patrolData?.type === 'boneco') {
+                    if (enemy.patrolData.state === 'vulnerable') {
+                        this._killEnemy(enemy);
+                    } else {
+                        this._stunBoneco(enemy);
+                    }
+                } else {
+                    this._killEnemy(enemy);
+                }
                 player.setVelocityY(GC.PLAYER.STOMP_BOUNCE);
                 return;
             }
@@ -251,11 +350,22 @@ class EnemyManager {
         }
     }
 
+    _stunBoneco(enemy) {
+        const data = enemy.patrolData;
+        if (!data || data.state === 'vulnerable') return;
+
+        data.state = 'vulnerable';
+        data.vulnerableUntil = this.scene.time.now + GC.ENEMY.BONECO.VULNERABLE_MS;
+        enemy.setVelocityX(0);
+        enemy.anims.play('boneco-vulnerable', true);
+        SoundManager.play('damage');
+    }
+
     _killEnemy(enemy) {
         this.scene.tweens.add({
             targets: enemy,
-            scaleY: 0.2,
-            scaleX: 1.3,
+            scaleY: enemy.scaleY * 0.2,
+            scaleX: enemy.scaleX * 1.3,
             alpha: 0,
             y: enemy.y + 16,
             duration: GC.ENEMY.KILL_DURATION_MS,

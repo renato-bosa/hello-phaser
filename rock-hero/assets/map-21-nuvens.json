@@ -248,6 +248,18 @@
                  "width":32,
                  "x":2016,
                  "y":128
+                }, 
+                {
+                 "gid":67,
+                 "height":32,
+                 "id":242,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":1024,
+                 "y":448
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -256,7 +268,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":242,
+ "nextobjectid":243,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -746,6 +758,19 @@
          "name":"ceu-azul-medio",
          "spacing":0,
          "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":3,
+         "firstgid":67,
+         "image":"spritesheets\/Boneco-14fps.png",
+         "imageheight":96,
+         "imagewidth":96,
+         "margin":0,
+         "name":"Boneco-14fps",
+         "spacing":0,
+         "tilecount":9,
          "tileheight":32,
          "tilewidth":32
         }],

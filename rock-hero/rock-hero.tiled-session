@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "dev-resources/map-4--big-jumps.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -159,7 +159,7 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 548,
+                "x": 262.66666666666663,
                 "y": 744
             }
         },
@@ -463,10 +463,10 @@
                 8
             ],
             "scale": 0.75,
-            "selectedLayer": 2,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 1694.6666666666665,
-                "y": 1525.3333333333333
+                "x": 1978.6666666666665,
+                "y": 688
             }
         },
         "dev-resources/map-17.tmx#1up": {
@@ -1015,8 +1015,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1345,
-                "y": 481
+                "x": 1346,
+                "y": 480
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
@@ -1124,8 +1124,8 @@
             "scale": 0.75,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 1440.6666666666665,
-                "y": 480.6666666666667
+                "x": 1441.3333333333333,
+                "y": 481.33333333333326
             }
         },
         "dev-resources/map-4--big-jumps.tmx#abstract-blue": {
@@ -1276,8 +1276,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1121,
-                "y": 399
+                "x": 1122,
+                "y": 398
             }
         },
         "dev-resources/map-6--caverna2.tmx#abstract-blue": {
@@ -1792,22 +1792,23 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
+        "dev-resources/map-4--big-jumps.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "dev-resources/map-11.tmx",
-        "dev-resources/map-12.tmx",
-        "dev-resources/map-13.tmx",
-        "dev-resources/map-14.tmx",
-        "dev-resources/map-15.tmx",
-        "dev-resources/map-16.tmx",
-        "dev-resources/map-17.tmx",
-        "dev-resources/map-18.tmx",
+        "dev-resources/map-4--big-jumps.tmx",
+        "dev-resources/map-3--desafio do luigi.tmx",
+        "dev-resources/map-6--caverna2.tmx",
+        "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-8--o-resgate-do-baixista.tmx",
+        "dev-resources/map-9.tmx",
         "dev-resources/map-19.tmx",
-        "dev-resources/map-20-auto-rolagem.tmx",
-        "dev-resources/map-10.tmx",
-        "dev-resources/map-2--expansion and speed.tmx"
+        "dev-resources/map-18.tmx",
+        "dev-resources/map-17.tmx",
+        "dev-resources/map-16.tmx",
+        "dev-resources/map-15.tmx",
+        "dev-resources/map-14.tmx"
     ],
     "tileset.embedInMap": true
 }

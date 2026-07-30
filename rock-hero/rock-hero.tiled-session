@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-4--big-jumps.tmx",
+    "activeFile": "dev-resources/map-21-nuvens.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -911,14 +911,14 @@
         },
         "dev-resources/map-21-nuvens.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
-            "scale": 0.5,
-            "selectedLayer": 0,
+            "scale": 0.75,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 520,
-                "y": 238
+                "x": 511.99999999999994,
+                "y": 354.6666666666667
             }
         },
         "dev-resources/map-21-nuvens.tmx#1up": {
@@ -928,6 +928,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-21-nuvens.tmx#Areia": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-21-nuvens.tmx#Boneco-14fps": {
             "scaleInDock": 1
         },
         "dev-resources/map-21-nuvens.tmx#Cavalo marinho": {
@@ -1792,12 +1795,14 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-4--big-jumps.tmx"
+        "dev-resources/map-4--big-jumps.tmx",
+        "dev-resources/map-21-nuvens.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
         "dev-resources/map-4--big-jumps.tmx",
+        "dev-resources/map-21-nuvens.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-6--caverna2.tmx",
         "dev-resources/map-5--caverna.tmx",
@@ -1807,8 +1812,7 @@
         "dev-resources/map-18.tmx",
         "dev-resources/map-17.tmx",
         "dev-resources/map-16.tmx",
-        "dev-resources/map-15.tmx",
-        "dev-resources/map-14.tmx"
+        "dev-resources/map-15.tmx"
     ],
     "tileset.embedInMap": true
 }

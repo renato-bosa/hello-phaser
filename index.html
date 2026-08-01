@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fun Games</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
@@ -174,6 +175,20 @@
             margin-top: 60px;
             color: rgba(255, 255, 255, 0.3);
             font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            text-align: center;
+        }
+
+        .footer-avatar {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
 
         /* Decorative elements */
@@ -206,16 +221,16 @@
     <div class="bg-decoration two"></div>
 
     <h1>🎮 Fun Games</h1>
-    <p class="subtitle">Estes são alguns experimentos que fiz junto com meu filho, usando Phaser 3.</p>
+    <p class="subtitle">Olá!<br>Fizemos estes jogos usando ferramentas como o Tiled e o Phaser 3.<br>Escolha um deles e divirta-se!</p>
 
     <div class="games-container">
-        <a href="rock-hero/index.html" class="game-card rock-hero">
+        <a href="rock-hero/index.html" class="game-card rock-hero" target="_blank" rel="noopener noreferrer">
             <div class="game-icon">🎸</div>
             <h2 class="game-title">The Lost Band</h2>
             <p class="game-description">
-                <b>Status:</b> Beta<br>
-                Aventura de plataforma estilo retro com um herói roqueiro que perdeu a banda! 
-                Pule, colete estrelas, evite a lava, enfrente os monstros e resgate os membros da banda.
+                <b>Status:</b> Em desenvolvimento<br>
+                Um herói roqueiro perdeu os integrantes da sua banda! 
+                Pule pelas plataformas, colete estrelas, desvie da lava, enfrente monstros e ajude a reunir a banda novamente.
             </p>
             <div class="play-hint">
                 <span>Jogar</span>
@@ -225,14 +240,13 @@
             </div>
         </a>
 
-        <a href="a aventura do pinguim perdido/index.html" class="game-card pinguim">
+        <a href="a aventura do pinguim perdido/index.html" class="game-card pinguim" target="_blank" rel="noopener noreferrer">
             <div class="game-icon">🐧</div>
             <h2 class="game-title">A Aventura do Pinguim Perdido</h2>
             <p class="game-description">
-                <b>Status:</b> Prova de conceito.<br>
-                Ajude o pinguim a encontrar seu caminho! 
-                Explore cenários desenhados à mão.
-                Apenas 1 fase de teste.
+                <b>Status:</b> Primeira versão<br>
+                Um pinguim está perdido e precisa encontrar o seu caminho! 
+                Explore cenários desenhados à mão nesta pequena fase de teste.
             </p>
             <div class="play-hint">
                 <span>Jogar</span>
@@ -244,8 +258,8 @@
     </div>
 
     <footer>
-        Feito com ❤️ usando Phaser 3
+        <span>Fun Games © 2026 — Play. Create. Repeat. 🎮</span>
+        <img src="fun-games-avatar.png" alt="Avatar do Fun Games" class="footer-avatar">
     </footer>
 </body>
 </html>
-

@@ -505,6 +505,7 @@ const GameConfig = {
     // - unlockMs: ms mínimos antes de liberar avanço manual em cada frame
     // - fadeMs: duração do crossfade entre frames
     // - bgColor: cor de fundo (letterbox se imagem não cobrir o canvas)
+    // - music: key (ou array de keys) de MUSIC_TRACKS — BGM durante a cutscene
     //
     // Para adicionar uma nova cutscene: criar nova entrada + chamar
     //   scene.start('CutsceneScene', { cutsceneId: 'X', next: { scene: 'Y', data: {} } })
@@ -520,7 +521,8 @@ const GameConfig = {
             ],
             unlockMs: 2000,
             fadeMs: 600,
-            bgColor: 0x000000
+            bgColor: 0x000000,
+            music: 'rock-theme1'
         }
     },
 

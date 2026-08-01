@@ -51,6 +51,7 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('boneco', GameData.assetUrl('assets/spritesheets/Boneco-14fps.png'), {
             frameWidth: 32, frameHeight: 32
         });
+        this.load.image('red-heart', GameData.assetUrl('assets/spritesheets/red-heart.png'));
 
         // Trilha sonora — registra faixas MP3 no cache do Phaser
         MusicManager.preload(this);
@@ -230,6 +231,7 @@ class GameScene extends Phaser.Scene {
         const enemies = [];
         const speedBoosts = [];
         const extraLives = [];
+        const heartPickups = [];
         const mushrooms = [];
         const movingPlatforms = [];
 
@@ -295,6 +297,10 @@ class GameScene extends Phaser.Scene {
                      tilesetName.includes('speed') || tilesetName.includes('boost')) {
                 speedBoosts.push({ x: obj.x + 16, y: obj.y - 16, transform });
             }
+            else if (type === 'heart' || type === 'health' ||
+                     tilesetName.includes('red-heart') || tilesetName.includes('heart')) {
+                heartPickups.push({ x: obj.x + 16, y: obj.y - 16, transform });
+            }
             else if (type === '1up' || type === 'extra_life' ||
                      tilesetName.includes('1up') || tilesetName.includes('nota') ||
                      tilesetName.includes('extra-life') || tilesetName.includes('extra_life')) {
@@ -329,6 +335,7 @@ class GameScene extends Phaser.Scene {
         this.createStars(stars);
         this.createSpeedBoosts(speedBoosts);
         this.createExtraLives(extraLives);
+        this.createHeartPickups(heartPickups);
         this.createMushrooms(mushrooms);
         this.createMovingPlatforms(movingPlatforms);
         this.createWaterZones(map);
@@ -584,6 +591,55 @@ class GameScene extends Phaser.Scene {
 
         const text = this.add.text(item.x, item.y - 20, '1UP!', {
             fontSize: '16px', fontFamily: 'Arial', color: '#00ff88',
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setDepth(GC.DEPTH.HUD);
+
+        this.tweens.add({
+            targets: text,
+            y: text.y - 30,
+            alpha: 0,
+            duration: 800,
+            onComplete: () => text.destroy()
+        });
+    }
+
+    createHeartPickups(positions) {
+        this.heartPickups = this.physics.add.staticGroup();
+        const cfg = GC.HEART_PICKUP;
+
+        positions.forEach(pos => {
+            const item = this.heartPickups.create(pos.x, pos.y, 'red-heart');
+            item.body.setSize(cfg.BODY_SIZE, cfg.BODY_SIZE);
+            item.body.setOffset(cfg.BODY_OFFSET, cfg.BODY_OFFSET);
+            this._applyTilesetTransform(item, pos.transform);
+
+            this.tweens.add({
+                targets: item,
+                y: pos.y - cfg.BOB_OFFSET_Y,
+                duration: cfg.BOB_DURATION_MS,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+        });
+    }
+
+    /**
+     * Cura +1 coração. Com vida cheia o item fica no chão (não coleta).
+     */
+    collectHeart(player, item) {
+        if (!item || !item.active) return;
+        if (this.playerController.hearts >= GC.HEARTS.MAX) return;
+
+        item.disableBody(true, true);
+        this.tweens.killTweensOf(item);
+
+        if (!this.playerController.heal(1)) return;
+
+        SoundManager.play('collectHeart');
+
+        const text = this.add.text(item.x, item.y - 20, '+❤', {
+            fontSize: '16px', fontFamily: 'Arial', color: '#ff6688',
             stroke: '#000000', strokeThickness: 3
         }).setOrigin(0.5).setDepth(GC.DEPTH.HUD);
 
@@ -968,6 +1024,11 @@ class GameScene extends Phaser.Scene {
         if (this.extraLives && this.extraLives.children.size > 0) {
             this.physics.add.overlap(player, this.extraLives,
                 (p, item) => this.collectExtraLife(p, item), null, this);
+        }
+
+        if (this.heartPickups && this.heartPickups.children.size > 0) {
+            this.physics.add.overlap(player, this.heartPickups,
+                (p, item) => this.collectHeart(p, item), null, this);
         }
 
         if (this.mushrooms && this.mushrooms.children.size > 0) {

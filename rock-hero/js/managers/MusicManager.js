@@ -28,6 +28,7 @@
  * Uso típico:
  *   scene.preload():  MusicManager.preload(scene)
  *   scene.create():   MusicManager.startGameplay(scene, levelIndex)
+ *                     MusicManager.startCutscene(scene, cutsceneId)
  *   scene.shutdown(): MusicManager.stop()
  *   PauseMenu.show(): MusicManager.pause()
  *   PauseMenu.resume(): MusicManager.resume()
@@ -129,6 +130,40 @@ const MusicManager = {
         const missing = this.currentPool.filter(k => !scene.cache.audio.exists(k));
         if (missing.length > 0) {
             console.warn(`MusicManager: pool tem faixas sem áudio no cache: [${missing.join(', ')}]. Verifique MUSIC_TRACKS.`);
+        }
+
+        this._playRandom();
+    },
+
+    /**
+     * Inicia BGM para uma cutscene. Pool vem de CUTSCENES[id].music
+     * (string ou array de keys em MUSIC_TRACKS). Sem `music` → no-op.
+     */
+    startCutscene(scene, cutsceneId) {
+        this._ensureInit();
+        if (!this.enabled) {
+            console.warn(`MusicManager: startCutscene(${cutsceneId}) ignorado — enabled=false.`);
+            return;
+        }
+
+        const cutscene = GameConfig?.CUTSCENES?.[cutsceneId];
+        const music = cutscene?.music;
+        if (!music) return;
+
+        this._suspendedContext = null;
+        this.scene = scene;
+        this.contextType = 'cutscene';
+        this.contextData = { cutsceneId };
+        this.currentPool = Array.isArray(music) ? music.slice() : [music];
+
+        scene.events.once('shutdown', this._onSceneShutdown, this);
+        scene.events.once('destroy', this._onSceneShutdown, this);
+
+        if (this.currentPool.length === 0) return;
+
+        const missing = this.currentPool.filter(k => !scene.cache.audio.exists(k));
+        if (missing.length > 0) {
+            console.warn(`MusicManager: cutscene pool sem áudio no cache: [${missing.join(', ')}].`);
         }
 
         this._playRandom();

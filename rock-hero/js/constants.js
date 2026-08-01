@@ -316,6 +316,14 @@ const GC = {
         INVINCIBILITY_MS: 1500,
     },
 
+    // Item coletável que restaura 1 coração (só coleta se hearts < MAX)
+    HEART_PICKUP: {
+        BODY_SIZE: 20,          // coração 20×20 no centro do frame 32×32
+        BODY_OFFSET: 6,         // (32 - 20) / 2
+        BOB_OFFSET_Y: 4,
+        BOB_DURATION_MS: 1000,
+    },
+
     LIVES: {
         INITIAL: 5,
     },

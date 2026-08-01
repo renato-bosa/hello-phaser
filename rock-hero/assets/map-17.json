@@ -1483,6 +1483,18 @@
                  "width":32,
                  "x":1536,
                  "y":1856
+                }, 
+                {
+                 "gid":64,
+                 "height":32,
+                 "id":206,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":1920,
+                 "y":2016
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1491,7 +1503,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":206,
+ "nextobjectid":207,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1940,6 +1952,19 @@
          "imagewidth":32,
          "margin":0,
          "name":"yellow-flag",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":64,
+         "image":"spritesheets\/red-heart.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"red-heart",
          "spacing":0,
          "tilecount":1,
          "tileheight":32,

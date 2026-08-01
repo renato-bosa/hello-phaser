@@ -413,6 +413,18 @@ class PlayerController {
 
     // --- Dano e Respawn ---
 
+    /**
+     * Restaura corações (clamp em MAX). Retorna true se curou de fato.
+     */
+    heal(amount = 1) {
+        const max = GC.HEARTS.MAX;
+        if (this.hearts >= max) return false;
+
+        this.hearts = Math.min(max, this.hearts + amount);
+        this.scene.hudManager.updateHearts(this.hearts);
+        return true;
+    }
+
     takeDamage() {
         if (this.isRespawning || this.isInvincible) return;
         // A fase já foi ganha: durante a celebração o update() está parado, mas

@@ -911,14 +911,14 @@
         },
         "dev-resources/map-21-nuvens.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 511.99999999999994,
-                "y": 354.6666666666667
+                "x": 1120,
+                "y": 287.33333333333326
             }
         },
         "dev-resources/map-21-nuvens.tmx#1up": {

@@ -165,6 +165,16 @@ const SoundManager = {
                 delayMs: 100
             }
         },
+        collectHeart: {
+            // Mais curto/suave que o 1up — ping de cura
+            type: 'sine',
+            frequency: 660,
+            duration: 0.14,
+            volume: 0.35,
+            attack: 0.005,
+            decay: 0.1,
+            sequence: [660, 880, 1320]
+        },
         checkpoint: {
             type: 'sawtooth',
             frequency: 440,

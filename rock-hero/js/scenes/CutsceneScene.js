@@ -8,7 +8,8 @@
  * Comportamento (definido em GameConfig.CUTSCENES[id]):
  * - Cada frame fica bloqueado por `unlockMs` ms (4s default).
  * - Após `unlockMs`, surge prompt "▶ Pressione O para continuar".
- * - Avanço manual via O / Enter / Space / Click (sem auto-advance).
+ * - Avanço manual via O / Enter / Space / Click / → (sem auto-advance).
+ * - Voltar frame via ← (sem unlock; no-op no primeiro slide).
  * - Crossfade de `fadeMs` ms entre frames.
  * - Sem skip da cutscene inteira — usuário passa frame a frame.
  * - Indicador de progresso (●●○○○○) no rodapé.
@@ -55,6 +56,8 @@ class CutsceneScene extends Phaser.Scene {
                 this.load.image(key, GameState.assetUrl(frame.file));
             }
         });
+
+        MusicManager.preload(this);
     }
 
     create() {
@@ -80,6 +83,8 @@ class CutsceneScene extends Phaser.Scene {
 
         this.virtualControls = GameState.getVirtualControls();
 
+        MusicManager.startCutscene(this, this.cutsceneId);
+
         // Mostra primeiro frame
         this._showFrame(0);
     }
@@ -98,18 +103,23 @@ class CutsceneScene extends Phaser.Scene {
 
     _setupControls() {
         const handleAdvance = () => this._tryAdvance();
+        const handleBack = () => this._tryBack();
 
         const enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         const spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         const oKey     = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
+        const rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        const leftKey  = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
 
         enterKey.on('down', handleAdvance);
         spaceKey.on('down', handleAdvance);
         oKey.on('down', handleAdvance);
+        rightKey.on('down', handleAdvance);
+        leftKey.on('down', handleBack);
 
         this.input.on('pointerdown', handleAdvance);
 
-        this.keyListeners = [enterKey, spaceKey, oKey];
+        this.keyListeners = [enterKey, spaceKey, oKey, rightKey, leftKey];
     }
 
     _tryAdvance() {
@@ -125,6 +135,15 @@ class CutsceneScene extends Phaser.Scene {
         }
     }
 
+    _tryBack() {
+        // Voltar não exige unlock — só bloqueia durante crossfade
+        if (this.isTransitioning) return;
+        if (this.currentFrameIdx <= 0) return;
+
+        SoundManager.play('menuNavigate');
+        this._showFrame(this.currentFrameIdx - 1);
+    }
+
     // ==================== TRANSIÇÕES ====================
 
     _showFrame(idx) {
@@ -133,7 +152,8 @@ class CutsceneScene extends Phaser.Scene {
 
         // Esconde prompt enquanto transita
         if (this.advancePrompt) {
-            this.advancePrompt.setAlpha(0);
+            this.tweens.killTweensOf(this.advancePrompt);
+            this.advancePrompt.setAlpha(0).setScale(1);
         }
 
         const key = this._frameKey(idx);
@@ -169,6 +189,10 @@ class CutsceneScene extends Phaser.Scene {
     }
 
     _scheduleUnlock() {
+        if (this.unlockTimer) {
+            this.unlockTimer.remove();
+            this.unlockTimer = null;
+        }
         const unlockMs = this.config.unlockMs ?? 4000;
         this.unlockTimer = this.time.delayedCall(unlockMs, () => {
             this.canAdvance = true;
@@ -284,5 +308,6 @@ class CutsceneScene extends Phaser.Scene {
         }
         this.input.off('pointerdown');
         this.tweens.killAll();
+        MusicManager.stop();
     }
 }

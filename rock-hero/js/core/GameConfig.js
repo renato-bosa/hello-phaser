@@ -205,7 +205,7 @@ const GameConfig = {
             id: 1,
             name: 'Mundo 1',
             subtitle: 'O Resgate do Baterista',
-            levels: [0, 1, 2, 3, 4], // Índices das fases (0-4 = fases 0-1 até 4)
+            levels: [0, 1, 2, 3], // 4 fases (map0-1 até map4)
             rescuedCharacter: 'baterista',
             celebrationMessage: 'Você resgatou o Baterista!',
             // Visual no WorldMap
@@ -218,7 +218,7 @@ const GameConfig = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [5, 6, 7, 8, 9], // 5 fases (map5 a map10)
+            levels: [4, 5, 6, 7, 8], // 5 fases (map5 a map10)
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             // Visual no WorldMap (tema caverna/noturno)
@@ -230,7 +230,7 @@ const GameConfig = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [10, 11, 12, 13, 14], // 5 fases (map11, map12, map16, map17, map18)
+            levels: [9, 10, 11, 12, 13], // 5 fases (map11, map12, map16, map17, map18)
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             // Visual no WorldMap (tema aquático)
@@ -242,7 +242,7 @@ const GameConfig = {
             id: 4,
             name: 'Mundo 4',
             subtitle: 'Mecânicas Experimentais',
-            levels: [15, 16, 17],
+            levels: [14, 15, 16],
             rescuedCharacter: 'vocalista',
             celebrationMessage: 'Mecânicas dominadas!',
             theme: 'special',
@@ -293,25 +293,14 @@ const GameConfig = {
     // ==================== FASES ====================
     LEVELS: [
         {
-            key: 'map0-0',
-            file: 'assets/map0-0.json',
-            name: 'Primeiros Passos',
-            zoom: 1,
-            roundPixels: true,
-            world: 1,
-            // Posição no WorldMap (relativa ao mundo)
-            mapPosition: { x: 80, y: 200 },
-            connectsTo: [1] // Conecta à fase 1
-        },
-        {
             key: 'map0-1',
             file: 'assets/map0-1.json',
             name: 'Descobrindo o mundo',
             zoom: 1.0,
             roundPixels: true,
             world: 1,
-            mapPosition: { x: 160, y: 190 },
-            connectsTo: [2] // Conecta à fase 2
+            mapPosition: { x: 80, y: 200 },
+            connectsTo: [1]
         },
         {
             key: 'map2',
@@ -320,8 +309,8 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 240, y: 180 },
-            connectsTo: [3]
+            mapPosition: { x: 200, y: 180 },
+            connectsTo: [2]
         },
         {
             key: 'map3',
@@ -330,8 +319,8 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 340, y: 220 },
-            connectsTo: [4]
+            mapPosition: { x: 320, y: 220 },
+            connectsTo: [3]
         },
         {
             key: 'map4',
@@ -352,7 +341,7 @@ const GameConfig = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 80, y: 200 },
-            connectsTo: [6]
+            connectsTo: [5]
         },
         {
             key: 'map6',
@@ -362,7 +351,7 @@ const GameConfig = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 170, y: 160 },
-            connectsTo: [7]
+            connectsTo: [6]
         },
         {
             key: 'map7',
@@ -372,7 +361,7 @@ const GameConfig = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 270, y: 210 },
-            connectsTo: [8]
+            connectsTo: [7]
         },
         {
             key: 'map8',
@@ -382,7 +371,7 @@ const GameConfig = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 370, y: 180 },
-            connectsTo: [9] // Conecta à fase 10 (map10)
+            connectsTo: [8]
         },
         /*
         {
@@ -414,8 +403,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 85, y: 200 },
-            connectsTo: [11], // Conecta ao map12 (índice 11)
-            // Features ativadas automaticamente nesta fase
+            connectsTo: [10],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -426,7 +414,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 195, y: 215 },
-            connectsTo: [12]
+            connectsTo: [11]
         },
         {
             key: 'map16',
@@ -436,7 +424,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 305, y: 185 },
-            connectsTo: [13],
+            connectsTo: [12],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -447,7 +435,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 415, y: 215 },
-            connectsTo: [14],
+            connectsTo: [13],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -470,7 +458,7 @@ const GameConfig = {
             roundPixels: true,
             world: 4,
             mapPosition: { x: 120, y: 200 },
-            connectsTo: [16],
+            connectsTo: [15],
             features: { upsideDown: true, wind: true }
         },
         {
@@ -481,7 +469,7 @@ const GameConfig = {
             roundPixels: true,
             world: 4,
             mapPosition: { x: 370, y: 200 },
-            connectsTo: [17],
+            connectsTo: [16],
             features: { autoScroll: true }
         },
         {

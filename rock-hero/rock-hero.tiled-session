@@ -466,7 +466,7 @@
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 1978.6666666666665,
-                "y": 688
+                "y": 2033.333333333333
             }
         },
         "dev-resources/map-17.tmx#1up": {
@@ -527,6 +527,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-17.tmx#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-17.tmx#red-heart": {
             "scaleInDock": 1
         },
         "dev-resources/map-17.tmx#sapo-tomate-6fps": {

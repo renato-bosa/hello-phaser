@@ -135,6 +135,9 @@ class PlayerController {
         }
 
         // --- Pulo ---
+        // Modelo: chão/coyote e double-jump são ramos exclusivos (if/else if).
+        // Um único jumpJustPressed nunca pode consumir os dois no mesmo frame —
+        // o bug antigo fazia o coyote jump gastar o double-jump imediatamente.
         const jumpJustPressed = Phaser.Input.Keyboard.JustDown(scene.spaceKey) ||
                                 scene.virtualControls.jumpJustPressed;
         const jumpHeld = scene.spaceKey.isDown || scene.virtualControls.jumpHeld;
@@ -145,6 +148,7 @@ class PlayerController {
 
         if (onGround) {
             this.coyoteTime = GC.PLAYER.COYOTE_DURATION_MS;
+            this.hasDoubleJumped = false;
             this.isJumping = false;
         } else {
             this.coyoteTime -= delta;
@@ -156,14 +160,23 @@ class PlayerController {
             this.jumpBufferTime -= delta;
         }
 
-        const canCoyoteJump = this.coyoteTime > 0;
         const hasBufferedJump = this.jumpBufferTime > 0;
-        const shouldJump = (jumpJustPressed && canCoyoteJump) || (onGround && hasBufferedJump);
+        const canGroundOrCoyote = onGround || this.coyoteTime > 0;
+        const wantsGroundJump = (jumpJustPressed && canGroundOrCoyote) || (onGround && hasBufferedJump);
+        const wantsDoubleJump = jumpJustPressed && !onGround && !canGroundOrCoyote
+            && GameData.isFeatureEnabled('doubleJump') && !this.hasDoubleJumped;
 
-        if (shouldJump && !this.isJumping) {
+        if (wantsGroundJump && !this.isJumping) {
             player.setVelocityY(jumpForce);
             this.isJumping = true;
             this.coyoteTime = 0;
+            this.jumpBufferTime = 0;
+            SoundManager.play('jump');
+        } else if (wantsDoubleJump) {
+            const djForce = upsideDown ? -GC.PLAYER.DOUBLE_JUMP_FORCE : GC.PLAYER.DOUBLE_JUMP_FORCE;
+            player.setVelocityY(djForce);
+            this.hasDoubleJumped = true;
+            this.isJumping = true;
             this.jumpBufferTime = 0;
             SoundManager.play('jump');
         }
@@ -202,20 +215,6 @@ class PlayerController {
             }
         } else {
             player.body.gravity.y = 0;
-        }
-
-        // --- Double Jump ---
-        if (GameData.isFeatureEnabled('doubleJump')) {
-            if (onGround) {
-                this.hasDoubleJumped = false;
-            }
-            if (jumpJustPressed && !onGround && !this.hasDoubleJumped) {
-                const djForce = upsideDown ? -GC.PLAYER.DOUBLE_JUMP_FORCE : GC.PLAYER.DOUBLE_JUMP_FORCE;
-                player.setVelocityY(djForce);
-                this.hasDoubleJumped = true;
-                this.isJumping = true;
-                SoundManager.play('jump');
-            }
         }
 
         // --- Animação no ar ---

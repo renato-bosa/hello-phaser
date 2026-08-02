@@ -871,11 +871,9 @@ class GameScene extends Phaser.Scene {
             const platformEdge = upsideDown ? platform.body.bottom : platform.body.top;
             if (Math.abs(playerEdge - platformEdge) > 8) return;
 
+            // Só soma X: forçar velocity.y anulava o pulo na plataforma vertical
+            // (o Arcade já acompanha a plataforma no eixo Y pela colisão).
             player.body.velocity.x += platform.body.velocity.x;
-            // Vertical: ajuda a acompanhar plataforma que sobe/desce sem “soltar”
-            if (platform.body.velocity.y !== 0) {
-                player.body.velocity.y = platform.body.velocity.y;
-            }
             carried = true;
         });
     }

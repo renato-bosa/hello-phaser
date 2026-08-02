@@ -5,6 +5,9 @@
  * - Criar novo jogo em slot vazio
  * - Continuar jogo existente
  * - Deletar slot
+ *
+ * Resolução: sobe temporariamente para 2× (1280×704) só nesta cena e
+ * restaura 640×352 no shutdown, sem afetar as demais.
  */
 
 class SlotSelectScene extends Phaser.Scene {
@@ -12,18 +15,41 @@ class SlotSelectScene extends Phaser.Scene {
         super({ key: 'SlotSelectScene' });
     }
 
+    /** Escala valores de layout desenhados para a resolução base (640×352). */
+    u(n) {
+        return n * (this.uiScale || 1);
+    }
+
+    font(px) {
+        return `${this.u(px)}px`;
+    }
+
+    applySlotSelectResolution() {
+        GameConfig.UI_RESOLUTION.apply(this);
+    }
+
+    restoreGameResolution() {
+        GameConfig.UI_RESOLUTION.restore(this);
+    }
+
     init(data) {
         this.returnTo = data?.returnTo || 'MenuScene';
         this.selectedSlot = 0; // Índice do slot selecionado (0-3)
         this.mode = 'select'; // 'select', 'confirm_delete', 'name_input'
         this.deleteConfirmSlot = null;
+        this.deleteChoice = 1; // 0 = Deletar, 1 = Cancelar (padrão seguro)
         this._slotLongPressTimer = null;
         this._virtualODeleteTimer = null;
         this._virtualODeleteTriggered = false;
         this._jumpWasDownVirtual = false;
+        this.uiScale = 1;
     }
 
     create() {
+        // 2× só nesta cena; shutdown restaura a resolução base do jogo
+        this.applySlotSelectResolution();
+        this.events.once('shutdown', this.restoreGameResolution, this);
+
         const { width, height } = this.cameras.main;
         this.centerX = width / 2;
         this.centerY = height / 2;
@@ -58,20 +84,20 @@ class SlotSelectScene extends Phaser.Scene {
             const x = Phaser.Math.Between(0, width);
             const y = Phaser.Math.Between(0, height);
             const alpha = Phaser.Math.FloatBetween(0.1, 0.3);
-            this.add.circle(x, y, 2, 0xffffff, alpha);
+            this.add.circle(x, y, this.u(2), 0xffffff, alpha);
         }
     }
 
     createTitle() {
-        this.add.text(this.centerX, 35, 'SELECIONE UMA PARTIDA', {
+        this.add.text(this.centerX, this.u(35), 'SELECIONE UMA PARTIDA', {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '16px',
+            fontSize: this.font(16),
             color: '#ffffff'
         }).setOrigin(0.5);
 
-        this.add.text(this.centerX, 60, 'Escolha um slot para jogar ou criar nova partida', {
+        this.add.text(this.centerX, this.u(60), 'Escolha um slot para jogar ou criar nova partida', {
             fontFamily: 'Arial',
-            fontSize: '12px',
+            fontSize: this.font(12),
             color: '#888888'
         }).setOrigin(0.5);
     }
@@ -79,12 +105,12 @@ class SlotSelectScene extends Phaser.Scene {
     createSlots() {
         this.slotCards = [];
         
-        const slotWidth = 130;
-        const slotHeight = 160;
-        const spacing = 15;
+        const slotWidth = this.u(130);
+        const slotHeight = this.u(160);
+        const spacing = this.u(15);
         const totalWidth = (GameData.MAX_SLOTS * slotWidth) + ((GameData.MAX_SLOTS - 1) * spacing);
         const startX = this.centerX - totalWidth / 2 + slotWidth / 2;
-        const y = this.centerY - 10;
+        const y = this.centerY - this.u(10);
 
         for (let i = 0; i < GameData.MAX_SLOTS; i++) {
             const x = startX + i * (slotWidth + spacing);
@@ -101,29 +127,29 @@ class SlotSelectScene extends Phaser.Scene {
         // Background do card
         const bg = this.add.rectangle(0, 0, width, height, 
             slotData.isEmpty ? 0x1a1a2a : 0x2a2a4a, 1);
-        bg.setStrokeStyle(3, slotData.isEmpty ? 0x333344 : 0x4a4a6a);
+        bg.setStrokeStyle(this.u(3), slotData.isEmpty ? 0x333344 : 0x4a4a6a);
         container.add(bg);
 
         // Número do slot
-        const slotNumber = this.add.text(0, -height/2 + 20, `SLOT ${slotData.slotId}`, {
+        const slotNumber = this.add.text(0, -height/2 + this.u(20), `SLOT ${slotData.slotId}`, {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '10px',
+            fontSize: this.font(10),
             color: slotData.isEmpty ? '#555555' : '#ffffff'
         }).setOrigin(0.5);
         container.add(slotNumber);
 
         if (slotData.isEmpty) {
             // Slot vazio - mostra ícone de "+"
-            const plusIcon = this.add.text(0, -10, '+', {
+            const plusIcon = this.add.text(0, this.u(-10), '+', {
                 fontFamily: 'Arial Black',
-                fontSize: '48px',
+                fontSize: this.font(48),
                 color: '#444466'
             }).setOrigin(0.5);
             container.add(plusIcon);
 
-            const newGameText = this.add.text(0, 40, 'Novo Jogo', {
+            const newGameText = this.add.text(0, this.u(40), 'Novo Jogo', {
                 fontFamily: 'Arial',
-                fontSize: '11px',
+                fontSize: this.font(11),
                 color: '#666688'
             }).setOrigin(0.5);
             container.add(newGameText);
@@ -131,47 +157,47 @@ class SlotSelectScene extends Phaser.Scene {
             // Slot com dados - mostra informações
             
             // Nome do jogador
-            const nameText = this.add.text(0, -20, slotData.playerName, {
+            const nameText = this.add.text(0, this.u(-20), slotData.playerName, {
                 fontFamily: '"Press Start 2P", monospace',
-                fontSize: '9px',
+                fontSize: this.font(9),
                 color: '#ffffff',
-                wordWrap: { width: width - 20 }
+                wordWrap: { width: width - this.u(20) }
             }).setOrigin(0.5);
             container.add(nameText);
 
             // Progresso (fases)
-            const progressText = this.add.text(0, 10, 
+            const progressText = this.add.text(0, this.u(10), 
                 `⭐ ${slotData.completedLevels}/${slotData.totalLevels} fases`, {
                 fontFamily: 'Arial',
-                fontSize: '10px',
+                fontSize: this.font(10),
                 color: '#aaaacc'
             }).setOrigin(0.5);
             container.add(progressText);
 
             // Mundos completos
-            const worldsText = this.add.text(0, 28, 
+            const worldsText = this.add.text(0, this.u(28), 
                 `🌍 ${slotData.completedWorlds}/${slotData.totalWorlds} mundos`, {
                 fontFamily: 'Arial',
-                fontSize: '10px',
+                fontSize: this.font(10),
                 color: '#aaaacc'
             }).setOrigin(0.5);
             container.add(worldsText);
 
             // Personagens desbloqueados
-            const charsText = this.add.text(0, 46, 
+            const charsText = this.add.text(0, this.u(46), 
                 `🎸 ${slotData.unlockedCharacters} personagem${slotData.unlockedCharacters > 1 ? 's' : ''}`, {
                 fontFamily: 'Arial',
-                fontSize: '10px',
+                fontSize: this.font(10),
                 color: '#aaaacc'
             }).setOrigin(0.5);
             container.add(charsText);
 
             // Última vez jogado
             if (slotData.lastPlayedAt) {
-                const dateText = this.add.text(0, height/2 - 20, 
+                const dateText = this.add.text(0, height/2 - this.u(20), 
                     `Último: ${GameData.formatDateShort(slotData.lastPlayedAt)}`, {
                     fontFamily: 'Arial',
-                    fontSize: '9px',
+                    fontSize: this.font(9),
                     color: '#666688'
                 }).setOrigin(0.5);
                 container.add(dateText);
@@ -244,51 +270,51 @@ class SlotSelectScene extends Phaser.Scene {
 
     createControls() {
         const { height } = this.cameras.main;
-        const panelY = height - 35;
+        const panelY = height - this.u(35);
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
         // Painel de controles
-        this.add.rectangle(this.centerX, panelY, 550, 45, 0x000000, 0.7)
-            .setStrokeStyle(2, 0x444444);
+        this.add.rectangle(this.centerX, panelY, this.u(550), this.u(45), 0x000000, 0.7)
+            .setStrokeStyle(this.u(2), 0x444444);
 
         // Instruções principais
-        this.controlsText = this.add.text(this.centerX - 180, panelY, '← →  Navegar', {
+        this.controlsText = this.add.text(this.centerX - this.u(180), panelY, '← →  Navegar', {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '9px',
+            fontSize: this.font(9),
             color: '#ffff00'
         }).setOrigin(0.5);
 
         this.selectText = this.add.text(this.centerX, panelY, 
             isMobile ? 'O  Selecionar' : 'ENTER  Selecionar', {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '9px',
+            fontSize: this.font(9),
             color: '#00ff00'
         }).setOrigin(0.5);
 
-        this.add.text(this.centerX + 180, panelY, 
+        this.add.text(this.centerX + this.u(180), panelY, 
             isMobile ? 'X  Voltar' : 'ESC  Voltar', {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '9px',
+            fontSize: this.font(9),
             color: '#ff6666'
         }).setOrigin(0.5);
 
         // Texto de deletar (só aparece em slots com dados)
-        this.deleteText = this.add.text(this.centerX, panelY + 18,
+        this.deleteText = this.add.text(this.centerX, panelY + this.u(18),
             isMobile ? 'Segure o slot ou O (~0,5s) para resetar' : 'DEL  Resetar slot', {
             fontFamily: 'Arial',
-            fontSize: '9px',
+            fontSize: this.font(9),
             color: '#ff4444'
         }).setOrigin(0.5).setAlpha(0);
     }
 
     setupInput() {
-        // Navegação
+        // Navegação (slots ou opções do diálogo de delete)
         this.input.keyboard.on('keydown-LEFT', () => this.navigate(-1));
         this.input.keyboard.on('keydown-RIGHT', () => this.navigate(1));
 
-        // Seleção
-        this.input.keyboard.on('keydown-ENTER', () => this.selectSlot(this.selectedSlot));
-        this.input.keyboard.on('keydown-SPACE', () => this.selectSlot(this.selectedSlot));
+        // Confirmar seleção atual
+        this.input.keyboard.on('keydown-ENTER', () => this.confirmSelection());
+        this.input.keyboard.on('keydown-SPACE', () => this.confirmSelection());
 
         // Deletar
         this.input.keyboard.on('keydown-DELETE', () => this.confirmDelete(this.selectedSlot));
@@ -374,15 +400,25 @@ class SlotSelectScene extends Phaser.Scene {
                 }
             }
         } else if (this.mode === 'confirm_delete') {
-            // O = confirma deletar (equivalente a Y no teclado)
+            // O / bolinha = confirma a opção selecionada (Deletar ou Cancelar)
             if (vc.jumpJustPressed) {
                 vc.jumpJustPressed = false;
-                this.executeDelete();
+                this.confirmDeleteChoice();
             }
-            // X = cancela (equivalente a N/ESC no teclado)
+            // X = cancela o diálogo
             if (vc.backJustPressed) {
                 vc.backJustPressed = false;
                 this.cancelDelete();
+            }
+            // D-pad ← → escolhe entre Deletar e Cancelar
+            if (time - this.lastNavTime > 200) {
+                if (vc.left) {
+                    this.navigateDeleteChoice(-1);
+                    this.lastNavTime = time;
+                } else if (vc.right) {
+                    this.navigateDeleteChoice(1);
+                    this.lastNavTime = time;
+                }
             }
         } else if (this.mode === 'name_input') {
             // No name_input o <input> HTML tem foco e recebe as teclas reais. Aqui só
@@ -414,6 +450,10 @@ class SlotSelectScene extends Phaser.Scene {
     }
 
     navigate(direction) {
+        if (this.mode === 'confirm_delete') {
+            this.navigateDeleteChoice(direction);
+            return;
+        }
         if (this.mode !== 'select') return;
 
         const newIndex = this.selectedSlot + direction;
@@ -426,6 +466,71 @@ class SlotSelectScene extends Phaser.Scene {
         }
     }
 
+    navigateDeleteChoice(direction) {
+        if (this.mode !== 'confirm_delete') return;
+        const next = Phaser.Math.Clamp(this.deleteChoice + direction, 0, 1);
+        if (next === this.deleteChoice) return;
+        this.deleteChoice = next;
+        this.highlightDeleteChoice();
+        SoundManager.play('menuNavigate');
+    }
+
+    highlightDeleteChoice() {
+        if (!this.deleteConfirmBtn || !this.deleteCancelBtn) return;
+
+        const styleSelected = (btn, isDelete) => {
+            btn.setStyle({
+                color: isDelete ? '#ff6666' : '#ffffff',
+                backgroundColor: isDelete ? '#5a2020' : '#3a3a4a'
+            });
+            this.tweens.add({
+                targets: btn,
+                scale: 1.12,
+                duration: 100,
+                ease: 'Power2'
+            });
+        };
+        const styleIdle = (btn, isDelete) => {
+            btn.setStyle({
+                color: isDelete ? '#ff4444' : '#aaaaaa',
+                backgroundColor: isDelete ? '#3a1a1a' : '#2a2a2a'
+            });
+            this.tweens.add({
+                targets: btn,
+                scale: 1,
+                duration: 100,
+                ease: 'Power2'
+            });
+        };
+
+        if (this.deleteChoice === 0) {
+            styleSelected(this.deleteConfirmBtn, true);
+            styleIdle(this.deleteCancelBtn, false);
+        } else {
+            styleIdle(this.deleteConfirmBtn, true);
+            styleSelected(this.deleteCancelBtn, false);
+        }
+    }
+
+    confirmSelection() {
+        if (this.mode === 'confirm_delete') {
+            this.confirmDeleteChoice();
+            return;
+        }
+        if (this.mode === 'select') {
+            this.selectSlot(this.selectedSlot);
+        }
+    }
+
+    confirmDeleteChoice() {
+        if (this.mode !== 'confirm_delete') return;
+        if (this.deleteChoice === 0) {
+            this.executeDelete();
+        } else {
+            this.cancelDelete();
+        }
+    }
+
     highlightSlot(index) {
         this.slotCards.forEach((card, i) => {
             const isSelected = i === index;
@@ -433,7 +538,7 @@ class SlotSelectScene extends Phaser.Scene {
             
             // Cor da borda
             card.bg.setStrokeStyle(
-                isSelected ? 4 : 3,
+                isSelected ? this.u(4) : this.u(3),
                 isSelected ? 0xffffff : (isEmpty ? 0x333344 : 0x4a4a6a)
             );
 
@@ -508,30 +613,30 @@ class SlotSelectScene extends Phaser.Scene {
         this.inputContainer = this.add.container(this.centerX, this.centerY);
 
         // Background do painel
-        const panelBg = this.add.rectangle(0, 0, 350, 180, 0x1a1a2e, 1);
-        panelBg.setStrokeStyle(3, 0x4a4aff);
+        const panelBg = this.add.rectangle(0, 0, this.u(350), this.u(180), 0x1a1a2e, 1);
+        panelBg.setStrokeStyle(this.u(3), 0x4a4aff);
         this.inputContainer.add(panelBg);
 
         // Título
-        const title = this.add.text(0, -65, 'NOVO JOGO', {
+        const title = this.add.text(0, this.u(-65), 'NOVO JOGO', {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '14px',
+            fontSize: this.font(14),
             color: '#ffffff'
         }).setOrigin(0.5);
         this.inputContainer.add(title);
 
         // Subtítulo
-        const subtitle = this.add.text(0, -40, `Slot ${slotId}`, {
+        const subtitle = this.add.text(0, this.u(-40), `Slot ${slotId}`, {
             fontFamily: 'Arial',
-            fontSize: '12px',
+            fontSize: this.font(12),
             color: '#888888'
         }).setOrigin(0.5);
         this.inputContainer.add(subtitle);
 
         // Label
-        const label = this.add.text(0, -10, 'Digite seu nome:', {
+        const label = this.add.text(0, this.u(-10), 'Digite seu nome:', {
             fontFamily: 'Arial',
-            fontSize: '14px',
+            fontSize: this.font(14),
             color: '#cccccc'
         }).setOrigin(0.5);
         this.inputContainer.add(label);
@@ -573,30 +678,30 @@ class SlotSelectScene extends Phaser.Scene {
         }, 100);
 
         // Instruções
-        const instructions = this.add.text(0, 55, 'ENTER: Confirmar | ESC: Cancelar', {
+        const instructions = this.add.text(0, this.u(55), 'ENTER: Confirmar | ESC: Cancelar', {
             fontFamily: 'Arial',
-            fontSize: '10px',
+            fontSize: this.font(10),
             color: '#666666'
         }).setOrigin(0.5);
         this.inputContainer.add(instructions);
 
         // Botões visuais
-        const confirmBtn = this.add.text(-55, 75, '✓ Confirmar', {
+        const confirmBtn = this.add.text(this.u(-55), this.u(75), '✓ Confirmar', {
             fontFamily: 'Arial',
-            fontSize: '11px',
+            fontSize: this.font(11),
             color: '#00ff00',
             backgroundColor: '#1a3a1a',
-            padding: { x: 8, y: 5 }
+            padding: { x: this.u(8), y: this.u(5) }
         }).setOrigin(0.5).setInteractive({ useHandCursor: true })
             .on('pointerdown', () => this.confirmNewGame());
         this.inputContainer.add(confirmBtn);
 
-        const cancelBtn = this.add.text(55, 75, '✗ Cancelar', {
+        const cancelBtn = this.add.text(this.u(55), this.u(75), '✗ Cancelar', {
             fontFamily: 'Arial',
-            fontSize: '11px',
+            fontSize: this.font(11),
             color: '#ff6666',
             backgroundColor: '#3a1a1a',
-            padding: { x: 8, y: 5 }
+            padding: { x: this.u(8), y: this.u(5) }
         }).setOrigin(0.5).setInteractive({ useHandCursor: true })
             .on('pointerdown', () => this.cancelNameInput());
         this.inputContainer.add(cancelBtn);
@@ -685,61 +790,91 @@ class SlotSelectScene extends Phaser.Scene {
         this.deleteContainer = this.add.container(this.centerX, this.centerY);
 
         // Background
-        const bg = this.add.rectangle(0, 0, 320, 150, 0x2a1a1a, 1);
-        bg.setStrokeStyle(3, 0xff4444);
+        const bg = this.add.rectangle(0, 0, this.u(320), this.u(150), 0x2a1a1a, 1);
+        bg.setStrokeStyle(this.u(3), 0xff4444);
         this.deleteContainer.add(bg);
 
         // Título
-        const title = this.add.text(0, -50, '⚠️ DELETAR SLOT?', {
+        const title = this.add.text(0, this.u(-50), '⚠️ DELETAR SLOT?', {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '12px',
+            fontSize: this.font(12),
             color: '#ff4444'
         }).setOrigin(0.5);
         this.deleteContainer.add(title);
 
         // Mensagem
-        const message = this.add.text(0, -15, 
+        const message = this.add.text(0, this.u(-15), 
             `Tem certeza que deseja deletar\no slot ${slotData.slotId} (${slotData.playerName})?`, {
             fontFamily: 'Arial',
-            fontSize: '12px',
+            fontSize: this.font(12),
             color: '#ffffff',
             align: 'center'
         }).setOrigin(0.5);
         this.deleteContainer.add(message);
 
         // Warning
-        const warning = this.add.text(0, 20, 'Esta ação não pode ser desfeita!', {
+        const warning = this.add.text(0, this.u(20), 'Esta ação não pode ser desfeita!', {
             fontFamily: 'Arial',
-            fontSize: '10px',
+            fontSize: this.font(10),
             color: '#ff6666'
         }).setOrigin(0.5);
         this.deleteContainer.add(warning);
 
-        // Botões
-        const confirmBtn = this.add.text(-60, 55, '✓ Deletar', {
+        // Botões (navegáveis por ← → / D-pad; Enter / O confirma a opção)
+        this.deleteChoice = 1; // padrão: Cancelar
+        this.deleteConfirmBtn = this.add.text(this.u(-60), this.u(55), '✓ Deletar', {
             fontFamily: 'Arial',
-            fontSize: '12px',
+            fontSize: this.font(12),
             color: '#ff4444',
             backgroundColor: '#3a1a1a',
-            padding: { x: 10, y: 5 }
+            padding: { x: this.u(10), y: this.u(5) }
         }).setOrigin(0.5).setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => this.executeDelete());
-        this.deleteContainer.add(confirmBtn);
+            .on('pointerover', () => {
+                if (this.mode !== 'confirm_delete') return;
+                if (this.deleteChoice !== 0) {
+                    this.deleteChoice = 0;
+                    this.highlightDeleteChoice();
+                    SoundManager.play('menuNavigate');
+                }
+            })
+            .on('pointerdown', () => {
+                this.deleteChoice = 0;
+                this.confirmDeleteChoice();
+            });
+        this.deleteContainer.add(this.deleteConfirmBtn);
 
-        const cancelBtn = this.add.text(60, 55, '✗ Cancelar', {
+        this.deleteCancelBtn = this.add.text(this.u(60), this.u(55), '✗ Cancelar', {
             fontFamily: 'Arial',
-            fontSize: '12px',
+            fontSize: this.font(12),
             color: '#aaaaaa',
             backgroundColor: '#2a2a2a',
-            padding: { x: 10, y: 5 }
+            padding: { x: this.u(10), y: this.u(5) }
         }).setOrigin(0.5).setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => this.cancelDelete());
-        this.deleteContainer.add(cancelBtn);
+            .on('pointerover', () => {
+                if (this.mode !== 'confirm_delete') return;
+                if (this.deleteChoice !== 1) {
+                    this.deleteChoice = 1;
+                    this.highlightDeleteChoice();
+                    SoundManager.play('menuNavigate');
+                }
+            })
+            .on('pointerdown', () => {
+                this.deleteChoice = 1;
+                this.confirmDeleteChoice();
+            });
+        this.deleteContainer.add(this.deleteCancelBtn);
 
-        // Teclas
-        this.input.keyboard.once('keydown-Y', () => this.executeDelete());
-        this.input.keyboard.once('keydown-N', () => this.cancelDelete());
-        this.input.keyboard.once('keydown-ESC', () => this.cancelDelete());
+        const hint = this.add.text(0, this.u(78), '← →  Escolher  |  ENTER/O  Confirmar', {
+            fontFamily: 'Arial',
+            fontSize: this.font(10),
+            color: '#888888'
+        }).setOrigin(0.5);
+        this.deleteContainer.add(hint);
+
+        // Ajusta altura do painel para a dica
+        bg.setSize(this.u(320), this.u(170));
+
+        this.highlightDeleteChoice();
     }
 
     executeDelete() {
@@ -780,7 +915,10 @@ class SlotSelectScene extends Phaser.Scene {
             this.deleteContainer.destroy();
             this.deleteContainer = null;
         }
+        this.deleteConfirmBtn = null;
+        this.deleteCancelBtn = null;
         this.deleteConfirmSlot = null;
+        this.deleteChoice = 1;
     }
 
     goBack() {

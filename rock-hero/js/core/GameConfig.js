@@ -23,6 +23,46 @@ const GameConfig = {
         SETTINGS: 'rockHero_settings'
     },
 
+    // ==================== UI HI-RES (menus) ====================
+    // Resolução lógica base do jogo (game.js). Cenas de menu podem subir
+    // temporariamente para BASE*SCALE e devem restaurar no shutdown.
+    UI_RESOLUTION: {
+        BASE_WIDTH: 640,
+        BASE_HEIGHT: 352,
+        SCALE: 2,
+
+        /** Aplica resolução hi-res e sincroniza câmera (evita “zoom cortado”). */
+        apply(scene) {
+            const s = this.SCALE;
+            const w = this.BASE_WIDTH * s;
+            const h = this.BASE_HEIGHT * s;
+            scene.uiScale = s;
+            scene.scale.setGameSize(w, h);
+            scene.scale.refresh();
+            const cam = scene.cameras?.main;
+            if (cam) {
+                cam.setZoom(1);
+                cam.setSize(w, h);
+                cam.setScroll(0, 0);
+            }
+        },
+
+        /** Restaura 640×352. Idempotente — seguro chamar mesmo se já estiver na base. */
+        restore(scene) {
+            const w = this.BASE_WIDTH;
+            const h = this.BASE_HEIGHT;
+            scene.uiScale = 1;
+            scene.scale.setGameSize(w, h);
+            scene.scale.refresh();
+            const cam = scene.cameras?.main;
+            if (cam) {
+                cam.setZoom(1);
+                cam.setSize(w, h);
+                cam.setScroll(0, 0);
+            }
+        }
+    },
+
     // ==================== FEATURE FLAGS DEFAULTS ====================
     // Valores iniciais das feature flags. FeatureFlags (Fase 4) usa
     // este objeto como ponto de partida e permite override via URL/menu.
@@ -205,7 +245,7 @@ const GameConfig = {
             id: 1,
             name: 'Mundo 1',
             subtitle: 'O Resgate do Baterista',
-            levels: [0, 1, 2, 3], // 4 fases (map0-1 até map4)
+            levels: [0, 1, 2, 3, 4], // 5 fases (map0-1 … map-ultima-mundo1)
             rescuedCharacter: 'baterista',
             celebrationMessage: 'Você resgatou o Baterista!',
             // Visual no WorldMap
@@ -218,7 +258,7 @@ const GameConfig = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [4, 5, 6, 7, 8], // 5 fases (map5 a map10)
+            levels: [5, 6, 7, 8, 9], // 5 fases (map5 a map10)
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             // Visual no WorldMap (tema caverna/noturno)
@@ -230,7 +270,7 @@ const GameConfig = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [9, 10, 11, 12, 13], // 5 fases (map11, map12, map16, map17, map18)
+            levels: [10, 11, 12, 13, 14], // 5 fases (map11, map12, map16, map17, map18)
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             // Visual no WorldMap (tema aquático)
@@ -242,7 +282,7 @@ const GameConfig = {
             id: 4,
             name: 'Mundo 4',
             subtitle: 'Mecânicas Experimentais',
-            levels: [14, 15, 16],
+            levels: [15, 16, 17],
             rescuedCharacter: 'vocalista',
             celebrationMessage: 'Mecânicas dominadas!',
             theme: 'special',
@@ -330,7 +370,17 @@ const GameConfig = {
             roundPixels: false,
             world: 1,
             mapPosition: { x: 440, y: 180 },
-            connectsTo: [] // Última fase do mundo
+            connectsTo: [4]
+        },
+        {
+            key: 'map-ultima-mundo1',
+            file: 'assets/map-ultima-mundo1.json',
+            name: 'O Último Desafio',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 560, y: 200 },
+            connectsTo: [] // Última fase do mundo 1
         },
         // ==================== MUNDO 2 ====================
         {
@@ -341,7 +391,7 @@ const GameConfig = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 80, y: 200 },
-            connectsTo: [5]
+            connectsTo: [6]
         },
         {
             key: 'map6',
@@ -351,7 +401,7 @@ const GameConfig = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 170, y: 160 },
-            connectsTo: [6]
+            connectsTo: [7]
         },
         {
             key: 'map7',
@@ -361,7 +411,7 @@ const GameConfig = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 270, y: 210 },
-            connectsTo: [7]
+            connectsTo: [8]
         },
         {
             key: 'map8',
@@ -371,7 +421,7 @@ const GameConfig = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 370, y: 180 },
-            connectsTo: [8]
+            connectsTo: [9]
         },
         /*
         {
@@ -403,7 +453,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 85, y: 200 },
-            connectsTo: [10],
+            connectsTo: [11],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -414,7 +464,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 195, y: 215 },
-            connectsTo: [11]
+            connectsTo: [12]
         },
         {
             key: 'map16',
@@ -424,7 +474,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 305, y: 185 },
-            connectsTo: [12],
+            connectsTo: [13],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -435,7 +485,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 415, y: 215 },
-            connectsTo: [13],
+            connectsTo: [14],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -458,7 +508,7 @@ const GameConfig = {
             roundPixels: true,
             world: 4,
             mapPosition: { x: 120, y: 200 },
-            connectsTo: [15],
+            connectsTo: [16],
             features: { upsideDown: true, wind: true }
         },
         {
@@ -469,7 +519,7 @@ const GameConfig = {
             roundPixels: true,
             world: 4,
             mapPosition: { x: 370, y: 200 },
-            connectsTo: [16],
+            connectsTo: [17],
             features: { autoScroll: true }
         },
         {

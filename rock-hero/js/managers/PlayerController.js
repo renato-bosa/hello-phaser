@@ -71,7 +71,10 @@ class PlayerController {
         const player = this.player;
         const scene = this.scene;
         const upsideDown = GameData.isFeatureEnabled('upsideDown');
-        const onGround = upsideDown ? player.body.blocked.up : player.body.blocked.down;
+        // blocked = tiles/mundo; touching = corpos dinâmicos (ex.: plataforma móvel)
+        const onGround = upsideDown
+            ? (player.body.blocked.up || player.body.touching.up)
+            : (player.body.blocked.down || player.body.touching.down);
         const currentTime = scene.time.now;
 
         if (this.isInvincible) {

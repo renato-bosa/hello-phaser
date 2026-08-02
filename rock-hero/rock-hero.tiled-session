@@ -98,9 +98,9 @@
                 8
             ],
             "scale": 0.5,
-            "selectedLayer": 2,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 996,
+                "x": 828,
                 "y": 302
             }
         },
@@ -138,6 +138,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-11.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-11.tmx#sapo-tomate-6fps": {
             "scaleInDock": 1
         },
         "dev-resources/map-11.tmx#setas-velocidade": {
@@ -1619,6 +1622,71 @@
         "dev-resources/map-9.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-ultima-mundo1.tmx": {
+            "expandedObjectLayers": [
+                8
+            ],
+            "scale": 0.9938244047619047,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 559.4549674328068,
+                "y": 175.08123081530283
+            }
+        },
+        "dev-resources/map-ultima-mundo1.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#abstract-spread-blue-blinking-green-8fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#abstract-spread-blue-blinking-red-8fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#abstract-spread-blue-blinking-yellow-8fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#green-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#lava-roxa": {
+            "scaleInEditor": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "dev-resources/map.tmx": {
             "expandedObjectLayers": [
                 8
@@ -1626,7 +1694,7 @@
             "scale": 0.75,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 319.33333333333337,
+                "x": 320,
                 "y": 174.66666666666669
             }
         },
@@ -1676,7 +1744,7 @@
             "scale": 0.9938244047619047,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 559.9580744179082,
+                "x": 559.4549674328068,
                 "y": 175.08123081530283
             }
         },
@@ -1738,7 +1806,7 @@
             "scale": 0.75,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 335.33333333333337,
+                "x": 336,
                 "y": 190.66666666666669
             }
         },
@@ -1804,18 +1872,18 @@
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map-12.tmx",
+        "dev-resources/map-13.tmx",
+        "dev-resources/map-10.tmx",
+        "dev-resources/map-11.tmx",
         "dev-resources/map-21-nuvens.tmx",
         "dev-resources/map-4--big-jumps.tmx",
-        "dev-resources/map-3--desafio do luigi.tmx",
-        "dev-resources/map-6--caverna2.tmx",
-        "dev-resources/map-5--caverna.tmx",
-        "dev-resources/map-8--o-resgate-do-baixista.tmx",
-        "dev-resources/map-9.tmx",
-        "dev-resources/map-19.tmx",
-        "dev-resources/map-18.tmx",
-        "dev-resources/map-17.tmx",
+        "dev-resources/map-14.tmx",
+        "dev-resources/map-15.tmx",
         "dev-resources/map-16.tmx",
-        "dev-resources/map-15.tmx"
+        "dev-resources/map-17.tmx",
+        "dev-resources/map.tmx",
+        "dev-resources/map-19.tmx"
     ],
     "tileset.embedInMap": true
 }

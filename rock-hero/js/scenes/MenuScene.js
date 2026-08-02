@@ -6,11 +6,31 @@
  * - Navegação entre opções
  * - Redirecionar para seleção de slots
  * - Mostrar ranking
+ *
+ * Resolução: sobe temporariamente para 2× (1280×704) só nesta cena e
+ * restaura 640×352 no shutdown, sem afetar as demais.
  */
 
 class MenuScene extends Phaser.Scene {
     constructor() {
         super({ key: 'MenuScene' });
+    }
+
+    /** Escala valores de layout desenhados para a resolução base (640×352). */
+    u(n) {
+        return n * (this.uiScale || 1);
+    }
+
+    font(px) {
+        return `${this.u(px)}px`;
+    }
+
+    applyMenuResolution() {
+        GameConfig.UI_RESOLUTION.apply(this);
+    }
+
+    restoreGameResolution() {
+        GameConfig.UI_RESOLUTION.restore(this);
     }
 
     preload() {
@@ -21,10 +41,14 @@ class MenuScene extends Phaser.Scene {
     create() {
         // Limpa qualquer estado anterior
         this.cleanup();
+
+        // 2× só nesta cena; restaura a base no shutdown (evento + método)
+        this.applyMenuResolution();
+        this.events.once('shutdown', this.restoreGameResolution, this);
         
-        // Configurações básicas
-        this.centerX = this.cameras.main.centerX;
-        this.centerY = this.cameras.main.centerY;
+        // Configurações básicas (depois do setGameSize/refresh)
+        this.centerX = this.cameras.main.width / 2;
+        this.centerY = this.cameras.main.height / 2;
         
         // Estado da cena
         this.currentView = 'menu'; // 'menu', 'effects'
@@ -118,7 +142,12 @@ class MenuScene extends Phaser.Scene {
     // ==================== CRIAÇÃO DE UI ====================
 
     createBackground() {
-        this.add.rectangle(this.centerX, this.centerY, 640, 352, 0x1a1a2e);
+        this.add.rectangle(
+            this.centerX, this.centerY,
+            this.cameras.main.width,
+            this.cameras.main.height,
+            0x1a1a2e
+        );
     }
 
     createHeroSprite() {
@@ -148,14 +177,14 @@ class MenuScene extends Phaser.Scene {
         this.textures.get(textureKey).setFilter(Phaser.Textures.FilterMode.NEAREST);
         
         this.heroSprite = this.add.sprite(heroX, this.centerY, textureKey);
-        this.heroSprite.setScale(3);
+        this.heroSprite.setScale(3 * this.uiScale);
         this.heroSprite.setDepth(0);
         this.heroSprite.play('menu-idle');
 
         // Flutuação
         this.tweens.add({
             targets: this.heroSprite,
-            y: this.heroSprite.y - 5,
+            y: this.heroSprite.y - this.u(5),
             duration: 1200,
             yoyo: true,
             repeat: -1,
@@ -165,17 +194,17 @@ class MenuScene extends Phaser.Scene {
 
     createTitle() {
         // Cria o título com fonte padrão inicialmente
-        this.title = this.add.text(this.centerX, this.centerY - 100, 'The Lost Band', {
-            fontSize: '48px',
+        this.title = this.add.text(this.centerX, this.centerY - this.u(100), 'The Lost Band', {
+            fontSize: this.font(48),
             fontFamily: 'Arial', // Fallback inicial
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 5
+            strokeThickness: this.u(5)
         }).setOrigin(0.5).setDepth(10);
 
         // Aguarda a fonte Rock Salt carregar e então aplica
         if (document.fonts && document.fonts.load) {
-            document.fonts.load('42px "Rock Salt"').then(() => {
+            document.fonts.load(`${this.u(42)}px "Rock Salt"`).then(() => {
                 // Fonte carregada - atualiza o estilo
                 if (this.title && this.title.active) {
                     this.title.setFontFamily('"Rock Salt", cursive');
@@ -189,7 +218,7 @@ class MenuScene extends Phaser.Scene {
         // Animação de pulo suave
         this.tweens.add({
             targets: this.title,
-            y: this.title.y - 8,
+            y: this.title.y - this.u(8),
             duration: 1200,
             yoyo: true,
             repeat: -1,
@@ -212,7 +241,7 @@ class MenuScene extends Phaser.Scene {
             () => this.openSlotSelect()
         );
         this.menuButtons.push(this.playBtn);
-        yOffset += 35;
+        yOffset += this.u(35);
 
         // Botão de música — alterna no lugar, sem abrir submenu
         this.musicBtn = this.createButton(
@@ -223,7 +252,7 @@ class MenuScene extends Phaser.Scene {
             () => this.toggleMusic()
         );
         this.menuButtons.push(this.musicBtn);
-        yOffset += 35;
+        yOffset += this.u(35);
 
         // Botão "DEV OPTIONS" — só aparece com ?dev=true na URL.
         // Segue o padrão do projeto para flags de desenvolvimento (?fps, ?debug, ?mapDebug).
@@ -240,12 +269,12 @@ class MenuScene extends Phaser.Scene {
         }
 
         // Cursor de seleção (posicionado à esquerda dos botões)
-        this.cursor = this.add.text(this.centerX - 170, this.menuButtons[0].y, '▶', {
-            fontSize: '24px',
+        this.cursor = this.add.text(this.centerX - this.u(170), this.menuButtons[0].y, '▶', {
+            fontSize: this.font(24),
             fontFamily: 'Arial',
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 3
+            strokeThickness: this.u(3)
         }).setOrigin(0.5).setDepth(11);
 
         // Animação do cursor
@@ -262,11 +291,11 @@ class MenuScene extends Phaser.Scene {
 
     createButton(x, y, text, color, callback) {
         const btn = this.add.text(x, y, text, {
-            fontSize: '22px',
+            fontSize: this.font(22),
             fontFamily: 'Arial',
             color: color,
             stroke: '#000000',
-            strokeThickness: 3
+            strokeThickness: this.u(3)
         }).setOrigin(0.5).setDepth(10).setInteractive({ useHandCursor: true });
 
         btn.defaultColor = color;
@@ -297,21 +326,26 @@ class MenuScene extends Phaser.Scene {
         
         this.instructions = this.add.text(
             this.centerX, 
-            this.centerY + 120, 
+            this.centerY + this.u(120), 
             text, 
             {
-                fontSize: '14px',
+                fontSize: this.font(14),
                 fontFamily: 'Arial',
                 color: '#aaaaaa'
             }
         ).setOrigin(0.5).setDepth(10);
 
         // Versão do jogo (canto inferior direito)
-        this.add.text(this.cameras.main.width - 8, this.cameras.main.height - 8, GameData.VERSION, {
-            fontSize: '10px',
-            fontFamily: 'Arial',
-            color: '#555555'
-        }).setOrigin(1, 1).setDepth(10);
+        this.add.text(
+            this.cameras.main.width - this.u(8),
+            this.cameras.main.height - this.u(8),
+            GameData.VERSION,
+            {
+                fontSize: this.font(10),
+                fontFamily: 'Arial',
+                color: '#555555'
+            }
+        ).setOrigin(1, 1).setDepth(10);
     }
 
     // ==================== CONTROLES ====================
@@ -472,17 +506,20 @@ class MenuScene extends Phaser.Scene {
 
         // Overlay
         const overlay = this.add.rectangle(
-            this.centerX, this.centerY, 640, 352, 0x000000, 0.95
+            this.centerX, this.centerY,
+            this.cameras.main.width,
+            this.cameras.main.height,
+            0x000000, 0.95
         ).setDepth(100);
         this.overlayElements.push(overlay);
 
         // Título
-        const title = this.add.text(this.centerX, 35, '⚙ DEV OPTIONS ⚙', {
-            fontSize: '20px',
+        const title = this.add.text(this.centerX, this.u(35), '⚙ DEV OPTIONS ⚙', {
+            fontSize: this.font(20),
             fontFamily: '"Press Start 2P", Arial',
             color: '#00ffaa',
             stroke: '#000000',
-            strokeThickness: 4
+            strokeThickness: this.u(4)
         }).setOrigin(0.5).setDepth(101);
         this.overlayElements.push(title);
 
@@ -491,7 +528,7 @@ class MenuScene extends Phaser.Scene {
             {
                 title: '✨ Efeitos Visuais',
                 color: '#00ffaa',
-                x: this.centerX - 155,
+                x: this.centerX - this.u(155),
                 items: [
                     { key: 'playerTrail', name: 'Rastro Sprite', desc: 'Cópias semi-transparentes' },
                     { key: 'neonLineTrail', name: 'Linha Neon', desc: 'Linha brilhante na trajetória' },
@@ -504,7 +541,7 @@ class MenuScene extends Phaser.Scene {
             {
                 title: '⚡ Mecânicas de Física',
                 color: '#ffaa00',
-                x: this.centerX + 155,
+                x: this.centerX + this.u(155),
                 items: [
                     { key: 'doubleJump', name: 'Double-Jump', desc: 'Pular novamente no ar' },
                     { key: 'waterPhysics', name: 'Física de Água', desc: 'Gravidade e movimento reduzidos' },
@@ -515,26 +552,26 @@ class MenuScene extends Phaser.Scene {
             }
         ];
 
-        const startY = 80;
-        // Com 6 itens numa coluna, 38 é o teto antes do último toggle colidir
+        const startY = this.u(80);
+        // Com 6 itens numa coluna, 38 (base) é o teto antes do último toggle colidir
         // com o texto de instruções no rodapé. A coluna está na capacidade
-        // máxima: um 7º item exige repaginar (3ª coluna não cabe em 640px).
-        const spacing = 38;
+        // máxima: um 7º item exige repaginar (3ª coluna não cabe na base 640px).
+        const spacing = this.u(38);
         let globalIndex = 0;
 
         columns.forEach((column) => {
             // Título da coluna
-            const colTitle = this.add.text(column.x, startY - 20, column.title, {
-                fontSize: '12px',
+            const colTitle = this.add.text(column.x, startY - this.u(20), column.title, {
+                fontSize: this.font(12),
                 fontFamily: '"Press Start 2P", Arial',
                 color: column.color,
                 stroke: '#000000',
-                strokeThickness: 2
+                strokeThickness: this.u(2)
             }).setOrigin(0.5).setDepth(101);
             this.overlayElements.push(colTitle);
 
             column.items.forEach((effect, itemIndex) => {
-                const y = startY + itemIndex * spacing + 20;
+                const y = startY + itemIndex * spacing + this.u(20);
                 const isEnabled = GameData.FEATURES[effect.key];
                 const currentIndex = globalIndex;
 
@@ -542,36 +579,38 @@ class MenuScene extends Phaser.Scene {
                 const toggleContainer = this.add.container(column.x, y).setDepth(101);
 
                 // Nome do efeito
-                const nameText = this.add.text(-110, -8, effect.name, {
-                    fontSize: '11px',
+                const nameText = this.add.text(this.u(-110), this.u(-8), effect.name, {
+                    fontSize: this.font(11),
                     fontFamily: '"Press Start 2P", Arial',
                     color: '#ffffff'
                 }).setOrigin(0, 0.5);
                 toggleContainer.add(nameText);
 
                 // Descrição
-                const descText = this.add.text(-110, 10, effect.desc, {
-                    fontSize: '9px',
+                const descText = this.add.text(this.u(-110), this.u(10), effect.desc, {
+                    fontSize: this.font(9),
                     fontFamily: 'Arial',
                     color: '#666666'
                 }).setOrigin(0, 0.5);
                 toggleContainer.add(descText);
 
                 // Botão toggle
-                const toggleBg = this.add.rectangle(100, 0, 50, 22, isEnabled ? 0x00ff00 : 0x333333)
-                    .setStrokeStyle(2, 0xffffff);
+                const toggleBg = this.add.rectangle(
+                    this.u(100), 0, this.u(50), this.u(22),
+                    isEnabled ? 0x00ff00 : 0x333333
+                ).setStrokeStyle(this.u(2), 0xffffff);
                 toggleContainer.add(toggleBg);
 
-                const toggleText = this.add.text(100, 0, isEnabled ? 'ON' : 'OFF', {
-                    fontSize: '9px',
+                const toggleText = this.add.text(this.u(100), 0, isEnabled ? 'ON' : 'OFF', {
+                    fontSize: this.font(9),
                     fontFamily: '"Press Start 2P", Arial',
                     color: isEnabled ? '#000000' : '#888888'
                 }).setOrigin(0.5);
                 toggleContainer.add(toggleText);
 
                 // Indicador de seleção
-                const selector = this.add.text(-130, 0, '▶', {
-                    fontSize: '14px',
+                const selector = this.add.text(this.u(-130), 0, '▶', {
+                    fontSize: this.font(14),
                     fontFamily: 'Arial',
                     color: column.color
                 }).setOrigin(0.5).setAlpha(currentIndex === 0 ? 1 : 0);
@@ -608,8 +647,8 @@ class MenuScene extends Phaser.Scene {
         const effectsHelp = isMobile
             ? '←→: Navegar | O: Alternar | X: Voltar'
             : '↑↓: Navegar | Enter: Alternar | ESC: Voltar';
-        const closeText = this.add.text(this.centerX, this.centerY + 145, effectsHelp, {
-            fontSize: '10px',
+        const closeText = this.add.text(this.centerX, this.centerY + this.u(145), effectsHelp, {
+            fontSize: this.font(10),
             fontFamily: 'Arial',
             color: '#aaaaaa'
         }).setOrigin(0.5).setDepth(101);
@@ -636,5 +675,10 @@ class MenuScene extends Phaser.Scene {
     // Limpeza ao sair da cena
     shutdown() {
         this.cleanup();
+        // Garante restore mesmo se o once('shutdown') não tiver sido registrado
+        this.restoreGameResolution();
     }
 }
+
+// Exporta globalmente
+window.MenuScene = MenuScene;

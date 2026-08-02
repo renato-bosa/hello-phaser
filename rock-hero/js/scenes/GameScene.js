@@ -315,9 +315,15 @@ class GameScene extends Phaser.Scene {
                 if (obj.properties) {
                     obj.properties.forEach(p => { objProps[p.name] = p.value; });
                 }
+                // Tiled: objeto com gid usa (x,y) no canto inferior-esquerdo;
+                // width/height podem ser > tile (redimensionar no editor).
+                const w = obj.width || 32;
+                const h = obj.height || 32;
                 movingPlatforms.push({
-                    x: obj.x + 16,
-                    y: obj.y - 16,
+                    x: obj.x + w / 2,
+                    y: obj.y - h / 2,
+                    width: w,
+                    height: h,
                     textureKey: tilesetName,
                     verticalBlocks: objProps['vertical-move_downward_in_blocks'] || 0,
                     horizontalBlocks: objProps['horizontal-move_right_in_blocks'] || 0,
@@ -782,8 +788,19 @@ class GameScene extends Phaser.Scene {
             const platform = this.movingPlatforms.create(p.x, p.y, p.textureKey);
             platform.body.allowGravity = false;
             platform.body.immovable = true;
-            platform.body.setSize(32, 6);
-            platform.body.setOffset(0, 26);
+
+            // Respeita width/height do Tiled (estica o tile 32×32).
+            // Hitbox: faixa fina na base do sprite (proporcional ao frame),
+            // escalada automaticamente pelo displaySize do Arcade.
+            const frameW = platform.frame.width;
+            const frameH = platform.frame.height;
+            const displayW = p.width || frameW;
+            const displayH = p.height || frameH;
+            platform.setDisplaySize(displayW, displayH);
+
+            const bodySrcH = Math.max(1, Math.round(frameH * (6 / 32)));
+            platform.body.setSize(frameW, bodySrcH);
+            platform.body.setOffset(0, frameH - bodySrcH);
             platform.body.checkCollision.down = false;
             platform.body.checkCollision.left = false;
             platform.body.checkCollision.right = false;
@@ -816,10 +833,50 @@ class GameScene extends Phaser.Scene {
 
             if (data.distanceY > 0) {
                 platform.body.velocity.y = (data.distanceY / 2) * omega * Math.sin(data.phase) * 1000;
+            } else {
+                platform.body.velocity.y = 0;
             }
             if (data.distanceX > 0) {
                 platform.body.velocity.x = (data.distanceX / 2) * omega * Math.sin(data.phase) * 1000;
+            } else {
+                platform.body.velocity.x = 0;
             }
+        });
+    }
+
+    /**
+     * Arcade não “cola” o jogador em plataformas móveis horizontais: o PlayerController
+     * redefine velocity.x todo frame. Se estiver em cima de uma plataforma, soma a
+     * velocidade dela (roda depois do playerController, como o auto-scroll).
+     */
+    _applyMovingPlatformCarry() {
+        const player = this.playerController?.player;
+        if (!player?.body || !this.movingPlatforms) return;
+
+        const upsideDown = GameData.isFeatureEnabled('upsideDown');
+        const standing = upsideDown
+            ? (player.body.touching.up || player.body.blocked.up)
+            : (player.body.touching.down || player.body.blocked.down);
+        if (!standing) return;
+
+        let carried = false;
+        this.movingPlatforms.children.iterate(platform => {
+            if (carried || !platform?.active || !platform.body) return;
+
+            const overlapX = player.body.right > platform.body.left
+                && player.body.left < platform.body.right;
+            if (!overlapX) return;
+
+            const playerEdge = upsideDown ? player.body.top : player.body.bottom;
+            const platformEdge = upsideDown ? platform.body.bottom : platform.body.top;
+            if (Math.abs(playerEdge - platformEdge) > 8) return;
+
+            player.body.velocity.x += platform.body.velocity.x;
+            // Vertical: ajuda a acompanhar plataforma que sobe/desce sem “soltar”
+            if (platform.body.velocity.y !== 0) {
+                player.body.velocity.y = platform.body.velocity.y;
+            }
+            carried = true;
         });
     }
 
@@ -1180,6 +1237,8 @@ class GameScene extends Phaser.Scene {
             this.windSystem.update(this.time.now);
         }
         this.playerController.update(delta);
+        // Plataforma móvel: carrega o jogador depois do input (senão velocity.x é sobrescrito)
+        this._applyMovingPlatformCarry();
         // Auto-scroll roda APÓS o playerController para sobrescrever o input com o empurrão
         if (GameData.isFeatureEnabled('autoScroll')) {
             this._updateAutoScroll(delta);

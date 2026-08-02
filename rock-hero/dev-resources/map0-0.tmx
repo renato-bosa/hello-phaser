@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="35" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="12" nextobjectid="16">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="35" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="16">
  <editorsettings>
   <export target="../assets/map0-1.json" format="json"/>
  </editorsettings>
@@ -122,8 +122,14 @@
  <tileset firstgid="78" name="grass-semi-dark" tilewidth="32" tileheight="32" tilecount="1" columns="1">
   <image source="../assets/spritesheets/grass-semi-dark.png" width="32" height="32"/>
  </tileset>
- <imagelayer id="10" name="bg_image_static" offsetx="-320" offsety="-192">
+ <tileset firstgid="79" name="fg_dec_grass_random_frame_grass" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/fg_dec_grass_random_frame_grass.png" width="64" height="96"/>
+ </tileset>
+ <imagelayer id="10" name="bg_image_static" offsetx="-32" offsety="-96">
   <image source="../assets/spritesheets/level-backgrounds/background1.png" width="1672" height="941"/>
+ </imagelayer>
+ <imagelayer id="12" name="bg_image_static" opacity="0.5" offsetx="-32" offsety="-96">
+  <image source="../assets/spritesheets/level-backgrounds/background2-day-0,75x.png" width="1254" height="706"/>
  </imagelayer>
  <layer id="5" name="bg" width="35" height="11" opacity="0.5">
   <data encoding="csv">
@@ -166,7 +172,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+79,79,79,79,79,79,79,79,79,79,0,0,0,79,79,79,79,79,79,79,79,79,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>

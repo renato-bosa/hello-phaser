@@ -295,14 +295,19 @@ class GameScene extends Phaser.Scene {
 
         this.bgLayer = map.createLayer('bg', allTilesets);
         this.setupAutoTileAnimations(map, this.bgLayer);
+        this.setupRandomFrameTiles(map, this.bgLayer);
 
         const bgDecoLayer = map.getLayer('bg_decoration');
         if (bgDecoLayer) {
             this.bgDecorationLayer = map.createLayer('bg_decoration', allTilesets);
             this.setupAutoTileAnimations(map, this.bgDecorationLayer);
+            this.setupRandomFrameTiles(map, this.bgDecorationLayer);
 
             const lavaBubblesTileset = map.tilesets.find(ts => ts.name === 'lava-bubbles-4fps');
-            if (lavaBubblesTileset && !this.getTilesetProperties(lavaBubblesTileset).fps) {
+            // Fallback legado se o nome não trouxer -Nfps e não houver prop fps
+            if (lavaBubblesTileset
+                && !this.getTilesetProperties(lavaBubblesTileset).fps
+                && !/-\d+fps$/i.test(lavaBubblesTileset.name || '')) {
                 this.setupLavaBubblesAnimation(this.bgDecorationLayer, lavaBubblesTileset);
             }
         }
@@ -310,6 +315,8 @@ class GameScene extends Phaser.Scene {
         this.solidsLayer = map.createLayer('solids', allTilesets);
         this.solidsLayer.setCollisionByProperty({ collider: true });
         this.solidsLayer.setCollisionByExclusion([-1, 0]);
+        this.setupRandomFrameTiles(map, this.solidsLayer);
+        this.setupAutoTileAnimations(map, this.solidsLayer);
 
         // Arcade debug não desenha tiles — renderDebug mostra os colliders da layer
         if (this.physics.world.drawDebug) {
@@ -326,8 +333,11 @@ class GameScene extends Phaser.Scene {
         if (fgDecoLayer) {
             this.fgDecorationLayer = map.createLayer('fg_decoration', allTilesets);
             this.fgDecorationLayer.setDepth(GC.DEPTH.FG_DECORATION);
+            this.setupRandomFrameTiles(map, this.fgDecorationLayer);
+            this.setupAutoTileAnimations(map, this.fgDecorationLayer);
         }
 
+        // lava-roxa-animated (sem -Nfps no nome): mantém o ciclo legado a 5 fps
         const lavaAnimatedTileset = map.tilesets.find(ts => ts.name === 'lava-roxa-animated');
         if (lavaAnimatedTileset) {
             this.setupTileAnimations(this.solidsLayer, lavaAnimatedTileset);
@@ -341,11 +351,13 @@ class GameScene extends Phaser.Scene {
      * Cria sprites a partir das Image Layers do Tiled.
      * Phaser não desenha imagelayer automaticamente — só expõe metadados em map.images
      * (e no JSON bruto). Texturas são pré-carregadas em setupTilesetAutoLoader.
+     *
+     * Suporta repeatx / repeaty do Tiled via TileSprite.
      */
     createMapImageLayers(map) {
         this.mapImageLayers = [];
 
-        // Preferir dados brutos do JSON (tem offsetx/offsety/opacity/visible confiáveis)
+        // Preferir dados brutos do JSON (tem offsetx/offsety/opacity/visible/repeat confiáveis)
         const mapKey = map.key || GameData.LEVELS[this.currentLevel]?.key;
         const raw = mapKey ? this.cache.tilemap.get(mapKey) : null;
         const rawLayers = raw?.data?.layers || [];
@@ -362,7 +374,11 @@ class GameScene extends Phaser.Scene {
                 offsetx: img.offsetx,
                 offsety: img.offsety,
                 opacity: img.opacity,
-                visible: img.visible
+                visible: img.visible,
+                repeatx: img.repeatx,
+                repeaty: img.repeaty,
+                imagewidth: img.imagewidth,
+                imageheight: img.imageheight
             }));
 
         sources.forEach(layer => {
@@ -376,22 +392,47 @@ class GameScene extends Phaser.Scene {
 
             const x = (layer.x || 0) + (layer.offsetx || 0);
             const y = (layer.y || 0) + (layer.offsety || 0);
+            const tex = this.textures.get(texKey);
+            const src = tex.getSourceImage();
+            const imgW = layer.imagewidth || src.width || 0;
+            const imgH = layer.imageheight || src.height || 0;
+            if (imgW <= 0 || imgH <= 0) return;
 
-            const sprite = this.add.image(x, y, texKey)
-                .setOrigin(0, 0)
-                .setDepth(-10)
+            const repeatX = !!layer.repeatx;
+            const repeatY = !!layer.repeaty;
+
+            let display;
+            if (repeatX || repeatY) {
+                // Cobre o mapa a partir do offset; TileSprite repete a textura
+                const coverW = repeatX
+                    ? Math.max(imgW, map.widthInPixels - x)
+                    : imgW;
+                const coverH = repeatY
+                    ? Math.max(imgH, map.heightInPixels - y)
+                    : imgH;
+
+                display = this.add.tileSprite(x, y, coverW, coverH, texKey)
+                    .setOrigin(0, 0)
+                    .setDepth(-10);
+            } else {
+                display = this.add.image(x, y, texKey)
+                    .setOrigin(0, 0)
+                    .setDepth(-10);
+            }
+
+            display
                 .setAlpha(layer.opacity != null ? layer.opacity : 1)
                 .setVisible(layer.visible !== false);
 
             // Parallax do Tiled (se presente)
             if (layer.parallaxx != null || layer.parallaxy != null) {
-                sprite.setScrollFactor(
+                display.setScrollFactor(
                     layer.parallaxx != null ? layer.parallaxx : 1,
                     layer.parallaxy != null ? layer.parallaxy : 1
                 );
             }
 
-            this.mapImageLayers.push(sprite);
+            this.mapImageLayers.push(display);
         });
     }
 
@@ -1124,29 +1165,41 @@ class GameScene extends Phaser.Scene {
     }
 
     /**
-     * Configura animações automáticas para tiles baseado em propriedades do Tiled
-     * (fps e frames_random)
+     * Anima tilesets na layer.
+     * FPS: propriedade Tiled `fps` OU sufixo no nome `-Nfps` (ex.: lava-roxa-profunda-6fps).
+     * frames_random: defasa o ciclo por tile (já usado nos blinkings).
      */
     setupAutoTileAnimations(map, layer) {
         if (!layer) return;
 
         const animationsByFps = new Map();
-        const levelConfig = GameData.LEVELS[GameData.state.currentLevel];
-        const mapKey = levelConfig ? levelConfig.key : 'map1';
-        const rawMapData = this.cache.tilemap.get(mapKey);
-        const rawTilesets = rawMapData?.data?.tilesets || [];
 
         map.tilesets.forEach((tileset, index) => {
+            if (!tileset?.name) return;
+            // random_frame = estático com frame sorteado; não anima
+            if (tileset.name.includes('random_frame')) return;
+            // Legado dedicado: lava-roxa-animated usa setupTileAnimations
+            if (tileset.name === 'lava-roxa-animated') return;
+
+            const rawMapData = this.cache.tilemap.get(map.key || GameData.LEVELS[this.currentLevel]?.key);
+            const rawTilesets = rawMapData?.data?.tilesets || [];
             const rawTileset = rawTilesets.find(ts => ts.name === tileset.name) || rawTilesets[index];
             const props = this.getTilesetProperties(rawTileset || tileset);
-            const fps = props.fps || 0;
-            const framesRandom = props.frames_random || 0;
 
+            const nameFpsMatch = tileset.name.match(/-(\d+)fps$/i);
+            const fps = props.fps || (nameFpsMatch ? parseInt(nameFpsMatch[1], 10) : 0);
             if (fps <= 0) return;
 
-            const frameCount = rawTileset?.tilecount || tileset.total || 1;
-            const delay = Math.round(1000 / fps);
+            const framesRandom = props.frames_random || 0;
+            const frameCount = this._getTilesetFrameCountFromTexture(tileset, map.tilesets[index + 1]);
+            if (frameCount <= 1) return;
 
+            tileset.total = Math.max(tileset.total || 0, frameCount);
+            if (tileset.columns > 0) {
+                tileset.rows = Math.max(tileset.rows || 0, Math.ceil(frameCount / tileset.columns));
+            }
+
+            const delay = Math.round(1000 / fps);
             if (!animationsByFps.has(delay)) {
                 animationsByFps.set(delay, []);
             }
@@ -1154,8 +1207,8 @@ class GameScene extends Phaser.Scene {
             animationsByFps.get(delay).push({
                 name: tileset.name,
                 firstGid: tileset.firstgid,
-                frameCount: frameCount,
-                framesRandom: framesRandom
+                frameCount,
+                framesRandom
             });
         });
 
@@ -1199,6 +1252,85 @@ class GameScene extends Phaser.Scene {
                 }
             });
         });
+    }
+
+    /**
+     * Decoração estática com variação: tilesets cujo nome contém `random_frame`
+     * (ex.: fg_dec_grass_random_frame_grass) recebem um frame aleatório por
+     * célula pintada — sem animação.
+     *
+     * Sempre usa todos os frames da textura (cols×rows), não o tilecount
+     * possivelmente desatualizado do JSON do Tiled.
+     */
+    setupRandomFrameTiles(map, layer) {
+        if (!layer) return;
+
+        const randomTilesets = [];
+        map.tilesets.forEach((tileset, index) => {
+            if (!tileset?.name || !tileset.name.includes('random_frame')) return;
+
+            const frameCount = this._getTilesetFrameCountFromTexture(tileset, map.tilesets[index + 1]);
+            if (frameCount <= 1) return;
+
+            // Garante que o Phaser aceite índices além do tilecount do JSON
+            tileset.total = Math.max(tileset.total || 0, frameCount);
+            if (tileset.columns > 0) {
+                tileset.rows = Math.max(tileset.rows || 0, Math.ceil(frameCount / tileset.columns));
+            }
+
+            randomTilesets.push({
+                firstGid: tileset.firstgid,
+                frameCount
+            });
+        });
+
+        if (randomTilesets.length === 0) return;
+
+        layer.forEachTile(tile => {
+            if (!tile || tile.index <= 0) return;
+            for (let i = 0; i < randomTilesets.length; i++) {
+                const ts = randomTilesets[i];
+                if (tile.index >= ts.firstGid && tile.index < ts.firstGid + ts.frameCount) {
+                    tile.index = ts.firstGid + Math.floor(Math.random() * ts.frameCount);
+                    break;
+                }
+            }
+        });
+    }
+
+    /**
+     * Conta frames a partir do tamanho real da textura (tileWidth × tileHeight).
+     * Limita pelo firstgid do próximo tileset para não invadir o espaço de GIDs.
+     */
+    _getTilesetFrameCountFromTexture(tileset, nextTileset) {
+        const tw = tileset.tileWidth || 32;
+        const th = tileset.tileHeight || 32;
+
+        let cols = 0;
+        let rows = 0;
+
+        const texKey = tileset.image?.key || tileset.name;
+        if (texKey && this.textures.exists(texKey)) {
+            const src = this.textures.get(texKey).getSourceImage();
+            if (src && src.width && src.height) {
+                cols = Math.floor(src.width / tw);
+                rows = Math.floor(src.height / th);
+            }
+        }
+
+        // Fallback: metadados do tileset Phaser / JSON
+        if (cols * rows <= 0) {
+            cols = tileset.columns || 1;
+            rows = tileset.rows || Math.ceil((tileset.total || 1) / cols);
+        }
+
+        let frameCount = Math.max(1, cols * rows);
+
+        if (nextTileset && nextTileset.firstgid > tileset.firstgid) {
+            frameCount = Math.min(frameCount, nextTileset.firstgid - tileset.firstgid);
+        }
+
+        return frameCount;
     }
 
     /**

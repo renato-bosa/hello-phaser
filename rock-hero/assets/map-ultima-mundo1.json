@@ -238,14 +238,14 @@
                         {
                          "name":"vertical-move_downward_in_blocks",
                          "type":"int",
-                         "value":4
+                         "value":6
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":96,
                  "x":416,
-                 "y":288
+                 "y":224
                 }],
          "opacity":1,
          "type":"objectgroup",

@@ -34,7 +34,7 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 484,
+                "x": 483.99999999999994,
                 "y": 390.6666666666667
             }
         },
@@ -94,8 +94,8 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.5,
             "selectedLayer": 4,
@@ -289,7 +289,7 @@
             "scale": 0.423046875,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 319.1135734072022,
+                "x": 319.11357340720224,
                 "y": 174.92151431209606
             }
         },
@@ -381,8 +381,8 @@
         },
         "dev-resources/map-16.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.25,
             "selectedLayer": 4,
@@ -462,14 +462,14 @@
         },
         "dev-resources/map-17.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
-            "scale": 0.75,
-            "selectedLayer": 4,
+            "scale": 1.0966,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 1978.6666666666665,
-                "y": 2033.333333333333
+                "x": 913.7333576509209,
+                "y": 1405.252598942185
             }
         },
         "dev-resources/map-17.tmx#1up": {
@@ -527,6 +527,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-17.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-17.tmx#lava-roxa-profunda-6fps": {
             "scaleInDock": 1
         },
         "dev-resources/map-17.tmx#mushroom-purple": {
@@ -1130,11 +1133,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.75,
-            "selectedLayer": 2,
+            "scale": 0.1977,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 1962.6666666666665,
-                "y": 481.33333333333326
+                "x": 505.8168942842692,
+                "y": 1476.9853313100657
             }
         },
         "dev-resources/map-4--big-jumps.tmx#abstract-blue": {
@@ -1626,11 +1629,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 1.5,
-            "selectedLayer": 3,
+            "scale": 1.8447,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 738,
-                "y": 136.66666666666663
+                "x": 477.0423375074537,
+                "y": 248.2788529300157
             }
         },
         "dev-resources/map-ultima-mundo1.tmx#abstract-blue": {
@@ -1680,6 +1683,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-ultima-mundo1.tmx#plataforma-deslizante-h": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-ultima-mundo1.tmx#plataforma-deslizante-v": {
             "scaleInDock": 1
         },
         "dev-resources/map-ultima-mundo1.tmx#sapo-tomate-6fps": {
@@ -1752,9 +1758,9 @@
                 8
             ],
             "scale": 1.5,
-            "selectedLayer": 4,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 1042,
+                "x": 180,
                 "y": 275.3333333333333
             }
         },
@@ -1780,6 +1786,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map0-0.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map0-0.tmx#fg_dec_grass_random_frame_grass": {
             "scaleInDock": 1
         },
         "dev-resources/map0-0.tmx#grama noturna": {
@@ -1887,18 +1896,18 @@
     "project": "rock-hero.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "dev-resources/map.tmx",
+        "dev-resources/map0-0.tmx",
         "dev-resources/map0-1.tmx",
-        "dev-resources/map-10.tmx",
-        "dev-resources/map-2--expansion and speed.tmx",
-        "dev-resources/map-ultima-mundo1.tmx",
-        "dev-resources/map-12.tmx",
-        "dev-resources/map-13.tmx",
-        "dev-resources/map-11.tmx",
-        "dev-resources/map-21-nuvens.tmx",
-        "dev-resources/map-4--big-jumps.tmx",
-        "dev-resources/map-14.tmx",
+        "dev-resources/map-17.tmx",
+        "dev-resources/map-16.tmx",
         "dev-resources/map-15.tmx",
-        "dev-resources/map-16.tmx"
+        "dev-resources/map-14.tmx",
+        "dev-resources/map-13.tmx",
+        "dev-resources/map-12.tmx",
+        "dev-resources/map-11.tmx",
+        "dev-resources/map-10.tmx",
+        "dev-resources/map-ultima-mundo1.tmx"
     ],
     "tileset.embedInMap": true
 }

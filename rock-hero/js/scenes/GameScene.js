@@ -25,36 +25,123 @@ class GameScene extends Phaser.Scene {
     }
 
     preload() {
+        this._createLoadingBar();
         this.setupTilesetAutoLoader();
 
-        GameData.LEVELS.forEach(level => {
-            this.load.tilemapTiledJSON(level.key, GameData.assetUrl(level.file));
-        });
+        // Só o mapa da fase atual (tilesets / image layers entram via auto-loader)
+        const level = GameData.LEVELS[this.currentLevel];
+        if (level) {
+            if (this.cache.tilemap.exists(level.key)) {
+                this._enqueueMapDependencies(level.key);
+            } else {
+                this.load.tilemapTiledJSON(level.key, GameData.assetUrl(level.file));
+            }
+        }
 
-        this.load.spritesheet('star', GameData.assetUrl('assets/spritesheets/yellow-star-animated.png'), {
-            frameWidth: 32, frameHeight: 32
-        });
+        this._loadSheetIfMissing('star', 'assets/spritesheets/yellow-star-animated.png', 32, 32);
 
-        GameData.loadCharacterSprites(this);
+        // Personagem selecionado (não a lista inteira)
+        const charId = GameData.state?.selectedCharacter || 'vocalista';
+        GameData.loadCharacterSprites(this, charId);
 
-        this.load.image('player-trail', GameData.assetUrl('assets/spritesheets/player-trail1.png'));
+        this._loadImageIfMissing('player-trail', 'assets/spritesheets/player-trail1.png');
+        this._loadSheetIfMissing('sapo-tomate', 'assets/spritesheets/sapo-tomate-6fps.png', 32, 32);
+        this._loadSheetIfMissing('sapo-verde', 'assets/spritesheets/sapo-verde-6fps.png', 32, 32);
+        this._loadSheetIfMissing('seahorse', 'assets/spritesheets/Cavalo marinho.png', 32, 32);
+        this._loadSheetIfMissing('boneco', 'assets/spritesheets/Boneco-14fps.png', 32, 32);
+        this._loadImageIfMissing('red-heart', 'assets/spritesheets/red-heart.png');
 
-        this.load.spritesheet('sapo-tomate', GameData.assetUrl('assets/spritesheets/sapo-tomate-6fps.png'), {
-            frameWidth: 32, frameHeight: 32
-        });
-        this.load.spritesheet('sapo-verde', GameData.assetUrl('assets/spritesheets/sapo-verde-6fps.png'), {
-            frameWidth: 32, frameHeight: 32
-        });
-        this.load.spritesheet('seahorse', GameData.assetUrl('assets/spritesheets/Cavalo marinho.png'), {
-            frameWidth: 32, frameHeight: 32
-        });
-        this.load.spritesheet('boneco', GameData.assetUrl('assets/spritesheets/Boneco-14fps.png'), {
-            frameWidth: 32, frameHeight: 32
-        });
-        this.load.image('red-heart', GameData.assetUrl('assets/spritesheets/red-heart.png'));
-
-        // Trilha sonora — registra faixas MP3 no cache do Phaser
+        // Trilha — só faixas ainda ausentes no cache
         MusicManager.preload(this);
+    }
+
+    _loadImageIfMissing(key, path) {
+        if (this.textures.exists(key)) return;
+        this.load.image(key, GameData.assetUrl(path));
+    }
+
+    _loadSheetIfMissing(key, path, frameWidth, frameHeight) {
+        if (this.textures.exists(key)) return;
+        this.load.spritesheet(key, GameData.assetUrl(path), { frameWidth, frameHeight });
+    }
+
+    /**
+     * UI de progresso durante o preload (a câmera fica preta sem isso).
+     */
+    _createLoadingBar() {
+        const width = this.scale.width || 640;
+        const height = this.scale.height || 352;
+        const cx = width / 2;
+        const cy = height / 2;
+        const barW = Math.min(360, width * 0.7);
+        const barH = 14;
+
+        this.cameras.main.setBackgroundColor(0x0a0a1a);
+
+        this._loadingUi = [];
+
+        this._loadingUi.push(
+            this.add.rectangle(cx, cy, barW + 8, barH + 8, 0x1a1a2e)
+                .setStrokeStyle(2, 0x444466)
+                .setScrollFactor(0)
+                .setDepth(1000)
+        );
+
+        this._loadingUi.push(
+            this.add.rectangle(cx, cy, barW, barH, 0x0a0a14)
+                .setScrollFactor(0)
+                .setDepth(1001)
+        );
+
+        const bar = this.add.rectangle(cx - barW / 2, cy, 1, barH, 0x00cc66)
+            .setOrigin(0, 0.5)
+            .setScrollFactor(0)
+            .setDepth(1002);
+        this._loadingUi.push(bar);
+
+        this._loadingUi.push(
+            this.add.text(cx, cy - 28, 'Carregando...', {
+                fontFamily: '"Press Start 2P", monospace',
+                fontSize: '10px',
+                color: '#aaaaaa'
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(1003)
+        );
+
+        const level = GameData.LEVELS[this.currentLevel];
+        if (level?.name) {
+            this._loadingUi.push(
+                this.add.text(cx, cy + 28, level.name, {
+                    fontFamily: 'Arial',
+                    fontSize: '12px',
+                    color: '#666688'
+                }).setOrigin(0.5).setScrollFactor(0).setDepth(1003)
+            );
+        }
+
+        this._loadingBar = bar;
+        this._loadingBarWidth = barW;
+
+        this.load.on('progress', this._onLoadProgress, this);
+        this.load.once('complete', this._destroyLoadingBar, this);
+    }
+
+    _onLoadProgress(value) {
+        if (this._loadingBar && this._loadingBar.active) {
+            this._loadingBar.width = Math.max(1, this._loadingBarWidth * value);
+        }
+    }
+
+    _destroyLoadingBar() {
+        this.load.off('progress', this._onLoadProgress, this);
+        this.load.off('complete', this._destroyLoadingBar, this);
+
+        if (this._loadingUi) {
+            this._loadingUi.forEach(obj => {
+                if (obj && obj.destroy) obj.destroy();
+            });
+            this._loadingUi = null;
+        }
+        this._loadingBar = null;
     }
 
     _ensureBubbleTexture() {
@@ -73,46 +160,73 @@ class GameScene extends Phaser.Scene {
     }
 
     /**
-     * Configura o carregamento automático de tilesets usando eventos do Phaser Loader.
-     * Quando cada mapa JSON termina de carregar, extrai os tilesets e adiciona à fila.
+     * Enfileira tilesets e image layers de um mapa já no cache (ou recém-carregado).
      */
-    setupTilesetAutoLoader() {
-        const loadedTilesets = new Set();
+    _enqueueMapDependencies(mapKey) {
+        const tilemapData = this.cache.tilemap.get(mapKey);
+        if (!tilemapData || !tilemapData.data) return;
+
         const TILESET_ALIASES = { 'trampoline-thick': 'trampoline' };
 
-        this.load.on('filecomplete', (key, type, data) => {
-            if (type !== 'tilemapJSON') return;
-
-            const tilemapData = this.cache.tilemap.get(key);
-            if (!tilemapData || !tilemapData.data || !tilemapData.data.tilesets) return;
-
+        if (tilemapData.data.tilesets) {
             tilemapData.data.tilesets.forEach(ts => {
-                if (loadedTilesets.has(ts.name)) return;
-                loadedTilesets.add(ts.name);
-
-                if (ts.image) {
-                    const imagePath = 'assets/' + ts.image.replace(/\\/g, '/');
-                    // Tilesets nomeados com sufixo "-Nfps" (e mais de um tile) são carregados
-                    // como spritesheet, permitindo animar sprites criados a partir deles.
-                    // O tilemap continua renderizando normalmente — addTilesetImage usa a textura base.
-                    const isAnimated = /-(\d+)fps$/.test(ts.name) && ts.tilecount > 1;
-                    if (isAnimated) {
-                        this.load.spritesheet(ts.name, GameData.assetUrl(imagePath), {
-                            frameWidth: ts.tilewidth,
-                            frameHeight: ts.tileheight
-                        });
-                    } else {
-                        this.load.image(ts.name, GameData.assetUrl(imagePath));
-                    }
-                    if (TILESET_ALIASES[ts.name]) {
+                if (!ts.image) return;
+                if (this.textures.exists(ts.name)) {
+                    if (TILESET_ALIASES[ts.name] && !this.textures.exists(TILESET_ALIASES[ts.name])) {
+                        const imagePath = 'assets/' + ts.image.replace(/\\/g, '/');
                         this.load.image(TILESET_ALIASES[ts.name], GameData.assetUrl(imagePath));
                     }
+                    return;
+                }
+
+                const imagePath = 'assets/' + ts.image.replace(/\\/g, '/');
+                const isAnimated = /-(\d+)fps$/.test(ts.name) && ts.tilecount > 1;
+                if (isAnimated) {
+                    this.load.spritesheet(ts.name, GameData.assetUrl(imagePath), {
+                        frameWidth: ts.tilewidth,
+                        frameHeight: ts.tileheight
+                    });
+                } else {
+                    this.load.image(ts.name, GameData.assetUrl(imagePath));
+                }
+                if (TILESET_ALIASES[ts.name] && !this.textures.exists(TILESET_ALIASES[ts.name])) {
+                    this.load.image(TILESET_ALIASES[ts.name], GameData.assetUrl(imagePath));
                 }
             });
-        });
+        }
+
+        if (Array.isArray(tilemapData.data.layers)) {
+            tilemapData.data.layers.forEach(layer => {
+                if (layer.type !== 'imagelayer' || !layer.image) return;
+                const imagePath = 'assets/' + String(layer.image).replace(/\\/g, '/');
+                const texKey = 'tiled-img:' + imagePath;
+                if (this.textures.exists(texKey)) return;
+                this.load.image(texKey, GameData.assetUrl(imagePath));
+            });
+        }
+    }
+
+    /**
+     * Auto-loader: quando o JSON do mapa atual termina, enfileira PNGs dele.
+     * Um único listener (substitui o anterior) para não acumular entre fases.
+     */
+    setupTilesetAutoLoader() {
+        if (this._onTilemapFileComplete) {
+            this.load.off('filecomplete', this._onTilemapFileComplete);
+        }
+
+        this._onTilemapFileComplete = (key, type) => {
+            if (type !== 'tilemapJSON') return;
+            this._enqueueMapDependencies(key);
+        };
+
+        this.load.on('filecomplete', this._onTilemapFileComplete);
     }
 
     create() {
+        // Garante limpeza se o 'complete' do loader não disparou (cache quente / 0 arquivos)
+        this._destroyLoadingBar();
+
         this.currentView = 'countdown';
         this.hasWon = false;
         this.overlayElements = [];
@@ -176,6 +290,9 @@ class GameScene extends Phaser.Scene {
             if (tileset) allTilesets.push(tileset);
         });
 
+        // Image Layers do Tiled (atrás das tile layers)
+        this.createMapImageLayers(map);
+
         this.bgLayer = map.createLayer('bg', allTilesets);
         this.setupAutoTileAnimations(map, this.bgLayer);
 
@@ -218,6 +335,64 @@ class GameScene extends Phaser.Scene {
 
         this.parseMapObjects(map);
         this.setupCamera(map, levelConfig);
+    }
+
+    /**
+     * Cria sprites a partir das Image Layers do Tiled.
+     * Phaser não desenha imagelayer automaticamente — só expõe metadados em map.images
+     * (e no JSON bruto). Texturas são pré-carregadas em setupTilesetAutoLoader.
+     */
+    createMapImageLayers(map) {
+        this.mapImageLayers = [];
+
+        // Preferir dados brutos do JSON (tem offsetx/offsety/opacity/visible confiáveis)
+        const mapKey = map.key || GameData.LEVELS[this.currentLevel]?.key;
+        const raw = mapKey ? this.cache.tilemap.get(mapKey) : null;
+        const rawLayers = raw?.data?.layers || [];
+        const imageLayers = rawLayers.filter(l => l.type === 'imagelayer' && l.image);
+
+        // Fallback: map.images do Phaser
+        const sources = imageLayers.length > 0
+            ? imageLayers
+            : (map.images || []).map(img => ({
+                name: img.name,
+                image: img.image,
+                x: img.x,
+                y: img.y,
+                offsetx: img.offsetx,
+                offsety: img.offsety,
+                opacity: img.opacity,
+                visible: img.visible
+            }));
+
+        sources.forEach(layer => {
+            if (!layer.image) return;
+            const imagePath = 'assets/' + String(layer.image).replace(/\\/g, '/');
+            const texKey = 'tiled-img:' + imagePath;
+            if (!this.textures.exists(texKey)) {
+                console.warn(`Image layer "${layer.name}": textura não carregada (${texKey})`);
+                return;
+            }
+
+            const x = (layer.x || 0) + (layer.offsetx || 0);
+            const y = (layer.y || 0) + (layer.offsety || 0);
+
+            const sprite = this.add.image(x, y, texKey)
+                .setOrigin(0, 0)
+                .setDepth(-10)
+                .setAlpha(layer.opacity != null ? layer.opacity : 1)
+                .setVisible(layer.visible !== false);
+
+            // Parallax do Tiled (se presente)
+            if (layer.parallaxx != null || layer.parallaxy != null) {
+                sprite.setScrollFactor(
+                    layer.parallaxx != null ? layer.parallaxx : 1,
+                    layer.parallaxy != null ? layer.parallaxy : 1
+                );
+            }
+
+            this.mapImageLayers.push(sprite);
+        });
     }
 
     parseMapObjects(map) {
@@ -1658,6 +1833,12 @@ class GameScene extends Phaser.Scene {
         MusicManager.stop();
         this.physics.world.gravity.y = 800;
         GameData.levelFeatureOverrides = null;
+
+        if (this._onTilemapFileComplete) {
+            this.load.off('filecomplete', this._onTilemapFileComplete);
+            this._onTilemapFileComplete = null;
+        }
+        this.load.off('progress', this._onLoadProgress, this);
 
         if (this._oscillationTimer) {
             this._oscillationTimer.remove(false);

@@ -58,6 +58,7 @@ const SpriteLoader = {
             Object.values(character.sprites).forEach(sprite => {
                 if (!sprite || loadedKeys.has(sprite.key)) return;
                 loadedKeys.add(sprite.key);
+                if (scene.textures.exists(sprite.key)) return;
 
                 scene.load.spritesheet(sprite.key, GameState.assetUrl(sprite.file), {
                     frameWidth: sprite.frameWidth,

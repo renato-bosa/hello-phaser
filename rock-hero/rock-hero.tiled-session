@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-ultima-mundo1.tmx",
+    "activeFile": "dev-resources/map-22-octopus.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         ".",
@@ -34,8 +34,8 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 464,
-                "y": 303.33333333333326
+                "x": 463.99999999999994,
+                "y": 302.6666666666667
             }
         },
         "dev-resources/map-10.tmx#Cavalo marinho": {
@@ -1020,6 +1020,117 @@
         "dev-resources/map-21-nuvens.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-22-octopus.tmx": {
+            "expandedObjectLayers": [
+                10,
+                8
+            ],
+            "scale": 0.33,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 715.151515151515,
+                "y": 548.4848484848485
+            }
+        },
+        "dev-resources/map-22-octopus.tmx#1up": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#Areia": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#Boneco-14fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#ceu-azul-medio": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#fg_dec_grass_random_frame_grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#grama noturna": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#green-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#nuvem-continuacao": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#nuvem-sorriso": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#nuvemzita": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#octopus": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-22-octopus.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-3--desafio do luigi.tmx": {
             "expandedObjectLayers": [
                 8
@@ -1712,7 +1823,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 320,
-                "y": 175.3333333333333
+                "y": 174.66666666666669
             }
         },
         "dev-resources/map.tmx#abstract-blue": {
@@ -1833,7 +1944,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 336,
-                "y": 191.3333333333333
+                "y": 190.66666666666669
             }
         },
         "dev-resources/map0-1.tmx#abstract-blue": {
@@ -1899,7 +2010,8 @@
         "dev-resources/map0-1.tmx",
         "dev-resources/map-10.tmx",
         "dev-resources/map.tmx",
-        "dev-resources/map0-0.tmx"
+        "dev-resources/map0-0.tmx",
+        "dev-resources/map-22-octopus.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
@@ -1907,15 +2019,15 @@
         "dev-resources/map-2--expansion and speed.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-4--big-jumps.tmx",
-        "dev-resources/map0-0.tmx",
-        "dev-resources/map.tmx",
-        "dev-resources/map-10.tmx",
-        "dev-resources/map0-1.tmx",
         "dev-resources/map-ultima-mundo1.tmx",
+        "dev-resources/map0-1.tmx",
+        "dev-resources/map-10.tmx",
+        "dev-resources/map.tmx",
+        "dev-resources/map0-0.tmx",
+        "dev-resources/map-22-octopus.tmx",
         "dev-resources/map-17.tmx",
         "dev-resources/map-16.tmx",
-        "dev-resources/map-15.tmx",
-        "dev-resources/map-14.tmx"
+        "dev-resources/map-15.tmx"
     ],
     "tileset.embedInMap": true
 }

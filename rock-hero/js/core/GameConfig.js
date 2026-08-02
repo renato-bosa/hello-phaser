@@ -282,7 +282,7 @@ const GameConfig = {
             id: 4,
             name: 'Mundo 4',
             subtitle: 'Mecânicas Experimentais',
-            levels: [15, 16, 17],
+            levels: [15, 16, 17, 18],
             rescuedCharacter: 'vocalista',
             celebrationMessage: 'Mecânicas dominadas!',
             theme: 'special',
@@ -518,7 +518,7 @@ const GameConfig = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 370, y: 200 },
+            mapPosition: { x: 280, y: 200 },
             connectsTo: [17],
             features: { autoScroll: true }
         },
@@ -529,9 +529,19 @@ const GameConfig = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 560, y: 200 },
-            connectsTo: [],
+            mapPosition: { x: 440, y: 200 },
+            connectsTo: [18],
             features: { wind: true }
+        },
+        {
+            key: 'map22',
+            file: 'assets/map-22-octopus.json',
+            name: 'Mar do Polvo',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 4,
+            mapPosition: { x: 580, y: 200 },
+            connectsTo: []
         }
     ],
 

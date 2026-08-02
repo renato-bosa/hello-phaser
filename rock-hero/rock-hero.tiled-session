@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map-ultima-mundo1.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -28,14 +28,14 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 483.99999999999994,
-                "y": 390.6666666666667
+                "x": 464,
+                "y": 303.33333333333326
             }
         },
         "dev-resources/map-10.tmx#Cavalo marinho": {
@@ -733,8 +733,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1440,
-                "y": 478
+                "x": 1470,
+                "y": 611
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#1up": {
@@ -1027,8 +1027,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1346,
-                "y": 480
+                "x": 1344,
+                "y": 479
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
@@ -1136,8 +1136,8 @@
             "scale": 0.1977,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 505.8168942842692,
-                "y": 1476.9853313100657
+                "x": 1441.5781487101672,
+                "y": 477.9969650986343
             }
         },
         "dev-resources/map-4--big-jumps.tmx#abstract-blue": {
@@ -1629,11 +1629,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 1.8447,
-            "selectedLayer": 4,
+            "scale": 0.5,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 477.0423375074537,
-                "y": 248.2788529300157
+                "x": 366,
+                "y": 268
             }
         },
         "dev-resources/map-ultima-mundo1.tmx#abstract-blue": {
@@ -1695,7 +1695,8 @@
             "scaleInDock": 1
         },
         "dev-resources/map-ultima-mundo1.tmx#spikes": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "dev-resources/map-ultima-mundo1.tmx#still-hero (2)": {
             "scaleInDock": 1
@@ -1711,7 +1712,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 320,
-                "y": 174.66666666666669
+                "y": 175.3333333333333
             }
         },
         "dev-resources/map.tmx#abstract-blue": {
@@ -1757,11 +1758,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 1.5,
-            "selectedLayer": 3,
+            "scale": 0.33,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 180,
-                "y": 275.3333333333333
+                "x": 421.21212121212113,
+                "y": 548.4848484848485
             }
         },
         "dev-resources/map0-0.tmx#abstract-blue": {
@@ -1832,7 +1833,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 336,
-                "y": 190.66666666666669
+                "y": 191.3333333333333
             }
         },
         "dev-resources/map0-1.tmx#abstract-blue": {
@@ -1891,23 +1892,30 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-ultima-mundo1.tmx"
+        "dev-resources/map-2--expansion and speed.tmx",
+        "dev-resources/map-3--desafio do luigi.tmx",
+        "dev-resources/map-4--big-jumps.tmx",
+        "dev-resources/map-ultima-mundo1.tmx",
+        "dev-resources/map0-1.tmx",
+        "dev-resources/map-10.tmx",
+        "dev-resources/map.tmx",
+        "dev-resources/map0-0.tmx"
     ],
     "project": "rock-hero.tiled-project",
-    "property.type": "int",
+    "property.type": "bool",
     "recentFiles": [
-        "dev-resources/map.tmx",
+        "dev-resources/map-2--expansion and speed.tmx",
+        "dev-resources/map-3--desafio do luigi.tmx",
+        "dev-resources/map-4--big-jumps.tmx",
         "dev-resources/map0-0.tmx",
+        "dev-resources/map.tmx",
+        "dev-resources/map-10.tmx",
         "dev-resources/map0-1.tmx",
+        "dev-resources/map-ultima-mundo1.tmx",
         "dev-resources/map-17.tmx",
         "dev-resources/map-16.tmx",
         "dev-resources/map-15.tmx",
-        "dev-resources/map-14.tmx",
-        "dev-resources/map-13.tmx",
-        "dev-resources/map-12.tmx",
-        "dev-resources/map-11.tmx",
-        "dev-resources/map-10.tmx",
-        "dev-resources/map-ultima-mundo1.tmx"
+        "dev-resources/map-14.tmx"
     ],
     "tileset.embedInMap": true
 }

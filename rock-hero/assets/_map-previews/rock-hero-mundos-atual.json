@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "worlds": [
+    {
+      "id": "world-1",
+      "name": "Mundo 1",
+      "maps": [
+        "map0-1",
+        "map-2--expansion and speed",
+        "map-3--desafio do luigi",
+        "map-4--big-jumps",
+        "map-ultima-mundo1"
+      ]
+    },
+    {
+      "id": "world-2",
+      "name": "Mundo 2",
+      "maps": [
+        "map-5--caverna",
+        "map-6--caverna2",
+        "map-7--planicie",
+        "map-8",
+        "map-10"
+      ]
+    },
+    {
+      "id": "world-0ddbbc19-9b24-4b6a-86e7-6f09ba8be258",
+      "name": "Mundo 3",
+      "maps": [
+        "map-11",
+        "map-12",
+        "map-16",
+        "map-17",
+        "map-18"
+      ]
+    },
+    {
+      "id": "world-4fdf1f5c-a6e9-4fc3-ae6b-36fc9b3908e3",
+      "name": "Mundo 4",
+      "maps": [
+        "map-19",
+        "map-20-auto-rolagem",
+        "map-21-nuvens",
+        "map-22-octopus"
+      ]
+    },
+    {
+      "id": "world-09db7202-0c15-4c92-93d2-cb24aec6aec2",
+      "name": "Off",
+      "maps": [
+        "map0-0",
+        "map9",
+        "map-19-upsidedown"
+      ]
+    }
+  ],
+  "unassigned": []
+}

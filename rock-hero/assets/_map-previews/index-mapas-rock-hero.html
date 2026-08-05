@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>Mapas do Rock Hero</title>
+
+    <style>
+        :root {
+            color-scheme: dark;
+            font-family: system-ui, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px;
+            background: #111827;
+            color: #f9fafb;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            border: 1px solid #4b5563;
+            border-radius: 8px;
+            padding: 9px 13px;
+            background: #1f2937;
+            color: #f9fafb;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #374151;
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+            outline: 3px solid #60a5fa;
+            outline-offset: 2px;
+        }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+        }
+
+        header p {
+            margin: 0;
+            color: #9ca3af;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .toolbar .primary {
+            border-color: #2563eb;
+            background: #2563eb;
+        }
+
+        .toolbar .primary:hover {
+            background: #1d4ed8;
+        }
+
+        .help {
+            margin: -10px 0 26px;
+            padding: 12px 15px;
+            border: 1px solid #374151;
+            border-radius: 10px;
+            background: #172033;
+            color: #cbd5e1;
+        }
+
+        .worlds {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .world {
+            overflow: hidden;
+            border: 1px solid #374151;
+            border-radius: 14px;
+            background: rgb(17 24 39 / 55%);
+            box-shadow: 0 10px 30px rgb(0 0 0 / 18%);
+        }
+
+        .world.drag-over {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgb(96 165 250 / 18%);
+        }
+
+        .world-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #374151;
+            background: #1f2937;
+        }
+
+        .world-heading {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .world-title {
+            overflow: hidden;
+            margin: 0;
+            font-size: 20px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .world-count {
+            color: #9ca3af;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .world-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .world-actions button {
+            padding: 6px 9px;
+            font-size: 13px;
+        }
+
+        .world-actions .danger:hover {
+            border-color: #dc2626;
+            background: #7f1d1d;
+        }
+
+        .world-gallery {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
+            min-height: 126px;
+            padding: 18px;
+        }
+
+        .world-gallery:empty::before {
+            content: "Arraste mapas para este mundo";
+            display: grid;
+            grid-column: 1 / -1;
+            min-height: 88px;
+            place-items: center;
+            border: 2px dashed #374151;
+            border-radius: 10px;
+            color: #6b7280;
+        }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            background: #1f2937;
+            box-shadow: 0 8px 20px rgb(0 0 0 / 20%);
+            transition:
+                opacity 120ms ease,
+                transform 120ms ease,
+                border-color 120ms ease;
+        }
+
+        .card.is-dragging {
+            opacity: 0.42;
+            transform: scale(0.98);
+            border-color: #60a5fa;
+        }
+
+        .card.drop-before {
+            box-shadow:
+                -5px 0 0 #60a5fa,
+                0 8px 20px rgb(0 0 0 / 20%);
+        }
+
+        .card.drop-after {
+            box-shadow:
+                5px 0 0 #60a5fa,
+                0 8px 20px rgb(0 0 0 / 20%);
+        }
+
+        .drag-handle {
+            position: absolute;
+            z-index: 2;
+            top: 9px;
+            right: 9px;
+            display: grid;
+            width: 36px;
+            height: 36px;
+            place-items: center;
+            border: 1px solid rgb(255 255 255 / 18%);
+            border-radius: 8px;
+            background: rgb(17 24 39 / 88%);
+            color: #e5e7eb;
+            cursor: grab;
+            user-select: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .card a {
+            display: flex;
+            min-height: 220px;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background:
+                linear-gradient(45deg, #111827 25%, transparent 25%),
+                linear-gradient(-45deg, #111827 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #111827 75%),
+                linear-gradient(-45deg, transparent 75%, #111827 75%);
+            background-position:
+                0 0,
+                0 8px,
+                8px -8px,
+                -8px 0;
+            background-size: 16px 16px;
+        }
+
+        .card img {
+            display: block;
+            width: 100%;
+            max-height: 420px;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        .info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 14px 16px;
+        }
+
+        .info strong {
+            overflow: hidden;
+            padding-right: 34px;
+            font-size: 16px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .info small {
+            overflow: hidden;
+            color: #9ca3af;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 18px;
+            }
+
+            header {
+                align-items: stretch;
+            }
+
+            .toolbar {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                width: 100%;
+            }
+
+            .world-gallery {
+                grid-template-columns: 1fr;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>Mapas do Rock Hero</h1>
+            <p id="summary">
+                22 mapas — atualizado em 05/08/2026 20:06:21
+            </p>
+        </div>
+
+        <div class="toolbar">
+            <button type="button" id="add-world" class="primary">
+                + Novo mundo
+            </button>
+
+            <button type="button" id="export-layout">
+                Exportar organização
+            </button>
+
+            <button type="button" id="import-layout">
+                Importar organização
+            </button>
+
+            <button type="button" id="reset-layout">
+                Restaurar padrão
+            </button>
+
+            <input
+                type="file"
+                id="import-file"
+                accept="application/json,.json"
+                hidden
+            >
+        </div>
+    </header>
+
+    <p class="help">
+        Arraste os mapas pelo botão <strong>⠿</strong>. A organização é
+        salva automaticamente neste navegador. Clique na imagem para abri-la.
+    </p>
+
+    <main id="worlds" class="worlds"></main>
+
+    <script>
+        const STORAGE_KEY = 'rock-hero-map-layout-v1';
+        const UNASSIGNED_ID = 'unassigned';
+
+        const MAPS = [
+            {
+                id: 'map0-0',
+                image: 'map0-0.png',
+                source: 'map0-0.json'
+            },
+            {
+                id: 'map0-1',
+                image: 'map0-1.png',
+                source: 'map0-1.json'
+            },
+            {
+                id: 'map-10',
+                image: 'map-10.png',
+                source: 'map-10.json'
+            },
+            {
+                id: 'map-11',
+                image: 'map-11.png',
+                source: 'map-11.json'
+            },
+            {
+                id: 'map-12',
+                image: 'map-12.png',
+                source: 'map-12.json'
+            },
+            {
+                id: 'map-16',
+                image: 'map-16.png',
+                source: 'map-16.json'
+            },
+            {
+                id: 'map-17',
+                image: 'map-17.png',
+                source: 'map-17.json'
+            },
+            {
+                id: 'map-18',
+                image: 'map-18.png',
+                source: 'map-18.tmj'
+            },
+            {
+                id: 'map-19',
+                image: 'map-19.png',
+                source: 'map-19.json'
+            },
+            {
+                id: 'map-19-upsidedown',
+                image: 'map-19-upsidedown.png',
+                source: 'map-19-upsidedown.json'
+            },
+            {
+                id: 'map-20-auto-rolagem',
+                image: 'map-20-auto-rolagem.png',
+                source: 'map-20-auto-rolagem.json'
+            },
+            {
+                id: 'map-21-nuvens',
+                image: 'map-21-nuvens.png',
+                source: 'map-21-nuvens.json'
+            },
+            {
+                id: 'map-22-octopus',
+                image: 'map-22-octopus.png',
+                source: 'map-22-octopus.json'
+            },
+            {
+                id: 'map-2--expansion and speed',
+                image: 'map-2--expansion and speed.png',
+                source: 'map-2--expansion and speed.json'
+            },
+            {
+                id: 'map-3--desafio do luigi',
+                image: 'map-3--desafio do luigi.png',
+                source: 'map-3--desafio do luigi.json'
+            },
+            {
+                id: 'map-4--big-jumps',
+                image: 'map-4--big-jumps.png',
+                source: 'map-4--big-jumps.json'
+            },
+            {
+                id: 'map-5--caverna',
+                image: 'map-5--caverna.png',
+                source: 'map-5--caverna.json'
+            },
+            {
+                id: 'map-6--caverna2',
+                image: 'map-6--caverna2.png',
+                source: 'map-6--caverna2.json'
+            },
+            {
+                id: 'map-7--planicie',
+                image: 'map-7--planicie.png',
+                source: 'map-7--planicie.json'
+            },
+            {
+                id: 'map-8',
+                image: 'map-8.png',
+                source: 'map-8.json'
+            },
+            {
+                id: 'map9',
+                image: 'map9.png',
+                source: 'map9.json'
+            },
+            {
+                id: 'map-ultima-mundo1',
+                image: 'map-ultima-mundo1.png',
+                source: 'map-ultima-mundo1.json'
+            }
+        ];
+
+        const DEFAULT_LAYOUT = {
+            version: 1,
+            worlds: [
+                {
+                    id: 'world-1',
+                    name: 'Mundo 1',
+                    maps: []
+                },
+                {
+                    id: 'world-2',
+                    name: 'Mundo 2',
+                    maps: []
+                }
+            ],
+            unassigned: MAPS.map(map => map.id)
+        };
+
+        const worldsElement = document.querySelector('#worlds');
+        const summaryElement = document.querySelector('#summary');
+        const importFileElement = document.querySelector('#import-file');
+
+        let draggedCard = null;
+
+        function createId() {
+            if (window.crypto?.randomUUID) {
+                return `world-${window.crypto.randomUUID()}`;
+            }
+
+            return `world-${Date.now()}-${Math.random()
+                .toString(16)
+                .slice(2)}`;
+        }
+
+        function cloneDefaultLayout() {
+            return JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+        }
+
+        function loadLayout() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+
+            if (!stored) {
+                return cloneDefaultLayout();
+            }
+
+            try {
+                return normalizeLayout(JSON.parse(stored));
+            } catch (error) {
+                console.warn('Organização salva inválida.', error);
+                return cloneDefaultLayout();
+            }
+        }
+
+        function normalizeLayout(layout) {
+            if (!layout || !Array.isArray(layout.worlds)) {
+                throw new Error('Formato de organização inválido.');
+            }
+
+            const knownMapIds = new Set(MAPS.map(map => map.id));
+            const usedMapIds = new Set();
+
+            const worlds = layout.worlds.map((world, index) => {
+                const id = String(world.id || createId());
+                const name = String(world.name || `Mundo ${index + 1}`);
+
+                const maps = Array.isArray(world.maps)
+                    ? world.maps
+                        .map(String)
+                        .filter(mapId => {
+                            if (
+                                !knownMapIds.has(mapId) ||
+                                usedMapIds.has(mapId)
+                            ) {
+                                return false;
+                            }
+
+                            usedMapIds.add(mapId);
+                            return true;
+                        })
+                    : [];
+
+                return { id, name, maps };
+            });
+
+            const unassigned = Array.isArray(layout.unassigned)
+                ? layout.unassigned
+                    .map(String)
+                    .filter(mapId => {
+                        if (
+                            !knownMapIds.has(mapId) ||
+                            usedMapIds.has(mapId)
+                        ) {
+                            return false;
+                        }
+
+                        usedMapIds.add(mapId);
+                        return true;
+                    })
+                : [];
+
+            for (const map of MAPS) {
+                if (!usedMapIds.has(map.id)) {
+                    unassigned.push(map.id);
+                }
+            }
+
+            return {
+                version: 1,
+                worlds,
+                unassigned
+            };
+        }
+
+        function createCard(map) {
+            const card = document.createElement('article');
+            card.className = 'card';
+            card.dataset.mapId = map.id;
+
+            const handle = document.createElement('span');
+            handle.className = 'drag-handle';
+            handle.textContent = '⠿';
+            handle.title = `Arrastar ${map.id}`;
+            handle.setAttribute('role', 'button');
+            handle.setAttribute('tabindex', '0');
+            handle.draggable = true;
+
+            handle.addEventListener('dragstart', event => {
+                draggedCard = card;
+                card.classList.add('is-dragging');
+
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', map.id);
+            });
+
+            handle.addEventListener('dragend', () => {
+                finishDragging();
+            });
+
+            const link = document.createElement('a');
+            link.href = map.image;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+
+            const image = document.createElement('img');
+            image.src = map.image;
+            image.alt = map.id;
+            image.loading = 'lazy';
+
+            const info = document.createElement('div');
+            info.className = 'info';
+
+            const title = document.createElement('strong');
+            title.textContent = map.id;
+
+            const source = document.createElement('small');
+            source.textContent = map.source;
+
+            link.append(image);
+            info.append(title, source);
+            card.append(handle, link, info);
+
+            return card;
+        }
+
+        function createWorldSection(world, isUnassigned = false) {
+            const section = document.createElement('section');
+            section.className = 'world';
+            section.dataset.worldId = world.id;
+
+            const header = document.createElement('div');
+            header.className = 'world-header';
+
+            const heading = document.createElement('div');
+            heading.className = 'world-heading';
+
+            const title = document.createElement('h2');
+            title.className = 'world-title';
+            title.textContent = world.name;
+
+            const count = document.createElement('span');
+            count.className = 'world-count';
+
+            heading.append(title, count);
+            header.append(heading);
+
+            if (!isUnassigned) {
+                const actions = document.createElement('div');
+                actions.className = 'world-actions';
+
+                const moveUp = createActionButton('↑', 'Mover mundo para cima');
+                const moveDown = createActionButton(
+                    '↓',
+                    'Mover mundo para baixo'
+                );
+                const rename = createActionButton('Renomear', 'Renomear mundo');
+                const remove = createActionButton(
+                    'Excluir',
+                    'Excluir mundo',
+                    'danger'
+                );
+
+                moveUp.addEventListener('click', () => {
+                    moveWorld(section, -1);
+                });
+
+                moveDown.addEventListener('click', () => {
+                    moveWorld(section, 1);
+                });
+
+                rename.addEventListener('click', () => {
+                    renameWorld(section);
+                });
+
+                remove.addEventListener('click', () => {
+                    removeWorld(section);
+                });
+
+                actions.append(moveUp, moveDown, rename, remove);
+                header.append(actions);
+            }
+
+            const gallery = document.createElement('div');
+            gallery.className = 'world-gallery';
+
+            gallery.addEventListener('dragover', event => {
+                event.preventDefault();
+
+                if (!draggedCard) {
+                    return;
+                }
+
+                event.dataTransfer.dropEffect = 'move';
+                clearDropIndicators();
+
+                const targetCard = event.target.closest('.card');
+
+                if (
+                    !targetCard ||
+                    targetCard === draggedCard ||
+                    targetCard.parentElement !== gallery
+                ) {
+                    gallery.append(draggedCard);
+                    section.classList.add('drag-over');
+                    updateCounts();
+                    return;
+                }
+
+                const rect = targetCard.getBoundingClientRect();
+                const relativeY = event.clientY - rect.top;
+                const relativeX = event.clientX - rect.left;
+
+                const after =
+                    relativeY > rect.height / 2 ||
+                    (
+                        Math.abs(relativeY - rect.height / 2) <
+                            rect.height * 0.28 &&
+                        relativeX > rect.width / 2
+                    );
+
+                if (after) {
+                    targetCard.after(draggedCard);
+                    targetCard.classList.add('drop-after');
+                } else {
+                    targetCard.before(draggedCard);
+                    targetCard.classList.add('drop-before');
+                }
+
+                section.classList.add('drag-over');
+                updateCounts();
+            });
+
+            gallery.addEventListener('drop', event => {
+                event.preventDefault();
+                finishDragging();
+            });
+
+            section.addEventListener('dragleave', event => {
+                if (!section.contains(event.relatedTarget)) {
+                    section.classList.remove('drag-over');
+                }
+            });
+
+            section.append(header, gallery);
+            return section;
+        }
+
+        function createActionButton(text, title, className = '') {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = text;
+            button.title = title;
+
+            if (className) {
+                button.classList.add(className);
+            }
+
+            return button;
+        }
+
+        function render(layout) {
+            worldsElement.replaceChildren();
+
+            const cardsById = new Map(
+                MAPS.map(map => [map.id, createCard(map)])
+            );
+
+            for (const world of layout.worlds) {
+                const section = createWorldSection(world);
+                const gallery = section.querySelector('.world-gallery');
+
+                for (const mapId of world.maps) {
+                    const card = cardsById.get(mapId);
+
+                    if (card) {
+                        gallery.append(card);
+                        cardsById.delete(mapId);
+                    }
+                }
+
+                worldsElement.append(section);
+            }
+
+            const unassignedWorld = {
+                id: UNASSIGNED_ID,
+                name: 'Sem mundo'
+            };
+
+            const unassignedSection = createWorldSection(
+                unassignedWorld,
+                true
+            );
+
+            const unassignedGallery = unassignedSection.querySelector(
+                '.world-gallery'
+            );
+
+            for (const mapId of layout.unassigned) {
+                const card = cardsById.get(mapId);
+
+                if (card) {
+                    unassignedGallery.append(card);
+                    cardsById.delete(mapId);
+                }
+            }
+
+            for (const card of cardsById.values()) {
+                unassignedGallery.append(card);
+            }
+
+            worldsElement.append(unassignedSection);
+
+            updateCounts();
+            saveLayout();
+        }
+
+        function collectLayout() {
+            const worlds = [];
+            let unassigned = [];
+
+            for (const section of worldsElement.querySelectorAll('.world')) {
+                const mapIds = Array.from(
+                    section.querySelectorAll('.card')
+                ).map(card => card.dataset.mapId);
+
+                if (section.dataset.worldId === UNASSIGNED_ID) {
+                    unassigned = mapIds;
+                    continue;
+                }
+
+                worlds.push({
+                    id: section.dataset.worldId,
+                    name: section.querySelector('.world-title').textContent,
+                    maps: mapIds
+                });
+            }
+
+            return {
+                version: 1,
+                worlds,
+                unassigned
+            };
+        }
+
+        function saveLayout() {
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(collectLayout())
+            );
+        }
+
+        function updateCounts() {
+            const worldSections = worldsElement.querySelectorAll('.world');
+            let totalMaps = 0;
+
+            for (const section of worldSections) {
+                const amount = section.querySelectorAll('.card').length;
+                totalMaps += amount;
+
+                section.querySelector('.world-count').textContent =
+                    `${amount} ${amount === 1 ? 'mapa' : 'mapas'}`;
+            }
+
+            const amountWorlds = Array.from(worldSections).filter(
+                section => section.dataset.worldId !== UNASSIGNED_ID
+            ).length;
+
+            summaryElement.textContent =
+                `${totalMaps} mapas em ${amountWorlds} ` +
+                `${amountWorlds === 1 ? 'mundo' : 'mundos'}`;
+        }
+
+        function finishDragging() {
+            if (draggedCard) {
+                draggedCard.classList.remove('is-dragging');
+            }
+
+            draggedCard = null;
+            clearDropIndicators();
+            updateCounts();
+            saveLayout();
+        }
+
+        function clearDropIndicators() {
+            document.querySelectorAll(
+                '.drop-before, .drop-after, .drag-over'
+            ).forEach(element => {
+                element.classList.remove(
+                    'drop-before',
+                    'drop-after',
+                    'drag-over'
+                );
+            });
+        }
+
+        function addWorld() {
+            const defaultName =
+                `Mundo ${worldsElement.querySelectorAll(
+                    '.world:not([data-world-id="unassigned"])'
+                ).length + 1}`;
+
+            const name = prompt('Nome do novo mundo:', defaultName);
+
+            if (name === null) {
+                return;
+            }
+
+            const normalizedName = name.trim() || defaultName;
+            const section = createWorldSection({
+                id: createId(),
+                name: normalizedName
+            });
+
+            const unassigned = worldsElement.querySelector(
+                `[data-world-id="${UNASSIGNED_ID}"]`
+            );
+
+            worldsElement.insertBefore(section, unassigned);
+            updateCounts();
+            saveLayout();
+        }
+
+        function renameWorld(section) {
+            const title = section.querySelector('.world-title');
+            const name = prompt('Novo nome do mundo:', title.textContent);
+
+            if (name === null || !name.trim()) {
+                return;
+            }
+
+            title.textContent = name.trim();
+            saveLayout();
+        }
+
+        function removeWorld(section) {
+            const title = section.querySelector('.world-title').textContent;
+            const confirmed = confirm(
+                `Excluir "${title}"?\n\n` +
+                'Os mapas serão movidos para "Sem mundo".'
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const unassignedGallery = worldsElement.querySelector(
+                `[data-world-id="${UNASSIGNED_ID}"] .world-gallery`
+            );
+
+            for (const card of section.querySelectorAll('.card')) {
+                unassignedGallery.append(card);
+            }
+
+            section.remove();
+            updateCounts();
+            saveLayout();
+        }
+
+        function moveWorld(section, direction) {
+            const movableWorlds = Array.from(
+                worldsElement.querySelectorAll(
+                    '.world:not([data-world-id="unassigned"])'
+                )
+            );
+
+            const currentIndex = movableWorlds.indexOf(section);
+            const targetIndex = currentIndex + direction;
+
+            if (
+                currentIndex < 0 ||
+                targetIndex < 0 ||
+                targetIndex >= movableWorlds.length
+            ) {
+                return;
+            }
+
+            const target = movableWorlds[targetIndex];
+
+            if (direction < 0) {
+                worldsElement.insertBefore(section, target);
+            } else {
+                target.after(section);
+            }
+
+            saveLayout();
+        }
+
+        function exportLayout() {
+            const content = JSON.stringify(collectLayout(), null, 2);
+            const blob = new Blob([content], {
+                type: 'application/json'
+            });
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.download = 'rock-hero-mundos.json';
+            link.click();
+
+            URL.revokeObjectURL(url);
+        }
+
+        async function importLayout(file) {
+            try {
+                const text = await file.text();
+                const layout = normalizeLayout(JSON.parse(text));
+
+                localStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify(layout)
+                );
+
+                render(layout);
+            } catch (error) {
+                console.error(error);
+                alert(
+                    'Não foi possível importar a organização. ' +
+                    'Verifique se o arquivo JSON é válido.'
+                );
+            } finally {
+                importFileElement.value = '';
+            }
+        }
+
+        function resetLayout() {
+            const confirmed = confirm(
+                'Restaurar a organização padrão?\n\n' +
+                'Todos os mapas voltarão para "Sem mundo".'
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            localStorage.removeItem(STORAGE_KEY);
+            render(cloneDefaultLayout());
+        }
+
+        document.querySelector('#add-world').addEventListener(
+            'click',
+            addWorld
+        );
+
+        document.querySelector('#export-layout').addEventListener(
+            'click',
+            exportLayout
+        );
+
+        document.querySelector('#import-layout').addEventListener(
+            'click',
+            () => importFileElement.click()
+        );
+
+        importFileElement.addEventListener('change', event => {
+            const [file] = event.target.files;
+
+            if (file) {
+                importLayout(file);
+            }
+        });
+
+        document.querySelector('#reset-layout').addEventListener(
+            'click',
+            resetLayout
+        );
+
+        render(loadLayout());
+    </script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+/**
+ * Variante de ordem de fases (mundos-proposta)
+ *
+ * Não redefine `GameConfig` — só registra WORLDS/LEVELS em
+ * `GameConfigVariants.proposta`, conforme
+ * `assets/_map-previews/rock-hero-mundos-proposta.json`.
+ *
+ * Ativação: DEV OPTIONS → “Ordem Proposta” (persiste em Settings e recarrega)
+ * ou `Settings.set('levelOrder', 'proposta')`.
+ *
+ * Mapas “Off” (map0-0, map9, map-19-upsidedown) ficam de fora.
+ */
+
+window.GameConfigVariants = window.GameConfigVariants || {};
+
+GameConfigVariants.proposta = {
+    WORLDS: [
+        {
+            id: 1,
+            name: 'Mundo 1',
+            subtitle: 'O Resgate do Baterista',
+            levels: [0, 1, 2, 3, 4], // map0-1, map6, map16, map8, map-ultima-mundo1
+            rescuedCharacter: 'baterista',
+            celebrationMessage: 'Você resgatou o Baterista!',
+            theme: 'grass',
+            bgColor: 0x87CEEB,
+            pathColor: 0x8B4513,
+            bgImage: 'assets/spritesheets/worldmap-backgrounds/world1.png'
+        },
+        {
+            id: 2,
+            name: 'Mundo 2',
+            subtitle: 'O Resgate do Baixista',
+            levels: [5, 6, 7, 8, 9], // map10, map7, map4, map3, map5
+            rescuedCharacter: 'baixista',
+            celebrationMessage: 'Você resgatou o Baixista!',
+            theme: 'cave',
+            bgColor: 0x1a1a2e,
+            pathColor: 0x4a4a6a
+        },
+        {
+            id: 3,
+            name: 'Mundo 3',
+            subtitle: 'O Resgate do Guitarrista',
+            levels: [10, 11, 12, 13, 14], // map12, map11, map2, map17, map18
+            rescuedCharacter: 'guitarrista',
+            celebrationMessage: 'Você resgatou o Guitarrista!',
+            theme: 'water',
+            bgColor: 0x0a2a4a,
+            pathColor: 0x2288aa
+        },
+        {
+            id: 4,
+            name: 'Mundo 4',
+            subtitle: 'Mecânicas Experimentais',
+            levels: [15, 16, 17, 18], // map19, map20, map21, map22
+            rescuedCharacter: 'vocalista',
+            celebrationMessage: 'Mecânicas dominadas!',
+            theme: 'special',
+            bgColor: 0x1a0a2e,
+            pathColor: 0x8844aa
+        }
+    ],
+
+    LEVELS: [
+        // Mundo 1: map0-1 → map-6 → map-16 → map-8 → map-ultima-mundo1
+        {
+            key: 'map0-1',
+            file: 'assets/map0-1.json',
+            name: 'Descobrindo o mundo',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 1,
+            mapPosition: { x: 80, y: 200 },
+            connectsTo: [1]
+        },
+        {
+            key: 'map6',
+            file: 'assets/map-6--caverna2.json',
+            name: 'Ative o turbo!',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 200, y: 180 },
+            connectsTo: [2]
+        },
+        {
+            key: 'map16',
+            file: 'assets/map-16.json',
+            name: 'Ascensão Abissal',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 320, y: 220 },
+            connectsTo: [3],
+            features: { doubleJump: true, neonLineTrail: true }
+        },
+        {
+            key: 'map8',
+            file: 'assets/map-8.json',
+            name: 'Simples',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 440, y: 180 },
+            connectsTo: [4]
+        },
+        {
+            key: 'map-ultima-mundo1',
+            file: 'assets/map-ultima-mundo1.json',
+            name: 'O Último Desafio',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 560, y: 200 },
+            connectsTo: []
+        },
+        // Mundo 2: map-10 → map-7 → map-4 → map-3 → map-5
+        {
+            key: 'map10',
+            file: 'assets/map-10.json',
+            name: 'Ruínas Submersas',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 2,
+            mapPosition: { x: 80, y: 200 },
+            connectsTo: [6]
+        },
+        {
+            key: 'map7',
+            file: 'assets/map-7--planicie.json',
+            name: 'Caos de anfíbios',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 2,
+            mapPosition: { x: 170, y: 160 },
+            connectsTo: [7]
+        },
+        {
+            key: 'map4',
+            file: 'assets/map-4--big-jumps.json',
+            name: 'Os Pulos Maiores',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 2,
+            mapPosition: { x: 270, y: 210 },
+            connectsTo: [8]
+        },
+        {
+            key: 'map3',
+            file: 'assets/map-3--desafio do luigi.json',
+            name: 'Sapos e lava',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 2,
+            mapPosition: { x: 370, y: 180 },
+            connectsTo: [9]
+        },
+        {
+            key: 'map5',
+            file: 'assets/map-5--caverna.json',
+            name: 'Cristais Fascinantes',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 2,
+            mapPosition: { x: 460, y: 220 },
+            connectsTo: []
+        },
+        // Mundo 3: map-12 → map-11 → map-2 → map-17 → map-18
+        {
+            key: 'map12',
+            file: 'assets/map-12.json',
+            name: 'Abismo Submerso',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 85, y: 200 },
+            connectsTo: [11]
+        },
+        {
+            key: 'map11',
+            file: 'assets/map-11.json',
+            name: 'Labirinto de Lava',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 195, y: 215 },
+            connectsTo: [12],
+            features: { doubleJump: true, neonLineTrail: true }
+        },
+        {
+            key: 'map2',
+            file: 'assets/map-2--expansion and speed.json',
+            name: 'Pulos decisivos',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 305, y: 185 },
+            connectsTo: [13]
+        },
+        {
+            key: 'map17',
+            file: 'assets/map-17.json',
+            name: 'Areia e Profundezas',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 415, y: 215 },
+            connectsTo: [14],
+            features: { doubleJump: true, neonLineTrail: true }
+        },
+        {
+            key: 'map18',
+            file: 'assets/map-18.json',
+            name: 'Abismo Final',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 515, y: 195 },
+            connectsTo: [],
+            features: { doubleJump: true, neonLineTrail: true }
+        },
+        // Mundo 4: map-19 → map-20 → map-21 → map-22
+        {
+            key: 'map19',
+            file: 'assets/map-19.json',
+            name: 'Ponta-Cabeça',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 4,
+            mapPosition: { x: 120, y: 200 },
+            connectsTo: [16],
+            features: { upsideDown: true, wind: true }
+        },
+        {
+            key: 'map20',
+            file: 'assets/map-20-auto-rolagem.json',
+            name: 'Sem Parar!',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 4,
+            mapPosition: { x: 280, y: 200 },
+            connectsTo: [17],
+            features: { autoScroll: true }
+        },
+        {
+            key: 'map21',
+            file: 'assets/map-21-nuvens.json',
+            name: 'Entre Nuvens',
+            zoom: 1.0,
+            roundPixels: true,
+            world: 4,
+            mapPosition: { x: 440, y: 200 },
+            connectsTo: [18],
+            features: { wind: true }
+        },
+        {
+            key: 'map22',
+            file: 'assets/map-22-octopus.json',
+            name: 'Mar do Polvo',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 4,
+            mapPosition: { x: 580, y: 200 },
+            connectsTo: []
+        }
+    ]
+};

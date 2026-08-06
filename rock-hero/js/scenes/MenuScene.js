@@ -642,12 +642,76 @@ class MenuScene extends Phaser.Scene {
             });
         });
 
+        // Toggle de ordem de fases (abaixo das colunas — recarrega a página)
+        {
+            const y = this.centerY + this.u(115);
+            const isProposta = (Settings.get('levelOrder') || 'default') === GameConfig.LEVEL_ORDER.PROPOSTA;
+            const currentIndex = globalIndex;
+
+            const toggleContainer = this.add.container(this.centerX, y).setDepth(101);
+
+            const nameText = this.add.text(this.u(-160), this.u(-8), 'Ordem Proposta', {
+                fontSize: this.font(11),
+                fontFamily: '"Press Start 2P", Arial',
+                color: '#ffffff'
+            }).setOrigin(0, 0.5);
+            toggleContainer.add(nameText);
+
+            const descText = this.add.text(this.u(-160), this.u(10), 'rock-hero-mundos-proposta (recarrega)', {
+                fontSize: this.font(9),
+                fontFamily: 'Arial',
+                color: '#666666'
+            }).setOrigin(0, 0.5);
+            toggleContainer.add(descText);
+
+            const toggleBg = this.add.rectangle(
+                this.u(150), 0, this.u(50), this.u(22),
+                isProposta ? 0x00ff00 : 0x333333
+            ).setStrokeStyle(this.u(2), 0xffffff);
+            toggleContainer.add(toggleBg);
+
+            const toggleText = this.add.text(this.u(150), 0, isProposta ? 'ON' : 'OFF', {
+                fontSize: this.font(9),
+                fontFamily: '"Press Start 2P", Arial',
+                color: isProposta ? '#000000' : '#888888'
+            }).setOrigin(0.5);
+            toggleContainer.add(toggleText);
+
+            const selector = this.add.text(this.u(-180), 0, '▶', {
+                fontSize: this.font(14),
+                fontFamily: 'Arial',
+                color: '#ff66cc'
+            }).setOrigin(0.5).setAlpha(0);
+            toggleContainer.add(selector);
+
+            this.overlayElements.push(toggleContainer);
+
+            toggleBg.setInteractive({ useHandCursor: true });
+            toggleBg.on('pointerdown', () => {
+                this.toggleEffect('levelOrder', toggleBg, toggleText);
+            });
+            toggleBg.on('pointerover', () => {
+                if (this.effectSelectedIndex !== currentIndex) {
+                    SoundManager.play('menuNavigate');
+                }
+                this.effectSelectedIndex = currentIndex;
+                this.updateEffectSelection();
+            });
+
+            this.effectToggles.push({
+                key: 'levelOrder',
+                bg: toggleBg,
+                text: toggleText,
+                selector: selector
+            });
+        }
+
         // Instruções (teclado vs mobile)
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         const effectsHelp = isMobile
             ? '←→: Navegar | O: Alternar | X: Voltar'
             : '↑↓: Navegar | Enter: Alternar | ESC: Voltar';
-        const closeText = this.add.text(this.centerX, this.centerY + this.u(145), effectsHelp, {
+        const closeText = this.add.text(this.centerX, this.centerY + this.u(155), effectsHelp, {
             fontSize: this.font(10),
             fontFamily: 'Arial',
             color: '#aaaaaa'
@@ -662,6 +726,22 @@ class MenuScene extends Phaser.Scene {
     }
 
     toggleEffect(key, bg, text) {
+        if (key === 'levelOrder') {
+            const current = Settings.get('levelOrder') || GameConfig.LEVEL_ORDER.DEFAULT;
+            const next = current === GameConfig.LEVEL_ORDER.PROPOSTA
+                ? GameConfig.LEVEL_ORDER.DEFAULT
+                : GameConfig.LEVEL_ORDER.PROPOSTA;
+            Settings.set('levelOrder', next);
+            const isOn = next === GameConfig.LEVEL_ORDER.PROPOSTA;
+            bg.setFillStyle(isOn ? 0x00ff00 : 0x333333);
+            text.setText(isOn ? 'ON' : 'OFF');
+            text.setColor(isOn ? '#000000' : '#888888');
+            SoundManager.play('menuSelect');
+            // Índices de fase mudam — recarrega para aplicar de forma consistente.
+            this.time.delayedCall(120, () => window.location.reload());
+            return;
+        }
+
         GameData.FEATURES[key] = !GameData.FEATURES[key];
         const isEnabled = GameData.FEATURES[key];
 

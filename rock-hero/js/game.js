@@ -15,12 +15,25 @@
  * - ?music=false      → Desliga a trilha sonora (BGM) — útil durante desenvolvimento
  * - ?musicVolume=0.6  → Volume inicial da trilha sonora (0..1). Default: 0.4
  * - ?crossfadeMs=1500 → Duração do cross-fade entre faixas (ms). Default: 2000. Zero = corte seco.
+ * - ?levelOrder=proposta → Força ordem de fases da proposta (também via DEV OPTIONS)
  */
 
 // Parâmetros de debug via URL
 const urlParams = new URLSearchParams(window.location.search);
 const showFPS = urlParams.get('fps') === 'true';
 const showDebug = urlParams.get('debug') === 'true';
+
+// Ordem de fases: URL sobrescreve Settings (sem persistir o param sozinho).
+(function applyLevelOrderFromSettings() {
+    const urlOrder = urlParams.get('levelOrder');
+    let order = Settings.get('levelOrder') || GameConfig.LEVEL_ORDER.DEFAULT;
+    if (urlOrder === GameConfig.LEVEL_ORDER.PROPOSTA || urlOrder === GameConfig.LEVEL_ORDER.DEFAULT) {
+        order = urlOrder;
+    }
+    if (order !== GameConfig.LEVEL_ORDER.DEFAULT) {
+        GameConfig.LEVEL_ORDER.apply(order);
+    }
+})();
 
 // Inicializa feature flags (funcionalidades experimentais)
 GameData.initFeatureFlags();

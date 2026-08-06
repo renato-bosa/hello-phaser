@@ -581,7 +581,35 @@ const GameConfig = {
         gravity: 800,
         playerSpeed: { min: 160, max: 260 },
         jumpForce: -480
+    },
+
+    // ==================== ORDEM DE FASES ====================
+    // Variantes em `window.GameConfigVariants` (default aqui; proposta em
+    // GameConfig.mundos-proposta.js). Preferência: Settings.levelOrder.
+    LEVEL_ORDER: {
+        DEFAULT: 'default',
+        PROPOSTA: 'proposta',
+
+        /** Troca GameConfig.WORLDS / LEVELS pela variante pedida. */
+        apply(orderId) {
+            const variants = window.GameConfigVariants;
+            const key = orderId === this.PROPOSTA ? this.PROPOSTA : this.DEFAULT;
+            const variant = variants && variants[key];
+            if (!variant) {
+                console.warn('GameConfig.LEVEL_ORDER: variante não encontrada:', key);
+                return;
+            }
+            GameConfig.WORLDS = variant.WORLDS;
+            GameConfig.LEVELS = variant.LEVELS;
+        }
     }
+};
+
+// Snapshot da ordem padrão antes de qualquer override em runtime.
+window.GameConfigVariants = window.GameConfigVariants || {};
+GameConfigVariants.default = {
+    WORLDS: GameConfig.WORLDS,
+    LEVELS: GameConfig.LEVELS
 };
 
 window.GameConfig = GameConfig;

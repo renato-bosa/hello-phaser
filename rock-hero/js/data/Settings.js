@@ -14,7 +14,9 @@
 
 const Settings = {
     DEFAULTS: {
-        musicEnabled: true
+        musicEnabled: true,
+        // 'default' | 'proposta' — ordem de fases (GameConfigVariants)
+        levelOrder: 'default'
     },
 
     /**

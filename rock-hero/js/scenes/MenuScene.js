@@ -553,9 +553,7 @@ class MenuScene extends Phaser.Scene {
         ];
 
         const startY = this.u(80);
-        // Com 6 itens numa coluna, 38 (base) é o teto antes do último toggle colidir
-        // com o texto de instruções no rodapé. A coluna está na capacidade
-        // máxima: um 7º item exige repaginar (3ª coluna não cabe na base 640px).
+        // 5 itens/coluna: spacing 38 deixa folga para os toggles de Settings no rodapé.
         const spacing = this.u(38);
         let globalIndex = 0;
 
@@ -642,22 +640,38 @@ class MenuScene extends Phaser.Scene {
             });
         });
 
-        // Toggle de ordem de fases (abaixo das colunas — recarrega a página)
-        {
-            const y = this.centerY + this.u(115);
-            const isProposta = (Settings.get('levelOrder') || 'default') === GameConfig.LEVEL_ORDER.PROPOSTA;
+        // Toggles de Settings (abaixo das colunas) — não são feature flags
+        const settingsToggles = [
+            {
+                key: 'waterPhysicsExperimental',
+                name: 'Água Experimental',
+                desc: 'Limiter na velocidade de queda',
+                isOn: () => (Settings.get('waterPhysicsVariant') || 'current') === 'experimental',
+                y: this.centerY + this.u(95)
+            },
+            {
+                key: 'levelOrder',
+                name: 'Ordem Proposta',
+                desc: 'rock-hero-mundos-proposta (recarrega)',
+                isOn: () => (Settings.get('levelOrder') || 'default') === GameConfig.LEVEL_ORDER.PROPOSTA,
+                y: this.centerY + this.u(130)
+            }
+        ];
+
+        settingsToggles.forEach((item) => {
+            const isEnabled = item.isOn();
             const currentIndex = globalIndex;
 
-            const toggleContainer = this.add.container(this.centerX, y).setDepth(101);
+            const toggleContainer = this.add.container(this.centerX, item.y).setDepth(101);
 
-            const nameText = this.add.text(this.u(-160), this.u(-8), 'Ordem Proposta', {
+            const nameText = this.add.text(this.u(-180), this.u(-8), item.name, {
                 fontSize: this.font(11),
                 fontFamily: '"Press Start 2P", Arial',
                 color: '#ffffff'
             }).setOrigin(0, 0.5);
             toggleContainer.add(nameText);
 
-            const descText = this.add.text(this.u(-160), this.u(10), 'rock-hero-mundos-proposta (recarrega)', {
+            const descText = this.add.text(this.u(-180), this.u(10), item.desc, {
                 fontSize: this.font(9),
                 fontFamily: 'Arial',
                 color: '#666666'
@@ -665,19 +679,19 @@ class MenuScene extends Phaser.Scene {
             toggleContainer.add(descText);
 
             const toggleBg = this.add.rectangle(
-                this.u(150), 0, this.u(50), this.u(22),
-                isProposta ? 0x00ff00 : 0x333333
+                this.u(170), 0, this.u(50), this.u(22),
+                isEnabled ? 0x00ff00 : 0x333333
             ).setStrokeStyle(this.u(2), 0xffffff);
             toggleContainer.add(toggleBg);
 
-            const toggleText = this.add.text(this.u(150), 0, isProposta ? 'ON' : 'OFF', {
+            const toggleText = this.add.text(this.u(170), 0, isEnabled ? 'ON' : 'OFF', {
                 fontSize: this.font(9),
                 fontFamily: '"Press Start 2P", Arial',
-                color: isProposta ? '#000000' : '#888888'
+                color: isEnabled ? '#000000' : '#888888'
             }).setOrigin(0.5);
             toggleContainer.add(toggleText);
 
-            const selector = this.add.text(this.u(-180), 0, '▶', {
+            const selector = this.add.text(this.u(-200), 0, '▶', {
                 fontSize: this.font(14),
                 fontFamily: 'Arial',
                 color: '#ff66cc'
@@ -688,7 +702,7 @@ class MenuScene extends Phaser.Scene {
 
             toggleBg.setInteractive({ useHandCursor: true });
             toggleBg.on('pointerdown', () => {
-                this.toggleEffect('levelOrder', toggleBg, toggleText);
+                this.toggleEffect(item.key, toggleBg, toggleText);
             });
             toggleBg.on('pointerover', () => {
                 if (this.effectSelectedIndex !== currentIndex) {
@@ -699,19 +713,21 @@ class MenuScene extends Phaser.Scene {
             });
 
             this.effectToggles.push({
-                key: 'levelOrder',
+                key: item.key,
                 bg: toggleBg,
                 text: toggleText,
                 selector: selector
             });
-        }
+
+            globalIndex++;
+        });
 
         // Instruções (teclado vs mobile)
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         const effectsHelp = isMobile
             ? '←→: Navegar | O: Alternar | X: Voltar'
             : '↑↓: Navegar | Enter: Alternar | ESC: Voltar';
-        const closeText = this.add.text(this.centerX, this.centerY + this.u(155), effectsHelp, {
+        const closeText = this.add.text(this.centerX, this.centerY + this.u(165), effectsHelp, {
             fontSize: this.font(10),
             fontFamily: 'Arial',
             color: '#aaaaaa'
@@ -739,6 +755,18 @@ class MenuScene extends Phaser.Scene {
             SoundManager.play('menuSelect');
             // Índices de fase mudam — recarrega para aplicar de forma consistente.
             this.time.delayedCall(120, () => window.location.reload());
+            return;
+        }
+
+        if (key === 'waterPhysicsExperimental') {
+            const current = Settings.get('waterPhysicsVariant') || 'current';
+            const next = current === 'experimental' ? 'current' : 'experimental';
+            Settings.set('waterPhysicsVariant', next);
+            const isOn = next === 'experimental';
+            bg.setFillStyle(isOn ? 0x00ff00 : 0x333333);
+            text.setText(isOn ? 'ON' : 'OFF');
+            text.setColor(isOn ? '#000000' : '#888888');
+            SoundManager.play('menuSelect');
             return;
         }
 

@@ -16,7 +16,9 @@ const Settings = {
     DEFAULTS: {
         musicEnabled: true,
         // 'default' | 'proposta' — ordem de fases (GameConfigVariants)
-        levelOrder: 'default'
+        levelOrder: 'default',
+        // 'current' | 'experimental' — física de água (GC.WATER vs WATER_EXPERIMENTAL)
+        waterPhysicsVariant: 'current'
     },
 
     /**

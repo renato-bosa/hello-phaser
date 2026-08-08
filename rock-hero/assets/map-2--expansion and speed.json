@@ -444,14 +444,14 @@
                         {
                          "name":"vertical-move_downward_in_blocks",
                          "type":"int",
-                         "value":7
+                         "value":9
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":32,
-                 "x":1504,
-                 "y":576
+                 "width":96,
+                 "x":1472,
+                 "y":518
                 }, 
                 {
                  "gid":42,

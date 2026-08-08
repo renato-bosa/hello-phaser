@@ -293,9 +293,9 @@
   <object id="22" gid="17" x="858" y="674" width="32" height="32"/>
   <object id="23" gid="17" x="1856" y="896" width="32" height="32"/>
   <object id="24" gid="11" x="2272" y="384" width="32" height="32"/>
-  <object id="25" gid="41" x="1504" y="576" width="32" height="32">
+  <object id="25" gid="41" x="1472" y="518" width="96" height="32">
    <properties>
-    <property name="vertical-move_downward_in_blocks" type="int" value="7"/>
+    <property name="vertical-move_downward_in_blocks" type="int" value="9"/>
    </properties>
   </object>
   <object id="26" gid="42" x="1504" y="160" width="32" height="32"/>

@@ -34,8 +34,8 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 464,
-                "y": 303.33333333333326
+                "x": 463.99999999999994,
+                "y": 302.6666666666667
             }
         },
         "dev-resources/map-10.tmx#Cavalo marinho": {
@@ -730,11 +730,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.5,
+            "scale": 1.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1470,
-                "y": 611
+                "x": 1548.6666666666665,
+                "y": 567.3333333333333
             }
         },
         "dev-resources/map-2--expansion and speed.tmx#1up": {
@@ -1138,8 +1138,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1344,
-                "y": 479
+                "x": 1986,
+                "y": 478
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
@@ -1247,8 +1247,8 @@
             "scale": 0.1977,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1441.5781487101672,
-                "y": 477.9969650986343
+                "x": 1441.578148710167,
+                "y": 475.46788062721293
             }
         },
         "dev-resources/map-4--big-jumps.tmx#abstract-blue": {
@@ -1741,10 +1741,10 @@
                 8
             ],
             "scale": 0.5,
-            "selectedLayer": 3,
+            "selectedLayer": 4,
             "viewCenter": {
                 "x": 836,
-                "y": 471
+                "y": 470
             }
         },
         "dev-resources/map-ultima-mundo1.tmx#abstract-blue": {
@@ -1823,7 +1823,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 320,
-                "y": 175.3333333333333
+                "y": 174.66666666666669
             }
         },
         "dev-resources/map.tmx#abstract-blue": {
@@ -1873,7 +1873,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 803.030303030303,
-                "y": 374.2424242424243
+                "y": 375.75757575757575
             }
         },
         "dev-resources/map0-0.tmx#abstract-blue": {
@@ -1944,7 +1944,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 336,
-                "y": 191.3333333333333
+                "y": 190.66666666666669
             }
         },
         "dev-resources/map0-1.tmx#abstract-blue": {
@@ -2019,12 +2019,12 @@
         "dev-resources/map-2--expansion and speed.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-4--big-jumps.tmx",
-        "dev-resources/map-ultima-mundo1.tmx",
         "dev-resources/map0-1.tmx",
-        "dev-resources/map-10.tmx",
         "dev-resources/map.tmx",
-        "dev-resources/map0-0.tmx",
         "dev-resources/map-22-octopus.tmx",
+        "dev-resources/map-ultima-mundo1.tmx",
+        "dev-resources/map-10.tmx",
+        "dev-resources/map0-0.tmx",
         "dev-resources/map-17.tmx",
         "dev-resources/map-16.tmx",
         "dev-resources/map-15.tmx"

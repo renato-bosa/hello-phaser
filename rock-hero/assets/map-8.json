@@ -3,6 +3,19 @@
  "infinite":false,
  "layers":[
         {
+         "id":11,
+         "image":"spritesheets\/level-backgrounds\/background2-day.png",
+         "imageheight":941,
+         "imagewidth":1672,
+         "name":"bg-image",
+         "opacity":1,
+         "repeatx":true,
+         "type":"imagelayer",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
          "data":[56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56,
             56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56,
             56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56,
@@ -26,7 +39,7 @@
          "height":20,
          "id":5,
          "name":"bg",
-         "opacity":1,
+         "opacity":0.75,
          "type":"tilelayer",
          "visible":true,
          "width":70,
@@ -437,7 +450,7 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":11,
+ "nextlayerid":12,
  "nextobjectid":311,
  "orientation":"orthogonal",
  "renderorder":"right-down",
@@ -1027,6 +1040,11 @@
          "name":"lava-laranja-cachoeira-5fps",
          "properties":[
                 {
+                 "name":"collider",
+                 "type":"bool",
+                 "value":true
+                }, 
+                {
                  "name":"jump_back_to_checkpoint",
                  "type":"bool",
                  "value":true
@@ -1034,6 +1052,63 @@
          "spacing":0,
          "tilecount":4,
          "tileheight":32,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"jump_back_to_checkpoint",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":1,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"jump_back_to_checkpoint",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":2,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"jump_back_to_checkpoint",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"jump_back_to_checkpoint",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }],
          "tilewidth":32
         }, 
         {
@@ -1044,6 +1119,17 @@
          "imagewidth":64,
          "margin":0,
          "name":"lava-roxa-profunda-6fps",
+         "properties":[
+                {
+                 "name":"collider",
+                 "type":"bool",
+                 "value":true
+                }, 
+                {
+                 "name":"jump_back_to_checkpoint",
+                 "type":"bool",
+                 "value":true
+                }],
          "spacing":0,
          "tilecount":4,
          "tileheight":32,
@@ -1052,11 +1138,71 @@
                  "id":0,
                  "properties":[
                         {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"jump_back_to_checkpoint",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":1,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"jump_back_to_checkpoint",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":2,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"jump_back_to_checkpoint",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":3,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
                          "name":"jump_back_to_checkpoint",
                          "type":"bool",
                          "value":true
                         }]
                 }],
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":67,
+         "image":"spritesheets\/pedra-dark.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"pedra-dark",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
          "tilewidth":32
         }],
  "tilewidth":32,

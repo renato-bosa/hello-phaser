@@ -210,6 +210,10 @@
                 0 8px 20px rgb(0 0 0 / 20%);
         }
 
+        .world-gallery.drop-empty {
+            box-shadow: inset 0 0 0 2px #60a5fa;
+        }
+
         .drag-handle {
             position: absolute;
             z-index: 2;
@@ -357,6 +361,11 @@
                 source: 'map0-0.json'
             },
             {
+                id: 'map2-0',
+                image: 'map2-0.png',
+                source: 'map2-0.json'
+            },
+            {
                 id: 'map0-1',
                 image: 'map0-1.png',
                 source: 'map0-1.json'
@@ -485,6 +494,8 @@
         const importFileElement = document.querySelector('#import-file');
 
         let draggedCard = null;
+        // Destino pretendido durante o drag — só aplica no drop (evita flicker).
+        let dropIntent = null;
 
         function createId() {
             if (window.crypto?.randomUUID) {
@@ -694,7 +705,6 @@
                 }
 
                 event.dataTransfer.dropEffect = 'move';
-                clearDropIndicators();
 
                 const targetCard = event.target.closest('.card');
 
@@ -703,9 +713,13 @@
                     targetCard === draggedCard ||
                     targetCard.parentElement !== gallery
                 ) {
-                    gallery.append(draggedCard);
+                    setDropIntent({ gallery, reference: null, after: false });
                     section.classList.add('drag-over');
-                    updateCounts();
+                    gallery.classList.toggle(
+                        'drop-empty',
+                        gallery.querySelectorAll('.card:not(.is-dragging)')
+                            .length === 0
+                    );
                     return;
                 }
 
@@ -721,26 +735,20 @@
                         relativeX > rect.width / 2
                     );
 
-                if (after) {
-                    targetCard.after(draggedCard);
-                    targetCard.classList.add('drop-after');
-                } else {
-                    targetCard.before(draggedCard);
-                    targetCard.classList.add('drop-before');
-                }
-
+                setDropIntent({ gallery, reference: targetCard, after });
                 section.classList.add('drag-over');
-                updateCounts();
             });
 
             gallery.addEventListener('drop', event => {
                 event.preventDefault();
+                applyDropIntent();
                 finishDragging();
             });
 
             section.addEventListener('dragleave', event => {
                 if (!section.contains(event.relatedTarget)) {
                     section.classList.remove('drag-over');
+                    gallery.classList.remove('drop-empty');
                 }
             });
 
@@ -873,12 +881,50 @@
                 `${amountWorlds === 1 ? 'mundo' : 'mundos'}`;
         }
 
+        function setDropIntent(nextIntent) {
+            const sameTarget =
+                dropIntent &&
+                dropIntent.gallery === nextIntent.gallery &&
+                dropIntent.reference === nextIntent.reference &&
+                dropIntent.after === nextIntent.after;
+
+            if (sameTarget) {
+                return;
+            }
+
+            clearDropIndicators();
+            dropIntent = nextIntent;
+
+            if (nextIntent.reference) {
+                nextIntent.reference.classList.add(
+                    nextIntent.after ? 'drop-after' : 'drop-before'
+                );
+            }
+        }
+
+        function applyDropIntent() {
+            if (!draggedCard || !dropIntent) {
+                return;
+            }
+
+            const { gallery, reference, after } = dropIntent;
+
+            if (!reference) {
+                gallery.append(draggedCard);
+            } else if (after) {
+                reference.after(draggedCard);
+            } else {
+                reference.before(draggedCard);
+            }
+        }
+
         function finishDragging() {
             if (draggedCard) {
                 draggedCard.classList.remove('is-dragging');
             }
 
             draggedCard = null;
+            dropIntent = null;
             clearDropIndicators();
             updateCounts();
             saveLayout();
@@ -886,12 +932,13 @@
 
         function clearDropIndicators() {
             document.querySelectorAll(
-                '.drop-before, .drop-after, .drag-over'
+                '.drop-before, .drop-after, .drag-over, .drop-empty'
             ).forEach(element => {
                 element.classList.remove(
                     'drop-before',
                     'drop-after',
-                    'drag-over'
+                    'drag-over',
+                    'drop-empty'
                 );
             });
         }

@@ -3,7 +3,7 @@
  *
  * Não redefine `GameConfig` — só registra WORLDS/LEVELS em
  * `GameConfigVariants.proposta`, conforme
- * `assets/_map-previews/rock-hero-mundos-proposta.json`.
+ * `assets/_map-previews/rock-hero-mundos-proposta2.json`.
  *
  * Ativação: DEV OPTIONS → “Ordem Proposta” (persiste em Settings e recarrega)
  * ou `Settings.set('levelOrder', 'proposta')`.
@@ -19,7 +19,7 @@ GameConfigVariants.proposta = {
             id: 1,
             name: 'Mundo 1',
             subtitle: 'O Resgate do Baterista',
-            levels: [0, 1, 2, 3, 4, 5], // map0-1, map2-0, map6, map16, map8, map-ultima-mundo1
+            levels: [0, 1, 2, 3, 4], // map0-1, map2-0, map3, map-ultima-mundo1, map4
             rescuedCharacter: 'baterista',
             celebrationMessage: 'Você resgatou o Baterista!',
             theme: 'grass',
@@ -31,7 +31,7 @@ GameConfigVariants.proposta = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [6, 7, 8, 9, 10], // map10, map7, map4, map3, map5
+            levels: [5, 6, 7, 8, 9], // map5, map6, map10, map8, map7
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             theme: 'cave',
@@ -42,7 +42,7 @@ GameConfigVariants.proposta = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [11, 12, 13, 14, 15], // map12, map11, map2, map17, map18
+            levels: [10, 11, 12, 13, 14], // map11, map2, map12, map16, map17
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             theme: 'water',
@@ -53,7 +53,7 @@ GameConfigVariants.proposta = {
             id: 4,
             name: 'Mundo 4',
             subtitle: 'Mecânicas Experimentais',
-            levels: [16, 17, 18, 19], // map19, map20, map21, map22
+            levels: [15, 16, 17, 18, 19], // map18, map19, map20, map21, map22
             rescuedCharacter: 'vocalista',
             celebrationMessage: 'Mecânicas dominadas!',
             theme: 'special',
@@ -63,7 +63,7 @@ GameConfigVariants.proposta = {
     ],
 
     LEVELS: [
-        // Mundo 1: map0-1 → map2-0 → map-6 → map-16 → map-8 → map-ultima-mundo1
+        // Mundo 1: map0-1 → map2-0 → map-3 → map-ultima-mundo1 → map-4
         {
             key: 'map0-1',
             file: 'assets/map0-1.json',
@@ -71,7 +71,7 @@ GameConfigVariants.proposta = {
             zoom: 1.0,
             roundPixels: true,
             world: 1,
-            mapPosition: { x: 70, y: 200 },
+            mapPosition: { x: 80, y: 200 },
             connectsTo: [1]
         },
         {
@@ -81,39 +81,18 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 160, y: 170 },
+            mapPosition: { x: 200, y: 170 },
             connectsTo: [2]
         },
         {
-            key: 'map6',
-            file: 'assets/map-6--caverna2.json',
-            name: 'Ative o turbo!',
+            key: 'map3',
+            file: 'assets/map-3--desafio do luigi.json',
+            name: 'Sapos e lava',
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 250, y: 210 },
+            mapPosition: { x: 320, y: 220 },
             connectsTo: [3]
-        },
-        {
-            key: 'map16',
-            file: 'assets/map-16.json',
-            name: 'Ascensão Abissal',
-            zoom: 0.9,
-            roundPixels: false,
-            world: 1,
-            mapPosition: { x: 340, y: 175 },
-            connectsTo: [4],
-            features: { doubleJump: true, neonLineTrail: true }
-        },
-        {
-            key: 'map8',
-            file: 'assets/map-8.json',
-            name: 'Simples',
-            zoom: 0.9,
-            roundPixels: false,
-            world: 1,
-            mapPosition: { x: 430, y: 215 },
-            connectsTo: [5]
         },
         {
             key: 'map-ultima-mundo1',
@@ -122,10 +101,40 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 530, y: 190 },
+            mapPosition: { x: 440, y: 180 },
+            connectsTo: [4]
+        },
+        {
+            key: 'map4',
+            file: 'assets/map-4--big-jumps.json',
+            name: 'Os Pulos Maiores',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 560, y: 200 },
             connectsTo: []
         },
-        // Mundo 2: map-10 → map-7 → map-4 → map-3 → map-5
+        // Mundo 2: map-5 → map-6 → map-10 → map-8 → map-7
+        {
+            key: 'map5',
+            file: 'assets/map-5--caverna.json',
+            name: 'Cristais Fascinantes',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 2,
+            mapPosition: { x: 80, y: 200 },
+            connectsTo: [6]
+        },
+        {
+            key: 'map6',
+            file: 'assets/map-6--caverna2.json',
+            name: 'Ative o turbo!',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 2,
+            mapPosition: { x: 170, y: 160 },
+            connectsTo: [7]
+        },
         {
             key: 'map10',
             file: 'assets/map-10.json',
@@ -133,8 +142,18 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 80, y: 200 },
-            connectsTo: [7]
+            mapPosition: { x: 270, y: 210 },
+            connectsTo: [8]
+        },
+        {
+            key: 'map8',
+            file: 'assets/map-8.json',
+            name: 'Simples',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 2,
+            mapPosition: { x: 370, y: 180 },
+            connectsTo: [9]
         },
         {
             key: 'map7',
@@ -143,50 +162,10 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 170, y: 160 },
-            connectsTo: [8]
-        },
-        {
-            key: 'map4',
-            file: 'assets/map-4--big-jumps.json',
-            name: 'Os Pulos Maiores',
-            zoom: 0.9,
-            roundPixels: false,
-            world: 2,
-            mapPosition: { x: 270, y: 210 },
-            connectsTo: [9]
-        },
-        {
-            key: 'map3',
-            file: 'assets/map-3--desafio do luigi.json',
-            name: 'Sapos e lava',
-            zoom: 0.9,
-            roundPixels: false,
-            world: 2,
-            mapPosition: { x: 370, y: 180 },
-            connectsTo: [10]
-        },
-        {
-            key: 'map5',
-            file: 'assets/map-5--caverna.json',
-            name: 'Cristais Fascinantes',
-            zoom: 0.9,
-            roundPixels: false,
-            world: 2,
             mapPosition: { x: 460, y: 220 },
             connectsTo: []
         },
-        // Mundo 3: map-12 → map-11 → map-2 → map-17 → map-18
-        {
-            key: 'map12',
-            file: 'assets/map-12.json',
-            name: 'Abismo Submerso',
-            zoom: 0.9,
-            roundPixels: false,
-            world: 3,
-            mapPosition: { x: 85, y: 200 },
-            connectsTo: [12]
-        },
+        // Mundo 3: map-11 → map-2 → map-12 → map-16 → map-17
         {
             key: 'map11',
             file: 'assets/map-11.json',
@@ -194,8 +173,8 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 195, y: 215 },
-            connectsTo: [13],
+            mapPosition: { x: 85, y: 200 },
+            connectsTo: [11],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -205,8 +184,29 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 305, y: 185 },
-            connectsTo: [14]
+            mapPosition: { x: 195, y: 185 },
+            connectsTo: [12]
+        },
+        {
+            key: 'map12',
+            file: 'assets/map-12.json',
+            name: 'Abismo Submerso',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 305, y: 215 },
+            connectsTo: [13]
+        },
+        {
+            key: 'map16',
+            file: 'assets/map-16.json',
+            name: 'Ascensão Abissal',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 415, y: 185 },
+            connectsTo: [14],
+            features: { doubleJump: true, neonLineTrail: true }
         },
         {
             key: 'map17',
@@ -215,22 +215,22 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 415, y: 215 },
-            connectsTo: [15],
+            mapPosition: { x: 515, y: 210 },
+            connectsTo: [],
             features: { doubleJump: true, neonLineTrail: true }
         },
+        // Mundo 4: map-18 → map-19 → map-20 → map-21 → map-22
         {
             key: 'map18',
             file: 'assets/map-18.json',
             name: 'Abismo Final',
             zoom: 0.9,
             roundPixels: false,
-            world: 3,
-            mapPosition: { x: 515, y: 195 },
-            connectsTo: [],
+            world: 4,
+            mapPosition: { x: 80, y: 200 },
+            connectsTo: [16],
             features: { doubleJump: true, neonLineTrail: true }
         },
-        // Mundo 4: map-19 → map-20 → map-21 → map-22
         {
             key: 'map19',
             file: 'assets/map-19.json',
@@ -238,7 +238,7 @@ GameConfigVariants.proposta = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 120, y: 200 },
+            mapPosition: { x: 200, y: 200 },
             connectsTo: [17],
             features: { upsideDown: true, wind: true }
         },
@@ -249,7 +249,7 @@ GameConfigVariants.proposta = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 280, y: 200 },
+            mapPosition: { x: 340, y: 200 },
             connectsTo: [18],
             features: { autoScroll: true }
         },
@@ -260,7 +260,7 @@ GameConfigVariants.proposta = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 440, y: 200 },
+            mapPosition: { x: 460, y: 200 },
             connectsTo: [19],
             features: { wind: true }
         },

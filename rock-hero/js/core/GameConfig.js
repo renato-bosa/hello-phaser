@@ -585,7 +585,7 @@ const GameConfig = {
 
     // ==================== ORDEM DE FASES ====================
     // Variantes em `window.GameConfigVariants` (default aqui; proposta em
-    // GameConfig.mundos-proposta.js). Preferência: Settings.levelOrder.
+    // GameConfig.mundos-proposta.js ← rock-hero-mundos-proposta2.json).
     LEVEL_ORDER: {
         DEFAULT: 'default',
         PROPOSTA: 'proposta',

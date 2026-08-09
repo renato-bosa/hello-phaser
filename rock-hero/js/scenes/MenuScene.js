@@ -652,7 +652,7 @@ class MenuScene extends Phaser.Scene {
             {
                 key: 'levelOrder',
                 name: 'Ordem Proposta',
-                desc: 'rock-hero-mundos-proposta (recarrega)',
+                desc: 'rock-hero-mundos-proposta2 (recarrega)',
                 isOn: () => (Settings.get('levelOrder') || 'default') === GameConfig.LEVEL_ORDER.PROPOSTA,
                 y: this.centerY + this.u(130)
             }

@@ -102,6 +102,15 @@ const GC = {
             JUMP_FORCE: -180,
             ANIM_FPS: 6,
         },
+        // Como o tomate, mas patrulha curta (1 bloco p/ cada lado = 2 no total)
+        // e salto = metade da altura do sapo verde (−420 → −210).
+        SAPO_ROXO: {
+            PATROL_DISTANCE: 32,
+            SPEED: 60,
+            JUMP_DISTANCE: 32,
+            JUMP_FORCE: -210,
+            ANIM_FPS: 6,
+        },
         SAPO_VERDE: {
             JUMP_FORCE: -420,
             JUMP_INTERVAL_MS: 1500,

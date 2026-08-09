@@ -47,6 +47,7 @@ class GameScene extends Phaser.Scene {
         this._loadImageIfMissing('player-trail', 'assets/spritesheets/player-trail1.png');
         this._loadSheetIfMissing('sapo-tomate', 'assets/spritesheets/sapo-tomate-6fps.png', 32, 32);
         this._loadSheetIfMissing('sapo-verde', 'assets/spritesheets/sapo-verde-6fps.png', 32, 32);
+        this._loadSheetIfMissing('sapo-roxo', 'assets/spritesheets/sapo-roxo-6fps.png', 32, 32);
         this._loadSheetIfMissing('seahorse', 'assets/spritesheets/Cavalo marinho.png', 32, 32);
         this._loadSheetIfMissing('boneco', 'assets/spritesheets/Boneco-14fps.png', 32, 32);
         this._loadImageIfMissing('red-heart', 'assets/spritesheets/red-heart.png');
@@ -489,14 +490,20 @@ class GameScene extends Phaser.Scene {
                     type: 'boneco'
                 });
             }
-            else if (type === 'enemy' || type === 'sapo' ||
+            else if (type === 'enemy' || type === 'sapo' || type === 'sapo-roxo' ||
                      tilesetName.includes('sapo') || tilesetName.includes('frog')) {
-                const isSapoVerde = tilesetName.includes('sapo-verde') || tilesetName.includes('verde');
+                // Ordem importa: "verde"/"roxo" no nome do tileset.
+                let sapoType = 'sapo';
+                if (type === 'sapo-verde' || tilesetName.includes('sapo-verde') || tilesetName.includes('verde')) {
+                    sapoType = 'sapo-verde';
+                } else if (type === 'sapo-roxo' || tilesetName.includes('sapo-roxo') || tilesetName.includes('roxo')) {
+                    sapoType = 'sapo-roxo';
+                }
                 // Inimigos com patrulha/AI ignoram transform — `flipX` é controlado pelo EnemyManager em runtime.
                 enemies.push({
                     x: obj.x + 16,
                     y: obj.y - 16,
-                    type: isSapoVerde ? 'sapo-verde' : 'sapo'
+                    type: sapoType
                 });
             }
             else if (type === 'seahorse' ||

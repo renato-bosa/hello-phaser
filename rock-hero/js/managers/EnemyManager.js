@@ -1,6 +1,7 @@
 /**
  * EnemyManager - Gerencia inimigos (sapos, seahorse, boneco)
  * Responsável por: criação, patrulha, pulo, colisão e morte de inimigos
+ * Sapos: tomate (patrulha larga), roxo (patrulha curta + salto médio), verde (parado + salto alto)
  */
 class EnemyManager {
     constructor(scene) {
@@ -16,6 +17,8 @@ class EnemyManager {
         enemyData.forEach(e => {
             if (e.type === 'sapo-verde') {
                 this._createSapoVerde(e.x, e.y);
+            } else if (e.type === 'sapo-roxo') {
+                this._createSapoRoxo(e.x, e.y);
             } else if (e.type === 'sapo') {
                 this._createSapo(e.x, e.y);
             } else if (e.type === 'seahorse') {
@@ -27,16 +30,34 @@ class EnemyManager {
     }
 
     _createSapo(x, y) {
+        this._createSapoPatrol(x, y, {
+            texture: 'sapo-tomate',
+            animKey: 'sapo-walk',
+            cfg: GC.ENEMY.SAPO
+        });
+    }
+
+    _createSapoRoxo(x, y) {
+        this._createSapoPatrol(x, y, {
+            texture: 'sapo-roxo',
+            animKey: 'sapo-roxo-walk',
+            cfg: GC.ENEMY.SAPO_ROXO,
+            type: 'sapo-roxo'
+        });
+    }
+
+    /** Sapo com patrulha horizontal + pulos (tomate / roxo). */
+    _createSapoPatrol(x, y, { texture, animKey, cfg, type }) {
         const scene = this.scene;
-        const sapo = scene.physics.add.sprite(x, y, 'sapo-tomate');
+        const sapo = scene.physics.add.sprite(x, y, texture);
 
         sapo.body.setSize(GC.ENEMY.BODY_WIDTH, GC.ENEMY.BODY_HEIGHT);
         sapo.body.setOffset(GC.ENEMY.BODY_OFFSET_X, 0);
         sapo.body.allowGravity = true;
         sapo.body.setCollideWorldBounds(true);
 
-        const cfg = GC.ENEMY.SAPO;
         sapo.patrolData = {
+            type: type || undefined,
             startX: x,
             leftLimit: x - cfg.PATROL_DISTANCE,
             rightLimit: x + cfg.PATROL_DISTANCE,
@@ -49,15 +70,15 @@ class EnemyManager {
 
         sapo.setVelocityX(cfg.SPEED);
 
-        if (!scene.anims.exists('sapo-walk')) {
+        if (!scene.anims.exists(animKey)) {
             scene.anims.create({
-                key: 'sapo-walk',
-                frames: scene.anims.generateFrameNumbers('sapo-tomate', { start: 0, end: 5 }),
+                key: animKey,
+                frames: scene.anims.generateFrameNumbers(texture, { start: 0, end: 5 }),
                 frameRate: cfg.ANIM_FPS,
                 repeat: -1
             });
         }
-        sapo.anims.play('sapo-walk', true);
+        sapo.anims.play(animKey, true);
         this.enemies.add(sapo);
     }
 

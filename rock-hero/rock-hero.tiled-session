@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map2-0.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -28,8 +28,8 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.75,
             "selectedLayer": 4,
@@ -1996,11 +1996,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.33,
-            "selectedLayer": 6,
+            "scale": 0.5,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 469.69696969696963,
-                "y": 433.3333333333333
+                "x": 554,
+                "y": 430
             }
         },
         "dev-resources/map2-0.tmx#abstract-blue": {

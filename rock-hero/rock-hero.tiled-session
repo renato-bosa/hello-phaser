@@ -34,8 +34,8 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 464,
-                "y": 303.33333333333326
+                "x": 463.99999999999994,
+                "y": 302.6666666666667
             }
         },
         "dev-resources/map-10.tmx#Cavalo marinho": {
@@ -1247,7 +1247,7 @@
             "scale": 0.1977,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1441.578148710167,
+                "x": 1441.5781487101672,
                 "y": 475.46788062721293
             }
         },
@@ -1483,8 +1483,8 @@
         },
         "dev-resources/map-7--planicie.tmx": {
             "expandedObjectLayers": [
-                8,
-                11
+                11,
+                8
             ],
             "scale": 0.25,
             "selectedLayer": 4,
@@ -1743,8 +1743,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 866,
-                "y": 601
+                "x": 812,
+                "y": 600
             }
         },
         "dev-resources/map-ultima-mundo1.tmx#abstract-blue": {

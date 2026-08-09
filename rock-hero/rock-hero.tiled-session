@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map2-0.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -28,14 +28,14 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 463.99999999999994,
-                "y": 302.6666666666667
+                "x": 464,
+                "y": 303.33333333333326
             }
         },
         "dev-resources/map-10.tmx#Cavalo marinho": {
@@ -1743,8 +1743,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 836,
-                "y": 470
+                "x": 866,
+                "y": 601
             }
         },
         "dev-resources/map-ultima-mundo1.tmx#abstract-blue": {
@@ -1997,10 +1997,10 @@
                 8
             ],
             "scale": 0.33,
-            "selectedLayer": 3,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 324.24242424242414,
-                "y": 572.7272727272727
+                "x": 469.69696969696963,
+                "y": 433.3333333333333
             }
         },
         "dev-resources/map2-0.tmx#abstract-blue": {

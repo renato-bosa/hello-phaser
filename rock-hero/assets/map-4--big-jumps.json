@@ -320,8 +320,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":602,
-                 "y":391
+                 "x":606,
+                 "y":387
                 }, 
                 {
                  "gid":17,
@@ -476,8 +476,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":664,
-                 "y":504
+                 "x":665,
+                 "y":502
                 }, 
                 {
                  "gid":17,
@@ -537,7 +537,7 @@
                  "visible":true,
                  "width":32,
                  "x":704,
-                 "y":592
+                 "y":590
                 }, 
                 {
                  "gid":17,
@@ -632,7 +632,7 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":1432,
+                 "x":1438,
                  "y":764
                 }, 
                 {
@@ -680,8 +680,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":1258,
-                 "y":387
+                 "x":1262,
+                 "y":383
                 }, 
                 {
                  "gid":17,
@@ -1407,7 +1407,7 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":1440,
+                 "x":1376,
                  "y":928
                 }, 
                 {
@@ -1577,6 +1577,18 @@
                  "width":32,
                  "x":1536,
                  "y":928
+                }, 
+                {
+                 "gid":42,
+                 "height":32,
+                 "id":213,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":2304,
+                 "y":448
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1585,7 +1597,7 @@
          "y":0
         }],
  "nextlayerid":12,
- "nextobjectid":213,
+ "nextobjectid":214,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1969,6 +1981,19 @@
          "name":"sapo-tomate-6fps",
          "spacing":0,
          "tilecount":6,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":42,
+         "image":"spritesheets\/red-heart.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"red-heart",
+         "spacing":0,
+         "tilecount":1,
          "tileheight":32,
          "tilewidth":32
         }],

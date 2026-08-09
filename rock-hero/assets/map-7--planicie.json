@@ -550,6 +550,18 @@
                  "width":32,
                  "x":640,
                  "y":384
+                }, 
+                {
+                 "gid":58,
+                 "height":32,
+                 "id":293,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":992,
+                 "y":640
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -580,7 +592,7 @@
          "y":0
         }],
  "nextlayerid":12,
- "nextobjectid":293,
+ "nextobjectid":294,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1115,6 +1127,19 @@
          "imagewidth":32,
          "margin":0,
          "name":"agua",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":58,
+         "image":"spritesheets\/red-heart.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"red-heart",
          "spacing":0,
          "tilecount":1,
          "tileheight":32,

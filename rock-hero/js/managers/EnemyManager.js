@@ -291,16 +291,34 @@ class EnemyManager {
                 return;
             }
 
-            // Sapo tomate: patrulha + pula
+            // Sapo roxo: patrulha + pula, sem cair em buracos
+            if (data.type === 'sapo-roxo') {
+                this._updatePatrol(enemy, data, onGround, {
+                    jump: true,
+                    avoidLedges: true
+                });
+                return;
+            }
+
+            // Sapo tomate: patrulha + pula (pode cair em buracos)
             this._updatePatrol(enemy, data, onGround, { jump: true });
         });
     }
 
     /**
      * Patrulha horizontal compartilhada (sapo / boneco).
-     * @param {{ jump?: boolean }} opts jump=true aplica pulos periódicos do sapo
+     * @param {{ jump?: boolean, avoidLedges?: boolean }} opts
+     *   jump=true → pulos periódicos do sapo
+     *   avoidLedges=true → vira na beirada (só sapo roxo)
      */
     _updatePatrol(enemy, data, onGround, opts = {}) {
+        // Beirada antes do pulo: evita saltar em direção ao buraco.
+        if (opts.avoidLedges && onGround && this._isLedgeAhead(enemy, data.direction)) {
+            data.direction *= -1;
+            enemy.setVelocityX(data.speed * data.direction);
+            enemy.setFlipX(data.direction === -1);
+        }
+
         if (opts.jump) {
             const distanceFromLastJump = Math.abs(enemy.x - data.lastJumpX);
             if (distanceFromLastJump >= data.jumpDistance && onGround) {
@@ -338,6 +356,25 @@ class EnemyManager {
         if (Math.abs(enemy.body.velocity.x) < data.speed * 0.5 && onGround) {
             enemy.setVelocityX(data.speed * data.direction);
         }
+    }
+
+    /**
+     * True se não há tile sólido colidível logo à frente dos pés (buraco/beirada).
+     */
+    _isLedgeAhead(enemy, direction) {
+        const solids = this.scene.solidsLayer;
+        if (!solids) return false;
+
+        const body = enemy.body;
+        const lookAhead = 4;
+        const probeX = direction > 0
+            ? body.right + lookAhead
+            : body.left - lookAhead;
+        const probeY = body.bottom + 2;
+
+        const tile = solids.getTileAtWorldXY(probeX, probeY, true);
+        if (!tile || tile.index === -1) return true;
+        return !tile.collides;
     }
 
     handleCollision(player, enemy) {

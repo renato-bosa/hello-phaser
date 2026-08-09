@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-5--caverna.tmx",
+    "activeFile": "dev-resources/map0-0.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -1135,11 +1135,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 1.5,
+            "scale": 0.33,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 2149.333333333333,
-                "y": 871.3333333333333
+                "x": 1936.3636363636365,
+                "y": 1224.2424242424242
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
@@ -1323,9 +1323,9 @@
                 8
             ],
             "scale": 0.5,
-            "selectedLayer": 1,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 1590,
+                "x": 568,
                 "y": 486
             }
         },
@@ -2028,7 +2028,7 @@
                 8
             ],
             "scale": 0.5,
-            "selectedLayer": 2,
+            "selectedLayer": 6,
             "viewCenter": {
                 "x": 500,
                 "y": 430
@@ -2094,6 +2094,9 @@
         "dev-resources/map2-0.tmx#lava-roxa-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map2-0.tmx#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
         "dev-resources/map2-0.tmx#sapo-tomate-6fps": {
             "scaleInDock": 1
         },
@@ -2120,24 +2123,24 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-3--desafio do luigi.tmx",
-        "dev-resources/map-5--caverna.tmx"
+        "dev-resources/map0-1.tmx",
+        "dev-resources/map0-0.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map0-1.tmx",
+        "dev-resources/map0-0.tmx",
+        "dev-resources/map2-0.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-5--caverna.tmx",
         "dev-resources/map-ultima-mundo1.tmx",
         "dev-resources/map-10.tmx",
-        "dev-resources/map2-0.tmx",
         "dev-resources/map-6--caverna2.tmx",
         "dev-resources/map-7--planicie.tmx",
         "dev-resources/map-4--big-jumps.tmx",
         "dev-resources/map-8--o-resgate-do-baixista.tmx",
-        "dev-resources/map-2--expansion and speed.tmx",
-        "dev-resources/map0-1.tmx",
-        "dev-resources/map.tmx"
+        "dev-resources/map-2--expansion and speed.tmx"
     ],
     "tileset.embedInMap": true
 }

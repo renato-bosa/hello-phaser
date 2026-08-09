@@ -1642,12 +1642,19 @@
         "dev-resources/map-8--o-resgate-do-baixista.tmx#lava-bubbles-4fps": {
             "scaleInDock": 1
         },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#lava-laranja-cachoeira-5fps": {
+            "scaleInEditor": 1
+        },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#lava-roxa": {
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#lava-roxa-animated": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "dev-resources/map-8--o-resgate-do-baixista.tmx#lava-roxa-profunda-6fps": {
+            "scaleInEditor": 1
         },
         "dev-resources/map-8--o-resgate-do-baixista.tmx#pedra": {
             "scaleInDock": 1

@@ -19,7 +19,7 @@ GameConfigVariants.proposta = {
             id: 1,
             name: 'Mundo 1',
             subtitle: 'O Resgate do Baterista',
-            levels: [0, 1, 2, 3, 4], // map0-1, map6, map16, map8, map-ultima-mundo1
+            levels: [0, 1, 2, 3, 4, 5], // map0-1, map2-0, map6, map16, map8, map-ultima-mundo1
             rescuedCharacter: 'baterista',
             celebrationMessage: 'Você resgatou o Baterista!',
             theme: 'grass',
@@ -31,7 +31,7 @@ GameConfigVariants.proposta = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [5, 6, 7, 8, 9], // map10, map7, map4, map3, map5
+            levels: [6, 7, 8, 9, 10], // map10, map7, map4, map3, map5
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             theme: 'cave',
@@ -42,7 +42,7 @@ GameConfigVariants.proposta = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [10, 11, 12, 13, 14], // map12, map11, map2, map17, map18
+            levels: [11, 12, 13, 14, 15], // map12, map11, map2, map17, map18
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             theme: 'water',
@@ -53,7 +53,7 @@ GameConfigVariants.proposta = {
             id: 4,
             name: 'Mundo 4',
             subtitle: 'Mecânicas Experimentais',
-            levels: [15, 16, 17, 18], // map19, map20, map21, map22
+            levels: [16, 17, 18, 19], // map19, map20, map21, map22
             rescuedCharacter: 'vocalista',
             celebrationMessage: 'Mecânicas dominadas!',
             theme: 'special',
@@ -63,7 +63,7 @@ GameConfigVariants.proposta = {
     ],
 
     LEVELS: [
-        // Mundo 1: map0-1 → map-6 → map-16 → map-8 → map-ultima-mundo1
+        // Mundo 1: map0-1 → map2-0 → map-6 → map-16 → map-8 → map-ultima-mundo1
         {
             key: 'map0-1',
             file: 'assets/map0-1.json',
@@ -71,8 +71,18 @@ GameConfigVariants.proposta = {
             zoom: 1.0,
             roundPixels: true,
             world: 1,
-            mapPosition: { x: 80, y: 200 },
+            mapPosition: { x: 70, y: 200 },
             connectsTo: [1]
+        },
+        {
+            key: 'map2-0',
+            file: 'assets/map2-0.json',
+            name: 'Seguindo em frente',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 160, y: 170 },
+            connectsTo: [2]
         },
         {
             key: 'map6',
@@ -81,8 +91,8 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 200, y: 180 },
-            connectsTo: [2]
+            mapPosition: { x: 250, y: 210 },
+            connectsTo: [3]
         },
         {
             key: 'map16',
@@ -91,8 +101,8 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 320, y: 220 },
-            connectsTo: [3],
+            mapPosition: { x: 340, y: 175 },
+            connectsTo: [4],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -102,8 +112,8 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 440, y: 180 },
-            connectsTo: [4]
+            mapPosition: { x: 430, y: 215 },
+            connectsTo: [5]
         },
         {
             key: 'map-ultima-mundo1',
@@ -112,7 +122,7 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 560, y: 200 },
+            mapPosition: { x: 530, y: 190 },
             connectsTo: []
         },
         // Mundo 2: map-10 → map-7 → map-4 → map-3 → map-5
@@ -124,7 +134,7 @@ GameConfigVariants.proposta = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 80, y: 200 },
-            connectsTo: [6]
+            connectsTo: [7]
         },
         {
             key: 'map7',
@@ -134,7 +144,7 @@ GameConfigVariants.proposta = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 170, y: 160 },
-            connectsTo: [7]
+            connectsTo: [8]
         },
         {
             key: 'map4',
@@ -144,7 +154,7 @@ GameConfigVariants.proposta = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 270, y: 210 },
-            connectsTo: [8]
+            connectsTo: [9]
         },
         {
             key: 'map3',
@@ -154,7 +164,7 @@ GameConfigVariants.proposta = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 370, y: 180 },
-            connectsTo: [9]
+            connectsTo: [10]
         },
         {
             key: 'map5',
@@ -175,7 +185,7 @@ GameConfigVariants.proposta = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 85, y: 200 },
-            connectsTo: [11]
+            connectsTo: [12]
         },
         {
             key: 'map11',
@@ -185,7 +195,7 @@ GameConfigVariants.proposta = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 195, y: 215 },
-            connectsTo: [12],
+            connectsTo: [13],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -196,7 +206,7 @@ GameConfigVariants.proposta = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 305, y: 185 },
-            connectsTo: [13]
+            connectsTo: [14]
         },
         {
             key: 'map17',
@@ -206,7 +216,7 @@ GameConfigVariants.proposta = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 415, y: 215 },
-            connectsTo: [14],
+            connectsTo: [15],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -229,7 +239,7 @@ GameConfigVariants.proposta = {
             roundPixels: true,
             world: 4,
             mapPosition: { x: 120, y: 200 },
-            connectsTo: [16],
+            connectsTo: [17],
             features: { upsideDown: true, wind: true }
         },
         {
@@ -240,7 +250,7 @@ GameConfigVariants.proposta = {
             roundPixels: true,
             world: 4,
             mapPosition: { x: 280, y: 200 },
-            connectsTo: [17],
+            connectsTo: [18],
             features: { autoScroll: true }
         },
         {
@@ -251,7 +261,7 @@ GameConfigVariants.proposta = {
             roundPixels: true,
             world: 4,
             mapPosition: { x: 440, y: 200 },
-            connectsTo: [18],
+            connectsTo: [19],
             features: { wind: true }
         },
         {

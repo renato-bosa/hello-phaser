@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map0-0.tmx",
+    "activeFile": "dev-resources/map2-0.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -1901,7 +1901,7 @@
                 8
             ],
             "scale": 0.33,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 803.030303030303,
                 "y": 375.75757575757575
@@ -2123,15 +2123,15 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map0-1.tmx",
-        "dev-resources/map0-0.tmx"
+        "dev-resources/map0-0.tmx",
+        "dev-resources/map2-0.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "dev-resources/map0-1.tmx",
         "dev-resources/map0-0.tmx",
         "dev-resources/map2-0.tmx",
+        "dev-resources/map0-1.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map-5--caverna.tmx",
         "dev-resources/map-ultima-mundo1.tmx",

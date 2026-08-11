@@ -1903,8 +1903,8 @@
             "scale": 0.33,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 803.030303030303,
-                "y": 375.75757575757575
+                "x": 848.4848484848485,
+                "y": 571.2121212121212
             }
         },
         "dev-resources/map0-0.tmx#abstract-blue": {
@@ -2027,12 +2027,15 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.5,
+            "scale": 0.75,
             "selectedLayer": 6,
             "viewCenter": {
-                "x": 500,
-                "y": 430
+                "x": 665.3333333333334,
+                "y": 401.33333333333326
             }
+        },
+        "dev-resources/map2-0.tmx#1up": {
+            "scaleInDock": 1
         },
         "dev-resources/map2-0.tmx#abstract-blue": {
             "scaleInDock": 1
@@ -2092,6 +2095,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map2-0.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map2-0.tmx#red-heart": {
             "scaleInDock": 1
         },
         "dev-resources/map2-0.tmx#sapo-roxo-6fps": {

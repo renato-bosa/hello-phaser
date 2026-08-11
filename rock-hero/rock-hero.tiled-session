@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map2-0.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -2028,7 +2028,7 @@
                 8
             ],
             "scale": 0.75,
-            "selectedLayer": 6,
+            "selectedLayer": 5,
             "viewCenter": {
                 "x": 665.3333333333334,
                 "y": 401.33333333333326

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="29" height="19" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="85">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="29" height="19" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="88">
  <editorsettings>
   <export target="../assets/map.json" format="json"/>
  </editorsettings>
@@ -108,6 +108,9 @@
  <tileset firstgid="41" name="Cavalo marinho" tilewidth="32" tileheight="32" tilecount="6" columns="2">
   <image source="../assets/spritesheets/Cavalo marinho.png" width="64" height="96"/>
  </tileset>
+ <tileset firstgid="47" name="sapo-roxo-6fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/sapo-roxo-6fps.png" width="64" height="96"/>
+ </tileset>
  <layer id="5" name="bg" width="29" height="19">
   <data encoding="csv">
 19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,30,30,30,30,30,30,30,30,30,
@@ -162,8 +165,8 @@
 2,0,0,0,0,0,0,0,29,0,0,0,0,0,0,0,0,0,0,2,31,31,2,33,0,0,0,0,0,
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,31,31,2,33,0,0,0,0,0,
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,31,31,2,33,0,0,33,33,33,
-2,0,0,0,0,29,0,0,0,0,0,0,0,0,0,0,0,33,0,2,31,31,2,33,0,0,33,33,0,
-2,0,0,0,29,29,0,0,0,0,0,0,0,0,0,0,0,0,0,2,31,31,2,33,0,0,33,33,0,
+2,0,0,0,0,29,0,0,0,0,0,0,0,0,0,0,0,0,0,2,31,31,2,33,0,0,33,33,0,
+2,0,0,0,29,29,0,0,0,0,0,0,0,0,0,0,0,33,0,2,31,31,2,33,0,0,33,33,0,
 2,0,0,0,29,29,0,0,0,0,0,0,0,0,0,0,0,0,0,2,31,31,2,33,0,0,33,33,0,
 2,0,0,29,29,29,0,0,0,0,0,0,0,0,0,0,0,0,0,2,31,31,2,33,0,0,33,33,0,
 2,1,1,1,1,1,0,0,0,0,33,33,33,33,33,33,33,33,33,2,2,2,2,33,0,0,33,33,0,
@@ -173,7 +176,7 @@
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-2,0,0,0,0,0,0,31,31,31,31,31,0,0,0,0,0,31,31,31,31,0,0,0,0,31,0,0,0,
+2,0,0,0,0,0,0,31,31,31,31,31,0,0,0,0,0,31,31,31,31,0,0,31,0,0,0,0,0,
 2,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,31,0,0,0
 </data>
  </layer>
@@ -201,8 +204,9 @@
   <object id="75" gid="20" x="608" y="384" width="32" height="32"/>
   <object id="80" gid="20" x="256" y="96" width="32" height="32"/>
   <object id="81" gid="20" x="544" y="64" width="32" height="32"/>
-  <object id="82" gid="34" x="544" y="192" width="32" height="32"/>
-  <object id="83" gid="35" x="448" y="576" width="32" height="32"/>
-  <object id="84" gid="41" x="800" y="544" width="32" height="32"/>
+  <object id="82" gid="34" x="544" y="224" width="32" height="32"/>
+  <object id="84" gid="41" x="736" y="544" width="32" height="32"/>
+  <object id="85" gid="47" x="288" y="544" width="32" height="32"/>
+  <object id="87" gid="35" x="448" y="576" width="32" height="32"/>
  </objectgroup>
 </map>

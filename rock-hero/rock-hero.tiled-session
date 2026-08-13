@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-ultima-mundo1.tmx",
+    "activeFile": "dev-resources/map-10.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -28,14 +28,14 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
-            "selectedLayer": 4,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 427.99999999999994,
-                "y": 302.6666666666667
+                "x": 664,
+                "y": 400
             }
         },
         "dev-resources/map-10.tmx#Cavalo marinho": {
@@ -75,6 +75,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-10.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#sapo-roxo-6fps": {
             "scaleInDock": 1
         },
         "dev-resources/map-10.tmx#sapo-tomate-6fps": {
@@ -1136,10 +1139,10 @@
                 8
             ],
             "scale": 0.75,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 1957.3333333333333,
-                "y": 806.6666666666665
+                "y": 562.6666666666666
             }
         },
         "dev-resources/map-3--desafio do luigi.tmx#abstract-blue": {
@@ -2132,18 +2135,14 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map0-0.tmx",
-        "dev-resources/map-4--big-jumps.tmx",
-        "dev-resources/map-5--caverna.tmx",
-        "dev-resources/map-6--caverna2.tmx",
-        "dev-resources/map-7--planicie.tmx",
-        "dev-resources/map-8--o-resgate-do-baixista.tmx",
-        "dev-resources/map-9.tmx",
-        "dev-resources/map-ultima-mundo1.tmx"
+        "dev-resources/map-3--desafio do luigi.tmx",
+        "dev-resources/map-10.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map-3--desafio do luigi.tmx",
+        "dev-resources/map-10.tmx",
         "dev-resources/map0-0.tmx",
         "dev-resources/map-4--big-jumps.tmx",
         "dev-resources/map-5--caverna.tmx",
@@ -2152,10 +2151,8 @@
         "dev-resources/map-8--o-resgate-do-baixista.tmx",
         "dev-resources/map-9.tmx",
         "dev-resources/map-ultima-mundo1.tmx",
-        "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map2-0.tmx",
-        "dev-resources/map0-1.tmx",
-        "dev-resources/map-10.tmx"
+        "dev-resources/map0-1.tmx"
     ],
     "tileset.embedInMap": true
 }

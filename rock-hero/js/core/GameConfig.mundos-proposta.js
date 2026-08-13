@@ -31,7 +31,7 @@ GameConfigVariants.proposta = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [5, 6, 7, 8, 9], // map5, map6, map10, map8, map7
+            levels: [5, 6, 7, 8, 9], // map5, map6, map2, map8, map7
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             theme: 'cave',
@@ -42,7 +42,7 @@ GameConfigVariants.proposta = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [10, 11, 12, 13, 14], // map11, map2, map12, map16, map17
+            levels: [10, 11, 12, 13, 14], // map10, map11, map12, map16, map17
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             theme: 'water',
@@ -114,7 +114,7 @@ GameConfigVariants.proposta = {
             mapPosition: { x: 560, y: 200 },
             connectsTo: []
         },
-        // Mundo 2: map-5 → map-6 → map-10 → map-8 → map-7
+        // Mundo 2: map-5 → map-6 → map-2 → map-8 → map-7
         {
             key: 'map5',
             file: 'assets/map-5--caverna.json',
@@ -136,9 +136,9 @@ GameConfigVariants.proposta = {
             connectsTo: [7]
         },
         {
-            key: 'map10',
-            file: 'assets/map-10.json',
-            name: 'Ruínas Submersas',
+            key: 'map2',
+            file: 'assets/map-2--expansion and speed.json',
+            name: 'Pulos decisivos',
             zoom: 0.9,
             roundPixels: false,
             world: 2,
@@ -165,7 +165,17 @@ GameConfigVariants.proposta = {
             mapPosition: { x: 460, y: 220 },
             connectsTo: []
         },
-        // Mundo 3: map-11 → map-2 → map-12 → map-16 → map-17
+        // Mundo 3: map-10 → map-11 → map-12 → map-16 → map-17
+        {
+            key: 'map10',
+            file: 'assets/map-10.json',
+            name: 'Ruínas Submersas',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 85, y: 200 },
+            connectsTo: [11]
+        },
         {
             key: 'map11',
             file: 'assets/map-11.json',
@@ -173,19 +183,9 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 85, y: 200 },
-            connectsTo: [11],
-            features: { doubleJump: true, neonLineTrail: true }
-        },
-        {
-            key: 'map2',
-            file: 'assets/map-2--expansion and speed.json',
-            name: 'Pulos decisivos',
-            zoom: 0.9,
-            roundPixels: false,
-            world: 3,
             mapPosition: { x: 195, y: 185 },
-            connectsTo: [12]
+            connectsTo: [12],
+            features: { doubleJump: true, neonLineTrail: true }
         },
         {
             key: 'map12',

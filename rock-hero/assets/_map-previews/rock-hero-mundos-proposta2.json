@@ -18,7 +18,7 @@
       "maps": [
         "map-5--caverna",
         "map-6--caverna2",
-        "map-10",
+        "map-2--expansion and speed",
         "map-8",
         "map-7--planicie"
       ]
@@ -27,8 +27,8 @@
       "id": "world-0ddbbc19-9b24-4b6a-86e7-6f09ba8be258",
       "name": "Mundo 3",
       "maps": [
+        "map-10",
         "map-11",
-        "map-2--expansion and speed",
         "map-12",
         "map-16",
         "map-17"

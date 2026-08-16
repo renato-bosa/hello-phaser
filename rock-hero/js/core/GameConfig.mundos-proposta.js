@@ -1,12 +1,9 @@
 /**
  * Variante de ordem de fases (mundos-proposta)
  *
- * Não redefine `GameConfig` — só registra WORLDS/LEVELS em
- * `GameConfigVariants.proposta`, conforme
- * `assets/_map-previews/rock-hero-mundos-proposta2.json`.
- *
- * Ativação: DEV OPTIONS → “Ordem Proposta” (persiste em Settings e recarrega)
- * ou `Settings.set('levelOrder', 'proposta')`.
+ * Espelha a ordem padrão atual (`GameConfig.js` ← proposta2).
+ * O toggle DEV “Ordem Proposta” continua disponível, mas ambas
+ * as variantes são iguais até surgir uma nova proposta.
  *
  * Mapas “Off” (map0-0, map9, map-19-upsidedown) ficam de fora.
  */
@@ -36,7 +33,8 @@ GameConfigVariants.proposta = {
             celebrationMessage: 'Você resgatou o Baixista!',
             theme: 'cave',
             bgColor: 0x1a1a2e,
-            pathColor: 0x4a4a6a
+            pathColor: 0x4a4a6a,
+            bgImage: 'assets/spritesheets/worldmap-backgrounds/world2.png'
         },
         {
             id: 3,
@@ -47,7 +45,8 @@ GameConfigVariants.proposta = {
             celebrationMessage: 'Você resgatou o Guitarrista!',
             theme: 'water',
             bgColor: 0x0a2a4a,
-            pathColor: 0x2288aa
+            pathColor: 0x2288aa,
+            bgImage: 'assets/spritesheets/worldmap-backgrounds/world3.png'
         },
         {
             id: 4,
@@ -58,7 +57,8 @@ GameConfigVariants.proposta = {
             celebrationMessage: 'Mecânicas dominadas!',
             theme: 'special',
             bgColor: 0x1a0a2e,
-            pathColor: 0x8844aa
+            pathColor: 0x8844aa,
+            bgImage: 'assets/spritesheets/worldmap-backgrounds/world4.png'
         }
     ],
 

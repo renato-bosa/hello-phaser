@@ -240,12 +240,13 @@ const GameConfig = {
     ],
 
     // ==================== MUNDOS ====================
+    // Ordem alinhada a rock-hero-mundos-proposta2.json
     WORLDS: [
         {
             id: 1,
             name: 'Mundo 1',
             subtitle: 'O Resgate do Baterista',
-            levels: [0, 1, 2, 3, 4], // 5 fases (map0-1 … map-ultima-mundo1)
+            levels: [0, 1, 2, 3, 4], // map0-1, map2-0, map3, map-ultima-mundo1, map4
             rescuedCharacter: 'baterista',
             celebrationMessage: 'Você resgatou o Baterista!',
             // Visual no WorldMap
@@ -258,36 +259,39 @@ const GameConfig = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [5, 6, 7, 8, 9], // 5 fases (map5 a map10)
+            levels: [5, 6, 7, 8, 9], // map5, map6, map2, map8, map7
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             // Visual no WorldMap (tema caverna/noturno)
             theme: 'cave',
             bgColor: 0x1a1a2e, // Azul escuro noturno
-            pathColor: 0x4a4a6a // Cinza arroxeado
+            pathColor: 0x4a4a6a, // Cinza arroxeado
+            bgImage: 'assets/spritesheets/worldmap-backgrounds/world2.png'
         },
         {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [10, 11, 12, 13, 14], // 5 fases (map11, map12, map16, map17, map18)
+            levels: [10, 11, 12, 13, 14], // map10, map11, map12, map16, map17
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             // Visual no WorldMap (tema aquático)
             theme: 'water',
             bgColor: 0x0a2a4a, // Azul profundo
-            pathColor: 0x2288aa // Azul água
+            pathColor: 0x2288aa, // Azul água
+            bgImage: 'assets/spritesheets/worldmap-backgrounds/world3.png'
         },
         {
             id: 4,
             name: 'Mundo 4',
             subtitle: 'Mecânicas Experimentais',
-            levels: [15, 16, 17, 18],
+            levels: [15, 16, 17, 18, 19], // map18, map19, map20, map21, map22
             rescuedCharacter: 'vocalista',
             celebrationMessage: 'Mecânicas dominadas!',
             theme: 'special',
             bgColor: 0x1a0a2e,
-            pathColor: 0x8844aa
+            pathColor: 0x8844aa,
+            bgImage: 'assets/spritesheets/worldmap-backgrounds/world4.png'
         }
     ],
 
@@ -331,7 +335,10 @@ const GameConfig = {
     },
 
     // ==================== FASES ====================
+    // Ordem alinhada a rock-hero-mundos-proposta2.json
     LEVELS: [
+        // ==================== MUNDO 1 ====================
+        // map0-1 → map2-0 → map-3 → map-ultima-mundo1 → map-4
         {
             key: 'map0-1',
             file: 'assets/map0-1.json',
@@ -343,13 +350,13 @@ const GameConfig = {
             connectsTo: [1]
         },
         {
-            key: 'map2',
-            file: 'assets/map-2--expansion and speed.json',
-            name: 'Pulos decisivos',
+            key: 'map2-0',
+            file: 'assets/map2-0.json',
+            name: 'Seguindo em frente',
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 200, y: 180 },
+            mapPosition: { x: 200, y: 170 },
             connectsTo: [2]
         },
         {
@@ -363,9 +370,9 @@ const GameConfig = {
             connectsTo: [3]
         },
         {
-            key: 'map4',
-            file: 'assets/map-4--big-jumps.json',
-            name: 'Os Pulos Maiores',
+            key: 'map-ultima-mundo1',
+            file: 'assets/map-ultima-mundo1.json',
+            name: 'O Último Desafio',
             zoom: 0.9,
             roundPixels: false,
             world: 1,
@@ -373,16 +380,17 @@ const GameConfig = {
             connectsTo: [4]
         },
         {
-            key: 'map-ultima-mundo1',
-            file: 'assets/map-ultima-mundo1.json',
-            name: 'O Último Desafio',
+            key: 'map4',
+            file: 'assets/map-4--big-jumps.json',
+            name: 'Os Pulos Maiores',
             zoom: 0.9,
             roundPixels: false,
             world: 1,
             mapPosition: { x: 560, y: 200 },
-            connectsTo: [] // Última fase do mundo 1
+            connectsTo: []
         },
         // ==================== MUNDO 2 ====================
+        // map-5 → map-6 → map-2 → map-8 → map-7
         {
             key: 'map5',
             file: 'assets/map-5--caverna.json',
@@ -404,9 +412,9 @@ const GameConfig = {
             connectsTo: [7]
         },
         {
-            key: 'map7',
-            file: 'assets/map-7--planicie.json',
-            name: 'Caos de anfíbios',
+            key: 'map2',
+            file: 'assets/map-2--expansion and speed.json',
+            name: 'Pulos decisivos',
             zoom: 0.9,
             roundPixels: false,
             world: 2,
@@ -423,27 +431,27 @@ const GameConfig = {
             mapPosition: { x: 370, y: 180 },
             connectsTo: [9]
         },
-        /*
         {
-            key: 'map9',
-            file: 'assets/map9.json',
-            name: 'Águas Profundas',
-            zoom: 1.0,
-            roundPixels: true,
+            key: 'map7',
+            file: 'assets/map-7--planicie.json',
+            name: 'Caos de anfíbios',
+            zoom: 0.9,
+            roundPixels: false,
             world: 2,
-            mapPosition: { x: 580, y: 220 },
+            mapPosition: { x: 460, y: 220 },
             connectsTo: []
         },
-        */
+        // ==================== MUNDO 3 ====================
+        // map-10 → map-11 → map-12 → map-16 → map-17
         {
             key: 'map10',
             file: 'assets/map-10.json',
             name: 'Ruínas Submersas',
             zoom: 0.9,
             roundPixels: false,
-            world: 2,
-            mapPosition: { x: 460, y: 220 },
-            connectsTo: [] // Última fase do mundo 2
+            world: 3,
+            mapPosition: { x: 85, y: 200 },
+            connectsTo: [11]
         },
         {
             key: 'map11',
@@ -452,8 +460,8 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 85, y: 200 },
-            connectsTo: [11],
+            mapPosition: { x: 195, y: 185 },
+            connectsTo: [12],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -463,8 +471,8 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 195, y: 215 },
-            connectsTo: [12]
+            mapPosition: { x: 305, y: 215 },
+            connectsTo: [13]
         },
         {
             key: 'map16',
@@ -473,8 +481,8 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 305, y: 185 },
-            connectsTo: [13],
+            mapPosition: { x: 415, y: 185 },
+            connectsTo: [14],
             features: { doubleJump: true, neonLineTrail: true }
         },
         {
@@ -484,22 +492,23 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 415, y: 215 },
-            connectsTo: [14],
+            mapPosition: { x: 515, y: 210 },
+            connectsTo: [],
             features: { doubleJump: true, neonLineTrail: true }
         },
+        // ==================== MUNDO 4 — Mecânicas Experimentais ====================
+        // map-18 → map-19 → map-20 → map-21 → map-22
         {
             key: 'map18',
             file: 'assets/map-18.json',
             name: 'Abismo Final',
             zoom: 0.9,
             roundPixels: false,
-            world: 3,
-            mapPosition: { x: 515, y: 195 },
-            connectsTo: [],
+            world: 4,
+            mapPosition: { x: 80, y: 200 },
+            connectsTo: [16],
             features: { doubleJump: true, neonLineTrail: true }
         },
-        // ==================== MUNDO 4 — Mecânicas Experimentais ====================
         {
             key: 'map19',
             file: 'assets/map-19.json',
@@ -507,8 +516,8 @@ const GameConfig = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 120, y: 200 },
-            connectsTo: [16],
+            mapPosition: { x: 200, y: 200 },
+            connectsTo: [17],
             features: { upsideDown: true, wind: true }
         },
         {
@@ -518,8 +527,8 @@ const GameConfig = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 280, y: 200 },
-            connectsTo: [17],
+            mapPosition: { x: 340, y: 200 },
+            connectsTo: [18],
             features: { autoScroll: true }
         },
         {
@@ -529,8 +538,8 @@ const GameConfig = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 440, y: 200 },
-            connectsTo: [18],
+            mapPosition: { x: 460, y: 200 },
+            connectsTo: [19],
             features: { wind: true }
         },
         {
@@ -584,8 +593,8 @@ const GameConfig = {
     },
 
     // ==================== ORDEM DE FASES ====================
-    // Variantes em `window.GameConfigVariants` (default aqui; proposta em
-    // GameConfig.mundos-proposta.js ← rock-hero-mundos-proposta2.json).
+    // Variantes em `window.GameConfigVariants` (default = proposta2;
+    // GameConfig.mundos-proposta.js espelha a mesma ordem por enquanto).
     LEVEL_ORDER: {
         DEFAULT: 'default',
         PROPOSTA: 'proposta',

@@ -643,18 +643,11 @@ class MenuScene extends Phaser.Scene {
         // Toggles de Settings (abaixo das colunas) — não são feature flags
         const settingsToggles = [
             {
-                key: 'waterPhysicsExperimental',
-                name: 'Água Experimental',
-                desc: 'Limiter na velocidade de queda',
-                isOn: () => (Settings.get('waterPhysicsVariant') || 'current') === 'experimental',
-                y: this.centerY + this.u(95)
-            },
-            {
                 key: 'levelOrder',
                 name: 'Ordem Proposta',
                 desc: 'rock-hero-mundos-proposta2 (recarrega)',
                 isOn: () => (Settings.get('levelOrder') || 'default') === GameConfig.LEVEL_ORDER.PROPOSTA,
-                y: this.centerY + this.u(130)
+                y: this.centerY + this.u(95)
             }
         ];
 
@@ -755,18 +748,6 @@ class MenuScene extends Phaser.Scene {
             SoundManager.play('menuSelect');
             // Índices de fase mudam — recarrega para aplicar de forma consistente.
             this.time.delayedCall(120, () => window.location.reload());
-            return;
-        }
-
-        if (key === 'waterPhysicsExperimental') {
-            const current = Settings.get('waterPhysicsVariant') || 'current';
-            const next = current === 'experimental' ? 'current' : 'experimental';
-            Settings.set('waterPhysicsVariant', next);
-            const isOn = next === 'experimental';
-            bg.setFillStyle(isOn ? 0x00ff00 : 0x333333);
-            text.setText(isOn ? 'ON' : 'OFF');
-            text.setColor(isOn ? '#000000' : '#888888');
-            SoundManager.play('menuSelect');
             return;
         }
 

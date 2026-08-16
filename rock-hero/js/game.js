@@ -16,7 +16,6 @@
  * - ?musicVolume=0.6  → Volume inicial da trilha sonora (0..1). Default: 0.4
  * - ?crossfadeMs=1500 → Duração do cross-fade entre faixas (ms). Default: 2000. Zero = corte seco.
  * - ?levelOrder=proposta → Força ordem de fases da proposta (também via DEV OPTIONS)
- * - ?waterPhysicsVariant=experimental → Física de água com limiter de queda (DEV OPTIONS)
  */
 
 // Parâmetros de debug via URL
@@ -33,14 +32,6 @@ const showDebug = urlParams.get('debug') === 'true';
     }
     if (order !== GameConfig.LEVEL_ORDER.DEFAULT) {
         GameConfig.LEVEL_ORDER.apply(order);
-    }
-})();
-
-// Variante de física de água via URL (persiste em Settings para o toggle do menu).
-(function applyWaterPhysicsVariantFromUrl() {
-    const urlVariant = urlParams.get('waterPhysicsVariant');
-    if (urlVariant === 'experimental' || urlVariant === 'current') {
-        Settings.set('waterPhysicsVariant', urlVariant);
     }
 })();
 

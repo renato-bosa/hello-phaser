@@ -95,21 +95,17 @@ class PlayerController {
         this.wasInWaterPrev = inWater;
         this.justEnteredWater = justEnteredWater;
 
-        // Variante A/B: 'current' (padrão, inalterada) | 'experimental' (+ limiter de queda)
-        const waterExperimental = (Settings.get('waterPhysicsVariant') || 'current') === 'experimental';
-        const water = waterExperimental ? GC.WATER_EXPERIMENTAL : GC.WATER;
-
-        if (justEnteredWater && player.body.velocity.y > water.SURFACE_IMPACT_MAX_SPEED) {
-            player.setVelocityY(water.SURFACE_IMPACT_MAX_SPEED);
+        if (justEnteredWater && player.body.velocity.y > GC.WATER.SURFACE_IMPACT_MAX_SPEED) {
+            player.setVelocityY(GC.WATER.SURFACE_IMPACT_MAX_SPEED);
         }
 
-        const waterMul = inWater ? water.SPEED_MULTIPLIER : 1.0;
+        const waterMul = inWater ? GC.WATER.SPEED_MULTIPLIER : 1.0;
         const minSpeed = GC.PLAYER.MIN_SPEED * waterMul;
         const maxSpeed = GC.PLAYER.MAX_SPEED * waterMul;
         // Ponta-cabeça inverte a força de pulo (positiva = empurra para baixo = longe do teto)
         const baseJump = upsideDown ? -GC.PLAYER.JUMP_FORCE : GC.PLAYER.JUMP_FORCE;
-        const jumpForce = inWater ? water.JUMP_FORCE : baseJump;
-        const fallGravExtra = inWater ? water.FALL_GRAVITY_EXTRA : GC.PLAYER.FALL_GRAVITY_EXTRA;
+        const jumpForce = inWater ? GC.WATER.JUMP_FORCE : baseJump;
+        const fallGravExtra = inWater ? GC.WATER.FALL_GRAVITY_EXTRA : GC.PLAYER.FALL_GRAVITY_EXTRA;
         const dt = delta / 1000;
 
         // --- Movimento horizontal ---
@@ -202,29 +198,26 @@ class PlayerController {
         if (!onGround && isFalling) {
             const extraGravity = scene.physics.world.gravity.y * fallGravExtra * dt;
             player.setVelocityY(player.body.velocity.y + extraGravity);
-
-            // Física atual: clamp legado (só na variante current — comportamento inalterado)
-            if (!waterExperimental && !upsideDown && inWater && player.body.velocity.y > GC.WATER.MAX_FALL_SPEED) {
-                player.setVelocityY(GC.WATER.MAX_FALL_SPEED);
-            }
         }
 
         // --- Física de água (incompatível com ponta-cabeça) ---
         if (inWater && GameData.isFeatureEnabled('waterPhysics') && !upsideDown) {
-            player.body.gravity.y = water.BODY_GRAVITY_OFFSET;
+            player.body.gravity.y = GC.WATER.BODY_GRAVITY_OFFSET;
 
             if (player.body.velocity.y >= 0) {
                 this.isJumping = false;
             }
             if (jumpJustPressed && !this.isJumping) {
-                player.setVelocityY(water.SWIM_FORCE);
+                player.setVelocityY(GC.WATER.SWIM_FORCE);
                 this.isJumping = true;
                 SoundManager.play('jump');
             }
 
-            // Variante experimental: limiter contínuo na velocidade de queda
-            if (waterExperimental && player.body.velocity.y > water.MAX_FALL_SPEED) {
-                player.setVelocityY(water.MAX_FALL_SPEED);
+            // O limiter mora aqui, e não no bloco de gravidade extra, porque o
+            // overlap com a zona de água marca touching.down no corpo: onGround
+            // fica true enquanto o jogador afunda e aquele bloco não roda na água.
+            if (player.body.velocity.y > GC.WATER.MAX_FALL_SPEED) {
+                player.setVelocityY(GC.WATER.MAX_FALL_SPEED);
             }
         } else {
             player.body.gravity.y = 0;

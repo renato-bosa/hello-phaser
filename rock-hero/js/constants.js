@@ -55,21 +55,6 @@ const GC = {
         PLAYER_TINT: 0x88ddff,
     },
 
-    // Cópia da física de água para A/B (DEV OPTIONS → “Água + Limiter”).
-    // A variante experimental aplica MAX_FALL_SPEED de forma contínua na água;
-    // a atual permanece inalterada. Ajuste só estes valores ao tunar o experimento.
-    WATER_EXPERIMENTAL: {
-        SPEED_MULTIPLIER: 0.5,
-        JUMP_FORCE: -150,
-        FALL_GRAVITY_EXTRA: 0.1,
-        BODY_GRAVITY_OFFSET: -550,
-        MAX_FALL_SPEED: 120,
-        SURFACE_IMPACT_MAX_SPEED: 55,
-        SWIM_FORCE: -300,
-        BUBBLE_CHANCE_PERCENT: 5,
-        PLAYER_TINT: 0x88ddff,
-    },
-
     TRAMPOLINE: {
         BOUNCE_FORCE: -990,
         COOLDOWN_MS: 200,

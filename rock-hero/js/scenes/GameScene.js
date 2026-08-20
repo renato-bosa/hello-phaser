@@ -51,6 +51,7 @@ class GameScene extends Phaser.Scene {
         this._loadSheetIfMissing('seahorse', 'assets/spritesheets/Cavalo marinho.png', 32, 32);
         this._loadSheetIfMissing('boneco', 'assets/spritesheets/Boneco-14fps.png', 32, 32);
         this._loadImageIfMissing('red-heart', 'assets/spritesheets/red-heart.png');
+        this._loadImageIfMissing('sneaker-power', 'assets/spritesheets/sneaker-power.png');
 
         // Trilha — só faixas ainda ausentes no cache
         MusicManager.preload(this);
@@ -449,6 +450,7 @@ class GameScene extends Phaser.Scene {
         const speedBoosts = [];
         const extraLives = [];
         const heartPickups = [];
+        const sneakerPowerUps = [];
         const mushrooms = [];
         const movingPlatforms = [];
 
@@ -520,6 +522,10 @@ class GameScene extends Phaser.Scene {
                      tilesetName.includes('speed') || tilesetName.includes('boost')) {
                 speedBoosts.push({ x: obj.x + 16, y: obj.y - 16, transform });
             }
+            else if (type === 'sneaker-power' || type === 'sneaker_power' ||
+                     tilesetName.includes('sneaker-power') || tilesetName.includes('sneaker_power')) {
+                sneakerPowerUps.push({ x: obj.x + 16, y: obj.y - 16, transform });
+            }
             else if (type === 'heart' || type === 'health' ||
                      tilesetName.includes('red-heart') || tilesetName.includes('heart')) {
                 heartPickups.push({ x: obj.x + 16, y: obj.y - 16, transform });
@@ -565,6 +571,7 @@ class GameScene extends Phaser.Scene {
         this.createSpeedBoosts(speedBoosts);
         this.createExtraLives(extraLives);
         this.createHeartPickups(heartPickups);
+        this.createSneakerPowerUps(sneakerPowerUps);
         this.createMushrooms(mushrooms);
         this.createMovingPlatforms(movingPlatforms);
         this.createWaterZones(map);
@@ -828,6 +835,49 @@ class GameScene extends Phaser.Scene {
             y: text.y - 30,
             alpha: 0,
             duration: 800,
+            onComplete: () => text.destroy()
+        });
+    }
+
+    createSneakerPowerUps(positions) {
+        this.sneakerPowerUps = this.physics.add.staticGroup();
+        if (GameData.state.sneakerPowerActive) return;
+
+        positions.forEach(pos => {
+            const item = this.sneakerPowerUps.create(pos.x, pos.y, 'sneaker-power');
+            item.body.setSize(24, 24);
+            item.body.setOffset(4, 4);
+            this._applyTilesetTransform(item, pos.transform);
+
+            this.tweens.add({
+                targets: item,
+                y: pos.y - 4,
+                duration: 900,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+        });
+    }
+
+    collectSneakerPower(player, item) {
+        if (!item || !item.active) return;
+
+        item.disableBody(true, true);
+        this.tweens.killTweensOf(item);
+        this.playerController.grantSneakerPower();
+        SoundManager.play('powerUp');
+
+        const text = this.add.text(player.x, player.y - 28, 'PULO DUPLO!', {
+            fontSize: '12px', fontFamily: '"Press Start 2P", Arial', color: '#00ffff',
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setDepth(GC.DEPTH.HUD);
+
+        this.tweens.add({
+            targets: text,
+            y: text.y - 30,
+            alpha: 0,
+            duration: 1000,
             onComplete: () => text.destroy()
         });
     }
@@ -1400,6 +1450,11 @@ class GameScene extends Phaser.Scene {
                 (p, item) => this.collectHeart(p, item), null, this);
         }
 
+        if (this.sneakerPowerUps && this.sneakerPowerUps.children.size > 0) {
+            this.physics.add.overlap(player, this.sneakerPowerUps,
+                (p, item) => this.collectSneakerPower(p, item), null, this);
+        }
+
         if (this.mushrooms && this.mushrooms.children.size > 0) {
             this.physics.add.overlap(player, this.mushrooms,
                 (p, item) => this.collectMushroom(p, item), null, this);
@@ -1656,6 +1711,8 @@ class GameScene extends Phaser.Scene {
 
     onPlayerDied() {
         const pc = this.playerController;
+        pc.removeSneakerPower();
+        this.effectsManager.clearNeonLineTrail();
         const player = pc.player;
         pc.isRespawning = true;
         player.body.enable = false;

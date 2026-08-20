@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-5--caverna.tmx",
+    "activeFile": "dev-resources/map-3--desafio do luigi.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
@@ -34,8 +34,8 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 484,
-                "y": 391.33333333333326
+                "x": 664,
+                "y": 400
             }
         },
         "dev-resources/map-10.tmx#Cavalo marinho": {
@@ -1139,9 +1139,9 @@
                 8
             ],
             "scale": 0.75,
-            "selectedLayer": 2,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 1957.3333333333333,
+                "x": 381.33333333333337,
                 "y": 562.6666666666666
             }
         },
@@ -1233,6 +1233,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-3--desafio do luigi.tmx#sneaker-power": {
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx#starry-sky": {
@@ -2141,21 +2144,23 @@
         "dev-resources/map-9.tmx",
         "dev-resources/map-7--planicie.tmx",
         "dev-resources/map-6--caverna2.tmx",
-        "dev-resources/map-5--caverna.tmx"
+        "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-4--big-jumps.tmx",
+        "dev-resources/map-3--desafio do luigi.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "dev-resources/map-5--caverna.tmx",
         "dev-resources/map-10.tmx",
         "dev-resources/map-11.tmx",
         "dev-resources/map-8--o-resgate-do-baixista.tmx",
         "dev-resources/map-9.tmx",
         "dev-resources/map-7--planicie.tmx",
         "dev-resources/map-6--caverna2.tmx",
+        "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-4--big-jumps.tmx",
         "dev-resources/map-3--desafio do luigi.tmx",
         "dev-resources/map0-0.tmx",
-        "dev-resources/map-4--big-jumps.tmx",
         "dev-resources/map-ultima-mundo1.tmx",
         "dev-resources/map2-0.tmx"
     ],

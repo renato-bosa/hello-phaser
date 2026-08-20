@@ -23,7 +23,8 @@ class EffectsManager {
         if (GameData.isFeatureEnabled('jumpNeonBurst') || GameData.isFeatureEnabled('landNeonBurst')) {
             this._updateNeonBurstEffects();
         }
-        if (GameData.isFeatureEnabled('neonLineTrail')) {
+        if (GameData.isFeatureEnabled('neonLineTrail') ||
+            this.scene.playerController.hasSneakerPower()) {
             this._updateNeonLineTrail();
         }
         if (GameData.isFeatureEnabled('waterPhysics')) {
@@ -410,6 +411,13 @@ class EffectsManager {
 
             this.neonLineGraphics.lineStyle(GC.NEON_LINE.CORE_WIDTH, GC.NEON_LINE.CORE_COLOR, GC.NEON_LINE.CORE_ALPHA);
             this._drawSmoothLine(this.neonLineGraphics, this.neonLinePoints);
+        }
+    }
+
+    clearNeonLineTrail() {
+        this.neonLinePoints = [];
+        if (this.neonLineGraphics) {
+            this.neonLineGraphics.clear();
         }
     }
 

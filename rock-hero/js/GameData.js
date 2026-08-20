@@ -124,6 +124,9 @@ const GameData = {
      * Marca o slot como ativo (cache em memória + storage).
      */
     setActiveSlot(slotId) {
+        if (this.state.activeSlot !== slotId) {
+            this.state.sneakerPowerActive = false;
+        }
         this.state.activeSlot = slotId;
         SaveManager.setActiveSlotId(slotId);
     },
@@ -148,6 +151,8 @@ const GameData = {
      */
     loadSlotIntoState(slot) {
         if (!slot) return;
+
+        this.state.sneakerPowerActive = false;
 
         this.state.playerName = slot.playerName;
         this.state.selectedCharacter = slot.selectedCharacter;

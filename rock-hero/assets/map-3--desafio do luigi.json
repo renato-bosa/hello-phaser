@@ -530,6 +530,18 @@
                  "width":32,
                  "x":1376,
                  "y":192
+                }, 
+                {
+                 "gid":71,
+                 "height":32,
+                 "id":73,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":320,
+                 "y":736
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -538,7 +550,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":73,
+ "nextobjectid":74,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1143,6 +1155,19 @@
          "imagewidth":32,
          "margin":0,
          "name":"red-heart",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":71,
+         "image":"spritesheets\/sneaker-power.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"sneaker-power",
          "spacing":0,
          "tilecount":1,
          "tileheight":32,

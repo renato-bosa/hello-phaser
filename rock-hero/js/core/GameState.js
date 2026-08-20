@@ -49,7 +49,9 @@ const GameState = {
         elapsedTime: 0,
         selectedCharacter: 'vocalista',
         mapCursorLevel: 0,
-        activeSlot: null
+        activeSlot: null,
+        // Power-up temporario: atravessa cenas/fases, mas nao mortes.
+        sneakerPowerActive: false
     },
 
     /**

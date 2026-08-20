@@ -167,7 +167,8 @@ class PlayerController {
         const canGroundOrCoyote = onGround || this.coyoteTime > 0;
         const wantsGroundJump = (jumpJustPressed && canGroundOrCoyote) || (onGround && hasBufferedJump);
         const wantsDoubleJump = jumpJustPressed && !onGround && !canGroundOrCoyote
-            && GameData.isFeatureEnabled('doubleJump') && !this.hasDoubleJumped;
+            && (GameData.isFeatureEnabled('doubleJump') || this.hasSneakerPower())
+            && !this.hasDoubleJumped;
 
         if (wantsGroundJump && !this.isJumping) {
             player.setVelocityY(jumpForce);
@@ -418,8 +419,22 @@ class PlayerController {
 
     // --- Dano e Respawn ---
 
+    hasSneakerPower() {
+        return GameData.state.sneakerPowerActive === true;
+    }
+
+    grantSneakerPower() {
+        GameData.state.sneakerPowerActive = true;
+        this.hasDoubleJumped = false;
+    }
+
+    removeSneakerPower() {
+        GameData.state.sneakerPowerActive = false;
+        this.hasDoubleJumped = false;
+    }
+
     /**
-     * Restaura corações (clamp em MAX). Retorna true se curou de fato.
+     * Restaura coracoes (clamp em MAX). Retorna true se curou de fato.
      */
     heal(amount = 1) {
         const max = GC.HEARTS.MAX;

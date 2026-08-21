@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="29" height="19" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="88">
  <editorsettings>
-  <export target="../assets/map.json" format="json"/>
+  <export target="../assets/map-10.json" format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="grass" tilewidth="32" tileheight="32" tilecount="1" columns="1">
   <image source="../assets/spritesheets/grass.png" width="32" height="32"/>
@@ -111,6 +111,9 @@
  <tileset firstgid="47" name="sapo-roxo-6fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
   <image source="../assets/spritesheets/sapo-roxo-6fps.png" width="64" height="96"/>
  </tileset>
+ <tileset firstgid="53" name="fg_dec_ocean_random_frame" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/fg_dec_ocean_random_frame.png" width="64" height="96"/>
+ </tileset>
  <layer id="5" name="bg" width="29" height="19">
   <data encoding="csv">
 19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,30,30,30,30,30,30,30,30,30,
@@ -152,9 +155,9 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,53,0,0,0,0,0,0,0,0,0,0,
+0,0,0,53,0,0,53,0,0,0,0,0,53,0,0,0,0,0,0,0,0,53,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,53,0,0
 </data>
  </layer>
  <layer id="3" name="solids" width="29" height="19">

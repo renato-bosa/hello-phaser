@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="119">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="140">
  <editorsettings>
   <export target="../assets/map-12.json" format="json"/>
  </editorsettings>
@@ -123,6 +123,18 @@
  <tileset firstgid="56" name="setas-velocidade" tilewidth="32" tileheight="32" tilecount="1" columns="1">
   <image source="../assets/spritesheets/setas-velocidade.png" width="32" height="32"/>
  </tileset>
+ <tileset firstgid="57" name="yellow-flag" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/yellow-flag.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="58" name="red-heart" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="../assets/spritesheets/red-heart.png" width="32" height="32"/>
+ </tileset>
+ <tileset firstgid="59" name="fg_dec_ocean_random_frame" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/fg_dec_ocean_random_frame.png" width="64" height="96"/>
+ </tileset>
+ <tileset firstgid="65" name="1up-animated-4fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/1up-animated-4fps.png" width="64" height="96"/>
+ </tileset>
  <layer id="5" name="bg" width="32" height="32">
   <data encoding="csv">
 19,19,19,19,19,19,19,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,
@@ -210,8 +222,8 @@
 2,1,1,1,0,0,0,0,0,0,0,31,31,0,0,0,0,0,35,35,35,35,35,0,0,0,0,32,32,32,32,32,
 31,31,31,31,0,0,0,0,0,0,0,0,31,0,0,0,0,0,35,35,35,35,0,0,0,0,0,32,32,32,32,32,
 0,0,0,0,0,0,0,0,0,0,0,0,31,0,0,0,0,0,0,35,35,35,0,0,0,0,0,32,32,32,32,32,
-0,0,0,0,0,0,0,0,0,0,0,0,31,0,0,0,0,0,0,35,35,35,0,0,0,0,0,0,32,32,32,32,
-0,0,0,0,0,0,0,0,0,0,0,31,31,0,0,0,0,31,0,0,35,35,0,0,0,0,0,0,0,32,32,32,
+0,0,0,0,0,0,0,0,0,0,0,31,31,0,0,0,0,0,0,35,35,35,0,0,0,0,0,0,32,32,32,32,
+0,0,0,0,0,0,0,0,0,0,0,31,0,0,0,0,0,31,0,0,35,35,0,0,0,0,0,0,0,32,32,32,
 0,0,0,0,0,0,0,0,0,0,0,31,0,0,0,0,0,31,0,0,35,35,0,0,0,0,0,0,0,0,32,32,
 0,0,0,0,0,0,0,0,0,0,31,31,0,0,0,0,31,31,0,0,35,35,0,0,31,0,0,0,0,0,0,32,
 0,0,0,0,0,0,0,0,0,31,31,0,0,0,0,31,31,0,0,0,35,35,0,0,31,0,0,0,0,0,0,0,
@@ -222,8 +234,8 @@
 0,0,0,31,31,0,0,0,0,31,0,0,0,0,31,0,0,0,0,0,0,0,0,0,31,0,0,0,0,0,0,32,
 0,0,0,0,31,0,0,0,0,31,0,0,0,0,31,0,0,0,0,0,0,0,0,0,31,0,0,0,0,0,32,32,
 0,0,0,0,0,0,0,0,0,31,0,0,0,0,31,0,0,0,0,0,0,0,0,0,31,0,0,0,0,32,32,32,
-0,0,0,0,0,0,0,0,0,31,0,0,0,0,31,0,0,31,31,31,31,31,0,0,31,0,0,0,32,32,32,32,
-0,0,0,0,0,0,0,0,0,31,0,0,0,0,31,0,0,0,0,0,0,0,0,0,31,0,0,0,0,32,32,32,
+0,0,0,0,0,0,0,0,0,31,31,0,0,0,31,0,0,31,31,31,31,31,0,0,31,0,0,0,32,32,32,32,
+0,0,0,0,0,0,0,0,0,0,31,0,0,0,31,0,0,0,0,0,0,0,0,0,31,0,0,0,0,32,32,32,
 0,0,0,0,0,0,32,0,0,0,0,0,0,0,31,0,0,0,0,0,0,0,0,0,31,0,0,0,0,32,32,32,
 0,0,0,0,32,32,32,0,0,0,0,0,0,0,31,0,0,0,0,0,0,0,0,0,31,0,0,0,0,0,32,32,
 0,0,0,32,32,32,32,0,0,0,0,0,0,0,31,31,31,31,31,31,31,31,31,31,31,0,0,0,0,0,32,32,
@@ -254,8 +266,7 @@
   <object id="82" gid="20" x="256" y="64" width="32" height="32"/>
   <object id="83" gid="20" x="480" y="224" width="32" height="32"/>
   <object id="84" gid="20" x="320" y="608" width="32" height="32"/>
-  <object id="85" gid="20" x="608" y="992" width="32" height="32"/>
-  <object id="86" gid="20" x="608" y="992" width="32" height="32"/>
+  <object id="86" gid="20" x="616" y="1008" width="32" height="32"/>
   <object id="87" gid="20" x="320" y="1024" width="32" height="32"/>
   <object id="88" gid="20" x="224" y="960" width="32" height="32"/>
   <object id="89" gid="20" x="800" y="192" width="32" height="32"/>
@@ -270,12 +281,31 @@
   <object id="107" gid="48" x="512" y="480" width="32" height="32"/>
   <object id="108" gid="48" x="992" y="704" width="32" height="32"/>
   <object id="109" gid="54" x="544" y="448" width="32" height="32"/>
-  <object id="110" gid="55" x="288" y="544" width="32" height="32"/>
   <object id="113" gid="56" x="768" y="992" width="32" height="32"/>
   <object id="114" gid="56" x="768" y="1024" width="32" height="32"/>
   <object id="115" gid="2147483704" x="448" y="992" width="32" height="32"/>
   <object id="116" gid="2147483704" x="448" y="1024" width="32" height="32"/>
   <object id="117" gid="42" x="608" y="800" width="32" height="32"/>
   <object id="118" gid="48" x="608" y="928" width="32" height="32"/>
+  <object id="119" gid="57" x="608" y="1024" width="32" height="32"/>
+  <object id="120" gid="58" x="896" y="864" width="32" height="32"/>
+  <object id="121" gid="59" x="368" y="1024" width="32" height="32"/>
+  <object id="122" gid="59" x="520" y="1024" width="32" height="32"/>
+  <object id="123" gid="59" x="688" y="1024" width="32" height="32"/>
+  <object id="124" gid="59" x="832" y="1024" width="32" height="32"/>
+  <object id="125" gid="59" x="920" y="1024" width="32" height="32"/>
+  <object id="126" gid="59" x="160" y="896" width="32" height="32"/>
+  <object id="127" gid="59" x="96" y="928" width="32" height="32"/>
+  <object id="128" gid="59" x="64" y="960" width="32" height="32"/>
+  <object id="129" gid="59" x="32" y="992" width="32" height="32"/>
+  <object id="130" gid="59" x="896" y="800" width="32" height="32"/>
+  <object id="131" gid="59" x="696" y="928" width="32" height="32"/>
+  <object id="132" gid="59" x="512" y="928" width="32" height="32"/>
+  <object id="133" gid="59" x="320" y="800" width="32" height="32"/>
+  <object id="134" gid="59" x="448" y="576" width="32" height="32"/>
+  <object id="135" gid="59" x="384" y="320" width="32" height="32"/>
+  <object id="136" gid="59" x="256" y="160" width="32" height="32"/>
+  <object id="138" gid="59" x="328" y="288" width="32" height="32"/>
+  <object id="139" gid="65" x="288" y="544" width="32" height="32"/>
  </objectgroup>
 </map>

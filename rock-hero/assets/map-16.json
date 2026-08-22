@@ -579,6 +579,18 @@
                  "width":32,
                  "x":608,
                  "y":1408
+                }, 
+                {
+                 "gid":56,
+                 "height":32,
+                 "id":99,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":64,
+                 "y":2112
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -587,7 +599,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":99,
+ "nextobjectid":100,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1000,6 +1012,19 @@
          "name":"1up-animated-4fps",
          "spacing":0,
          "tilecount":6,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":56,
+         "image":"spritesheets\/sneaker-power.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"sneaker-power",
+         "spacing":0,
+         "tilecount":1,
          "tileheight":32,
          "tilewidth":32
         }],

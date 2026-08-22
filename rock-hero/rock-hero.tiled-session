@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-22-octopus.tmx",
+    "activeFile": "dev-resources/map-17.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
@@ -487,14 +487,14 @@
         },
         "dev-resources/map-17.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 574.6666666666666,
-                "y": 802.6666666666665
+                "x": 612,
+                "y": 878.6666666666665
             }
         },
         "dev-resources/map-17.tmx#1up": {
@@ -595,8 +595,8 @@
         },
         "dev-resources/map-18.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.25,
             "selectedLayer": 1,
@@ -876,8 +876,8 @@
         },
         "dev-resources/map-20-auto-rolagem.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.33,
             "selectedLayer": 0,
@@ -975,8 +975,8 @@
         },
         "dev-resources/map-21-nuvens.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 4,
@@ -1077,8 +1077,8 @@
         },
         "dev-resources/map-22-octopus.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.33,
             "selectedLayer": 5,
@@ -2211,12 +2211,7 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-17.tmx",
-        "dev-resources/map-18.tmx",
-        "dev-resources/map-19.tmx",
-        "dev-resources/map-20-auto-rolagem.tmx",
-        "dev-resources/map-21-nuvens.tmx",
-        "dev-resources/map-22-octopus.tmx"
+        "dev-resources/map-17.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",

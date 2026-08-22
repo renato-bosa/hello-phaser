@@ -576,7 +576,20 @@ const GameConfig = {
                 { file: 'assets/spritesheets/cutscenes/cut-scene1-abertura-5-6.png' },
                 { file: 'assets/spritesheets/cutscenes/cut-scene1-abertura-6-6.png' }
             ],
-            unlockMs: 2000,
+            unlockMs: 1000,
+            fadeMs: 600,
+            bgColor: 0x000000,
+            music: 'rock-theme1'
+        },
+        world1Complete: {
+            frames: [
+                { file: 'assets/spritesheets/cutscenes/cut-scene2-1-5.png' },
+                { file: 'assets/spritesheets/cutscenes/cut-scene2-2-5.png' },
+                { file: 'assets/spritesheets/cutscenes/cutscene2-3-5.png' },
+                { file: 'assets/spritesheets/cutscenes/cutscene2-4-5.png' },
+                { file: 'assets/spritesheets/cutscenes/cutscene2-5-5.png' }
+            ],
+            unlockMs: 1000,
             fadeMs: 600,
             bgColor: 0x000000,
             music: 'rock-theme1'

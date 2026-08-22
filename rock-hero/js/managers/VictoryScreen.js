@@ -438,11 +438,24 @@ class VictoryScreen {
         });
 
         const handleWorldComplete = () => {
-            scene.scene.start('WorldCompleteScene', {
+            const worldCompleteData = {
                 world: world,
                 playerName: scene.playerName,
                 totalTime: finalTime
-            });
+            };
+
+            if (world.id === 1) {
+                scene.scene.start('CutsceneScene', {
+                    cutsceneId: 'world1Complete',
+                    next: {
+                        scene: 'WorldCompleteScene',
+                        data: worldCompleteData
+                    }
+                });
+                return;
+            }
+
+            scene.scene.start('WorldCompleteScene', worldCompleteData);
         };
 
         this._bindContinueInput(handleWorldComplete);

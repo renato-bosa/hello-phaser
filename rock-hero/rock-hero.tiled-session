@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-17.tmx",
+    "activeFile": "dev-resources/map-18.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -487,14 +487,14 @@
         },
         "dev-resources/map-17.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.75,
-            "selectedLayer": 4,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 612,
-                "y": 878.6666666666665
+                "x": 866.6666666666666,
+                "y": 554.6666666666666
             }
         },
         "dev-resources/map-17.tmx#1up": {
@@ -595,13 +595,13 @@
         },
         "dev-resources/map-18.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.25,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1088,
+                "x": 1018,
                 "y": 644
             }
         },
@@ -2211,7 +2211,8 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-17.tmx"
+        "dev-resources/map-17.tmx",
+        "dev-resources/map-18.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",

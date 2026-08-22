@@ -339,7 +339,7 @@ const GC = {
 
     DEPTH: {
         PLAYER: 10,
-        FG_DECORATION: 5,
+        FG_DECORATION: 15,
         HUD: 100,
         OVERLAY: 200,
         OVERLAY_TEXT: 201,

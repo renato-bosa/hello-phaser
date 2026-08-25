@@ -50,6 +50,7 @@ class GameScene extends Phaser.Scene {
         this._loadSheetIfMissing('sapo-roxo', 'assets/spritesheets/sapo-roxo-6fps.png', 32, 32);
         this._loadSheetIfMissing('seahorse', 'assets/spritesheets/Cavalo marinho.png', 32, 32);
         this._loadSheetIfMissing('boneco', 'assets/spritesheets/Boneco-14fps.png', 32, 32);
+        this._loadSheetIfMissing('toupeira-walk', 'assets/spritesheets/toupeira-6fps.png', 32, 32);
         this._loadImageIfMissing('red-heart', 'assets/spritesheets/red-heart.png');
         this._loadImageIfMissing('sneaker-power', 'assets/spritesheets/sneaker-power.png');
 
@@ -182,8 +183,9 @@ class GameScene extends Phaser.Scene {
                 }
 
                 const imagePath = 'assets/' + ts.image.replace(/\\/g, '/');
+                const isReactiveMole = /toupeira/i.test(ts.name) && ts.tilecount > 1;
                 const isAnimated = /-(\d+)fps$/.test(ts.name) && ts.tilecount > 1;
-                if (isAnimated) {
+                if (isAnimated || isReactiveMole) {
                     this.load.spritesheet(ts.name, GameData.assetUrl(imagePath), {
                         frameWidth: ts.tilewidth,
                         frameHeight: ts.tileheight
@@ -537,6 +539,15 @@ class GameScene extends Phaser.Scene {
             }
             else if (type === 'mushroom' || tilesetName.includes('mushroom') || tilesetName.includes('cogumelo')) {
                 mushrooms.push({ x: obj.x + 16, y: obj.y - 16, textureKey: tilesetName, transform });
+            }
+            else if (type === 'toupeira' || tilesetName.includes('toupeira')) {
+                enemies.push({
+                    x: obj.x + 16,
+                    y: obj.y - 16,
+                    type: 'toupeira',
+                    holeTexture: tilesetName,
+                    transform
+                });
             }
             else if (tilesetName.includes('plataforma-deslisante') || tilesetName.includes('plataforma-deslizante') ||
                      tilesetName.includes('plataforma-movel')) {

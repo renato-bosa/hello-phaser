@@ -101,6 +101,16 @@ const GC = {
             JUMP_INTERVAL_MS: 1500,
             ANIM_FPS: 6,
         },
+        TOUPEIRA: {
+            ACTIVATION_DISTANCE: 160, // 5 blocos de 32 px
+            EMERGE_DELAY_MS: 250,
+            SPEED: 70,
+            ANIM_FPS: 6,
+            BODY_WIDTH: 24,
+            BODY_HEIGHT: 24,
+            BODY_OFFSET_X: 4,
+            BODY_OFFSET_Y: 8,
+        },
         SEAHORSE: {
             BODY_WIDTH: 22,
             BODY_HEIGHT: 30,

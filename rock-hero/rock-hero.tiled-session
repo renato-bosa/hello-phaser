@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-18.tmx",
+    "activeFile": "dev-resources/map-6--caverna2.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -28,13 +28,13 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.75,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 383.99999999999994,
+                "x": 383.3333333333333,
                 "y": 390.6666666666667
             }
         },
@@ -493,7 +493,7 @@
             "scale": 0.75,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 866.6666666666666,
+                "x": 867.3333333333333,
                 "y": 554.6666666666666
             }
         },
@@ -1386,7 +1386,7 @@
             "scale": 0.25,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 976,
+                "x": 974,
                 "y": 408
             }
         },
@@ -1479,8 +1479,8 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 664,
-                "y": 496
+                "x": 1371,
+                "y": 510
             }
         },
         "dev-resources/map-6--caverna2.tmx#1up-animated-4fps": {
@@ -1571,6 +1571,12 @@
             "scaleInDock": 1
         },
         "dev-resources/map-6--caverna2.tmx#terra-escura": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-6--caverna2.tmx#toupeira-2frames": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-6--caverna2.tmx#toupeira4": {
             "scaleInDock": 1
         },
         "dev-resources/map-6--caverna2.tmx#trampoline-thick": {
@@ -2211,12 +2217,14 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-17.tmx",
-        "dev-resources/map-18.tmx"
+        "dev-resources/map-6--caverna2.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map-6--caverna2.tmx",
+        "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-10.tmx",
         "dev-resources/map-17.tmx",
         "dev-resources/map-18.tmx",
         "dev-resources/map-19.tmx",
@@ -2225,10 +2233,7 @@
         "dev-resources/map-22-octopus.tmx",
         "dev-resources/map-12.tmx",
         "dev-resources/map-13.tmx",
-        "dev-resources/map-14.tmx",
-        "dev-resources/map-15.tmx",
-        "dev-resources/map-16.tmx",
-        "dev-resources/map-11.tmx"
+        "dev-resources/map-14.tmx"
     ],
     "tileset.embedInMap": true
 }

@@ -548,18 +548,6 @@
                  "y":608
                 }, 
                 {
-                 "gid":61,
-                 "height":32,
-                 "id":235,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":1984,
-                 "y":576
-                }, 
-                {
                  "gid":49,
                  "height":32,
                  "id":236,
@@ -654,6 +642,54 @@
                  "width":32,
                  "x":2208,
                  "y":576
+                }, 
+                {
+                 "gid":86,
+                 "height":32,
+                 "id":244,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":1952,
+                 "y":576
+                }, 
+                {
+                 "gid":86,
+                 "height":32,
+                 "id":245,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":224,
+                 "y":704
+                }, 
+                {
+                 "gid":86,
+                 "height":32,
+                 "id":246,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":960,
+                 "y":256
+                }, 
+                {
+                 "gid":86,
+                 "height":32,
+                 "id":247,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":1280,
+                 "y":224
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -662,7 +698,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":244,
+ "nextobjectid":248,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1238,6 +1274,32 @@
          "name":"fg_dec_grass_random_frame_grass",
          "spacing":0,
          "tilecount":6,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":84,
+         "image":"spritesheets\/toupeira-2frames.png",
+         "imageheight":64,
+         "imagewidth":32,
+         "margin":0,
+         "name":"toupeira-2frames",
+         "spacing":0,
+         "tilecount":2,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":86,
+         "image":"spritesheets\/toupeira4.png",
+         "imageheight":64,
+         "imagewidth":32,
+         "margin":0,
+         "name":"toupeira4",
+         "spacing":0,
+         "tilecount":2,
          "tileheight":32,
          "tilewidth":32
         }],

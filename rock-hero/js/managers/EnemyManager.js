@@ -1,5 +1,5 @@
 /**
- * EnemyManager - Gerencia inimigos (sapos, seahorse, boneco)
+ * EnemyManager - Gerencia inimigos (sapos, seahorse, boneco, toupeira)
  * Responsável por: criação, patrulha, pulo, colisão e morte de inimigos
  * Sapos: tomate (patrulha larga), roxo (patrulha curta + salto médio), verde (parado + salto alto)
  */
@@ -25,8 +25,120 @@ class EnemyManager {
                 this._createSeahorse(e.x, e.y);
             } else if (e.type === 'boneco') {
                 this._createBoneco(e.x, e.y);
+            } else if (e.type === 'toupeira') {
+                this._createToupeira(e);
             }
         });
+    }
+
+    _createToupeira(data) {
+        const scene = this.scene;
+        const cfg = GC.ENEMY.TOUPEIRA;
+        const mole = scene.physics.add.sprite(data.x, data.y, data.holeTexture, 0);
+
+        mole.body.setSize(cfg.BODY_WIDTH, cfg.BODY_HEIGHT);
+        mole.body.setOffset(cfg.BODY_OFFSET_X, cfg.BODY_OFFSET_Y);
+        mole.body.allowGravity = false;
+        mole.body.setCollideWorldBounds(true);
+        mole.body.checkCollision.none = true;
+        mole.body.moves = false;
+        mole.body.enable = false;
+
+        if (data.transform) {
+            mole.setFlipX(!!data.transform.flipX);
+            mole.setFlipY(!!data.transform.flipY);
+            if (data.transform.rotation) mole.setAngle(data.transform.rotation);
+        }
+
+        mole.patrolData = {
+            type: 'toupeira',
+            state: 'hidden',
+            holeTexture: data.holeTexture,
+            holeTransform: data.transform || null,
+            activationDistanceSq: cfg.ACTIVATION_DISTANCE * cfg.ACTIVATION_DISTANCE,
+            emergeAt: 0,
+            speed: cfg.SPEED,
+            direction: 1
+        };
+
+        this.enemies.add(mole);
+    }
+
+    _activateToupeira(mole, data, currentTime) {
+        if (data.state !== 'hidden') return;
+        data.state = 'emerging';
+        data.emergeAt = currentTime + GC.ENEMY.TOUPEIRA.EMERGE_DELAY_MS;
+        mole.setFrame(1);
+    }
+
+    _startToupeiraChase(mole, data, player) {
+        const scene = this.scene;
+        const cfg = GC.ENEMY.TOUPEIRA;
+        data.state = 'chasing';
+
+        // O marcador do Tiled representa tamb?m o buraco permanente. Quando a
+        // toupeira come?a a andar, recria o frame 0 atr?s dela para n?o levar
+        // o buraco junto ao trocar a textura do inimigo.
+        const hole = scene.add.sprite(mole.x, mole.y, data.holeTexture, 0);
+        hole.setDepth(mole.depth - 1);
+        if (data.holeTransform) {
+            hole.setFlipX(!!data.holeTransform.flipX);
+            hole.setFlipY(!!data.holeTransform.flipY);
+            if (data.holeTransform.rotation) hole.setAngle(data.holeTransform.rotation);
+        }
+        data.hole = hole;
+
+        mole.setTexture('toupeira-walk', 0);
+        mole.body.enable = true;
+        mole.body.moves = true;
+        mole.body.allowGravity = true;
+        mole.body.checkCollision.none = false;
+        mole.body.setSize(cfg.BODY_WIDTH, cfg.BODY_HEIGHT);
+        mole.body.setOffset(cfg.BODY_OFFSET_X, cfg.BODY_OFFSET_Y);
+
+        if (!scene.anims.exists('toupeira-walk')) {
+            scene.anims.create({
+                key: 'toupeira-walk',
+                frames: scene.anims.generateFrameNumbers('toupeira-walk', { start: 0, end: 3 }),
+                frameRate: cfg.ANIM_FPS,
+                repeat: -1
+            });
+        }
+        mole.anims.play('toupeira-walk', true);
+
+        data.direction = player && player.x < mole.x ? -1 : 1;
+        mole.setFlipX(data.direction === -1);
+        mole.setVelocityX(data.speed * data.direction);
+    }
+
+    _updateToupeira(mole, data, player, currentTime, onGround) {
+        if (!player || !player.active) return;
+
+        if (data.state === 'hidden') {
+            const dx = player.x - mole.x;
+            const dy = player.y - mole.y;
+            if (dx * dx + dy * dy < data.activationDistanceSq) {
+                this._activateToupeira(mole, data, currentTime);
+            }
+            return;
+        }
+
+        if (data.state === 'emerging') {
+            if (currentTime >= data.emergeAt) {
+                this._startToupeiraChase(mole, data, player);
+            }
+            return;
+        }
+
+        const desiredDirection = player.x < mole.x ? -1 : 1;
+        data.direction = desiredDirection;
+        mole.setFlipX(desiredDirection === -1);
+
+        if (onGround && this._isLedgeAhead(mole, desiredDirection)) {
+            mole.setVelocityX(0);
+            return;
+        }
+        mole.setVelocityX(data.speed * desiredDirection);
     }
 
     _createSapo(x, y) {
@@ -253,6 +365,11 @@ class EnemyManager {
             const onGround = enemy.body.blocked.down;
 
             // Sapo verde: fica parado, só pula
+            if (data.type === 'toupeira') {
+                this._updateToupeira(enemy, data, player, currentTime, onGround);
+                return;
+            }
+
             if (data.type === 'sapo-verde') {
                 if (onGround && currentTime - data.lastJumpTime >= data.jumpInterval) {
                     enemy.setVelocityY(data.jumpForce);
@@ -380,7 +497,10 @@ class EnemyManager {
     handleCollision(player, enemy) {
         if (!enemy || !enemy.active) return;
 
-        const isStompable = enemy.patrolData?.type !== 'seahorse';
+        const enemyType = enemy.patrolData?.type;
+        if (enemyType === 'toupeira' && enemy.patrolData.state !== 'chasing') return;
+
+        const isStompable = enemyType !== 'seahorse';
 
         if (isStompable) {
             const playerBottom = player.body.bottom;

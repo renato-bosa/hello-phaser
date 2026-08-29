@@ -102,6 +102,7 @@ const GC = {
             ANIM_FPS: 6,
         },
         TOUPEIRA: {
+            SCALE: 1.1,
             ACTIVATION_DISTANCE: 160, // 5 blocos de 32 px
             EMERGE_DELAY_MS: 250,
             SPEED: 70,

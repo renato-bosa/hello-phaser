@@ -444,9 +444,15 @@ class VictoryScreen {
                 totalTime: finalTime
             };
 
-            if (world.id === 1) {
+            const cutsceneByWorld = {
+                1: 'world1Complete',
+                2: 'world2Complete'
+            };
+            const cutsceneId = cutsceneByWorld[world.id];
+
+            if (cutsceneId) {
                 scene.scene.start('CutsceneScene', {
-                    cutsceneId: 'world1Complete',
+                    cutsceneId,
                     next: {
                         scene: 'WorldCompleteScene',
                         data: worldCompleteData

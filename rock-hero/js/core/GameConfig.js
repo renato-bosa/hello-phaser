@@ -593,6 +593,19 @@ const GameConfig = {
             fadeMs: 600,
             bgColor: 0x000000,
             music: 'rock-theme1'
+        },
+        world2Complete: {
+            frames: [
+                { file: 'assets/spritesheets/cutscenes/cut-scene3-1-5.png' },
+                { file: 'assets/spritesheets/cutscenes/cut-scene3-2-5.png' },
+                { file: 'assets/spritesheets/cutscenes/cut-scene3-3-5.png' },
+                { file: 'assets/spritesheets/cutscenes/cut-scene3-4-5.png' },
+                { file: 'assets/spritesheets/cutscenes/cut-scene3-5-5.png' }
+            ],
+            unlockMs: 1000,
+            fadeMs: 600,
+            bgColor: 0x000000,
+            music: 'rock-theme1'
         }
     },
 

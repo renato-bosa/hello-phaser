@@ -80,7 +80,8 @@ class EnemyManager {
         // toupeira come?a a andar, recria o frame 0 atr?s dela para n?o levar
         // o buraco junto ao trocar a textura do inimigo.
         const hole = scene.add.sprite(mole.x, mole.y, data.holeTexture, 0);
-        hole.setDepth(mole.depth - 1);
+        // Mant?m o buraco acima do mapa, mas atr?s da toupeira e do jogador.
+        hole.setDepth(GC.DEPTH.PLAYER - 2);
         if (data.holeTransform) {
             hole.setFlipX(!!data.holeTransform.flipX);
             hole.setFlipY(!!data.holeTransform.flipY);
@@ -89,6 +90,11 @@ class EnemyManager {
         data.hole = hole;
 
         mole.setTexture('toupeira-walk', 0);
+        // Escala a partir dos p?s, como o boneco, sem enterrar o sprite.
+        mole.y += mole.height / 2;
+        mole.setOrigin(0.5, 1);
+        mole.setScale(cfg.SCALE);
+        mole.setDepth(GC.DEPTH.PLAYER - 1);
         mole.body.enable = true;
         mole.body.moves = true;
         mole.body.allowGravity = true;

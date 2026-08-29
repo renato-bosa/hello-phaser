@@ -10,6 +10,27 @@ class WorldMapScene extends Phaser.Scene {
         super({ key: 'WorldMapScene' });
     }
 
+    /** Escala valores de layout desenhados para a resolução base (640×352). */
+    u(n) {
+        return n * (this.uiScale || 1);
+    }
+
+    font(px) {
+        return `${this.u(px)}px`;
+    }
+
+    _scaledMapPos(pos) {
+        return { x: this.u(pos.x), y: this.u(pos.y) };
+    }
+
+    applyWorldMapResolution() {
+        GameConfig.UI_RESOLUTION.apply(this);
+    }
+
+    restoreGameResolution() {
+        GameConfig.UI_RESOLUTION.restore(this);
+    }
+
     init(data) {
         const savedPos = GameData.loadMapPosition();
 
@@ -65,6 +86,10 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     create() {
+        // 2× só nesta cena; restaura a base no shutdown
+        this.applyWorldMapResolution();
+        this.events.once('shutdown', this.restoreGameResolution, this);
+
         const { width, height } = this.cameras.main;
         
         // Obtém dados do mundo atual
@@ -148,13 +173,13 @@ class WorldMapScene extends Phaser.Scene {
     createGrassDecoration(width, height) {
         // Nuvens decorativas
         for (let i = 0; i < 5; i++) {
-            const x = Phaser.Math.Between(50, width - 50);
-            const y = Phaser.Math.Between(30, 100);
-            const cloud = this.add.ellipse(x, y, 80, 40, 0xffffff, 0.7);
+            const x = Phaser.Math.Between(this.u(50), width - this.u(50));
+            const y = Phaser.Math.Between(this.u(30), this.u(100));
+            const cloud = this.add.ellipse(x, y, this.u(80), this.u(40), 0xffffff, 0.7);
             
             this.tweens.add({
                 targets: cloud,
-                x: cloud.x + Phaser.Math.Between(-20, 20),
+                x: cloud.x + Phaser.Math.Between(this.u(-20), this.u(20)),
                 duration: Phaser.Math.Between(3000, 5000),
                 yoyo: true,
                 repeat: -1,
@@ -163,17 +188,17 @@ class WorldMapScene extends Phaser.Scene {
         }
         
         // Grama na base
-        const grassHeight = 60;
+        const grassHeight = this.u(60);
         this.add.rectangle(0, height - grassHeight, width, grassHeight, 0x228B22).setOrigin(0);
         
         // Detalhes da grama
-        for (let x = 0; x < width; x += 20) {
-            const bladeHeight = Phaser.Math.Between(5, 15);
+        for (let x = 0; x < width; x += this.u(20)) {
+            const bladeHeight = Phaser.Math.Between(this.u(5), this.u(15));
             this.add.triangle(
                 x, height - grassHeight,
                 0, 0,
-                5, -bladeHeight,
-                10, 0,
+                this.u(5), -bladeHeight,
+                this.u(10), 0,
                 0x32CD32
             ).setOrigin(0, 1);
         }
@@ -182,9 +207,9 @@ class WorldMapScene extends Phaser.Scene {
     createCaveDecoration(width, height) {
         // Estrelas/cristais no céu noturno
         for (let i = 0; i < 30; i++) {
-            const x = Phaser.Math.Between(10, width - 10);
-            const y = Phaser.Math.Between(70, height - 100);
-            const size = Phaser.Math.Between(1, 3);
+            const x = Phaser.Math.Between(this.u(10), width - this.u(10));
+            const y = Phaser.Math.Between(this.u(70), height - this.u(100));
+            const size = Phaser.Math.Between(this.u(1), this.u(3));
             const star = this.add.circle(x, y, size, 0xffffff, Phaser.Math.FloatBetween(0.3, 0.8));
             
             // Animação de brilho
@@ -200,16 +225,16 @@ class WorldMapScene extends Phaser.Scene {
         
         // Cristais roxos decorativos
         for (let i = 0; i < 8; i++) {
-            const x = Phaser.Math.Between(50, width - 50);
-            const baseY = height - 60;
-            const crystalHeight = Phaser.Math.Between(15, 35);
+            const x = Phaser.Math.Between(this.u(50), width - this.u(50));
+            const baseY = height - this.u(60);
+            const crystalHeight = Phaser.Math.Between(this.u(15), this.u(35));
             
             // Cristal (triângulo)
             const crystal = this.add.triangle(
                 x, baseY,
                 0, 0,
-                Phaser.Math.Between(5, 12), -crystalHeight,
-                Phaser.Math.Between(10, 20), 0,
+                Phaser.Math.Between(this.u(5), this.u(12)), -crystalHeight,
+                Phaser.Math.Between(this.u(10), this.u(20)), 0,
                 Phaser.Math.Between(0x6a0dad, 0x9932cc),
                 0.7
             ).setOrigin(0.5, 1);
@@ -226,13 +251,13 @@ class WorldMapScene extends Phaser.Scene {
         }
         
         // Chão rochoso
-        const groundHeight = 60;
+        const groundHeight = this.u(60);
         this.add.rectangle(0, height - groundHeight, width, groundHeight, 0x2d2d3d).setOrigin(0);
         
         // Pedras decorativas
-        for (let x = 0; x < width; x += Phaser.Math.Between(30, 60)) {
-            const rockWidth = Phaser.Math.Between(15, 40);
-            const rockHeight = Phaser.Math.Between(8, 20);
+        for (let x = 0; x < width; x += Phaser.Math.Between(this.u(30), this.u(60))) {
+            const rockWidth = Phaser.Math.Between(this.u(15), this.u(40));
+            const rockHeight = Phaser.Math.Between(this.u(8), this.u(20));
             this.add.ellipse(
                 x + rockWidth/2, 
                 height - groundHeight + rockHeight/2, 
@@ -245,25 +270,25 @@ class WorldMapScene extends Phaser.Scene {
 
     createTitle(width) {
         // Nome do mundo
-        const titleY = 35;
-        const rectWidth = 400;
+        const titleY = this.u(35);
+        const rectWidth = this.u(400);
         const rectHalfWidth = rectWidth / 2;
 
         // Fundo do título
-        this.add.rectangle(width / 2, titleY, rectWidth, 50, 0x000000, 0.6)
-            .setStrokeStyle(2, 0xffffff);
+        this.add.rectangle(width / 2, titleY, rectWidth, this.u(50), 0x000000, 0.6)
+            .setStrokeStyle(this.u(2), 0xffffff);
 
         // Texto do título
-        this.add.text(width / 2, titleY - 8, this.worldData?.name || 'Mundo', {
+        this.add.text(width / 2, titleY - this.u(8), this.worldData?.name || 'Mundo', {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '16px',
+            fontSize: this.font(16),
             color: '#ffffff'
         }).setOrigin(0.5);
 
         // Subtítulo
-        this.add.text(width / 2, titleY + 12, this.worldData?.subtitle || '', {
+        this.add.text(width / 2, titleY + this.u(12), this.worldData?.subtitle || '', {
             fontFamily: 'Arial',
-            fontSize: '11px',
+            fontSize: this.font(11),
             color: '#cccccc'
         }).setOrigin(0.5);
 
@@ -272,13 +297,13 @@ class WorldMapScene extends Phaser.Scene {
         // facilitar futuras mecânicas (extra-life no mapa, portais, etc.).
         const lives = GameData.getLives();
         this.livesText = this.add.text(
-            width / 2 + rectHalfWidth - 12, titleY, `🎵 x${lives}`,
+            width / 2 + rectHalfWidth - this.u(12), titleY, `🎵 x${lives}`,
             {
                 fontFamily: '"Press Start 2P", monospace',
-                fontSize: '15px',
+                fontSize: this.font(15),
                 color: '#ffffff',
                 stroke: '#000000',
-                strokeThickness: 2
+                strokeThickness: this.u(2)
             }
         ).setOrigin(1, 0.5);
     }
@@ -293,9 +318,11 @@ class WorldMapScene extends Phaser.Scene {
                 level.connectsTo.forEach(targetIndex => {
                     const targetLevel = this.levelsData.find(l => l.index === targetIndex);
                     if (targetLevel) {
+                        const from = this._scaledMapPos(level.mapPosition);
+                        const to = this._scaledMapPos(targetLevel.mapPosition);
                         this.drawPath(
-                            level.mapPosition.x, level.mapPosition.y,
-                            targetLevel.mapPosition.x, targetLevel.mapPosition.y,
+                            from.x, from.y,
+                            to.x, to.y,
                             pathColor
                         );
                     }
@@ -306,14 +333,14 @@ class WorldMapScene extends Phaser.Scene {
 
     drawPath(x1, y1, x2, y2, color) {
         // Linha principal (estrada)
-        this.graphics.lineStyle(8, color, 1);
+        this.graphics.lineStyle(this.u(8), color, 1);
         this.graphics.beginPath();
         this.graphics.moveTo(x1, y1);
         this.graphics.lineTo(x2, y2);
         this.graphics.strokePath();
         
         // Linha de destaque (meio da estrada)
-        this.graphics.lineStyle(2, 0xDEB887, 0.5);
+        this.graphics.lineStyle(this.u(2), 0xDEB887, 0.5);
         this.graphics.beginPath();
         this.graphics.moveTo(x1, y1);
         this.graphics.lineTo(x2, y2);
@@ -324,7 +351,7 @@ class WorldMapScene extends Phaser.Scene {
         this.levelNodes = [];
         
         this.levelsData.forEach((level, i) => {
-            const { x, y } = level.mapPosition;
+            const { x, y } = this._scaledMapPos(level.mapPosition);
             
             // Container para o nó
             const container = this.add.container(x, y);
@@ -345,36 +372,36 @@ class WorldMapScene extends Phaser.Scene {
                 nodeAlpha = 0.5;
             }
             
-            // Circulo do no ? fases concluidas um pouco menores
-            const radius = level.isComplete ? 17 : 22;
+            // Círculo do nó — fases concluídas um pouco menores
+            const radius = this.u(level.isComplete ? 17 : 22);
             const circle = this.add.circle(0, 0, radius, nodeColor, nodeAlpha);
-            circle.setStrokeStyle(3, strokeColor);
+            circle.setStrokeStyle(this.u(3), strokeColor);
             container.add(circle);
             
-            // Icone de status
+            // Ícone de status
             if (level.isComplete) {
-                const checkmark = this.add.text(12, -12, '✓', {
-                    fontSize: '14px',
+                const checkmark = this.add.text(this.u(12), this.u(-12), '✓', {
+                    fontSize: this.font(14),
                     color: '#00ff00',
                     stroke: '#000000',
-                    strokeThickness: 2
+                    strokeThickness: this.u(2)
                 }).setOrigin(0.5);
                 container.add(checkmark);
             } else if (!level.isUnlocked) {
                 const lock = this.add.text(0, 0, '🔒', {
-                    fontSize: '14px'
+                    fontSize: this.font(14)
                 }).setOrigin(0.5);
                 container.add(lock);
             }
             
             // Melhor tempo (se houver)
             if (level.bestTime && level.isComplete) {
-                const timeText = this.add.text(0, 32, GameData.formatTime(level.bestTime), {
+                const timeText = this.add.text(0, this.u(32), GameData.formatTime(level.bestTime), {
                     fontFamily: 'monospace',
-                    fontSize: '9px',
+                    fontSize: this.font(9),
                     color: '#ffffff',
                     stroke: '#000000',
-                    strokeThickness: 2
+                    strokeThickness: this.u(2)
                 }).setOrigin(0.5);
                 container.add(timeText);
             }
@@ -387,7 +414,7 @@ class WorldMapScene extends Phaser.Scene {
                 index: level.index,
                 type: 'level',
                 isUnlocked: level.isUnlocked,
-                mapPosition: level.mapPosition
+                mapPosition: { x, y }
             };
             this.levelNodes.push(node);
             this.allNodes.push(node);
@@ -400,12 +427,13 @@ class WorldMapScene extends Phaser.Scene {
         // Portal para mundo anterior (à esquerda da primeira fase)
         if (this.previousWorld && GameData.isWorldUnlocked(this.previousWorld.id)) {
             const firstLevel = this.levelsData[0];
-            const portalX = 30;
-            const portalY = firstLevel?.mapPosition?.y || 200;
+            const portalX = this.u(30);
+            const portalY = this.u(firstLevel?.mapPosition?.y || 200);
             
             // Desenha caminho para o portal
             if (firstLevel) {
-                this.drawPath(portalX, portalY, firstLevel.mapPosition.x, firstLevel.mapPosition.y, 0x6b4c9a);
+                const firstPos = this._scaledMapPos(firstLevel.mapPosition);
+                this.drawPath(portalX, portalY, firstPos.x, firstPos.y, 0x6b4c9a);
             }
             
             // Cria o portal
@@ -424,15 +452,16 @@ class WorldMapScene extends Phaser.Scene {
         // Portal para próximo mundo (à direita da última fase)
         if (this.nextWorld) {
             const lastLevel = this.levelsData[this.levelsData.length - 1];
-            const portalX = width - 30;
-            const portalY = lastLevel?.mapPosition?.y || 200;
+            const portalX = width - this.u(30);
+            const portalY = this.u(lastLevel?.mapPosition?.y || 200);
             
             // Verifica se o próximo mundo está desbloqueado
             const isNextUnlocked = GameData.isWorldUnlocked(this.nextWorld.id);
             
             // Desenha caminho para o portal
             if (lastLevel) {
-                this.drawPath(lastLevel.mapPosition.x, lastLevel.mapPosition.y, portalX, portalY, 
+                const lastPos = this._scaledMapPos(lastLevel.mapPosition);
+                this.drawPath(lastPos.x, lastPos.y, portalX, portalY, 
                     isNextUnlocked ? 0x6b4c9a : 0x444444);
             }
             
@@ -455,30 +484,30 @@ class WorldMapScene extends Phaser.Scene {
         const container = this.add.container(x, y);
         
         // Forma de portal (arco/portão)
-        const portalWidth = 40;
-        const portalHeight = 50;
+        const portalWidth = this.u(40);
+        const portalHeight = this.u(50);
         
         // Sombra
-        const shadow = this.add.ellipse(0, 5, portalWidth + 4, 20, 0x000000, 0.3);
+        const shadow = this.add.ellipse(0, this.u(5), portalWidth + this.u(4), this.u(20), 0x000000, 0.3);
         container.add(shadow);
         
         // Base do portal (retângulo arredondado simulado)
         const portalBg = this.add.rectangle(0, 0, portalWidth, portalHeight, color, locked ? 0.4 : 0.9);
-        portalBg.setStrokeStyle(3, locked ? 0x333333 : 0xffffff);
+        portalBg.setStrokeStyle(this.u(3), locked ? 0x333333 : 0xffffff);
         container.add(portalBg);
         
         // Arco superior
-        const arc = this.add.arc(0, -portalHeight/2 + 5, portalWidth/2, 180, 360, false, color, locked ? 0.4 : 0.9);
-        arc.setStrokeStyle(3, locked ? 0x333333 : 0xffffff);
+        const arc = this.add.arc(0, -portalHeight/2 + this.u(5), portalWidth/2, 180, 360, false, color, locked ? 0.4 : 0.9);
+        arc.setStrokeStyle(this.u(3), locked ? 0x333333 : 0xffffff);
         container.add(arc);
         
         // Interior do portal (efeito de profundidade)
         if (!locked) {
-            const inner = this.add.rectangle(0, 5, portalWidth - 10, portalHeight - 15, 0x2d1b4e, 0.8);
+            const inner = this.add.rectangle(0, this.u(5), portalWidth - this.u(10), portalHeight - this.u(15), 0x2d1b4e, 0.8);
             container.add(inner);
             
             // Efeito de brilho/energia
-            const glow = this.add.ellipse(0, 0, 20, 30, 0xaa88ff, 0.5);
+            const glow = this.add.ellipse(0, 0, this.u(20), this.u(30), 0xaa88ff, 0.5);
             container.add(glow);
             
             // Animação de energia
@@ -497,25 +526,25 @@ class WorldMapScene extends Phaser.Scene {
         // Seta direcional
         const arrowText = this.add.text(0, 0, arrow, {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '16px',
+            fontSize: this.font(16),
             color: locked ? '#666666' : '#ffffff'
         }).setOrigin(0.5);
         container.add(arrowText);
         
         // Nome do mundo de destino
-        const worldName = this.add.text(0, 35, targetWorld.name, {
+        const worldName = this.add.text(0, this.u(35), targetWorld.name, {
             fontFamily: 'Arial',
-            fontSize: '10px',
+            fontSize: this.font(10),
             color: locked ? '#666666' : '#ffffff',
             stroke: '#000000',
-            strokeThickness: 2
+            strokeThickness: this.u(2)
         }).setOrigin(0.5);
         container.add(worldName);
         
         // Cadeado se bloqueado
         if (locked) {
-            const lock = this.add.text(15, -20, '🔒', {
-                fontSize: '14px'
+            const lock = this.add.text(this.u(15), this.u(-20), '🔒', {
+                fontSize: this.font(14)
             }).setOrigin(0.5);
             container.add(lock);
         }
@@ -569,11 +598,11 @@ class WorldMapScene extends Phaser.Scene {
         const { x, y } = startNode.mapPosition;
         
         // Cursor (triângulo apontando para baixo)
-        this.cursor = this.add.container(x, y - 45);
+        this.cursor = this.add.container(x, y - this.u(45));
         
         // Triângulo indicador
-        const arrow = this.add.triangle(0, 0, 0, 0, 10, -15, -10, -15, 0xff0000);
-        arrow.setStrokeStyle(2, 0xffffff);
+        const arrow = this.add.triangle(0, 0, 0, 0, this.u(10), this.u(-15), this.u(-10), this.u(-15), 0xff0000);
+        arrow.setStrokeStyle(this.u(2), 0xffffff);
         this.cursor.add(arrow);
 
         // Personagem selecionado, abaixo da seta. Usa a pose `showcase` quando
@@ -582,8 +611,10 @@ class WorldMapScene extends Phaser.Scene {
         const showcaseState = GameData.getCharacterShowcaseState(selectedId);
         const textureKey = GameData.getCharacterTextureKey(selectedId, showcaseState);
         if (this.textures.exists(textureKey)) {
+            // GameScene pode ter deixado LINEAR (zoom < 1); no mapa queremos pixel art nítido
+            GameData.applyPixelArtFilter(this, selectedId);
             GameData.createCharacterAnimations(this, selectedId, 'mapcursor-', true);
-            const charSprite = this.add.sprite(0, 22, textureKey).setOrigin(0.5).setScale(1.5);
+            const charSprite = this.add.sprite(0, this.u(22), textureKey).setOrigin(0.5).setScale(1.5 * (this.uiScale || 1));
             charSprite.anims.play(`mapcursor-${showcaseState}`, true);
             this.cursor.add(charSprite);
         }
@@ -591,7 +622,7 @@ class WorldMapScene extends Phaser.Scene {
         // Animação de bounce
         this.tweens.add({
             targets: this.cursor,
-            y: this.cursor.y - 8,
+            y: this.cursor.y - this.u(8),
             duration: 400,
             yoyo: true,
             repeat: -1,
@@ -604,11 +635,11 @@ class WorldMapScene extends Phaser.Scene {
 
     createUI(width, height) {
         // Painel inferior com controles
-        const panelY = height - 35;
+        const panelY = height - this.u(35);
         
         // Fundo do painel
-        this.add.rectangle(width / 2, panelY, width - 20, 50, 0x000000, 0.7)
-            .setStrokeStyle(2, 0x444444);
+        this.add.rectangle(width / 2, panelY, width - this.u(20), this.u(50), 0x000000, 0.7)
+            .setStrokeStyle(this.u(2), 0x444444);
         
         // Instruções (detecta mobile)
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -626,23 +657,23 @@ class WorldMapScene extends Phaser.Scene {
 
         // Espaça os controles uniformemente pelo canvas (evita corte quando há
         // muitos itens, como no modo desktop com 5 controles).
-        const spacing = (width - 40) / controls.length;
-        const startX = 20 + spacing / 2;
+        const spacing = (width - this.u(40)) / controls.length;
+        const startX = this.u(20) + spacing / 2;
 
         controls.forEach((ctrl, i) => {
             const x = startX + (i * spacing);
             
             // Tecla
-            this.add.text(x, panelY - 8, ctrl.key, {
+            this.add.text(x, panelY - this.u(8), ctrl.key, {
                 fontFamily: '"Press Start 2P", monospace',
-                fontSize: '10px',
+                fontSize: this.font(10),
                 color: '#ffff00'
             }).setOrigin(0.5);
             
             // Ação
-            this.add.text(x, panelY + 10, ctrl.action, {
+            this.add.text(x, panelY + this.u(10), ctrl.action, {
                 fontFamily: 'Arial',
-                fontSize: '11px',
+                fontSize: this.font(11),
                 color: '#aaaaaa'
             }).setOrigin(0.5);
         });
@@ -667,12 +698,12 @@ class WorldMapScene extends Phaser.Scene {
         const container = this.add.container(cx, cy).setDepth(10);
 
         // Sombra deslocada para profundidade
-        const shadow = this.add.rectangle(3, 3, btnW, btnH, 0x000000, 0.5);
+        const shadow = this.add.rectangle(this.u(3), this.u(3), btnW, btnH, 0x000000, 0.5);
         container.add(shadow);
 
         // Fundo principal
         const bg = this.add.rectangle(0, 0, btnW, btnH, 0x1a1a2e, 0.9)
-            .setStrokeStyle(2, strokeColor);
+            .setStrokeStyle(this.u(2), strokeColor);
         container.add(bg);
 
         // Hit-test no fundo (ícone/label ficam por cima, não interativos, e não bloqueiam)
@@ -680,13 +711,13 @@ class WorldMapScene extends Phaser.Scene {
 
         bg.on('pointerover', () => {
             if (this.currentView !== 'map') return;
-            bg.setStrokeStyle(2, strokeHover);
+            bg.setStrokeStyle(this.u(2), strokeHover);
             bg.setFillStyle(0x2a2a4e, 0.95);
             this.tweens.killTweensOf(container);
             this.tweens.add({ targets: container, scale: 1.06, duration: 120, ease: 'Power1' });
         });
         bg.on('pointerout', () => {
-            bg.setStrokeStyle(2, strokeColor);
+            bg.setStrokeStyle(this.u(2), strokeColor);
             bg.setFillStyle(0x1a1a2e, 0.9);
             this.tweens.killTweensOf(container);
             this.tweens.add({ targets: container, scale: 1, duration: 120, ease: 'Power1' });
@@ -704,10 +735,10 @@ class WorldMapScene extends Phaser.Scene {
     createCharacterButton(width, height) {
         // Cartão-botão de trocar personagem (canto superior esquerdo).
         // Ícone (🎸) empilhado sobre o nome do personagem selecionado.
-        const btnW = 100;
-        const btnH = 44;
-        const cx = 10 + btnW / 2;
-        const cy = 12 + btnH / 2;
+        const btnW = this.u(100);
+        const btnH = this.u(44);
+        const cx = this.u(10) + btnW / 2;
+        const cy = this.u(12) + btnH / 2;
 
         const container = this._createCardButton(
             cx, cy, btnW, btnH,
@@ -716,18 +747,18 @@ class WorldMapScene extends Phaser.Scene {
         );
 
         // Ícone do instrumento
-        const icon = this.add.text(0, -10, '🎸', { fontSize: '18px' }).setOrigin(0.5);
+        const icon = this.add.text(0, this.u(-10), '🎸', { fontSize: this.font(18) }).setOrigin(0.5);
         container.add(icon);
 
         // Nome amigável do personagem (usa o display name de GameConfig, não o id).
         const characterId = GameData.loadSelectedCharacter();
         const characterName = GameData.getCharacter(characterId)?.name || characterId;
-        const label = this.add.text(0, 11, characterName, {
+        const label = this.add.text(0, this.u(11), characterName, {
             fontFamily: 'Arial',
-            fontSize: '11px',
+            fontSize: this.font(11),
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 2,
+            strokeThickness: this.u(2),
             fontStyle: 'bold'
         }).setOrigin(0.5);
         container.add(label);
@@ -737,10 +768,10 @@ class WorldMapScene extends Phaser.Scene {
         // Cartão-botão "Ver meus tempos" (canto superior direito, espelhando o
         // botão de personagem à esquerda). Fica na coluna livre entre o retângulo
         // do título (que termina em x≈520) e a borda direita do canvas.
-        const btnW = 110;
-        const btnH = 44;
-        const cx = width - 5 - btnW / 2;
-        const cy = 12 + btnH / 2;
+        const btnW = this.u(110);
+        const btnH = this.u(44);
+        const cx = width - this.u(5) - btnW / 2;
+        const cy = this.u(12) + btnH / 2;
 
         const container = this._createCardButton(
             cx, cy, btnW, btnH,
@@ -748,15 +779,15 @@ class WorldMapScene extends Phaser.Scene {
             () => this.showRanking()
         );
 
-        const icon = this.add.text(0, -10, '🏆', { fontSize: '18px' }).setOrigin(0.5);
+        const icon = this.add.text(0, this.u(-10), '🏆', { fontSize: this.font(18) }).setOrigin(0.5);
         container.add(icon);
 
-        const label = this.add.text(0, 11, 'Ver meus tempos', {
+        const label = this.add.text(0, this.u(11), 'Ver meus tempos', {
             fontFamily: 'Arial',
-            fontSize: '10px',
+            fontSize: this.font(10),
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 2,
+            strokeThickness: this.u(2),
             fontStyle: 'bold'
         }).setOrigin(0.5);
         container.add(label);
@@ -800,15 +831,15 @@ class WorldMapScene extends Phaser.Scene {
         this.rankingOverlayElements.push(overlay);
 
         // Título
-        const title = this.add.text(centerX, 25, '🏆 MEUS TEMPOS 🏆', {
-            fontSize: '18px', fontFamily: 'Arial', color: '#ffd700',
-            stroke: '#000000', strokeThickness: 4
+        const title = this.add.text(centerX, this.u(25), '🏆 MEUS TEMPOS 🏆', {
+            fontSize: this.font(18), fontFamily: 'Arial', color: '#ffd700',
+            stroke: '#000000', strokeThickness: this.u(4)
         }).setOrigin(0.5).setDepth(201);
         this.rankingOverlayElements.push(title);
 
         // Nome do jogador (chegamos aqui sempre com slot ativo)
-        const subtitle = this.add.text(centerX, 46, `Partida: ${GameData.loadPlayerName()}`, {
-            fontSize: '11px', fontFamily: 'Arial', color: '#888888'
+        const subtitle = this.add.text(centerX, this.u(46), `Partida: ${GameData.loadPlayerName()}`, {
+            fontSize: this.font(11), fontFamily: 'Arial', color: '#888888'
         }).setOrigin(0.5).setDepth(201);
         this.rankingOverlayElements.push(subtitle);
 
@@ -826,12 +857,12 @@ class WorldMapScene extends Phaser.Scene {
     _createRankingArrows(width) {
         // Setas grandes nas laterais — alvos de toque generosos (~48px).
         // Posicionadas verticalmente próximas ao meio da lista de fases.
-        const arrowY = 170;
+        const arrowY = this.u(170);
 
         const makeArrow = (x, glyph, direction) => {
             const arrow = this.add.text(x, arrowY, glyph, {
-                fontSize: '48px', fontFamily: 'Arial', color: '#ffffff',
-                stroke: '#000000', strokeThickness: 3
+                fontSize: this.font(48), fontFamily: 'Arial', color: '#ffffff',
+                stroke: '#000000', strokeThickness: this.u(3)
             }).setOrigin(0.5).setDepth(201).setInteractive({ useHandCursor: true });
 
             // Guarda a direção pra `_updateRankingArrows` decidir se a seta
@@ -855,8 +886,8 @@ class WorldMapScene extends Phaser.Scene {
             return arrow;
         };
 
-        this.rankingLeftArrow = makeArrow(28, '‹', -1);
-        this.rankingRightArrow = makeArrow(width - 28, '›', 1);
+        this.rankingLeftArrow = makeArrow(this.u(28), '‹', -1);
+        this.rankingRightArrow = makeArrow(width - this.u(28), '›', 1);
         this.rankingOverlayElements.push(this.rankingLeftArrow, this.rankingRightArrow);
     }
 
@@ -888,14 +919,14 @@ class WorldMapScene extends Phaser.Scene {
 
     _createRankingPageDots(centerX, height) {
         this.rankingDots = [];
-        const dotY = height - 42;
-        const dotSpacing = 18;
+        const dotY = height - this.u(42);
+        const dotSpacing = this.u(18);
         const count = GameData.WORLDS.length;
         const totalWidth = (count - 1) * dotSpacing;
         const startX = centerX - totalWidth / 2;
 
         for (let i = 0; i < count; i++) {
-            const dot = this.add.circle(startX + i * dotSpacing, dotY, 5, 0xffffff, 0.4)
+            const dot = this.add.circle(startX + i * dotSpacing, dotY, this.u(5), 0xffffff, 0.4)
                 .setDepth(201)
                 .setInteractive({ useHandCursor: true });
             dot.on('pointerdown', () => {
@@ -914,8 +945,8 @@ class WorldMapScene extends Phaser.Scene {
         const text = isMobile
             ? 'X: Voltar   |   ← →: Trocar mundo'
             : 'ESC: Voltar   |   ← →: Trocar mundo';
-        const hint = this.add.text(centerX, height - 15, text, {
-            fontSize: '11px', fontFamily: 'Arial', color: '#aaaaaa'
+        const hint = this.add.text(centerX, height - this.u(15), text, {
+            fontSize: this.font(11), fontFamily: 'Arial', color: '#aaaaaa'
         }).setOrigin(0.5).setDepth(201);
         this.rankingOverlayElements.push(hint);
     }
@@ -942,25 +973,25 @@ class WorldMapScene extends Phaser.Scene {
         const centerX = width / 2;
 
         // Cabeçalho do mundo
-        const worldName = this.add.text(centerX, 80, world.name, {
-            fontSize: '18px', fontFamily: '"Press Start 2P", monospace',
-            color: '#00ffff', stroke: '#000000', strokeThickness: 3
+        const worldName = this.add.text(centerX, this.u(80), world.name, {
+            fontSize: this.font(18), fontFamily: '"Press Start 2P", monospace',
+            color: '#00ffff', stroke: '#000000', strokeThickness: this.u(3)
         }).setOrigin(0.5).setDepth(201);
         this.rankingWorldElements.push(worldName);
 
         if (world.subtitle) {
-            const worldSubtitle = this.add.text(centerX, 105, world.subtitle, {
-                fontSize: '11px', fontFamily: 'Arial', color: '#cccccc',
+            const worldSubtitle = this.add.text(centerX, this.u(105), world.subtitle, {
+                fontSize: this.font(11), fontFamily: 'Arial', color: '#cccccc',
                 fontStyle: 'italic'
             }).setOrigin(0.5).setDepth(201);
             this.rankingWorldElements.push(worldSubtitle);
         }
 
         // Lista de fases (nome à esquerda, tempo à direita, com folga entre eles)
-        const rowSpacing = 22;
-        const leftX = centerX - 200;
-        const rightX = centerX + 200;
-        let y = 135;
+        const rowSpacing = this.u(22);
+        const leftX = centerX - this.u(200);
+        const rightX = centerX + this.u(200);
+        let y = this.u(135);
 
         world.levels.forEach((levelIndex, i) => {
             const level = GameData.LEVELS[levelIndex];
@@ -969,14 +1000,14 @@ class WorldMapScene extends Phaser.Scene {
             const isComplete = GameData.isLevelComplete(levelIndex);
 
             const nameText = this.add.text(leftX, y, `${i + 1}. ${level.name}`, {
-                fontSize: '13px', fontFamily: 'Arial',
+                fontSize: this.font(13), fontFamily: 'Arial',
                 color: isComplete ? '#ffffff' : '#666666'
             }).setOrigin(0, 0.5).setDepth(201);
             this.rankingWorldElements.push(nameText);
 
             const timeStr = bestTime !== null ? GameData.formatTime(bestTime) : '--:--.---';
             const timeText = this.add.text(rightX, y, timeStr, {
-                fontSize: '13px', fontFamily: 'monospace',
+                fontSize: this.font(13), fontFamily: 'monospace',
                 color: bestTime !== null ? '#00ff00' : '#444444'
             }).setOrigin(1, 0.5).setDepth(201);
             this.rankingWorldElements.push(timeText);
@@ -993,10 +1024,10 @@ class WorldMapScene extends Phaser.Scene {
             worldTotal += bt;
         }
         if (allComplete) {
-            const totalText = this.add.text(centerX, y + 12,
+            const totalText = this.add.text(centerX, y + this.u(12),
                 `⏱ Total do mundo: ${GameData.formatTime(worldTotal)}`, {
-                fontSize: '13px', fontFamily: 'Arial', color: '#ffd700',
-                fontStyle: 'bold', stroke: '#000000', strokeThickness: 2
+                fontSize: this.font(13), fontFamily: 'Arial', color: '#ffd700',
+                fontStyle: 'bold', stroke: '#000000', strokeThickness: this.u(2)
             }).setOrigin(0.5).setDepth(201);
             this.rankingWorldElements.push(totalText);
         }
@@ -1016,14 +1047,14 @@ class WorldMapScene extends Phaser.Scene {
         const { width } = this.cameras.main;
         const centerX = width / 2;
 
-        const lockIcon = this.add.text(centerX, 105, '🔒', {
-            fontSize: '56px'
+        const lockIcon = this.add.text(centerX, this.u(105), '🔒', {
+            fontSize: this.font(56)
         }).setOrigin(0.5).setDepth(201);
         this.rankingWorldElements.push(lockIcon);
 
-        const lockedTitle = this.add.text(centerX, 165, 'Mundo Bloqueado', {
-            fontSize: '18px', fontFamily: '"Press Start 2P", monospace',
-            color: '#888888', stroke: '#000000', strokeThickness: 3
+        const lockedTitle = this.add.text(centerX, this.u(165), 'Mundo Bloqueado', {
+            fontSize: this.font(18), fontFamily: '"Press Start 2P", monospace',
+            color: '#888888', stroke: '#000000', strokeThickness: this.u(3)
         }).setOrigin(0.5).setDepth(201);
         this.rankingWorldElements.push(lockedTitle);
 
@@ -1033,9 +1064,9 @@ class WorldMapScene extends Phaser.Scene {
             ? `Complete o ${previousWorld.name} para revelar`
             : 'Continue jogando para revelar este mundo';
 
-        const hint = this.add.text(centerX, 205, hintText, {
-            fontSize: '12px', fontFamily: 'Arial', color: '#aaaaaa',
-            fontStyle: 'italic', align: 'center', wordWrap: { width: width - 80 }
+        const hint = this.add.text(centerX, this.u(205), hintText, {
+            fontSize: this.font(12), fontFamily: 'Arial', color: '#aaaaaa',
+            fontStyle: 'italic', align: 'center', wordWrap: { width: width - this.u(80) }
         }).setOrigin(0.5).setDepth(201);
         this.rankingWorldElements.push(hint);
     }
@@ -1086,32 +1117,32 @@ class WorldMapScene extends Phaser.Scene {
         // Painel de informações da fase selecionada.
         // Posicionado horizontalmente centralizado, logo abaixo do retângulo do título
         // (título ocupa y=10..60, então deixamos ~6px de respiro antes do painel).
-        const panelWidth = 280;
-        const panelHeight = 60;
+        const panelWidth = this.u(280);
+        const panelHeight = this.u(60);
         const panelX = width / 2;
-        const panelY = 66 + panelHeight / 2; // top do painel em y=66
+        const panelY = this.u(66) + panelHeight / 2; // top do painel em y=66 (base)
 
         // Fundo
         this.infoPanelBg = this.add.rectangle(panelX, panelY, panelWidth, panelHeight, 0x000000, 0.8)
-            .setStrokeStyle(2, 0x666666);
+            .setStrokeStyle(this.u(2), 0x666666);
 
         // Espaçamento vertical entre linhas (mais apertado que o original de 25/30px
         // para acomodar a altura reduzida sem sobreposição).
-        const rowGap = 20;
+        const rowGap = this.u(20);
 
         // Nome da fase
         this.infoLevelName = this.add.text(panelX, panelY - rowGap, '', {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '11px',
+            fontSize: this.font(11),
             color: '#ffffff',
             align: 'center',
-            wordWrap: { width: panelWidth - 20 }
+            wordWrap: { width: panelWidth - this.u(20) }
         }).setOrigin(0.5);
 
         // Status
         this.infoStatus = this.add.text(panelX, panelY, '', {
             fontFamily: 'Arial',
-            fontSize: '12px',
+            fontSize: this.font(12),
             color: '#aaaaaa',
             align: 'center'
         }).setOrigin(0.5);
@@ -1119,7 +1150,7 @@ class WorldMapScene extends Phaser.Scene {
         // Melhor tempo
         this.infoBestTime = this.add.text(panelX, panelY + rowGap, '', {
             fontFamily: 'monospace',
-            fontSize: '12px',
+            fontSize: this.font(12),
             color: '#00ffff',
             align: 'center'
         }).setOrigin(0.5);
@@ -1294,14 +1325,14 @@ class WorldMapScene extends Phaser.Scene {
         this.tweens.add({
             targets: this.cursor,
             x: x,
-            y: y - 45,
+            y: y - this.u(45),
             duration: 200,
             ease: 'Power2',
             onComplete: () => {
                 // Reinicia animação de bounce
                 this.tweens.add({
                     targets: this.cursor,
-                    y: y - 45 - 8,
+                    y: y - this.u(45) - this.u(8),
                     duration: 400,
                     yoyo: true,
                     repeat: -1,
@@ -1321,15 +1352,15 @@ class WorldMapScene extends Phaser.Scene {
         // Remove destaque de todos os nós
         this.allNodes.forEach(n => {
             if (n.type === 'level') {
-                n.circle.setStrokeStyle(3, n.level?.isComplete ? 0x008800 : 
+                n.circle.setStrokeStyle(this.u(3), n.level?.isComplete ? 0x008800 : 
                                             n.isUnlocked ? 0xccaa00 : 0x444444);
             } else {
-                n.circle.setStrokeStyle(3, n.isUnlocked ? 0xffffff : 0x333333);
+                n.circle.setStrokeStyle(this.u(3), n.isUnlocked ? 0xffffff : 0x333333);
             }
         });
         
         // Adiciona destaque ao nó selecionado
-        node.circle.setStrokeStyle(4, 0xffffff);
+        node.circle.setStrokeStyle(this.u(4), 0xffffff);
         
         // Efeito de pulso
         this.tweens.add({
@@ -1372,7 +1403,7 @@ class WorldMapScene extends Phaser.Scene {
         // Texto de transição
         const transitionText = this.add.text(width / 2, height / 2, `Entrando no ${targetWorld.name}...`, {
             fontFamily: '"Press Start 2P", monospace',
-            fontSize: '14px',
+            fontSize: this.font(14),
             color: '#ffffff'
         }).setOrigin(0.5).setDepth(101).setAlpha(0);
         
@@ -1413,6 +1444,10 @@ class WorldMapScene extends Phaser.Scene {
     backToMenu() {
         SoundManager.play('menuBack');
         this.scene.start('MenuScene');
+    }
+
+    shutdown() {
+        this.restoreGameResolution();
     }
 }
 

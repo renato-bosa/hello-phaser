@@ -28,6 +28,23 @@ class CutsceneScene extends Phaser.Scene {
         super({ key: 'CutsceneScene' });
     }
 
+    /** Escala valores de layout desenhados para a resolução base (640×352). */
+    u(n) {
+        return n * (this.uiScale || 1);
+    }
+
+    font(px) {
+        return `${this.u(px)}px`;
+    }
+
+    applyCutsceneResolution() {
+        GameConfig.UI_RESOLUTION.apply(this);
+    }
+
+    restoreGameResolution() {
+        GameConfig.UI_RESOLUTION.restore(this);
+    }
+
     init(data) {
         this.cutsceneId = data?.cutsceneId || 'opening';
         this.nextScene = data?.next?.scene || 'MenuScene';
@@ -62,6 +79,10 @@ class CutsceneScene extends Phaser.Scene {
 
     create() {
         if (!this.config) return;
+
+        // 2× só nesta cena; restaura a base no shutdown
+        this.applyCutsceneResolution();
+        this.events.once('shutdown', this.restoreGameResolution, this);
 
         const cam = this.cameras.main;
         const bgColor = this.config.bgColor ?? 0x000000;
@@ -239,15 +260,15 @@ class CutsceneScene extends Phaser.Scene {
     _createProgressDots() {
         const cam = this.cameras.main;
         const total = this.config.frames.length;
-        const spacing = 14;
+        const spacing = this.u(14);
         const totalWidth = (total - 1) * spacing;
         const startX = cam.centerX - totalWidth / 2;
-        const y = cam.height - 28;
+        const y = cam.height - this.u(28);
 
         this.progressDots = [];
         for (let i = 0; i < total; i++) {
-            const dot = this.add.circle(startX + i * spacing, y, 4, 0xffffff, 0.3)
-                .setStrokeStyle(1, 0x000000, 0.6);
+            const dot = this.add.circle(startX + i * spacing, y, this.u(4), 0xffffff, 0.3)
+                .setStrokeStyle(this.u(1), 0x000000, 0.6);
             this.progressDots.push(dot);
         }
     }
@@ -264,13 +285,13 @@ class CutsceneScene extends Phaser.Scene {
         const cam = this.cameras.main;
 
         // Padding extra evita que a glifo seja cortado em algumas fontes/renderers
-        this.advancePrompt = this.add.text(cam.centerX, cam.height - 10, '▶', {
-            fontSize: '8px',
+        this.advancePrompt = this.add.text(cam.centerX, cam.height - this.u(10), '▶', {
+            fontSize: this.font(8),
             fontFamily: 'Arial',
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 2,
-            padding: { top: 2, bottom: 2 }
+            strokeThickness: this.u(2),
+            padding: { top: this.u(2), bottom: this.u(2) }
         }).setOrigin(0.5, 0.5).setAlpha(0);
     }
 
@@ -298,6 +319,7 @@ class CutsceneScene extends Phaser.Scene {
     // ==================== CLEANUP ====================
 
     shutdown() {
+        this.restoreGameResolution();
         if (this.unlockTimer) {
             this.unlockTimer.remove();
             this.unlockTimer = null;

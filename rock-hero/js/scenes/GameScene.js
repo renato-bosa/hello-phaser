@@ -447,7 +447,7 @@ class GameScene extends Phaser.Scene {
         const objectsLayer = map.getObjectLayer('objects');
 
         this.playerSpawn = { x: 100, y: 100 };
-        this.goalPosition = { x: 500, y: 100 };
+        this.goalPosition = null;
         this.checkpointPositions = [];
         const trampolines = [];
         const stars = [];
@@ -702,6 +702,9 @@ class GameScene extends Phaser.Scene {
     }
 
     createGoal() {
+        this.goal = null;
+        if (!this.goalPosition) return;
+
         this.goal = this.physics.add.staticSprite(this.goalPosition.x, this.goalPosition.y, 'green-flag');
         this.goal.body.setSize(GC.GOAL.BODY_WIDTH, GC.GOAL.BODY_HEIGHT);
         this.goal.body.setOffset(GC.GOAL.BODY_OFFSET_X, GC.GOAL.BODY_OFFSET_Y);
@@ -1600,7 +1603,9 @@ class GameScene extends Phaser.Scene {
         const player = this.playerController.player;
 
         this.physics.add.collider(player, this.solidsLayer, this.handleTileCollision, null, this);
-        this.physics.add.overlap(player, this.goal, () => this.victoryScreen.reachGoal(), null, this);
+        if (this.goal) {
+            this.physics.add.overlap(player, this.goal, () => this.victoryScreen.reachGoal(), null, this);
+        }
         if (this.prison) {
             this.physics.add.collider(player, this.prison, () => this.tryOpenPrison(), null, this);
         }

@@ -477,6 +477,18 @@ const SoundManager = {
         if (options.frequency !== undefined) {
             config.frequency = options.frequency;
         }
+        if (options.duration !== undefined) {
+            config.duration = options.duration;
+        }
+        if (options.decay !== undefined) {
+            config.decay = options.decay;
+        }
+        if (options.slide !== undefined) {
+            config.slide = options.slide;
+        }
+        if (options.filterQ !== undefined) {
+            config.filterQ = options.filterQ;
+        }
         
         this.generateAndPlay(config);
     },

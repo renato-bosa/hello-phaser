@@ -19,12 +19,14 @@ class EnemyManager {
                 this._createSapoVerde(e.x, e.y);
             } else if (e.type === 'sapo-roxo') {
                 this._createSapoRoxo(e.x, e.y);
+            } else if (e.type === 'sapo-chefe-laranja') {
+                this._createSapoChefeLaranja(e.x, e.y);
             } else if (e.type === 'sapo') {
                 this._createSapo(e.x, e.y);
             } else if (e.type === 'seahorse') {
                 this._createSeahorse(e.x, e.y);
             } else if (e.type === 'boneco') {
-                this._createBoneco(e.x, e.y);
+                this._createBoneco(e);
             } else if (e.type === 'toupeira') {
                 this._createToupeira(e);
             }
@@ -164,13 +166,31 @@ class EnemyManager {
         });
     }
 
+    _createSapoChefeLaranja(x, y) {
+        const cfg = GC.ENEMY.SAPO_CHEFE_LARANJA;
+        const boss = this._createSapoPatrol(x, y, {
+            texture: 'sapo-chefe-laranja',
+            animKey: 'sapo-chefe-laranja-walk',
+            cfg,
+            type: 'sapo-chefe-laranja',
+            body: cfg
+        });
+        boss.patrolData.health = cfg.MAX_HEALTH;
+        boss.patrolData.hitsTaken = 0;
+        boss.patrolData.state = 'normal';
+        boss.patrolData.stateUntil = 0;
+        boss.patrolData.baseSpeed = cfg.SPEED;
+        boss.patrolData.nextFlashAt = 0;
+        boss.patrolData.flashOn = false;
+    }
+
     /** Sapo com patrulha horizontal + pulos (tomate / roxo). */
-    _createSapoPatrol(x, y, { texture, animKey, cfg, type }) {
+    _createSapoPatrol(x, y, { texture, animKey, cfg, type, body = GC.ENEMY }) {
         const scene = this.scene;
         const sapo = scene.physics.add.sprite(x, y, texture);
 
-        sapo.body.setSize(GC.ENEMY.BODY_WIDTH, GC.ENEMY.BODY_HEIGHT);
-        sapo.body.setOffset(GC.ENEMY.BODY_OFFSET_X, 0);
+        sapo.body.setSize(body.BODY_WIDTH, body.BODY_HEIGHT);
+        sapo.body.setOffset(body.BODY_OFFSET_X, body.BODY_OFFSET_Y || 0);
         sapo.body.allowGravity = true;
         sapo.body.setCollideWorldBounds(true);
 
@@ -198,6 +218,7 @@ class EnemyManager {
         }
         sapo.anims.play(animKey, true);
         this.enemies.add(sapo);
+        return sapo;
     }
 
     _createSapoVerde(x, y) {
@@ -272,13 +293,13 @@ class EnemyManager {
      * Escala a partir dos pés (origin bottom) para não enterrar no chão.
      * setSize usa medidas do frame; o Arcade multiplica pela scale do sprite.
      */
-    _createBoneco(x, y) {
+    _createBoneco(data) {
         const scene = this.scene;
         const cfg = GC.ENEMY.BONECO;
         const scale = cfg.SCALE;
-        // Spawn Tiled (x,y) é o centro de um tile 32×32 — pés ficavam em y+16.
-        const feetY = y + 16;
-        const boneco = scene.physics.add.sprite(x, feetY, 'boneco');
+        // Usa a altura real para converter o centro do objeto na posicao dos pes.
+        const feetY = data.y + data.height / 2;
+        const boneco = scene.physics.add.sprite(data.x, feetY, 'boneco');
 
         boneco.setOrigin(0.5, 1);
         boneco.setScale(scale);
@@ -292,9 +313,9 @@ class EnemyManager {
             type: 'boneco',
             state: 'normal',
             vulnerableUntil: 0,
-            startX: x,
-            leftLimit: x - cfg.PATROL_DISTANCE,
-            rightLimit: x + cfg.PATROL_DISTANCE,
+            startX: data.x,
+            leftLimit: data.x - cfg.PATROL_DISTANCE,
+            rightLimit: data.x + cfg.PATROL_DISTANCE,
             speed: cfg.SPEED,
             direction: 1
         };
@@ -414,7 +435,12 @@ class EnemyManager {
                 return;
             }
 
-            // Sapo roxo: patrulha + pula, sem cair em buracos
+            if (data.type === 'sapo-chefe-laranja') {
+                this._updateSapoChefe(enemy, data, player, currentTime, onGround);
+                return;
+            }
+
+            // Sapo roxo: patrulha, pula e evita beiradas.
             if (data.type === 'sapo-roxo') {
                 this._updatePatrol(enemy, data, onGround, {
                     jump: true,
@@ -426,6 +452,136 @@ class EnemyManager {
             // Sapo tomate: patrulha + pula (pode cair em buracos)
             this._updatePatrol(enemy, data, onGround, { jump: true });
         });
+    }
+
+    _updateSapoChefe(enemy, data, player, currentTime, onGround) {
+        const cfg = GC.ENEMY.SAPO_CHEFE_LARANJA;
+
+        if (data.state === 'dying') return;
+
+        if (data.state === 'crushed') {
+            enemy.setVelocityX(0);
+            this._flashBoss(enemy, data, currentTime, 0xffffff, 0xffaa33);
+            if (currentTime >= data.stateUntil) {
+                data.state = 'attack';
+                const attackDuration = cfg.ATTACK_BASE_DURATION_MS *
+                    Math.pow(cfg.ATTACK_DURATION_GROWTH, data.hitsTaken - 1);
+                data.stateUntil = currentTime + attackDuration;
+                data.speed = data.baseSpeed * cfg.ATTACK_SPEED_MULTIPLIER;
+                data.direction = player?.x < enemy.x ? -1 : 1;
+                data.lastJumpX = enemy.x;
+                enemy.setScale(cfg.ATTACK_SCALE_X, cfg.ATTACK_SCALE_Y);
+                enemy.clearTint();
+                enemy.anims.resume();
+                this._startBossElectricEffect(enemy, data);
+                enemy.setVelocityX(data.speed * data.direction);
+            }
+            return;
+        }
+
+        if (data.state === 'attack') {
+            this._flashBoss(enemy, data, currentTime, 0xd8ffff, 0xffffd8, false);
+            this._updateBossElectricEffect(enemy, data);
+            this._updatePatrol(enemy, data, onGround, {
+                jump: true,
+                avoidLedges: true
+            });
+            if (currentTime >= data.stateUntil) {
+                data.state = 'normal';
+                data.stateUntil = 0;
+                data.speed = data.baseSpeed;
+                data.flashOn = false;
+                enemy.clearTint();
+                this._stopBossElectricEffect(data);
+                enemy.setScale(1);
+                enemy.setVelocityX(data.speed * data.direction);
+            }
+            return;
+        }
+
+        this._updatePatrol(enemy, data, onGround, {
+            jump: true,
+            avoidLedges: true
+        });
+    }
+
+    _flashBoss(enemy, data, currentTime, colorA, colorB, fill = true) {
+        if (currentTime < data.nextFlashAt) return;
+        data.nextFlashAt = currentTime + GC.ENEMY.SAPO_CHEFE_LARANJA.FLASH_INTERVAL_MS;
+        data.flashOn = !data.flashOn;
+        const color = data.flashOn ? colorA : colorB;
+        if (fill) enemy.setTintFill(color);
+        else enemy.setTint(color);
+
+        if (data.electricGraphics) this._drawBossElectricBolts(enemy, data.electricGraphics);
+    }
+
+    _startBossElectricEffect(enemy, data) {
+        this._stopBossElectricEffect(data);
+        const cfg = GC.ENEMY.SAPO_CHEFE_LARANJA;
+        const graphics = this.scene.add.graphics()
+            .setDepth(enemy.depth + 1)
+            .setAlpha(cfg.ELECTRIC_EFFECT_ALPHA);
+        data.electricGraphics = graphics;
+        this._updateBossElectricEffect(enemy, data);
+        this._drawBossElectricBolts(enemy, graphics);
+    }
+
+    _updateBossElectricEffect(enemy, data) {
+        const graphics = data.electricGraphics;
+        if (!graphics) return;
+        graphics.setPosition(enemy.x, enemy.y);
+        graphics.setDepth(enemy.depth + 1);
+    }
+
+    _drawBossElectricBolts(enemy, graphics) {
+        const cfg = GC.ENEMY.SAPO_CHEFE_LARANJA;
+        const halfW = enemy.displayWidth / 2 + 2;
+        const halfH = enemy.displayHeight / 2 + 2;
+        const segments = [];
+
+        for (let i = 0; i < cfg.ELECTRIC_BOLT_COUNT; i++) {
+            const angle = (Math.PI * 2 * i / cfg.ELECTRIC_BOLT_COUNT) + Phaser.Math.FloatBetween(-0.18, 0.18);
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            const radius = 1 / Math.sqrt((cos * cos) / (halfW * halfW) + (sin * sin) / (halfH * halfH));
+            const length = Phaser.Math.Between(8, 16);
+            const startX = cos * radius;
+            const startY = sin * radius;
+            const endX = cos * (radius + length);
+            const endY = sin * (radius + length);
+            const jitter = Phaser.Math.Between(-5, 5);
+            segments.push({
+                startX,
+                startY,
+                midX: (startX + endX) / 2 - sin * jitter,
+                midY: (startY + endY) / 2 + cos * jitter,
+                endX,
+                endY
+            });
+        }
+
+        graphics.clear();
+        this._strokeBossElectricShape(graphics, segments, halfW, halfH, 5, cfg.ELECTRIC_GLOW_COLOR, 0.3);
+        this._strokeBossElectricShape(graphics, segments, halfW, halfH, 2, cfg.ELECTRIC_CORE_COLOR, 0.95);
+    }
+
+    _strokeBossElectricShape(graphics, segments, halfW, halfH, width, color, alpha) {
+        graphics.lineStyle(width, color, alpha);
+        graphics.strokeEllipse(0, 0, halfW * 2, halfH * 2);
+        segments.forEach(segment => {
+            graphics.beginPath();
+            graphics.moveTo(segment.startX, segment.startY);
+            graphics.lineTo(segment.midX, segment.midY);
+            graphics.lineTo(segment.endX, segment.endY);
+            graphics.strokePath();
+        });
+    }
+
+    _stopBossElectricEffect(data) {
+        if (!data.electricGraphics) return;
+        data.electricGraphics.destroy();
+        data.electricGraphics = null;
     }
 
     /**
@@ -506,6 +662,15 @@ class EnemyManager {
         const enemyType = enemy.patrolData?.type;
         if (enemyType === 'toupeira' && enemy.patrolData.state !== 'chasing') return;
 
+        if (enemyType === 'sapo-chefe-laranja') {
+            const bossState = enemy.patrolData.state;
+            if (bossState === 'attack') {
+                this._damagePlayer();
+                return;
+            }
+            if (bossState === 'crushed') return;
+        }
+
         const isStompable = enemyType !== 'seahorse';
 
         if (isStompable) {
@@ -515,7 +680,9 @@ class EnemyManager {
                                playerBottom <= enemyCenter + GC.PLAYER.STOMP_TOLERANCE;
 
             if (isStomping) {
-                if (enemy.patrolData?.type === 'boneco') {
+                if (enemyType === 'sapo-chefe-laranja') {
+                    this._hitSapoChefe(enemy);
+                } else if (enemy.patrolData?.type === 'boneco') {
                     if (enemy.patrolData.state === 'vulnerable') {
                         this._killBoneco(enemy);
                     } else {
@@ -529,9 +696,104 @@ class EnemyManager {
             }
         }
 
+        this._damagePlayer();
+    }
+
+    _damagePlayer() {
         if (!this.scene.playerController.isRespawning) {
             this.scene.playerController.takeDamage();
         }
+    }
+
+    _hitSapoChefe(enemy) {
+        const data = enemy.patrolData;
+        const cfg = GC.ENEMY.SAPO_CHEFE_LARANJA;
+        if (!data || data.state !== 'normal') return;
+
+        data.health -= 1;
+        data.hitsTaken += 1;
+        SoundManager.play('damage');
+
+        if (data.health <= 0) {
+            this._killSapoChefe(enemy);
+            return;
+        }
+
+        data.state = 'crushed';
+        data.stateUntil = this.scene.time.now + cfg.CRUSHED_DURATION_MS;
+        data.nextFlashAt = 0;
+        data.flashOn = false;
+        enemy.setVelocity(0, 0);
+        enemy.anims.pause();
+        enemy.setScale(cfg.CRUSHED_SCALE_X, cfg.CRUSHED_SCALE_Y);
+        enemy.setTintFill(0xffffff);
+    }
+
+    _killSapoChefe(enemy) {
+        const cfg = GC.ENEMY.SAPO_CHEFE_LARANJA;
+        const data = enemy.patrolData;
+        if (!data || data.state === 'dying') return;
+
+        data.state = 'dying';
+        this._stopBossElectricEffect(data);
+        enemy.body.enable = false;
+        enemy.setVelocity(0, 0);
+        enemy.anims.pause();
+        enemy.clearTint();
+        SoundManager.play('damage');
+
+        // Curta carga branca e pulsante antes do estouro, para dar peso ? derrota.
+        this.scene.tweens.add({
+            targets: enemy,
+            scaleX: { from: 1.05, to: 1.35 },
+            scaleY: { from: 0.95, to: 0.7 },
+            alpha: { from: 1, to: 0.65 },
+            duration: cfg.DEATH_CHARGE_MS / 4,
+            yoyo: true,
+            repeat: 1,
+            ease: 'Sine.easeInOut',
+            onUpdate: tween => {
+                enemy.setTintFill(tween.totalProgress > 0.45 ? 0xffffff : 0xffcc66);
+            },
+            onComplete: () => this._explodeSapoChefe(enemy)
+        });
+    }
+
+    _explodeSapoChefe(enemy) {
+        if (!enemy.active) return;
+        const cfg = GC.ENEMY.SAPO_CHEFE_LARANJA;
+        const effects = this.scene.effectsManager;
+        const x = enemy.x;
+        const y = enemy.y;
+
+        // Reaproveita o estouro do boneco em camadas para preencher o chefe 64x64.
+        const durationScale = cfg.DEATH_EFFECT_DURATION_SCALE;
+        effects.createEnemyPopBurst(x, y, durationScale);
+        effects.createEnemyPopBurst(x - 18, y - 12, durationScale);
+        effects.createEnemyPopBurst(x + 18, y - 12, durationScale);
+        effects.createEnemyPopBurst(x, y + 16, durationScale);
+        SoundManager.play('enemyPop', {
+            frequency: cfg.DEATH_SOUND_FREQUENCY,
+            duration: cfg.DEATH_SOUND_DURATION,
+            decay: cfg.DEATH_SOUND_DECAY,
+            slide: cfg.DEATH_SOUND_SLIDE,
+            filterQ: 1.1
+        });
+        this.scene.cameras.main.shake(520, 0.007);
+
+        enemy.clearTint();
+        this.scene.tweens.add({
+            targets: enemy,
+            scaleX: enemy.scaleX * 1.8,
+            scaleY: enemy.scaleY * 1.8,
+            alpha: 0,
+            duration: cfg.DEATH_POP_MS,
+            ease: 'Cubic.easeOut',
+            onComplete: () => {
+                enemy.destroy();
+                this.scene.spawnPrisonKey(x, y);
+            }
+        });
     }
 
     _stunBoneco(enemy) {
@@ -570,6 +832,7 @@ class EnemyManager {
     }
 
     _killEnemy(enemy) {
+        if (enemy.patrolData) this._stopBossElectricEffect(enemy.patrolData);
         this.scene.tweens.add({
             targets: enemy,
             scaleY: enemy.scaleY * 0.2,

@@ -173,17 +173,17 @@ class EffectsManager {
     /**
      * Estouro do boneco na 2ª pisada: flash + faíscas radiais coloridas.
      */
-    createEnemyPopBurst(x, y) {
+    createEnemyPopBurst(x, y, durationScale = 1) {
         const cfg = GC.ENEMY.BONECO;
         const depth = GC.DEPTH.PLAYER + 2;
 
         this._createExpandingGlow(
             x, y, cfg.POP_GLOW_RADIUS, 0xffffff, 0.9,
-            cfg.POP_GLOW_SCALE * 0.6, cfg.POP_GLOW_MS * 0.6, depth + 1
+            cfg.POP_GLOW_SCALE * 0.6, cfg.POP_GLOW_MS * 0.6 * durationScale, depth + 1
         );
         this._createExpandingGlow(
             x, y, cfg.POP_GLOW_RADIUS, 0xffd447, 0.7,
-            cfg.POP_GLOW_SCALE, cfg.POP_GLOW_MS, depth
+            cfg.POP_GLOW_SCALE, cfg.POP_GLOW_MS * durationScale, depth
         );
 
         this._createSparkleBurst(x, y, depth + 1, {
@@ -194,9 +194,9 @@ class EffectsManager {
             maxDistance: cfg.POP_SPARKLE_MAX_DIST,
             rise: 8,
             angleJitter: 0.4,
-            minDuration: cfg.POP_SPARKLE_MS * 0.7,
-            maxDuration: cfg.POP_SPARKLE_MS,
-            stagger: 40,
+            minDuration: cfg.POP_SPARKLE_MS * 0.7 * durationScale,
+            maxDuration: cfg.POP_SPARKLE_MS * durationScale,
+            stagger: 40 * durationScale,
             colors: cfg.POP_COLORS
         });
     }

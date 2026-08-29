@@ -39,8 +39,8 @@ const GC = {
     LANDING: {
         MIN_IMPACT_SPEED: 150,    // quedas mais leves não soam
         MAX_IMPACT_SPEED: 750,    // satura o volume
-        MIN_VOLUME: 0.3,
-        MAX_VOLUME: 0.9,
+        MIN_VOLUME: 0.15,
+        MAX_VOLUME: 0.45,
     },
 
     WATER: {
@@ -95,6 +95,39 @@ const GC = {
             JUMP_DISTANCE: 32,
             JUMP_FORCE: -210,
             ANIM_FPS: 6,
+        },
+        // Chefe do Mundo 1: mesma patrulha do sapo roxo, em sprite 64x64.
+        SAPO_CHEFE_LARANJA: {
+            PATROL_DISTANCE: 64,
+            SPEED: 60,
+            JUMP_DISTANCE: 32,
+            JUMP_FORCE: -210,
+            ANIM_FPS: 6,
+            MAX_HEALTH: 4,
+            CRUSHED_DURATION_MS: 700,
+            ATTACK_BASE_DURATION_MS: 2000,
+            ATTACK_DURATION_GROWTH: 1.5,
+            ATTACK_SPEED_MULTIPLIER: 2.4,
+            FLASH_INTERVAL_MS: 90,
+            ELECTRIC_BOLT_COUNT: 9,
+            ELECTRIC_EFFECT_ALPHA: 0.78,
+            ELECTRIC_GLOW_COLOR: 0x33ddff,
+            ELECTRIC_CORE_COLOR: 0xeeffff,
+            CRUSHED_SCALE_X: 1.25,
+            CRUSHED_SCALE_Y: 0.45,
+            ATTACK_SCALE_X: 1.08,
+            ATTACK_SCALE_Y: 0.92,
+            DEATH_CHARGE_MS: 1040,
+            DEATH_POP_MS: 850,
+            DEATH_EFFECT_DURATION_SCALE: 2.5,
+            DEATH_SOUND_FREQUENCY: 620,
+            DEATH_SOUND_DURATION: 1.1,
+            DEATH_SOUND_DECAY: 1.0,
+            DEATH_SOUND_SLIDE: -420,
+            BODY_WIDTH: 52,
+            BODY_HEIGHT: 56,
+            BODY_OFFSET_X: 6,
+            BODY_OFFSET_Y: 8,
         },
         SAPO_VERDE: {
             JUMP_FORCE: -420,

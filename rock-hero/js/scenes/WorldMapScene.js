@@ -345,32 +345,24 @@ class WorldMapScene extends Phaser.Scene {
                 nodeAlpha = 0.5;
             }
             
-            // Círculo do nó
-            const circle = this.add.circle(0, 0, 22, nodeColor, nodeAlpha);
+            // Circulo do no ? fases concluidas um pouco menores
+            const radius = level.isComplete ? 17 : 22;
+            const circle = this.add.circle(0, 0, radius, nodeColor, nodeAlpha);
             circle.setStrokeStyle(3, strokeColor);
             container.add(circle);
             
-            // Número da fase
-            const levelNumber = (level.index + 1).toString();
-            const numberText = this.add.text(0, 0, levelNumber, {
-                fontFamily: '"Press Start 2P", monospace',
-                fontSize: '14px',
-                color: level.isUnlocked ? '#000000' : '#888888'
-            }).setOrigin(0.5);
-            container.add(numberText);
-            
-            // Ícone de status
+            // Icone de status
             if (level.isComplete) {
-                const checkmark = this.add.text(14, -14, '✓', {
-                    fontSize: '16px',
+                const checkmark = this.add.text(12, -12, '✓', {
+                    fontSize: '14px',
                     color: '#00ff00',
                     stroke: '#000000',
                     strokeThickness: 2
                 }).setOrigin(0.5);
                 container.add(checkmark);
             } else if (!level.isUnlocked) {
-                const lock = this.add.text(14, -14, '🔒', {
-                    fontSize: '12px'
+                const lock = this.add.text(0, 0, '🔒', {
+                    fontSize: '14px'
                 }).setOrigin(0.5);
                 container.add(lock);
             }

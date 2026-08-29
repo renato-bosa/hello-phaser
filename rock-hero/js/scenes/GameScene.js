@@ -48,6 +48,9 @@ class GameScene extends Phaser.Scene {
         this._loadSheetIfMissing('sapo-tomate', 'assets/spritesheets/sapo-tomate-6fps.png', 32, 32);
         this._loadSheetIfMissing('sapo-verde', 'assets/spritesheets/sapo-verde-6fps.png', 32, 32);
         this._loadSheetIfMissing('sapo-roxo', 'assets/spritesheets/sapo-roxo-6fps.png', 32, 32);
+        this._loadSheetIfMissing('sapo-chefe-laranja', 'assets/spritesheets/sapo-chefe-laranja-64x64-6fps.png', 64, 64);
+        this._loadImageIfMissing('prison-key-w1', 'assets/spritesheets/key-w1.png');
+        this._loadSheetIfMissing('prison-open-w1', 'assets/spritesheets/prisao-aberta-frames.png', 32, 32);
         this._loadSheetIfMissing('seahorse', 'assets/spritesheets/Cavalo marinho.png', 32, 32);
         this._loadSheetIfMissing('boneco', 'assets/spritesheets/Boneco-14fps.png', 32, 32);
         this._loadSheetIfMissing('toupeira-walk', 'assets/spritesheets/toupeira-6fps.png', 32, 32);
@@ -455,6 +458,7 @@ class GameScene extends Phaser.Scene {
         const sneakerPowerUps = [];
         const mushrooms = [];
         const movingPlatforms = [];
+        let prisonPosition = null;
 
         const gidToTilesetName = {};
         map.tilesets.forEach(ts => {
@@ -467,30 +471,42 @@ class GameScene extends Phaser.Scene {
             const type = obj.properties?.find(p => p.name === 'type')?.value;
             const tilesetName = gidToTilesetName[obj.gid] || '';
             const transform = this._extractTilesetTransform(obj);
+            const placement = this._getTileObjectPlacement(obj, map);
 
             if (type === 'player_spawn' || type === 'player-spawn' ||
                 tilesetName.includes('still-hero') || tilesetName.includes('still hero')) {
                 // Spawn não usa transform — o sprite do jogador tem orientação própria (flipX dinâmico pela direção do movimento).
-                this.playerSpawn = { x: obj.x + 16, y: obj.y - 16 };
+                this.playerSpawn = { x: placement.x, y: placement.y };
             }
             else if (type === 'goal' ||
                      tilesetName.includes('green-flag') || tilesetName.includes('green flag')) {
-                this.goalPosition = { x: obj.x + 16, y: obj.y - 16, transform };
+                this.goalPosition = { x: placement.x, y: placement.y, transform };
             }
             else if (type === 'checkpoint' ||
                      tilesetName.includes('yellow-flag') || tilesetName.includes('yellow flag')) {
-                this.checkpointPositions.push({ x: obj.x + 16, y: obj.y - 16, transform });
+                this.checkpointPositions.push({ x: placement.x, y: placement.y, transform });
+            }
+            else if (type === 'prison' || type === 'prisao' || tilesetName.includes('prisao-fechada')) {
+                prisonPosition = {
+                    x: placement.x,
+                    y: placement.y,
+                    height: placement.height,
+                    textureKey: tilesetName,
+                    transform
+                };
             }
             else if (type === 'trampoline' || tilesetName.includes('trampoline')) {
-                trampolines.push({ x: obj.x + 16, y: obj.y - 16, transform });
+                trampolines.push({ x: placement.x, y: placement.y, transform });
             }
             else if (type === 'star' || tilesetName.includes('star') || tilesetName.includes('estrela')) {
-                stars.push({ x: obj.x + 16, y: obj.y - 16, transform });
+                stars.push({ x: placement.x, y: placement.y, transform });
             }
             else if (type === 'boneco' || tilesetName.includes('boneco')) {
                 enemies.push({
-                    x: obj.x + 16,
-                    y: obj.y - 16,
+                    x: placement.x,
+                    y: placement.y,
+                    width: placement.width,
+                    height: placement.height,
                     type: 'boneco'
                 });
             }
@@ -498,15 +514,20 @@ class GameScene extends Phaser.Scene {
                      tilesetName.includes('sapo') || tilesetName.includes('frog')) {
                 // Ordem importa: "verde"/"roxo" no nome do tileset.
                 let sapoType = 'sapo';
-                if (type === 'sapo-verde' || tilesetName.includes('sapo-verde') || tilesetName.includes('verde')) {
+                if (type === 'sapo-chefe-laranja' || tilesetName.includes('sapo-chefe-laranja') ||
+                    (tilesetName.includes('sapo') && tilesetName.includes('laranja'))) {
+                    sapoType = 'sapo-chefe-laranja';
+                } else if (type === 'sapo-verde' || tilesetName.includes('sapo-verde') || tilesetName.includes('verde')) {
                     sapoType = 'sapo-verde';
                 } else if (type === 'sapo-roxo' || tilesetName.includes('sapo-roxo') || tilesetName.includes('roxo')) {
                     sapoType = 'sapo-roxo';
                 }
                 // Inimigos com patrulha/AI ignoram transform — `flipX` é controlado pelo EnemyManager em runtime.
                 enemies.push({
-                    x: obj.x + 16,
-                    y: obj.y - 16,
+                    x: placement.x,
+                    y: placement.y,
+                    width: placement.width,
+                    height: placement.height,
                     type: sapoType
                 });
             }
@@ -514,36 +535,40 @@ class GameScene extends Phaser.Scene {
                      tilesetName.includes('cavalo marinho') || tilesetName.includes('cavalo-marinho') ||
                      tilesetName.includes('seahorse')) {
                 enemies.push({
-                    x: obj.x + 16,
-                    y: obj.y - 16,
+                    x: placement.x,
+                    y: placement.y,
+                    width: placement.width,
+                    height: placement.height,
                     type: 'seahorse'
                 });
             }
             else if (type === 'speed_boost' || type === 'boost' ||
                      tilesetName.includes('setas') || tilesetName.includes('velocidade') ||
                      tilesetName.includes('speed') || tilesetName.includes('boost')) {
-                speedBoosts.push({ x: obj.x + 16, y: obj.y - 16, transform });
+                speedBoosts.push({ x: placement.x, y: placement.y, transform });
             }
             else if (type === 'sneaker-power' || type === 'sneaker_power' ||
                      tilesetName.includes('sneaker-power') || tilesetName.includes('sneaker_power')) {
-                sneakerPowerUps.push({ x: obj.x + 16, y: obj.y - 16, transform });
+                sneakerPowerUps.push({ x: placement.x, y: placement.y, transform });
             }
             else if (type === 'heart' || type === 'health' ||
                      tilesetName.includes('red-heart') || tilesetName.includes('heart')) {
-                heartPickups.push({ x: obj.x + 16, y: obj.y - 16, transform });
+                heartPickups.push({ x: placement.x, y: placement.y, transform });
             }
             else if (type === '1up' || type === 'extra_life' ||
                      tilesetName.includes('1up') || tilesetName.includes('nota') ||
                      tilesetName.includes('extra-life') || tilesetName.includes('extra_life')) {
-                extraLives.push({ x: obj.x + 16, y: obj.y - 16, textureKey: tilesetName, transform });
+                extraLives.push({ x: placement.x, y: placement.y, textureKey: tilesetName, transform });
             }
             else if (type === 'mushroom' || tilesetName.includes('mushroom') || tilesetName.includes('cogumelo')) {
-                mushrooms.push({ x: obj.x + 16, y: obj.y - 16, textureKey: tilesetName, transform });
+                mushrooms.push({ x: placement.x, y: placement.y, textureKey: tilesetName, transform });
             }
             else if (type === 'toupeira' || tilesetName.includes('toupeira')) {
                 enemies.push({
-                    x: obj.x + 16,
-                    y: obj.y - 16,
+                    x: placement.x,
+                    y: placement.y,
+                    width: placement.width,
+                    height: placement.height,
                     type: 'toupeira',
                     holeTexture: tilesetName,
                     transform
@@ -576,6 +601,7 @@ class GameScene extends Phaser.Scene {
         this._enemyData = enemies;
 
         this.createGoal();
+        this.createPrison(prisonPosition);
         this.createCheckpoints();
         this.createTrampolines(trampolines);
         this.createStars(stars);
@@ -589,14 +615,25 @@ class GameScene extends Phaser.Scene {
     }
 
     /**
-     * Extrai flip/rotação de um objeto Tiled após o parser do Phaser.
-     *
-     * O Tiled codifica flips nos 3 bits altos do `gid` (0x80000000=H, 0x40000000=V, 0x20000000=anti-diag).
-     * O Phaser parseia isso em runtime: mascara o gid e expõe `flippedHorizontal`/`flippedVertical`/`rotation`
-     * como propriedades top-level do objeto. Aqui só consolidamos em uma estrutura uniforme.
-     *
-     * @returns {{ flipX: boolean, flipY: boolean, rotation: number }} rotation em graus
+     * Converte a ancora inferior-esquerda de um tile object do Tiled para o
+     * centro usado pelo Phaser. Objetos legados sem tamanho continuam 32x32
+     * (ou usam o tile size do mapa), preservando as coordenadas atuais.
      */
+    _getTileObjectPlacement(obj, map) {
+        const fallbackWidth = map?.tileWidth || 32;
+        const fallbackHeight = map?.tileHeight || 32;
+        const width = Number(obj.width) || fallbackWidth;
+        const height = Number(obj.height) || fallbackHeight;
+
+        return {
+            x: obj.x + width / 2,
+            y: obj.y - height / 2,
+            width,
+            height
+        };
+    }
+
+    /** Extrai flip e rotacao ja normalizados pelo parser do Phaser. */
     _extractTilesetTransform(obj) {
         return {
             flipX: !!obj.flippedHorizontal,
@@ -669,6 +706,141 @@ class GameScene extends Phaser.Scene {
         this.goal.body.setSize(GC.GOAL.BODY_WIDTH, GC.GOAL.BODY_HEIGHT);
         this.goal.body.setOffset(GC.GOAL.BODY_OFFSET_X, GC.GOAL.BODY_OFFSET_Y);
         this._applyTilesetTransform(this.goal, this.goalPosition.transform);
+    }
+
+    createPrison(position) {
+        this.prison = null;
+        this.prisonKey = null;
+        this.hasPrisonKey = false;
+        this.prisonState = position ? 'locked' : 'absent';
+        if (!position) return;
+
+        // Mant?m a base no mesmo ponto do objeto do Tiled e amplia para cima.
+        const bottomY = position.y + position.height / 2;
+        this.prison = this.physics.add.staticSprite(position.x, bottomY, position.textureKey, 0);
+        this.prison.setOrigin(0.5, 1);
+        this.prison.setScale(1.5);
+        this.prison.setDepth(GC.DEPTH.PLAYER - 1);
+        this.prison.refreshBody();
+        this._applyTilesetTransform(this.prison, position.transform);
+        this._playTilesetAnimation(this.prison, position.textureKey);
+        this._setupRescuedPrisoner();
+    }
+
+    /**
+     * Converte o tile do personagem preso (ex.: baterista em bg_decoration)
+     * em sprite controlavel, inicialmente atras da grade.
+     */
+    _setupRescuedPrisoner() {
+        this.rescuedPrisoner = null;
+        if (!this.map || !this.bgDecorationLayer || !this.prison) return;
+
+        const tileset = this.map.tilesets.find(ts =>
+            (ts.name || '').toLowerCase().includes('baterista')
+        );
+        if (!tileset) return;
+
+        const layer = this.bgDecorationLayer;
+        const matches = [];
+        layer.forEachTile(tile => {
+            if (!tile || tile.index < 0) return;
+            if (tile.index < tileset.firstgid) return;
+            if (tile.index >= tileset.firstgid + tileset.total) return;
+            matches.push({
+                x: tile.x,
+                y: tile.y,
+                worldX: tile.getCenterX(),
+                worldY: tile.getCenterY(),
+                frame: tile.index - tileset.firstgid
+            });
+        });
+
+        if (!matches.length) return;
+        const match = matches[0];
+        layer.removeTileAt(match.x, match.y);
+
+        const textureKey = tileset.name;
+        const prisoner = this.add.sprite(match.worldX, match.worldY, textureKey, match.frame);
+        prisoner.setDepth(this.prison.depth - 1);
+        this._playTilesetAnimation(prisoner, textureKey);
+        this.rescuedPrisoner = prisoner;
+    }
+
+    spawnPrisonKey(x, y) {
+        if (!this.prison || this.prisonState !== 'locked' || this.prisonKey) return;
+        this.prisonKey = this.physics.add.sprite(x, y, 'prison-key-w1');
+        this.prisonKey.body.allowGravity = false;
+        this.prisonKey.setDepth(GC.DEPTH.PLAYER + 1);
+        this.tweens.add({
+            targets: this.prisonKey,
+            y: y - 6,
+            duration: 700,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+        this.physics.add.overlap(this.playerController.player, this.prisonKey,
+            () => this.collectPrisonKey(), null, this);
+    }
+
+    collectPrisonKey() {
+        if (!this.prisonKey?.active || this.hasPrisonKey) return;
+        this.hasPrisonKey = true;
+        this.prisonKey.destroy();
+        this.prisonKey = null;
+        SoundManager.play('collectStar');
+    }
+
+    tryOpenPrison() {
+        if (!this.hasPrisonKey || this.prisonState !== 'locked' || !this.prison) return;
+        this.prisonState = 'opening';
+        this.prison.anims.stop();
+        this.prison.setTexture('prison-open-w1', 0);
+
+        if (!this.anims.exists('prison-opening-w1')) {
+            this.anims.create({
+                key: 'prison-opening-w1',
+                frames: this.anims.generateFrameNumbers('prison-open-w1', { start: 0, end: 2 }),
+                frameRate: 10,
+                repeat: -1
+            });
+        }
+        this.prison.anims.play('prison-opening-w1', true);
+        this.prison.anims.timeScale = 1;
+        this.tweens.add({
+            targets: this.prison.anims,
+            timeScale: 2.5,
+            duration: 2000,
+            ease: 'Linear'
+        });
+        SoundManager.play('powerUp');
+
+        this.time.delayedCall(2000, () => {
+            if (!this.prison?.active) return;
+            this.prison.anims.stop();
+            this.prison.setFrame(3);
+            this.prisonState = 'open';
+            this.prison.body.enable = false;
+            this.cameras.main.shake(520, 0.007);
+
+            if (this.rescuedPrisoner?.active) {
+                this.rescuedPrisoner.setDepth(this.prison.depth + 1);
+            }
+
+            const bossCfg = GC.ENEMY.SAPO_CHEFE_LARANJA;
+            SoundManager.play('enemyPop', {
+                frequency: bossCfg.DEATH_SOUND_FREQUENCY,
+                duration: bossCfg.DEATH_SOUND_DURATION,
+                decay: bossCfg.DEATH_SOUND_DECAY,
+                slide: bossCfg.DEATH_SOUND_SLIDE,
+                filterQ: 1.1
+            });
+
+            this.time.delayedCall(800, () => {
+                const origin = this.rescuedPrisoner || this.prison;
+                this.victoryScreen.reachGoal(origin);
+            });
+        });
     }
 
     createCheckpoints() {
@@ -1429,6 +1601,9 @@ class GameScene extends Phaser.Scene {
 
         this.physics.add.collider(player, this.solidsLayer, this.handleTileCollision, null, this);
         this.physics.add.overlap(player, this.goal, () => this.victoryScreen.reachGoal(), null, this);
+        if (this.prison) {
+            this.physics.add.collider(player, this.prison, () => this.tryOpenPrison(), null, this);
+        }
         this.physics.add.collider(player, this.trampolines,
             (p, t) => this.playerController.handleTrampolineCollision(p, t), null, this);
         this.physics.add.overlap(player, this.stars, this.collectStar, null, this);

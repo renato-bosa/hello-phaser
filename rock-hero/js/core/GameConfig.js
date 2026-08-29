@@ -246,7 +246,7 @@ const GameConfig = {
             id: 1,
             name: 'Mundo 1',
             subtitle: 'O Resgate do Baterista',
-            levels: [0, 1, 2, 3, 4], // map0-1, map2-0, map3, map-ultima-mundo1, map4
+            levels: [0, 1, 2, 3, 4, 20], // mapas existentes + chefe do Mundo 1
             rescuedCharacter: 'baterista',
             celebrationMessage: 'Você resgatou o Baterista!',
             // Visual no WorldMap
@@ -346,7 +346,7 @@ const GameConfig = {
             zoom: 1.0,
             roundPixels: true,
             world: 1,
-            mapPosition: { x: 80, y: 200 },
+            mapPosition: { x: 55, y: 200 },
             connectsTo: [1]
         },
         {
@@ -356,7 +356,7 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 200, y: 170 },
+            mapPosition: { x: 145, y: 170 },
             connectsTo: [2]
         },
         {
@@ -366,7 +366,7 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 320, y: 220 },
+            mapPosition: { x: 235, y: 220 },
             connectsTo: [3]
         },
         {
@@ -376,7 +376,7 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 440, y: 180 },
+            mapPosition: { x: 325, y: 180 },
             connectsTo: [4]
         },
         {
@@ -386,8 +386,8 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 1,
-            mapPosition: { x: 560, y: 200 },
-            connectsTo: []
+            mapPosition: { x: 415, y: 200 },
+            connectsTo: [20]
         },
         // ==================== MUNDO 2 ====================
         // map-5 → map-6 → map-2 → map-8 → map-7
@@ -550,6 +550,16 @@ const GameConfig = {
             roundPixels: false,
             world: 4,
             mapPosition: { x: 580, y: 200 },
+            connectsTo: []
+        },
+        {
+            key: 'map-chefe-mundo1',
+            file: 'assets/map-chefe-mundo1.json',
+            name: 'Chefe do Mundo 1',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 1,
+            mapPosition: { x: 520, y: 170 },
             connectsTo: []
         }
     ],

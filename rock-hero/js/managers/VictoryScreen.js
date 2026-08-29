@@ -8,7 +8,7 @@ class VictoryScreen {
         this.starsWarningActive = false;
     }
 
-    reachGoal() {
+    reachGoal(celebrationOrigin = null) {
         const scene = this.scene;
         if (scene.hasWon) return;
 
@@ -36,7 +36,7 @@ class VictoryScreen {
             );
         }
 
-        this._celebrate(result.isRecord, () => this._showVictoryOverlay(finalTime, result));
+        this._celebrate(result.isRecord, () => this._showVictoryOverlay(finalTime, result), celebrationOrigin);
     }
 
     /**
@@ -48,7 +48,7 @@ class VictoryScreen {
      * `hasWon`, mas a física segue rodando — se ele tocou a bandeira no ar,
      * cai e pousa naturalmente durante a celebração.
      */
-    _celebrate(isRecord, onDone) {
+    _celebrate(isRecord, onDone, celebrationOrigin = null) {
         const scene = this.scene;
 
         if (!GameData.isFeatureEnabled('victoryCelebration')) {
@@ -58,7 +58,7 @@ class VictoryScreen {
 
         const cfg = GC.VICTORY;
         const goal = scene.goal;
-        const origin = goal || scene.playerController.player;
+        const origin = celebrationOrigin || goal || scene.playerController.player;
 
         if (goal) {
             // Seguro tweenar escala: _applyTilesetTransform usa flipX/angle,
@@ -119,8 +119,10 @@ class VictoryScreen {
         const scene = this.scene;
         const centerX = scene.cameras.main.centerX;
         const centerY = scene.cameras.main.centerY;
-        const nextLevel = scene.currentLevel + 1;
-        const hasNextLevel = nextLevel < GameData.LEVELS.length;
+        const currentWorld = GameData.getWorldForLevel(scene.currentLevel);
+        const levelPosition = currentWorld?.levels.indexOf(scene.currentLevel) ?? -1;
+        const nextLevel = levelPosition >= 0 ? currentWorld.levels[levelPosition + 1] : undefined;
+        const hasNextLevel = Number.isInteger(nextLevel);
         const completedWorld = GameData.checkWorldCompletion(scene.currentLevel);
 
         const overlay = scene.add.rectangle(centerX, centerY, 640, 400, 0x000000, 0.82)

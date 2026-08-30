@@ -144,6 +144,13 @@ const GC = {
             BODY_HEIGHT: 24,
             BODY_OFFSET_X: 4,
             BODY_OFFSET_Y: 8,
+            // Sondagem à frente dos pés (px): borda para buracos; ~1 tile p/ achar pouso acima.
+            LOOK_AHEAD_EDGE_PX: 4,
+            LOOK_AHEAD_STEP_PX: 32,
+            MAX_DROP_TILES: 1,
+            MAX_STEP_TILES: 1,
+            STEP_JUMP_MARGIN_PX: 6,   // folga mínima acima de 1 tile
+            STEP_JUMP_COOLDOWN_MS: 350,
         },
         SEAHORSE: {
             BODY_WIDTH: 22,

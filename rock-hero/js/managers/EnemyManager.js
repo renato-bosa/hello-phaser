@@ -60,7 +60,8 @@ class EnemyManager {
             activationDistanceSq: cfg.ACTIVATION_DISTANCE * cfg.ACTIVATION_DISTANCE,
             emergeAt: 0,
             speed: cfg.SPEED,
-            direction: 1
+            direction: 1,
+            lastStepJumpAt: 0
         };
 
         this.enemies.add(mole);
@@ -142,10 +143,30 @@ class EnemyManager {
         data.direction = desiredDirection;
         mole.setFlipX(desiredDirection === -1);
 
-        if (onGround && this._isLedgeAhead(mole, desiredDirection)) {
-            mole.setVelocityX(0);
-            return;
+        if (onGround) {
+            const blockedAhead = desiredDirection > 0
+                ? mole.body.blocked.right
+                : mole.body.blocked.left;
+            const terrain = this._analyzeToupeiraTerrainAhead(mole, desiredDirection, blockedAhead);
+
+            if (terrain === 'deep_hole') {
+                mole.setVelocityX(0);
+                return;
+            }
+
+            if (terrain === 'step_up') {
+                const tileSize = this._getTileSize();
+                const jumpHeight = tileSize * GC.ENEMY.TOUPEIRA.MAX_STEP_TILES
+                    + GC.ENEMY.TOUPEIRA.STEP_JUMP_MARGIN_PX;
+                const cooldown = GC.ENEMY.TOUPEIRA.STEP_JUMP_COOLDOWN_MS;
+                if (currentTime - data.lastStepJumpAt >= cooldown) {
+                    mole.setVelocityY(this._computeStepJumpForce(jumpHeight));
+                    data.lastStepJumpAt = currentTime;
+                }
+            }
+            // shallow_hole e clear: segue andando (cai ou continua reto).
         }
+
         mole.setVelocityX(data.speed * desiredDirection);
     }
 
@@ -635,6 +656,88 @@ class EnemyManager {
         if (Math.abs(enemy.body.velocity.x) < data.speed * 0.5 && onGround) {
             enemy.setVelocityX(data.speed * data.direction);
         }
+    }
+
+    _getTileSize() {
+        return this.scene.map?.tileWidth || 32;
+    }
+
+    /** Há colisor sólido na camada `solids` neste ponto do mundo? */
+    _probeSolidAt(worldX, worldY) {
+        const solids = this.scene.solidsLayer;
+        if (!solids) return false;
+
+        const tile = solids.getTileAtWorldXY(worldX, worldY, true);
+        if (!tile || tile.index === -1) return false;
+        return tile.collides;
+    }
+
+    /**
+     * Impulso vertical mínimo para subir exatamente `heightPx` com a gravidade atual.
+     * v = sqrt(2 * g * h)
+     */
+    _computeStepJumpForce(heightPx) {
+        const gravity = Math.abs(this.scene.physics.world.gravity.y);
+        return -Math.sqrt(2 * gravity * heightPx);
+    }
+
+    /**
+     * Há superfície de pouso 1 tile acima, entre a borda do corpo e ~1 tile à frente.
+     * Varre em X porque a face vertical do degrau ocupa a coluna imediata — o chão
+     * de cima fica na coluna seguinte.
+     */
+    _hasStepLandingAhead(enemy, direction) {
+        const cfg = GC.ENEMY.TOUPEIRA;
+        const tileSize = this._getTileSize();
+        const body = enemy.body;
+        const landingY = body.bottom + 2 - tileSize * cfg.MAX_STEP_TILES;
+        const startX = direction > 0
+            ? body.right + cfg.LOOK_AHEAD_EDGE_PX
+            : body.left - cfg.LOOK_AHEAD_EDGE_PX;
+        const endX = direction > 0
+            ? body.right + cfg.LOOK_AHEAD_STEP_PX
+            : body.left - cfg.LOOK_AHEAD_STEP_PX;
+        const stepPx = 8;
+
+        for (let x = startX; direction > 0 ? x <= endX : x >= endX; x += direction * stepPx) {
+            if (this._probeSolidAt(x, landingY)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Terreno à frente da toupeira:
+     * - clear        → chão contínuo no mesmo nível
+     * - shallow_hole → queda de até MAX_DROP_TILES (continua andando)
+     * - step_up      → degrau de até MAX_STEP_TILES (pula baixo)
+     * - deep_hole    → buraco mais profundo (para)
+     */
+    _analyzeToupeiraTerrainAhead(enemy, direction, blockedAhead = false) {
+        const cfg = GC.ENEMY.TOUPEIRA;
+        const tileSize = this._getTileSize();
+        const body = enemy.body;
+        const feetY = body.bottom + 2;
+        const edgeProbeX = direction > 0
+            ? body.right + cfg.LOOK_AHEAD_EDGE_PX
+            : body.left - cfg.LOOK_AHEAD_EDGE_PX;
+        const floorAheadSameLevel = this._probeSolidAt(edgeProbeX, feetY);
+        const hasStepLanding = this._hasStepLandingAhead(enemy, direction);
+
+        // Degrau: pouso 1 tile acima. A face do bloco conta como "chão" na sonda
+        // horizontal — por isso também disparamos ao encostar (blockedAhead).
+        if (hasStepLanding && (!floorAheadSameLevel || blockedAhead)) {
+            return 'step_up';
+        }
+
+        if (floorAheadSameLevel) {
+            return 'clear';
+        }
+
+        if (this._probeSolidAt(edgeProbeX, feetY + tileSize * cfg.MAX_DROP_TILES)) {
+            return 'shallow_hole';
+        }
+
+        return 'deep_hole';
     }
 
     /**

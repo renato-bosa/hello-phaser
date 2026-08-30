@@ -29,6 +29,8 @@ class EnemyManager {
                 this._createBoneco(e);
             } else if (e.type === 'toupeira') {
                 this._createToupeira(e);
+            } else if (e.type === 'toupeira-chefe') {
+                this._createToupeiraChefe(e);
             }
         });
     }
@@ -147,18 +149,19 @@ class EnemyManager {
             const blockedAhead = desiredDirection > 0
                 ? mole.body.blocked.right
                 : mole.body.blocked.left;
-            const terrain = this._analyzeToupeiraTerrainAhead(mole, desiredDirection, blockedAhead);
+            const terrainCfg = GC.ENEMY.TOUPEIRA;
+            const terrain = this._analyzeToupeiraTerrainAhead(mole, desiredDirection, blockedAhead, terrainCfg);
 
-            if (terrain === 'deep_hole') {
+            if (terrain.kind === 'deep_hole') {
                 mole.setVelocityX(0);
                 return;
             }
 
-            if (terrain === 'step_up') {
+            if (terrain.kind === 'step_up') {
                 const tileSize = this._getTileSize();
-                const jumpHeight = tileSize * GC.ENEMY.TOUPEIRA.MAX_STEP_TILES
-                    + GC.ENEMY.TOUPEIRA.STEP_JUMP_MARGIN_PX;
-                const cooldown = GC.ENEMY.TOUPEIRA.STEP_JUMP_COOLDOWN_MS;
+                const jumpHeight = terrain.jumpHeightPx
+                    ?? (tileSize * terrain.stepTiles + terrainCfg.STEP_JUMP_MARGIN_PX);
+                const cooldown = terrainCfg.STEP_JUMP_COOLDOWN_MS;
                 if (currentTime - data.lastStepJumpAt >= cooldown) {
                     mole.setVelocityY(this._computeStepJumpForce(jumpHeight));
                     data.lastStepJumpAt = currentTime;
@@ -168,6 +171,291 @@ class EnemyManager {
         }
 
         mole.setVelocityX(data.speed * desiredDirection);
+    }
+
+    _createToupeiraChefe(spawn) {
+        const scene = this.scene;
+        const cfg = GC.ENEMY.TOUPEIRA_CHEFE;
+        const holes = (spawn.holes && spawn.holes.length)
+            ? spawn.holes.slice()
+            : [{ x: spawn.x, y: spawn.y }];
+
+        let startHole = holes[0];
+        let bestDist = Infinity;
+        holes.forEach(h => {
+            const d = (h.x - spawn.x) ** 2 + (h.y - spawn.y) ** 2;
+            if (d < bestDist) {
+                bestDist = d;
+                startHole = h;
+            }
+        });
+
+        const mole = scene.physics.add.sprite(startHole.x, startHole.y, cfg.WALK_TEXTURE, 0);
+        mole.setOrigin(0.5, 1);
+        mole.setScale(cfg.SCALE);
+        mole.setAlpha(0);
+        mole.setDepth(GC.DEPTH.PLAYER - 1);
+        mole.body.setSize(cfg.BODY_WIDTH, cfg.BODY_HEIGHT);
+        mole.body.setOffset(cfg.BODY_OFFSET_X, cfg.BODY_OFFSET_Y);
+        mole.body.allowGravity = false;
+        mole.body.setCollideWorldBounds(true);
+        mole.body.checkCollision.none = true;
+        mole.body.moves = false;
+        mole.body.enable = false;
+
+        mole.patrolData = {
+            type: 'toupeira-chefe',
+            state: 'hidden',
+            bossCfg: cfg,
+            holes,
+            currentHole: startHole,
+            activationDistanceSq: cfg.ACTIVATION_DISTANCE * cfg.ACTIVATION_DISTANCE,
+            emergeAt: 0,
+            speed: cfg.SPEED,
+            baseSpeed: cfg.SPEED,
+            direction: 1,
+            health: cfg.MAX_HEALTH,
+            hitsTaken: 0,
+            stateUntil: 0,
+            nextFlashAt: 0,
+            flashOn: false,
+            lastStepJumpAt: 0,
+            electricGraphics: null
+        };
+
+        this.enemies.add(mole);
+    }
+
+    _updateToupeiraChefe(mole, data, player, currentTime, onGround) {
+        if (!player || !player.active) return;
+        if (data.state === 'dying') return;
+
+        if (data.state === 'hidden') {
+            const dx = player.x - mole.x;
+            const dy = player.y - mole.y;
+            if (dx * dx + dy * dy < data.activationDistanceSq) {
+                data.state = 'emerging';
+                data.emergeAt = currentTime + data.bossCfg.EMERGE_DELAY_MS;
+                data.emergeInto = 'chasing';
+            }
+            return;
+        }
+
+        if (data.state === 'emerging') {
+            if (currentTime >= data.emergeAt) {
+                this._emergeToupeiraChefe(mole, data, player, data.emergeInto || 'chasing');
+            }
+            return;
+        }
+
+        if (data.state === 'burrowing') {
+            mole.setVelocity(0, 0);
+            if (currentTime >= data.emergeAt) {
+                const nextHole = this._pickOtherHole(data);
+                data.currentHole = nextHole;
+                mole.setPosition(nextHole.x, nextHole.y);
+                data.state = 'emerging';
+                data.emergeAt = currentTime;
+                data.emergeInto = 'attack';
+            }
+            return;
+        }
+
+        if (data.state === 'fleeing') {
+            this._updateToupeiraChefeFlee(mole, data, currentTime);
+            return;
+        }
+
+        if (data.state === 'attack') {
+            this._flashBoss(mole, data, currentTime, 0xd8ffff, 0xffffd8, false);
+            this._updateBossElectricEffect(mole, data);
+            this._chaseLikeToupeira(mole, data, player, onGround);
+            if (currentTime >= data.stateUntil) {
+                data.state = 'chasing';
+                data.stateUntil = 0;
+                data.speed = data.baseSpeed;
+                data.flashOn = false;
+                mole.clearTint();
+                this._stopBossElectricEffect(data);
+                mole.setScale(data.bossCfg.SCALE);
+            }
+            return;
+        }
+
+        // chasing
+        this._chaseLikeToupeira(mole, data, player, onGround);
+    }
+
+    _chaseLikeToupeira(mole, data, player, onGround) {
+        const desiredDirection = player.x < mole.x ? -1 : 1;
+        data.direction = desiredDirection;
+        mole.setFlipX(desiredDirection === -1);
+
+        if (onGround) {
+            const blockedAhead = desiredDirection > 0
+                ? mole.body.blocked.right
+                : mole.body.blocked.left;
+            // Chefe usa os próprios limites de degrau/queda; toupeira comum cai no default.
+            const terrainCfg = data.bossCfg || GC.ENEMY.TOUPEIRA;
+            const terrain = this._analyzeToupeiraTerrainAhead(mole, desiredDirection, blockedAhead, terrainCfg);
+
+            if (terrain.kind === 'deep_hole') {
+                mole.setVelocityX(0);
+                return;
+            }
+
+            if (terrain.kind === 'step_up') {
+                const tileSize = this._getTileSize();
+                const jumpHeight = terrain.jumpHeightPx
+                    ?? (tileSize * terrain.stepTiles
+                        + (terrainCfg.STEP_JUMP_MARGIN_PX ?? GC.ENEMY.TOUPEIRA.STEP_JUMP_MARGIN_PX));
+                const cooldown = terrainCfg.STEP_JUMP_COOLDOWN_MS ?? GC.ENEMY.TOUPEIRA.STEP_JUMP_COOLDOWN_MS;
+                const now = this.scene.time.now;
+                if (now - data.lastStepJumpAt >= cooldown) {
+                    mole.setVelocityY(this._computeStepJumpForce(jumpHeight));
+                    data.lastStepJumpAt = now;
+                }
+            }
+        }
+
+        mole.setVelocityX(data.speed * desiredDirection);
+    }
+
+    _updateToupeiraChefeFlee(mole, data, currentTime) {
+        const target = data.fleeHole || data.currentHole;
+        if (!target) {
+            this._enterToupeiraChefeBurrow(mole, data, currentTime);
+            return;
+        }
+
+        const dx = target.x - mole.x;
+        data.direction = dx < 0 ? -1 : 1;
+        mole.setFlipX(data.direction === -1);
+
+        const onGround = mole.body.blocked.down;
+        if (onGround) {
+            const blockedAhead = data.direction > 0
+                ? mole.body.blocked.right
+                : mole.body.blocked.left;
+            const terrainCfg = data.bossCfg;
+            const terrain = this._analyzeToupeiraTerrainAhead(mole, data.direction, blockedAhead, terrainCfg);
+            if (terrain.kind === 'step_up') {
+                const tileSize = this._getTileSize();
+                const jumpHeight = terrain.jumpHeightPx
+                    ?? (tileSize * terrain.stepTiles + terrainCfg.STEP_JUMP_MARGIN_PX);
+                if (currentTime - data.lastStepJumpAt >= terrainCfg.STEP_JUMP_COOLDOWN_MS) {
+                    mole.setVelocityY(this._computeStepJumpForce(jumpHeight));
+                    data.lastStepJumpAt = currentTime;
+                }
+            }
+        }
+
+        mole.setVelocityX(data.speed * data.direction);
+
+        if (Math.abs(dx) <= data.bossCfg.HOLE_REACH_DISTANCE) {
+            this._enterToupeiraChefeBurrow(mole, data, currentTime);
+        }
+    }
+
+    _enterToupeiraChefeBurrow(mole, data, currentTime) {
+        const cfg = data.bossCfg;
+        const hole = data.fleeHole || data.currentHole;
+        data.currentHole = hole;
+        data.state = 'burrowing';
+        data.emergeAt = currentTime + cfg.REAPPEAR_DELAY_MS;
+        this._stopBossElectricEffect(data);
+        mole.clearTint();
+        mole.anims.stop();
+        mole.setVelocity(0, 0);
+        mole.setAlpha(0);
+        mole.body.enable = false;
+        mole.body.moves = false;
+        mole.body.allowGravity = false;
+        mole.body.checkCollision.none = true;
+        if (hole) mole.setPosition(hole.x, hole.y);
+    }
+
+    _emergeToupeiraChefe(mole, data, player, nextState) {
+        const cfg = data.bossCfg;
+        const hole = data.currentHole || { x: mole.x, y: mole.y };
+
+        mole.setPosition(hole.x, hole.y);
+        mole.setOrigin(0.5, 1);
+        mole.setTexture(cfg.WALK_TEXTURE, 0);
+        mole.setScale(cfg.SCALE * 0.45);
+        mole.setAlpha(0);
+        mole.setDepth(GC.DEPTH.PLAYER - 1);
+
+        mole.body.enable = true;
+        mole.body.moves = true;
+        mole.body.allowGravity = true;
+        mole.body.checkCollision.none = false;
+        mole.body.setSize(cfg.BODY_WIDTH, cfg.BODY_HEIGHT);
+        mole.body.setOffset(cfg.BODY_OFFSET_X, cfg.BODY_OFFSET_Y);
+
+        if (!this.scene.anims.exists(cfg.WALK_ANIM)) {
+            this.scene.anims.create({
+                key: cfg.WALK_ANIM,
+                frames: this.scene.anims.generateFrameNumbers(cfg.WALK_TEXTURE, {
+                    start: 0,
+                    end: cfg.FRAME_END
+                }),
+                frameRate: cfg.ANIM_FPS,
+                repeat: -1
+            });
+        }
+        mole.anims.play(cfg.WALK_ANIM, true);
+
+        data.direction = player && player.x < mole.x ? -1 : 1;
+        mole.setFlipX(data.direction === -1);
+
+        this.scene.tweens.add({
+            targets: mole,
+            alpha: 1,
+            scaleX: nextState === 'attack' ? cfg.ATTACK_SCALE_X : cfg.SCALE,
+            scaleY: nextState === 'attack' ? cfg.ATTACK_SCALE_Y : cfg.SCALE,
+            duration: cfg.EMERGE_PROCEDURAL_MS,
+            ease: 'Back.easeOut'
+        });
+
+        if (nextState === 'attack') {
+            data.state = 'attack';
+            const attackDuration = cfg.ATTACK_BASE_DURATION_MS *
+                Math.pow(cfg.ATTACK_DURATION_GROWTH, Math.max(0, data.hitsTaken - 1));
+            data.stateUntil = this.scene.time.now + attackDuration;
+            data.speed = data.baseSpeed * cfg.ATTACK_SPEED_MULTIPLIER;
+            this._startBossElectricEffect(mole, data);
+        } else {
+            data.state = 'chasing';
+            data.speed = data.baseSpeed;
+        }
+
+        mole.setVelocityX(data.speed * data.direction);
+        data.emergeInto = null;
+    }
+
+    _pickOtherHole(data) {
+        const holes = data.holes || [];
+        if (holes.length <= 1) return data.currentHole || holes[0];
+        const others = holes.filter(h => h !== data.currentHole &&
+            !(data.currentHole && h.x === data.currentHole.x && h.y === data.currentHole.y));
+        const pool = others.length ? others : holes;
+        return Phaser.Utils.Array.GetRandom(pool);
+    }
+
+    _nearestHole(data, x, y) {
+        const holes = data.holes || [];
+        if (!holes.length) return { x, y };
+        let best = holes[0];
+        let bestDist = Infinity;
+        holes.forEach(h => {
+            const d = (h.x - x) ** 2 + (h.y - y) ** 2;
+            if (d < bestDist) {
+                bestDist = d;
+                best = h;
+            }
+        });
+        return best;
     }
 
     _createSapo(x, y) {
@@ -203,6 +491,7 @@ class EnemyManager {
         boss.patrolData.baseSpeed = cfg.SPEED;
         boss.patrolData.nextFlashAt = 0;
         boss.patrolData.flashOn = false;
+        boss.patrolData.bossCfg = cfg;
     }
 
     /** Sapo com patrulha horizontal + pulos (tomate / roxo). */
@@ -418,6 +707,11 @@ class EnemyManager {
                 return;
             }
 
+            if (data.type === 'toupeira-chefe') {
+                this._updateToupeiraChefe(enemy, data, player, currentTime, onGround);
+                return;
+            }
+
             if (data.type === 'sapo-verde') {
                 if (onGround && currentTime - data.lastJumpTime >= data.jumpInterval) {
                     enemy.setVelocityY(data.jumpForce);
@@ -527,39 +821,45 @@ class EnemyManager {
     }
 
     _flashBoss(enemy, data, currentTime, colorA, colorB, fill = true) {
+        const cfg = data.bossCfg || GC.ENEMY.SAPO_CHEFE_LARANJA;
         if (currentTime < data.nextFlashAt) return;
-        data.nextFlashAt = currentTime + GC.ENEMY.SAPO_CHEFE_LARANJA.FLASH_INTERVAL_MS;
+        data.nextFlashAt = currentTime + cfg.FLASH_INTERVAL_MS;
         data.flashOn = !data.flashOn;
         const color = data.flashOn ? colorA : colorB;
         if (fill) enemy.setTintFill(color);
         else enemy.setTint(color);
 
-        if (data.electricGraphics) this._drawBossElectricBolts(enemy, data.electricGraphics);
+        if (data.electricGraphics) this._drawBossElectricBolts(enemy, data);
     }
 
     _startBossElectricEffect(enemy, data) {
         this._stopBossElectricEffect(data);
-        const cfg = GC.ENEMY.SAPO_CHEFE_LARANJA;
+        const cfg = data.bossCfg || GC.ENEMY.SAPO_CHEFE_LARANJA;
         const graphics = this.scene.add.graphics()
             .setDepth(enemy.depth + 1)
             .setAlpha(cfg.ELECTRIC_EFFECT_ALPHA);
         data.electricGraphics = graphics;
         this._updateBossElectricEffect(enemy, data);
-        this._drawBossElectricBolts(enemy, graphics);
+        this._drawBossElectricBolts(enemy, data);
     }
 
     _updateBossElectricEffect(enemy, data) {
         const graphics = data.electricGraphics;
         if (!graphics) return;
-        graphics.setPosition(enemy.x, enemy.y);
+        // Centro visual do sprite (origem nos pés da toupeira-chefe ≠ centro).
+        const centerX = enemy.x - enemy.displayWidth * (enemy.originX - 0.5);
+        const centerY = enemy.y - enemy.displayHeight * (enemy.originY - 0.5);
+        graphics.setPosition(centerX, centerY);
         graphics.setDepth(enemy.depth + 1);
     }
 
-    _drawBossElectricBolts(enemy, graphics) {
-        const cfg = GC.ENEMY.SAPO_CHEFE_LARANJA;
+    _drawBossElectricBolts(enemy, data) {
+        const graphics = data.electricGraphics;
+        if (!graphics) return;
+        const cfg = data.bossCfg || GC.ENEMY.SAPO_CHEFE_LARANJA;
         const halfW = enemy.displayWidth / 2 + 2;
         const halfH = enemy.displayHeight / 2 + 2;
-        const segments = [];
+        graphics.clear();
 
         for (let i = 0; i < cfg.ELECTRIC_BOLT_COUNT; i++) {
             const angle = (Math.PI * 2 * i / cfg.ELECTRIC_BOLT_COUNT) + Phaser.Math.FloatBetween(-0.18, 0.18);
@@ -572,19 +872,23 @@ class EnemyManager {
             const endX = cos * (radius + length);
             const endY = sin * (radius + length);
             const jitter = Phaser.Math.Between(-5, 5);
-            segments.push({
-                startX,
-                startY,
-                midX: (startX + endX) / 2 - sin * jitter,
-                midY: (startY + endY) / 2 + cos * jitter,
-                endX,
-                endY
-            });
-        }
+            const midX = (startX + endX) / 2 + jitter * -sin;
+            const midY = (startY + endY) / 2 + jitter * cos;
 
-        graphics.clear();
-        this._strokeBossElectricShape(graphics, segments, halfW, halfH, 5, cfg.ELECTRIC_GLOW_COLOR, 0.3);
-        this._strokeBossElectricShape(graphics, segments, halfW, halfH, 2, cfg.ELECTRIC_CORE_COLOR, 0.95);
+            graphics.lineStyle(3, cfg.ELECTRIC_GLOW_COLOR, 0.55);
+            graphics.beginPath();
+            graphics.moveTo(startX, startY);
+            graphics.lineTo(midX, midY);
+            graphics.lineTo(endX, endY);
+            graphics.strokePath();
+
+            graphics.lineStyle(1.5, cfg.ELECTRIC_CORE_COLOR, 0.95);
+            graphics.beginPath();
+            graphics.moveTo(startX, startY);
+            graphics.lineTo(midX, midY);
+            graphics.lineTo(endX, endY);
+            graphics.strokePath();
+        }
     }
 
     _strokeBossElectricShape(graphics, segments, halfW, halfH, width, color, alpha) {
@@ -682,15 +986,40 @@ class EnemyManager {
     }
 
     /**
-     * Há superfície de pouso 1 tile acima, entre a borda do corpo e ~1 tile à frente.
-     * Varre em X porque a face vertical do degrau ocupa a coluna imediata — o chão
-     * de cima fica na coluna seguinte.
+     * Altura de pulo (px) para superar a prisão à frente, ou 0.
+     * A prisão é um staticSprite — não aparece na sonda de tiles `solids`.
      */
-    _hasStepLandingAhead(enemy, direction) {
-        const cfg = GC.ENEMY.TOUPEIRA;
+    _getPrisonJumpHeightPx(enemy, direction, terrainCfg) {
+        if (!terrainCfg?.CAN_JUMP_PRISON) return 0;
+        const prison = this.scene.prison;
+        if (!prison?.active || !prison.body?.enable) return 0;
+        if (this.scene.prisonState !== 'locked' && this.scene.prisonState !== 'opening') return 0;
+
+        const body = enemy.body;
+        const pb = prison.body;
+        const lookAhead = terrainCfg.PRISON_LOOK_AHEAD_PX || 56;
+
+        const ahead = direction > 0
+            ? pb.left <= body.right + lookAhead && pb.right >= body.right - 4
+            : pb.right >= body.left - lookAhead && pb.left <= body.left + 4;
+        if (!ahead) return 0;
+
+        // Mesmo chão aproximado (não pula prisão em outro patamar)
+        if (Math.abs(pb.bottom - body.bottom) > 48) return 0;
+
+        const clearance = (body.bottom - pb.top) + (terrainCfg.PRISON_JUMP_MARGIN_PX || 12);
+        return Math.max(clearance, prison.displayHeight + (terrainCfg.PRISON_JUMP_MARGIN_PX || 12));
+    }
+
+    /**
+     * Menor altura de degrau (em tiles) com pouso à frente, ou 0 se não houver
+     * dentro de MAX_STEP_TILES. Varre em X porque a face vertical ocupa a coluna
+     * imediata — o chão de cima fica nas colunas seguintes.
+     */
+    _findStepUpTiles(enemy, direction, terrainCfg) {
+        const cfg = terrainCfg || GC.ENEMY.TOUPEIRA;
         const tileSize = this._getTileSize();
         const body = enemy.body;
-        const landingY = body.bottom + 2 - tileSize * cfg.MAX_STEP_TILES;
         const startX = direction > 0
             ? body.right + cfg.LOOK_AHEAD_EDGE_PX
             : body.left - cfg.LOOK_AHEAD_EDGE_PX;
@@ -698,22 +1027,26 @@ class EnemyManager {
             ? body.right + cfg.LOOK_AHEAD_STEP_PX
             : body.left - cfg.LOOK_AHEAD_STEP_PX;
         const stepPx = 8;
+        const maxTiles = cfg.MAX_STEP_TILES || 1;
 
-        for (let x = startX; direction > 0 ? x <= endX : x >= endX; x += direction * stepPx) {
-            if (this._probeSolidAt(x, landingY)) return true;
+        for (let tiles = 1; tiles <= maxTiles; tiles++) {
+            const landingY = body.bottom + 2 - tileSize * tiles;
+            for (let x = startX; direction > 0 ? x <= endX : x >= endX; x += direction * stepPx) {
+                if (this._probeSolidAt(x, landingY)) return tiles;
+            }
         }
-        return false;
+        return 0;
     }
 
     /**
      * Terreno à frente da toupeira:
      * - clear        → chão contínuo no mesmo nível
      * - shallow_hole → queda de até MAX_DROP_TILES (continua andando)
-     * - step_up      → degrau de até MAX_STEP_TILES (pula baixo)
+     * - step_up      → degrau / prisão (pula o necessário)
      * - deep_hole    → buraco mais profundo (para)
      */
-    _analyzeToupeiraTerrainAhead(enemy, direction, blockedAhead = false) {
-        const cfg = GC.ENEMY.TOUPEIRA;
+    _analyzeToupeiraTerrainAhead(enemy, direction, blockedAhead = false, terrainCfg = null) {
+        const cfg = terrainCfg || GC.ENEMY.TOUPEIRA;
         const tileSize = this._getTileSize();
         const body = enemy.body;
         const feetY = body.bottom + 2;
@@ -721,23 +1054,32 @@ class EnemyManager {
             ? body.right + cfg.LOOK_AHEAD_EDGE_PX
             : body.left - cfg.LOOK_AHEAD_EDGE_PX;
         const floorAheadSameLevel = this._probeSolidAt(edgeProbeX, feetY);
-        const hasStepLanding = this._hasStepLandingAhead(enemy, direction);
+        const stepTiles = this._findStepUpTiles(enemy, direction, cfg);
+        const prisonJumpPx = this._getPrisonJumpHeightPx(enemy, direction, cfg);
 
-        // Degrau: pouso 1 tile acima. A face do bloco conta como "chão" na sonda
+        // Prisão: obstáculo de física (não aparece em `solids`). Pula ao aproximar.
+        if (prisonJumpPx > 0) {
+            return { kind: 'step_up', stepTiles: 0, jumpHeightPx: prisonJumpPx };
+        }
+
+        // Degrau de tile: pouso acima. A face do bloco conta como "chão" na sonda
         // horizontal — por isso também disparamos ao encostar (blockedAhead).
-        if (hasStepLanding && (!floorAheadSameLevel || blockedAhead)) {
-            return 'step_up';
+        if (stepTiles > 0 && (!floorAheadSameLevel || blockedAhead)) {
+            return { kind: 'step_up', stepTiles };
         }
 
         if (floorAheadSameLevel) {
-            return 'clear';
+            return { kind: 'clear' };
         }
 
-        if (this._probeSolidAt(edgeProbeX, feetY + tileSize * cfg.MAX_DROP_TILES)) {
-            return 'shallow_hole';
+        const maxDrop = cfg.MAX_DROP_TILES || 1;
+        for (let tiles = 1; tiles <= maxDrop; tiles++) {
+            if (this._probeSolidAt(edgeProbeX, feetY + tileSize * tiles)) {
+                return { kind: 'shallow_hole' };
+            }
         }
 
-        return 'deep_hole';
+        return { kind: 'deep_hole' };
     }
 
     /**
@@ -765,6 +1107,19 @@ class EnemyManager {
         const enemyType = enemy.patrolData?.type;
         if (enemyType === 'toupeira' && enemy.patrolData.state !== 'chasing') return;
 
+        if (enemyType === 'toupeira-chefe') {
+            const bossState = enemy.patrolData.state;
+            // Fuga / buraco / emergência: invulnerável e inofensivo.
+            if (bossState === 'hidden' || bossState === 'emerging' ||
+                bossState === 'fleeing' || bossState === 'burrowing' || bossState === 'dying') {
+                return;
+            }
+            if (bossState === 'attack') {
+                this._damagePlayer();
+                return;
+            }
+        }
+
         if (enemyType === 'sapo-chefe-laranja') {
             const bossState = enemy.patrolData.state;
             if (bossState === 'attack') {
@@ -785,6 +1140,8 @@ class EnemyManager {
             if (isStomping) {
                 if (enemyType === 'sapo-chefe-laranja') {
                     this._hitSapoChefe(enemy);
+                } else if (enemyType === 'toupeira-chefe') {
+                    this._hitToupeiraChefe(enemy);
                 } else if (enemy.patrolData?.type === 'boneco') {
                     if (enemy.patrolData.state === 'vulnerable') {
                         this._killBoneco(enemy);
@@ -806,6 +1163,95 @@ class EnemyManager {
         if (!this.scene.playerController.isRespawning) {
             this.scene.playerController.takeDamage();
         }
+    }
+
+    _hitToupeiraChefe(enemy) {
+        const data = enemy.patrolData;
+        const cfg = data?.bossCfg || GC.ENEMY.TOUPEIRA_CHEFE;
+        if (!data || data.state !== 'chasing') return;
+
+        data.health -= 1;
+        data.hitsTaken += 1;
+        SoundManager.play('damage');
+
+        if (data.health <= 0) {
+            this._killToupeiraChefe(enemy);
+            return;
+        }
+
+        data.state = 'fleeing';
+        data.fleeHole = this._nearestHole(data, enemy.x, enemy.y);
+        data.speed = data.baseSpeed * cfg.FLEE_SPEED_MULTIPLIER;
+        data.direction = data.fleeHole.x < enemy.x ? -1 : 1;
+        enemy.setFlipX(data.direction === -1);
+        enemy.clearTint();
+        this._stopBossElectricEffect(data);
+        enemy.setVelocityX(data.speed * data.direction);
+    }
+
+    _killToupeiraChefe(enemy) {
+        const cfg = enemy.patrolData?.bossCfg || GC.ENEMY.TOUPEIRA_CHEFE;
+        const data = enemy.patrolData;
+        if (!data || data.state === 'dying') return;
+
+        data.state = 'dying';
+        this._stopBossElectricEffect(data);
+        enemy.body.enable = false;
+        enemy.setVelocity(0, 0);
+        enemy.anims.pause();
+        enemy.clearTint();
+        SoundManager.play('damage');
+
+        this.scene.tweens.add({
+            targets: enemy,
+            scaleX: { from: 1.05, to: 1.35 },
+            scaleY: { from: 0.95, to: 0.7 },
+            alpha: { from: 1, to: 0.65 },
+            duration: cfg.DEATH_CHARGE_MS / 4,
+            yoyo: true,
+            repeat: 1,
+            ease: 'Sine.easeInOut',
+            onUpdate: tween => {
+                enemy.setTintFill(tween.totalProgress > 0.45 ? 0xffffff : 0xffcc66);
+            },
+            onComplete: () => this._explodeToupeiraChefe(enemy)
+        });
+    }
+
+    _explodeToupeiraChefe(enemy) {
+        if (!enemy.active) return;
+        const cfg = enemy.patrolData?.bossCfg || GC.ENEMY.TOUPEIRA_CHEFE;
+        const effects = this.scene.effectsManager;
+        const x = enemy.x;
+        const y = enemy.y - enemy.displayHeight / 2;
+
+        const durationScale = cfg.DEATH_EFFECT_DURATION_SCALE;
+        effects.createEnemyPopBurst(x, y, durationScale);
+        effects.createEnemyPopBurst(x - 18, y - 12, durationScale);
+        effects.createEnemyPopBurst(x + 18, y - 12, durationScale);
+        effects.createEnemyPopBurst(x, y + 16, durationScale);
+        SoundManager.play('enemyPop', {
+            frequency: cfg.DEATH_SOUND_FREQUENCY,
+            duration: cfg.DEATH_SOUND_DURATION,
+            decay: cfg.DEATH_SOUND_DECAY,
+            slide: cfg.DEATH_SOUND_SLIDE,
+            filterQ: 1.1
+        });
+        this.scene.cameras.main.shake(520, 0.007);
+
+        enemy.clearTint();
+        this.scene.tweens.add({
+            targets: enemy,
+            scaleX: enemy.scaleX * 1.8,
+            scaleY: enemy.scaleY * 1.8,
+            alpha: 0,
+            duration: cfg.DEATH_POP_MS,
+            ease: 'Cubic.easeOut',
+            onComplete: () => {
+                enemy.destroy();
+                this.scene.spawnPrisonKey(x, y);
+            }
+        });
     }
 
     _hitSapoChefe(enemy) {

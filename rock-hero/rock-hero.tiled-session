@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-17.tmx",
+    "activeFile": "dev-resources/map-chefe-mundo1.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -490,11 +490,11 @@
                 8,
                 10
             ],
-            "scale": 0.75,
-            "selectedLayer": 2,
+            "scale": 0.33,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 867.3333333333333,
-                "y": 554.6666666666666
+                "x": 1683.3333333333335,
+                "y": 1112.121212121212
             }
         },
         "dev-resources/map-17.tmx#1up": {
@@ -1482,7 +1482,7 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1371,
+                "x": 545,
                 "y": 510
             }
         },
@@ -1596,11 +1596,11 @@
                 8,
                 11
             ],
-            "scale": 0.25,
-            "selectedLayer": 4,
+            "scale": 2,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 1118,
-                "y": 316
+                "x": 761.75,
+                "y": 661
             }
         },
         "dev-resources/map-7--planicie.tmx#abstract-blue": {
@@ -1657,6 +1657,9 @@
         "dev-resources/map-7--planicie.tmx#lava-roxa-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-7--planicie.tmx#lava-roxa-profunda-6fps": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-7--planicie.tmx#pedra": {
             "scaleInDock": 1
         },
@@ -1685,6 +1688,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-7--planicie.tmx#terra-escura": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-7--planicie.tmx#toupeira4": {
             "scaleInDock": 1
         },
         "dev-resources/map-7--planicie.tmx#trampoline-thick": {
@@ -1859,11 +1865,11 @@
             "scaleInDock": 1
         },
         "dev-resources/map-chefe-mundo1.tmx": {
-            "scale": 0.75,
+            "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 730,
-                "y": 258.6666666666667
+                "x": 659,
+                "y": 258
             }
         },
         "dev-resources/map-chefe-mundo1.tmx#abstract-blue": {
@@ -2316,45 +2322,23 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-5--caverna.tmx",
-        "dev-resources/map-8--o-resgate-do-baixista.tmx",
-        "dev-resources/map-20-auto-rolagem.tmx",
-        "dev-resources/map-18.tmx",
-        "dev-resources/map-15.tmx",
-        "dev-resources/map-16.tmx",
-        "dev-resources/map-17.tmx",
-        "dev-resources/map-13.tmx",
-        "dev-resources/map-14.tmx",
-        "dev-resources/map-11.tmx",
-        "dev-resources/map0-1.tmx",
-        "dev-resources/map-10.tmx",
-        "dev-resources/map-ultima-mundo1.tmx",
-        "dev-resources/map-6--caverna2.tmx",
-        "dev-resources/map-7--planicie.tmx",
-        "dev-resources/map-4--big-jumps.tmx",
-        "dev-resources/map-3--desafio do luigi.tmx",
-        "dev-resources/map-22-octopus.tmx",
-        "dev-resources/map-2--expansion and speed.tmx",
-        "dev-resources/map2-0.tmx",
-        "dev-resources/map-19.tmx",
-        "dev-resources/map0-0.tmx",
-        "dev-resources/map-12.tmx"
+        "dev-resources/map-chefe-mundo1.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map-chefe-mundo1.tmx",
+        "dev-resources/map-7--planicie.tmx",
+        "dev-resources/map-17.tmx",
+        "dev-resources/map-18.tmx",
+        "dev-resources/map-19.tmx",
         "dev-resources/map-5--caverna.tmx",
         "dev-resources/map-8--o-resgate-do-baixista.tmx",
         "dev-resources/map-20-auto-rolagem.tmx",
-        "dev-resources/map-18.tmx",
         "dev-resources/map-15.tmx",
         "dev-resources/map-16.tmx",
         "dev-resources/map-12.tmx",
-        "dev-resources/map0-0.tmx",
-        "dev-resources/map-19.tmx",
-        "dev-resources/map2-0.tmx",
-        "dev-resources/map-2--expansion and speed.tmx",
-        "dev-resources/map-22-octopus.tmx"
+        "dev-resources/map0-0.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

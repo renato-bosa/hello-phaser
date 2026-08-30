@@ -50,10 +50,12 @@ class GameScene extends Phaser.Scene {
         this._loadSheetIfMissing('sapo-roxo', 'assets/spritesheets/sapo-roxo-6fps.png', 32, 32);
         this._loadSheetIfMissing('sapo-chefe-laranja', 'assets/spritesheets/sapo-chefe-laranja-64x64-6fps.png', 64, 64);
         this._loadImageIfMissing('prison-key-w1', 'assets/spritesheets/key-w1.png');
+        this._loadImageIfMissing('prison-key-w2', 'assets/spritesheets/key-w2.png');
         this._loadSheetIfMissing('prison-open-w1', 'assets/spritesheets/prisao-aberta-frames.png', 32, 32);
         this._loadSheetIfMissing('seahorse', 'assets/spritesheets/Cavalo marinho.png', 32, 32);
         this._loadSheetIfMissing('boneco', 'assets/spritesheets/Boneco-14fps.png', 32, 32);
         this._loadSheetIfMissing('toupeira-walk', 'assets/spritesheets/toupeira-6fps.png', 32, 32);
+        this._loadSheetIfMissing('toupeiroudo-64x64-6fps', 'assets/spritesheets/toupeiroudo-64x64-6fps.png', 64, 64);
         this._loadImageIfMissing('red-heart', 'assets/spritesheets/red-heart.png');
         this._loadImageIfMissing('sneaker-power', 'assets/spritesheets/sneaker-power.png');
 
@@ -458,7 +460,9 @@ class GameScene extends Phaser.Scene {
         const sneakerPowerUps = [];
         const mushrooms = [];
         const movingPlatforms = [];
+        const moleHoles = [];
         let prisonPosition = null;
+        let prisonerObject = null;
 
         const gidToTilesetName = {};
         map.tilesets.forEach(ts => {
@@ -494,6 +498,31 @@ class GameScene extends Phaser.Scene {
                     textureKey: tilesetName,
                     transform
                 };
+            }
+            else if (tilesetName.includes('baterista') || tilesetName.includes('baixista') ||
+                     tilesetName.includes('guitarrista')) {
+                // Personagem aprisionado (object). Depth atrás/na frente da grade é controlado no código.
+                prisonerObject = {
+                    x: placement.x,
+                    y: placement.y,
+                    height: placement.height,
+                    textureKey: tilesetName,
+                    transform
+                };
+            }
+            else if (tilesetName.includes('buraco-topeirudo') || tilesetName.includes('buraco-toupeirudo')) {
+                const hole = this.add.image(placement.x, placement.y, tilesetName)
+                    .setDepth(GC.DEPTH.PLAYER - 3);
+                if (transform) {
+                    hole.setFlipX(!!transform.flipX);
+                    hole.setFlipY(!!transform.flipY);
+                    if (transform.rotation) hole.setAngle(transform.rotation);
+                }
+                // Posição de gameplay = pés no fundo do objeto Tiled (origem bottom do boss).
+                moleHoles.push({
+                    x: placement.x,
+                    y: placement.y + placement.height / 2
+                });
             }
             else if (type === 'trampoline' || tilesetName.includes('trampoline')) {
                 trampolines.push({ x: placement.x, y: placement.y, transform });
@@ -563,6 +592,17 @@ class GameScene extends Phaser.Scene {
             else if (type === 'mushroom' || tilesetName.includes('mushroom') || tilesetName.includes('cogumelo')) {
                 mushrooms.push({ x: placement.x, y: placement.y, textureKey: tilesetName, transform });
             }
+            else if (type === 'toupeira-chefe' || tilesetName.includes('toupeiroudo') ||
+                     tilesetName.includes('toupeira-chefe')) {
+                enemies.push({
+                    x: placement.x,
+                    y: placement.y,
+                    width: placement.width,
+                    height: placement.height,
+                    type: 'toupeira-chefe',
+                    transform
+                });
+            }
             else if (type === 'toupeira' || tilesetName.includes('toupeira')) {
                 enemies.push({
                     x: placement.x,
@@ -597,8 +637,13 @@ class GameScene extends Phaser.Scene {
             }
         });
 
+        enemies.forEach(e => {
+            if (e.type === 'toupeira-chefe') e.holes = moleHoles.slice();
+        });
+
         this.currentCheckpoint = this.playerSpawn;
         this._enemyData = enemies;
+        this._prisonerObject = prisonerObject;
 
         this.createGoal();
         this.createPrison(prisonPosition);
@@ -731,47 +776,68 @@ class GameScene extends Phaser.Scene {
     }
 
     /**
-     * Converte o tile do personagem preso (ex.: baterista em bg_decoration)
-     * em sprite controlavel, inicialmente atras da grade.
+     * Converte o personagem preso em sprite controlável.
+     * Preferência: object na layer objects; fallback: tile em bg/fg_decoration.
      */
     _setupRescuedPrisoner() {
         this.rescuedPrisoner = null;
-        if (!this.map || !this.bgDecorationLayer || !this.prison) return;
+        if (!this.prison) return;
 
-        const tileset = this.map.tilesets.find(ts =>
-            (ts.name || '').toLowerCase().includes('baterista')
-        );
+        if (this._prisonerObject) {
+            const data = this._prisonerObject;
+            const prisoner = this.add.sprite(data.x, data.y, data.textureKey, 0);
+            prisoner.setDepth(this.prison.depth - 1);
+            this._applyTilesetTransform(prisoner, data.transform);
+            this._playTilesetAnimation(prisoner, data.textureKey);
+            this.rescuedPrisoner = prisoner;
+            return;
+        }
+
+        if (!this.map) return;
+
+        const bandNames = ['baterista', 'baixista', 'guitarrista'];
+        const tileset = this.map.tilesets.find(ts => {
+            const name = (ts.name || '').toLowerCase();
+            return bandNames.some(n => name.includes(n));
+        });
         if (!tileset) return;
 
-        const layer = this.bgDecorationLayer;
-        const matches = [];
-        layer.forEachTile(tile => {
-            if (!tile || tile.index < 0) return;
-            if (tile.index < tileset.firstgid) return;
-            if (tile.index >= tileset.firstgid + tileset.total) return;
-            matches.push({
-                x: tile.x,
-                y: tile.y,
-                worldX: tile.getCenterX(),
-                worldY: tile.getCenterY(),
-                frame: tile.index - tileset.firstgid
+        const layers = [this.bgDecorationLayer, this.fgDecorationLayer].filter(Boolean);
+        for (const layer of layers) {
+            const matches = [];
+            layer.forEachTile(tile => {
+                if (!tile || tile.index < 0) return;
+                if (tile.index < tileset.firstgid) return;
+                if (tile.index >= tileset.firstgid + tileset.total) return;
+                matches.push({
+                    x: tile.x,
+                    y: tile.y,
+                    worldX: tile.getCenterX(),
+                    worldY: tile.getCenterY(),
+                    frame: tile.index - tileset.firstgid,
+                    layer
+                });
             });
-        });
+            if (!matches.length) continue;
 
-        if (!matches.length) return;
-        const match = matches[0];
-        layer.removeTileAt(match.x, match.y);
-
-        const textureKey = tileset.name;
-        const prisoner = this.add.sprite(match.worldX, match.worldY, textureKey, match.frame);
-        prisoner.setDepth(this.prison.depth - 1);
-        this._playTilesetAnimation(prisoner, textureKey);
-        this.rescuedPrisoner = prisoner;
+            const match = matches[0];
+            match.layer.removeTileAt(match.x, match.y);
+            const textureKey = tileset.name;
+            const prisoner = this.add.sprite(match.worldX, match.worldY, textureKey, match.frame);
+            prisoner.setDepth(this.prison.depth - 1);
+            this._playTilesetAnimation(prisoner, textureKey);
+            this.rescuedPrisoner = prisoner;
+            return;
+        }
     }
 
     spawnPrisonKey(x, y) {
         if (!this.prison || this.prisonState !== 'locked' || this.prisonKey) return;
-        this.prisonKey = this.physics.add.sprite(x, y, 'prison-key-w1');
+        const worldId = GameData.LEVELS[this.currentLevel]?.world || 1;
+        const keyTexture = this.textures.exists(`prison-key-w${worldId}`)
+            ? `prison-key-w${worldId}`
+            : 'prison-key-w1';
+        this.prisonKey = this.physics.add.sprite(x, y, keyTexture);
         this.prisonKey.body.allowGravity = false;
         this.prisonKey.setDepth(GC.DEPTH.PLAYER + 1);
         this.tweens.add({
@@ -1608,6 +1674,9 @@ class GameScene extends Phaser.Scene {
         }
         if (this.prison) {
             this.physics.add.collider(player, this.prison, () => this.tryOpenPrison(), null, this);
+            if (this.enemyManager.enemies) {
+                this.physics.add.collider(this.enemyManager.enemies, this.prison);
+            }
         }
         this.physics.add.collider(player, this.trampolines,
             (p, t) => this.playerController.handleTrampolineCollision(p, t), null, this);

@@ -28,7 +28,7 @@ GameConfigVariants.proposta = {
             id: 2,
             name: 'Mundo 2',
             subtitle: 'O Resgate do Baixista',
-            levels: [5, 6, 7, 8, 9], // map5, map6, map2, map8, map7
+            levels: [5, 6, 7, 8, 9, 21], // + chefe do Mundo 2
             rescuedCharacter: 'baixista',
             celebrationMessage: 'Você resgatou o Baixista!',
             theme: 'cave',
@@ -163,7 +163,7 @@ GameConfigVariants.proposta = {
             roundPixels: false,
             world: 2,
             mapPosition: { x: 460, y: 220 },
-            connectsTo: []
+            connectsTo: [21]
         },
         // Mundo 3: map-10 → map-11 → map-12 → map-16 → map-17
         {
@@ -282,6 +282,16 @@ GameConfigVariants.proposta = {
             roundPixels: false,
             world: 1,
             mapPosition: { x: 520, y: 170 },
+            connectsTo: []
+        },
+        {
+            key: 'map-chefe-mundo2',
+            file: 'assets/map-chefe-mundo2.json',
+            name: 'Chefe do Mundo 2',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 2,
+            mapPosition: { x: 560, y: 180 },
             connectsTo: []
         }
     ]

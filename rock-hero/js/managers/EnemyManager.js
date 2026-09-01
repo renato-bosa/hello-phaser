@@ -234,9 +234,7 @@ class EnemyManager {
             const dx = player.x - mole.x;
             const dy = player.y - mole.y;
             if (dx * dx + dy * dy < data.activationDistanceSq) {
-                data.state = 'emerging';
-                data.emergeAt = currentTime + data.bossCfg.EMERGE_DELAY_MS;
-                data.emergeInto = 'chasing';
+                this._scheduleToupeiraChefeEmerge(mole, data, currentTime, 'chasing');
             }
             return;
         }
@@ -254,9 +252,7 @@ class EnemyManager {
                 const nextHole = this._pickOtherHole(data);
                 data.currentHole = nextHole;
                 mole.setPosition(nextHole.x, nextHole.y);
-                data.state = 'emerging';
-                data.emergeAt = currentTime;
-                data.emergeInto = 'attack';
+                this._scheduleToupeiraChefeEmerge(mole, data, currentTime, 'attack');
             }
             return;
         }
@@ -391,6 +387,14 @@ class EnemyManager {
         mole.body.allowGravity = false;
         mole.body.checkCollision.none = true;
         if (hole) mole.setPosition(hole.x, hole.y);
+    }
+
+    _scheduleToupeiraChefeEmerge(mole, data, currentTime, nextState) {
+        const cfg = data.bossCfg;
+        data.state = 'emerging';
+        data.emergeAt = currentTime + cfg.EMERGE_SHAKE_MS;
+        data.emergeInto = nextState;
+        this.scene.cameras.main.shake(cfg.EMERGE_SHAKE_MS, cfg.EMERGE_SHAKE_INTENSITY);
     }
 
     _emergeToupeiraChefe(mole, data, player, nextState) {

@@ -159,6 +159,8 @@ const GC = {
             EMERGE_DELAY_MS: 250,
             EMERGE_PROCEDURAL_MS: 280,
             REAPPEAR_DELAY_MS: 300,
+            EMERGE_SHAKE_MS: 500,
+            EMERGE_SHAKE_INTENSITY: 0.007,
             SPEED: 70,
             FLEE_SPEED_MULTIPLIER: 4.0,
             ATTACK_SPEED_MULTIPLIER: 4.0,

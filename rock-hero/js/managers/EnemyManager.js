@@ -261,6 +261,24 @@ class EnemyManager {
             return;
         }
 
+        if (data.state === 'crushed') {
+            mole.setVelocityX(0);
+            this._flashBoss(mole, data, currentTime, 0xffffff, 0xcc8844);
+            if (currentTime >= data.stateUntil) {
+                const cfg = data.bossCfg;
+                data.state = 'fleeing';
+                data.fleeHole = this._nearestHole(data, mole.x, mole.y);
+                data.speed = data.baseSpeed * cfg.FLEE_SPEED_MULTIPLIER;
+                data.direction = data.fleeHole.x < mole.x ? -1 : 1;
+                mole.setFlipX(data.direction === -1);
+                mole.clearTint();
+                mole.anims.resume();
+                mole.setScale(cfg.SCALE);
+                mole.setVelocityX(data.speed * data.direction);
+            }
+            return;
+        }
+
         if (data.state === 'fleeing') {
             this._updateToupeiraChefeFlee(mole, data, currentTime);
             return;
@@ -1111,7 +1129,8 @@ class EnemyManager {
             const bossState = enemy.patrolData.state;
             // Fuga / buraco / emergência: invulnerável e inofensivo.
             if (bossState === 'hidden' || bossState === 'emerging' ||
-                bossState === 'fleeing' || bossState === 'burrowing' || bossState === 'dying') {
+                bossState === 'fleeing' || bossState === 'burrowing' || bossState === 'dying' ||
+                bossState === 'crushed') {
                 return;
             }
             if (bossState === 'attack') {
@@ -1179,14 +1198,15 @@ class EnemyManager {
             return;
         }
 
-        data.state = 'fleeing';
-        data.fleeHole = this._nearestHole(data, enemy.x, enemy.y);
-        data.speed = data.baseSpeed * cfg.FLEE_SPEED_MULTIPLIER;
-        data.direction = data.fleeHole.x < enemy.x ? -1 : 1;
-        enemy.setFlipX(data.direction === -1);
-        enemy.clearTint();
+        data.state = 'crushed';
+        data.stateUntil = this.scene.time.now + cfg.CRUSHED_DURATION_MS;
+        data.nextFlashAt = 0;
+        data.flashOn = false;
+        enemy.setVelocity(0, 0);
+        enemy.anims.pause();
+        enemy.setScale(cfg.CRUSHED_SCALE_X, cfg.CRUSHED_SCALE_Y);
+        enemy.setTintFill(0xffffff);
         this._stopBossElectricEffect(data);
-        enemy.setVelocityX(data.speed * data.direction);
     }
 
     _killToupeiraChefe(enemy) {

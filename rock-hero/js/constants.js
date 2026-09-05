@@ -164,7 +164,7 @@ const GC = {
             SPEED: 70, // referência 1× (fuga/ataque multiplicam este valor)
             CHASE_SPEED_MULTIPLIER: 1.5,
             FLEE_SPEED_MULTIPLIER: 5.0,
-            ATTACK_SPEED_MULTIPLIER: 3.0,
+            ATTACK_SPEED_MULTIPLIER: 3.5,
             ANIM_FPS: 6,
             MAX_HEALTH: 4,
             CRUSHED_DURATION_MS: 700,

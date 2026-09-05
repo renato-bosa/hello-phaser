@@ -211,8 +211,8 @@ class EnemyManager {
             currentHole: startHole,
             activationDistanceSq: cfg.ACTIVATION_DISTANCE * cfg.ACTIVATION_DISTANCE,
             emergeAt: 0,
-            speed: cfg.SPEED,
-            baseSpeed: cfg.SPEED,
+            speed: cfg.SPEED * cfg.CHASE_SPEED_MULTIPLIER,
+            baseSpeed: cfg.SPEED * cfg.CHASE_SPEED_MULTIPLIER,
             direction: 1,
             health: cfg.MAX_HEALTH,
             hitsTaken: 0,
@@ -264,7 +264,7 @@ class EnemyManager {
                 const cfg = data.bossCfg;
                 data.state = 'fleeing';
                 data.fleeHole = this._nearestHole(data, mole.x, mole.y);
-                data.speed = data.baseSpeed * cfg.FLEE_SPEED_MULTIPLIER;
+                data.speed = cfg.SPEED * cfg.FLEE_SPEED_MULTIPLIER;
                 data.direction = data.fleeHole.x < mole.x ? -1 : 1;
                 mole.setFlipX(data.direction === -1);
                 mole.clearTint();
@@ -445,7 +445,7 @@ class EnemyManager {
             const attackDuration = cfg.ATTACK_BASE_DURATION_MS *
                 Math.pow(cfg.ATTACK_DURATION_GROWTH, Math.max(0, data.hitsTaken - 1));
             data.stateUntil = this.scene.time.now + attackDuration;
-            data.speed = data.baseSpeed * cfg.ATTACK_SPEED_MULTIPLIER;
+            data.speed = cfg.SPEED * cfg.ATTACK_SPEED_MULTIPLIER;
             this._startBossElectricEffect(mole, data);
         } else {
             data.state = 'chasing';

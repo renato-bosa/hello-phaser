@@ -6,8 +6,8 @@
     "activeFile": "dev-resources/map-chefe2.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
-        "."
+        ".",
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -1964,11 +1964,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.5,
+            "scale": 1,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 591,
-                "y": 438
+                "x": 463.5,
+                "y": 439
             }
         },
         "dev-resources/map-chefe2.tmx#1up-animated-4fps": {

@@ -161,9 +161,10 @@ const GC = {
             REAPPEAR_DELAY_MS: 300,
             EMERGE_SHAKE_MS: 500,
             EMERGE_SHAKE_INTENSITY: 0.007,
-            SPEED: 70,
-            FLEE_SPEED_MULTIPLIER: 4.0,
-            ATTACK_SPEED_MULTIPLIER: 4.0,
+            SPEED: 70, // referência 1× (fuga/ataque multiplicam este valor)
+            CHASE_SPEED_MULTIPLIER: 1.5,
+            FLEE_SPEED_MULTIPLIER: 5.0,
+            ATTACK_SPEED_MULTIPLIER: 3.0,
             ANIM_FPS: 6,
             MAX_HEALTH: 4,
             CRUSHED_DURATION_MS: 700,

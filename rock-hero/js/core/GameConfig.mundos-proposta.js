@@ -52,12 +52,24 @@ GameConfigVariants.proposta = {
             id: 4,
             name: 'Mundo 4',
             subtitle: 'Mecânicas Experimentais',
-            levels: [15, 16, 17, 18, 19], // map18, map19, map20, map21, map22
+            levels: [15, 16, 17, 18, 19], // map18 … map22
             rescuedCharacter: 'vocalista',
             celebrationMessage: 'Mecânicas dominadas!',
             theme: 'special',
             bgColor: 0x1a0a2e,
             pathColor: 0x8844aa,
+            bgImage: 'assets/spritesheets/worldmap-backgrounds/world4.png'
+        },
+        {
+            id: 5,
+            name: 'Mundo 5',
+            subtitle: 'Ecos da Catedral',
+            levels: [22, 23, 24], // Catedral do Eco … Carrilhão de Ferro
+            rescuedCharacter: 'vocalista',
+            celebrationMessage: 'O eco responde!',
+            theme: 'special',
+            bgColor: 0x0a0618,
+            pathColor: 0xaa66cc,
             bgImage: 'assets/spritesheets/worldmap-backgrounds/world4.png'
         }
     ],
@@ -122,7 +134,7 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 80, y: 200 },
+            mapPosition: { x: 95, y: 200 },
             connectsTo: [6]
         },
         {
@@ -132,7 +144,7 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 170, y: 160 },
+            mapPosition: { x: 180, y: 160 },
             connectsTo: [7]
         },
         {
@@ -142,7 +154,7 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 270, y: 210 },
+            mapPosition: { x: 265, y: 210 },
             connectsTo: [8]
         },
         {
@@ -152,7 +164,7 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 370, y: 180 },
+            mapPosition: { x: 355, y: 180 },
             connectsTo: [9]
         },
         {
@@ -162,7 +174,7 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 460, y: 220 },
+            mapPosition: { x: 440, y: 220 },
             connectsTo: [21]
         },
         // Mundo 3: map-10 → map-11 → map-12 → map-16 → map-17
@@ -173,7 +185,7 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 85, y: 200 },
+            mapPosition: { x: 95, y: 200 },
             connectsTo: [11]
         },
         {
@@ -227,7 +239,7 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 4,
-            mapPosition: { x: 80, y: 200 },
+            mapPosition: { x: 95, y: 205 },
             connectsTo: [16],
             features: { doubleJump: true, neonLineTrail: true }
         },
@@ -238,7 +250,7 @@ GameConfigVariants.proposta = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 200, y: 200 },
+            mapPosition: { x: 200, y: 170 },
             connectsTo: [17],
             features: { upsideDown: true, wind: true }
         },
@@ -249,7 +261,7 @@ GameConfigVariants.proposta = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 340, y: 200 },
+            mapPosition: { x: 305, y: 215 },
             connectsTo: [18],
             features: { autoScroll: true }
         },
@@ -260,7 +272,7 @@ GameConfigVariants.proposta = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 460, y: 200 },
+            mapPosition: { x: 415, y: 165 },
             connectsTo: [19],
             features: { wind: true }
         },
@@ -271,7 +283,7 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 4,
-            mapPosition: { x: 580, y: 200 },
+            mapPosition: { x: 520, y: 210 },
             connectsTo: []
         },
         {
@@ -291,8 +303,41 @@ GameConfigVariants.proposta = {
             zoom: 0.9,
             roundPixels: false,
             world: 2,
-            mapPosition: { x: 560, y: 180 },
+            mapPosition: { x: 525, y: 180 },
             connectsTo: []
+        },
+        {
+            key: 'map23',
+            file: 'assets/map-23-catedral-do-eco.json',
+            name: 'Catedral do Eco',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 5,
+            mapPosition: { x: 150, y: 235 },
+            connectsTo: [23],
+            features: { doubleJump: true, neonLineTrail: true }
+        },
+        {
+            key: 'map24',
+            file: 'assets/map-24-cisternas.json',
+            name: 'Cisternas do Órgão',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 5,
+            mapPosition: { x: 330, y: 190 },
+            connectsTo: [24],
+            features: { waterPhysics: true, neonLineTrail: true }
+        },
+        {
+            key: 'map25',
+            file: 'assets/map-25-carrilhao.json',
+            name: 'Carrilhão de Ferro',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 5,
+            mapPosition: { x: 510, y: 240 },
+            connectsTo: [],
+            features: { doubleJump: true, neonLineTrail: true }
         }
     ]
 };

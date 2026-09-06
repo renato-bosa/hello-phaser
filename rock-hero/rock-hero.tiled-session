@@ -3,11 +3,12 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-chefe2.tmx",
+    "activeFile": "assets/map-25-carrilhao.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
+        "dev-resources",
         ".",
-        "dev-resources"
+        "assets"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -25,6 +26,225 @@
                 "x": 358,
                 "y": 624
             }
+        },
+        "assets/map-23-catedral-do-eco.json": {
+            "scale": 0.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 553,
+                "y": 296
+            }
+        },
+        "assets/map-23-catedral-do-eco.json#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#abstract-spread-blue-blinking-yellow-8fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#cristal das notas de som": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#dark-bricks-fuzzy-shades": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#sneaker-power": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#spikes": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#starry-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-23-catedral-do-eco.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json": {
+            "scale": 0.25,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 1226,
+                "y": 592
+            }
+        },
+        "assets/map-24-cisternas.json#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#Areia": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#agua": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#dark-bricks-fuzzy": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#pedra": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#plataforma-deslizante-h": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#plataforma-deslizante-v": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#red-heart": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#starry-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#terra": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#toupeira-2frames": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-24-cisternas.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json": {
+            "scale": 0.23378906249999998,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1366.6165413533838,
+                "y": 350.7435254803677
+            }
+        },
+        "assets/map-25-carrilhao.json#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#Boneco-14fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#blue-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#dark-bricks-fuzzy-shades": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#lava-laranja-cachoeira-5fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#plataforma-deslizante-h": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#plataforma-deslizante-v": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#red-heart": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#spikes": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#starry-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#toupeira-2frames": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#yellow-star-animated": {
+            "scaleInDock": 1
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
@@ -2453,12 +2673,16 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-chefe2.tmx"
+        "assets/map-24-cisternas.json",
+        "assets/map-25-carrilhao.json"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "assets/map-24-cisternas.json",
+        "assets/map-25-carrilhao.json",
         "dev-resources/map-chefe2.tmx",
+        "assets/map-23-catedral-do-eco.json",
         "dev-resources/map-chefe-mundo1.tmx",
         "dev-resources/map-7--planicie.tmx",
         "dev-resources/map-17.tmx",
@@ -2466,10 +2690,7 @@
         "dev-resources/map-19.tmx",
         "dev-resources/map-5--caverna.tmx",
         "dev-resources/map-8--o-resgate-do-baixista.tmx",
-        "dev-resources/map-20-auto-rolagem.tmx",
-        "dev-resources/map-15.tmx",
-        "dev-resources/map-16.tmx",
-        "dev-resources/map-12.tmx"
+        "dev-resources/map-20-auto-rolagem.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

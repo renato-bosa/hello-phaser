@@ -591,6 +591,11 @@ class EnemyManager {
         const cfg = GC.ENEMY.SEAHORSE;
         const seahorse = scene.physics.add.sprite(x, y, 'seahorse');
 
+        // Entra no grupo ANTES de configurar o corpo: Arcade.Group reaplica seus
+        // `defaults` (allowGravity: true, immovable: false) em todo filho adicionado,
+        // o que sobrescreveria os ajustes abaixo e faria o cavalo marinho afundar.
+        this.enemies.add(seahorse);
+
         seahorse.body.setSize(cfg.BODY_WIDTH, cfg.BODY_HEIGHT);
         seahorse.body.setOffset(cfg.BODY_OFFSET_X, cfg.BODY_OFFSET_Y);
         seahorse.body.allowGravity = false;
@@ -614,8 +619,6 @@ class EnemyManager {
                 this._spawnSeahorseBubble(seahorse);
             }
         });
-
-        this.enemies.add(seahorse);
     }
 
     /**

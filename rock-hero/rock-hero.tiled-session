@@ -6,9 +6,9 @@
     "activeFile": "assets/map-25-carrilhao.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
+        "assets",
         "dev-resources",
-        ".",
-        "assets"
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -29,10 +29,10 @@
         },
         "assets/map-23-catedral-do-eco.json": {
             "scale": 0.5,
-            "selectedLayer": 2,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 553,
-                "y": 296
+                "y": 1256
             }
         },
         "assets/map-23-catedral-do-eco.json#1up-animated-4fps": {
@@ -108,11 +108,11 @@
             "scaleInDock": 1
         },
         "assets/map-24-cisternas.json": {
-            "scale": 0.25,
-            "selectedLayer": 2,
+            "scale": 0.5,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 1226,
-                "y": 592
+                "x": 429,
+                "y": 452
             }
         },
         "assets/map-24-cisternas.json#1up-animated-4fps": {
@@ -151,6 +151,9 @@
         "assets/map-24-cisternas.json#red-heart": {
             "scaleInDock": 1
         },
+        "assets/map-24-cisternas.json#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
         "assets/map-24-cisternas.json#sapo-verde-6fps": {
             "scaleInDock": 1
         },
@@ -169,6 +172,9 @@
         "assets/map-24-cisternas.json#toupeira-2frames": {
             "scaleInDock": 1
         },
+        "assets/map-24-cisternas.json#toupeira4": {
+            "scaleInDock": 1
+        },
         "assets/map-24-cisternas.json#trampoline-thick": {
             "scaleInDock": 1
         },
@@ -179,11 +185,11 @@
             "scaleInDock": 1
         },
         "assets/map-25-carrilhao.json": {
-            "scale": 0.23378906249999998,
-            "selectedLayer": 0,
+            "scale": 0.25,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 1366.6165413533838,
-                "y": 350.7435254803677
+                "x": 1166,
+                "y": 388
             }
         },
         "assets/map-25-carrilhao.json#1up-animated-4fps": {
@@ -2673,16 +2679,15 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "assets/map-24-cisternas.json",
         "assets/map-25-carrilhao.json"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "assets/map-24-cisternas.json",
         "assets/map-25-carrilhao.json",
-        "dev-resources/map-chefe2.tmx",
         "assets/map-23-catedral-do-eco.json",
+        "assets/map-24-cisternas.json",
+        "dev-resources/map-chefe2.tmx",
         "dev-resources/map-chefe-mundo1.tmx",
         "dev-resources/map-7--planicie.tmx",
         "dev-resources/map-17.tmx",

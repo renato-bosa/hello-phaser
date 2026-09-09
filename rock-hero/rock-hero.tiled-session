@@ -3,11 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "assets/map-25-carrilhao.json",
+    "activeFile": "",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "assets",
         "dev-resources",
+        "assets",
         "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
@@ -185,17 +185,20 @@
             "scaleInDock": 1
         },
         "assets/map-25-carrilhao.json": {
-            "scale": 0.25,
-            "selectedLayer": 1,
+            "scale": 0.5,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 1166,
-                "y": 388
+                "x": 2451,
+                "y": 282
             }
         },
         "assets/map-25-carrilhao.json#1up-animated-4fps": {
             "scaleInDock": 1
         },
         "assets/map-25-carrilhao.json#Boneco-14fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-25-carrilhao.json#Cavalo marinho": {
             "scaleInDock": 1
         },
         "assets/map-25-carrilhao.json#abstract-smooth-blue": {
@@ -2679,7 +2682,6 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "assets/map-25-carrilhao.json"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",

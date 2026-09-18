@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "assets/map-18.tmj",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "dev-resources",
@@ -26,6 +26,89 @@
                 "x": 358,
                 "y": 624
             }
+        },
+        "assets/map-18.tmj": {
+            "scale": 0.29390625,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1121.1057947900053,
+                "y": 639.6597554492291
+            }
+        },
+        "assets/map-18.tmj#1up": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#Areia": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#agua": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#black": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-18.tmj#yellow-star-animated": {
+            "scaleInDock": 1
         },
         "assets/map-23-catedral-do-eco.json": {
             "scale": 0.5,
@@ -2682,10 +2765,12 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
+        "assets/map-18.tmj"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "assets/map-18.tmj",
         "assets/map-25-carrilhao.json",
         "assets/map-23-catedral-do-eco.json",
         "assets/map-24-cisternas.json",
@@ -2696,8 +2781,7 @@
         "dev-resources/map-18.tmx",
         "dev-resources/map-19.tmx",
         "dev-resources/map-5--caverna.tmx",
-        "dev-resources/map-8--o-resgate-do-baixista.tmx",
-        "dev-resources/map-20-auto-rolagem.tmx"
+        "dev-resources/map-8--o-resgate-do-baixista.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

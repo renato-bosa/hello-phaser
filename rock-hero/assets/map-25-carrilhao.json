@@ -542,6 +542,18 @@
                  "width":32,
                  "x":1888,
                  "y":416
+                }, 
+                {
+                 "gid":60,
+                 "height":32,
+                 "id":34,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":64,
+                 "y":384
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -550,7 +562,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":34,
+ "nextobjectid":35,
  "orientation":"orthogonal",
  "properties":[
         {
@@ -955,6 +967,19 @@
          "name":"Cavalo marinho",
          "spacing":0,
          "tilecount":6,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":60,
+         "image":"spritesheets\/sneaker-power.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"sneaker-power",
+         "spacing":0,
+         "tilecount":1,
          "tileheight":32,
          "tilewidth":32
         }],

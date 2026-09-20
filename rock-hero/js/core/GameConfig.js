@@ -473,8 +473,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 195, y: 185 },
-            connectsTo: [12],
-            features: { doubleJump: true, neonLineTrail: true }
+            connectsTo: [12]
         },
         {
             key: 'map12',
@@ -494,8 +493,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 415, y: 185 },
-            connectsTo: [14],
-            features: { doubleJump: true, neonLineTrail: true }
+            connectsTo: [14]
         },
         {
             key: 'map17',
@@ -505,8 +503,7 @@ const GameConfig = {
             roundPixels: false,
             world: 3,
             mapPosition: { x: 515, y: 210 },
-            connectsTo: [],
-            features: { doubleJump: true, neonLineTrail: true }
+            connectsTo: []
         },
         // ==================== MUNDO 4 — Mecânicas Experimentais ====================
         // map-18 → map-19 → map-20 → map-21 → map-22
@@ -518,8 +515,7 @@ const GameConfig = {
             roundPixels: false,
             world: 4,
             mapPosition: { x: 95, y: 205 },
-            connectsTo: [16],
-            features: { doubleJump: true, neonLineTrail: true }
+            connectsTo: [16]
         },
         {
             key: 'map19',
@@ -592,8 +588,7 @@ const GameConfig = {
             roundPixels: false,
             world: 5,
             mapPosition: { x: 150, y: 235 },
-            connectsTo: [23],
-            features: { doubleJump: true, neonLineTrail: true }
+            connectsTo: [23]
         },
         {
             key: 'map24',
@@ -603,8 +598,7 @@ const GameConfig = {
             roundPixels: false,
             world: 5,
             mapPosition: { x: 330, y: 190 },
-            connectsTo: [24],
-            features: { waterPhysics: true, neonLineTrail: true }
+            connectsTo: [24]
         },
         {
             key: 'map25',
@@ -614,8 +608,7 @@ const GameConfig = {
             roundPixels: false,
             world: 5,
             mapPosition: { x: 510, y: 240 },
-            connectsTo: [],
-            features: { doubleJump: true, neonLineTrail: true }
+            connectsTo: []
         }
     ],
 

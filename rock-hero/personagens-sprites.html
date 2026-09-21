@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rock Hero — Sprites dos Personagens</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #090a12;
+            --panel: #151827;
+            --panel-2: #1d2135;
+            --line: #343a55;
+            --text: #f7f7fb;
+            --muted: #a8adc4;
+            --cyan: #57e7ff;
+            --green: #71e49b;
+            --yellow: #ffd166;
+            --red: #ff6b7a;
+            --cell: 96px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-width: 320px;
+            background:
+                radial-gradient(circle at 15% 0%, rgb(53 31 88 / 45%), transparent 34rem),
+                radial-gradient(circle at 85% 0%, rgb(18 80 98 / 30%), transparent 30rem),
+                var(--bg);
+            color: var(--text);
+            font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        }
+
+        header, main { width: min(1500px, calc(100% - 40px)); margin-inline: auto; }
+        header { padding: 48px 0 28px; }
+        h1, h2, h3, p { margin-top: 0; }
+        h1 { margin-bottom: 8px; font-size: clamp(28px, 4vw, 48px); line-height: 1.05; }
+        h1 span { color: var(--cyan); }
+        .intro { max-width: 900px; color: var(--muted); font-size: 16px; }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid currentColor;
+            border-radius: 999px;
+            padding: 3px 9px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+        .badge.own { color: var(--green); }
+        .badge.derived { color: var(--yellow); }
+        .badge.fallback-status { color: var(--cyan); }
+        .badge.missing { color: var(--red); }
+
+        main { padding-bottom: 70px; }
+        .character {
+            margin-top: 26px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: rgb(21 24 39 / 92%);
+            box-shadow: 0 20px 50px rgb(0 0 0 / 25%);
+        }
+
+        .character-head {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            padding: 20px 22px;
+            border-bottom: 1px solid var(--line);
+            background: linear-gradient(90deg, rgb(87 231 255 / 9%), transparent 45%);
+        }
+        .character-head h2 { margin: 0; font-size: 24px; }
+        .instrument { color: var(--cyan); font-weight: 700; }
+        .unlock { margin-left: auto; color: var(--muted); font-size: 13px; }
+
+        .pose-group-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 22px;
+            border-bottom: 1px solid var(--line);
+            background: #101321;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        .pose-group-title.water {
+            border-top: 1px solid var(--line);
+            background: linear-gradient(90deg, rgb(87 231 255 / 12%), #101321 55%);
+            color: var(--cyan);
+        }
+        .poses {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(190px, 1fr));
+            gap: 1px;
+            background: var(--line);
+        }
+        .poses.water-poses { grid-template-columns: repeat(5, minmax(190px, 1fr)); }
+
+        .pose {
+            min-width: 0;
+            padding: 18px;
+            background: var(--panel);
+        }
+        .pose.missing-card {
+            background:
+                repeating-linear-gradient(-45deg, transparent 0 10px, rgb(255 107 122 / 4%) 10px 20px),
+                var(--panel);
+        }
+        .pose.aquatic-card {
+            background:
+                linear-gradient(180deg, rgb(87 231 255 / 5%), transparent 45%),
+                var(--panel);
+        }
+        .pose-title { display: flex; min-height: 26px; align-items: center; justify-content: space-between; gap: 8px; }
+        .pose h3 { margin: 0; font-size: 14px; }
+
+        .stage {
+            position: relative;
+            display: grid;
+            min-height: 128px;
+            place-items: center;
+            margin: 14px 0;
+            overflow: hidden;
+            border: 1px solid #2e344d;
+            border-radius: 11px;
+            background-color: #0c0e18;
+            background-image:
+                linear-gradient(45deg, #141728 25%, transparent 25%),
+                linear-gradient(-45deg, #141728 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #141728 75%),
+                linear-gradient(-45deg, transparent 75%, #141728 75%);
+            background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+            background-size: 16px 16px;
+        }
+
+        .sprite {
+            width: 32px;
+            height: 32px;
+            image-rendering: pixelated;
+            transform: scale(3);
+            transform-origin: center;
+        }
+        .sprite.flipped { transform: scale(-3, 3); }
+
+        .placeholder {
+            display: grid;
+            width: 88px;
+            height: 88px;
+            place-items: center;
+            border: 2px dashed var(--red);
+            border-radius: 12px;
+            color: var(--red);
+            font-size: 30px;
+            font-weight: 900;
+        }
+
+        .fallback { min-height: 38px; color: var(--muted); font-size: 12px; }
+        .file {
+            min-height: 36px;
+            overflow-wrap: anywhere;
+            color: #d6daeb;
+            font: 11px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        .frames-title {
+            margin: 14px 0 7px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+        }
+        .frames { display: flex; flex-wrap: wrap; gap: 6px; }
+        .frame {
+            display: grid;
+            width: 46px;
+            height: 52px;
+            place-items: center;
+            border: 1px solid #353b55;
+            border-radius: 7px;
+            background: #0c0e18;
+        }
+        .frame-sprite {
+            width: 32px;
+            height: 32px;
+            image-rendering: pixelated;
+            transform: scale(1.25);
+        }
+        .frame-sprite.flipped { transform: scale(-1.25, 1.25); }
+        .frame small { align-self: end; margin-bottom: 2px; color: var(--muted); font: 9px monospace; }
+
+        .notes {
+            padding: 18px 22px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .notes strong { color: var(--text); }
+        .error { padding: 30px; border: 1px solid var(--red); color: var(--red); }
+
+        @media (max-width: 1250px) { .poses { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 720px) {
+            header, main { width: min(100% - 24px, 1500px); }
+            .poses, .poses.water-poses { grid-template-columns: 1fr; }
+            .character-head { align-items: flex-start; flex-direction: column; }
+            .unlock { margin-left: 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sprite { background-position: 0 0 !important; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sprites dos <span>personagens</span></h1>
+        <p class="intro">
+            Inventário visual gerado diretamente de <code>GameConfig.CHARACTERS</code>.
+            Cada pose existente mostra a animação e todos os frames do spritesheet.
+            O catálogo também explicita os fallbacks terrestres usados atualmente dentro d’água.
+        </p>
+        <div class="legend">
+            <span class="badge own">Sprite próprio</span>
+            <span class="badge derived">Derivado / espelhado</span>
+            <span class="badge fallback-status">Fallback atual</span>
+            <span class="badge missing">Sprite faltando</span>
+        </div>
+    </header>
+
+    <main id="characters" aria-live="polite"></main>
+
+    <script src="js/core/GameConfig.js"></script>
+    <script>
+        (() => {
+            'use strict';
+
+            const GROUND_POSES = [
+                { id: 'idle', label: 'Parado', state: 'idle' },
+                { id: 'walk-right', label: 'Andando →', state: 'walk' },
+                { id: 'walk-left', label: 'Andando ←', state: 'walk-left' },
+                { id: 'jump-up', label: 'Subindo', state: 'jump', frame: 'upFrame' },
+                { id: 'fall', label: 'Caindo', state: 'jump', frame: 'downFrame' },
+                { id: 'showcase', label: 'Vitrine', state: 'showcase' }
+            ];
+
+            const WATER_POSES = [
+                { id: 'swim-idle', label: 'Flutuando / parado', state: 'idle', aquatic: true },
+                { id: 'swim-right', label: 'Nadando →', state: 'walk', aquatic: true },
+                { id: 'swim-left', label: 'Nadando ←', state: 'walk-left', aquatic: true },
+                { id: 'swim-up', label: 'Impulso ↑', state: 'jump', frame: 'upFrame', aquatic: true },
+                { id: 'swim-down', label: 'Afundando ↓', state: 'jump', frame: 'downFrame', aquatic: true }
+            ];
+
+            const root = document.querySelector('#characters');
+            const animations = [];
+
+            const cssUrl = value => `url("${encodeURI(value).replaceAll('"', '%22')}")`;
+            const range = sprite => Array.from(
+                { length: sprite.endFrame - sprite.startFrame + 1 },
+                (_, index) => sprite.startFrame + index
+            );
+
+            function resolvePose(character, pose) {
+                const sprites = character.sprites;
+                let sprite = sprites[pose.state];
+                let flipped = false;
+                let status = pose.aquatic ? 'fallback-status' : 'own';
+                let note = '';
+
+                const pointsLeft = pose.id === 'walk-left' || pose.id === 'swim-left';
+                if (pointsLeft && !sprite) {
+                    sprite = sprites.walk;
+                    flipped = Boolean(sprite);
+                    status = pose.aquatic ? 'fallback-status' : (sprite ? 'derived' : 'missing');
+                    note = sprite
+                        ? (pose.aquatic
+                            ? 'Fallback atual: animação de caminhada para a direita, espelhada, com tint azul.'
+                            : 'O jogo reutiliza o andar para a direita com flip horizontal.')
+                        : 'Não há sprite de caminhada para esta direção.';
+                } else if (pointsLeft && sprite?.file === sprites.walk?.file) {
+                    flipped = true;
+                    status = pose.aquatic ? 'fallback-status' : 'derived';
+                    note = pose.aquatic
+                        ? 'Fallback atual: caminhada terrestre espelhada em runtime, com tint azul.'
+                        : 'Usa o mesmo spritesheet da direita, espelhado em runtime.';
+                } else if (pose.aquatic && pose.state === 'jump' && !sprite) {
+                    sprite = sprites.idle;
+                    status = 'fallback-status';
+                    note = 'Fallback atual: frame 0 da animação terrestre “parado”, com tint azul.';
+                } else if (pose.aquatic) {
+                    const descriptions = {
+                        idle: 'Fallback atual: animação terrestre “parado”.',
+                        walk: 'Fallback atual: caminhada terrestre, em velocidade reduzida.',
+                        'walk-left': 'Fallback atual: caminhada terrestre dedicada para a esquerda.',
+                        jump: pose.id === 'swim-up'
+                            ? 'Fallback atual: pose terrestre de subida durante o impulso.'
+                            : 'Fallback atual: pose terrestre de queda durante o afundamento.'
+                    };
+                    note = `${descriptions[pose.state]} O jogo aplica tint azul sobre o sprite.`;
+                } else if (pose.id === 'showcase' && !sprite) {
+                    status = 'missing';
+                    note = 'Fallback atual no jogo: animação “parado”.';
+                } else if ((pose.id === 'jump-up' || pose.id === 'fall') && !sprite) {
+                    status = 'missing';
+                    note = 'Fallback atual no jogo: frame 0 da animação “parado”.';
+                } else if (!sprite) {
+                    status = 'missing';
+                    note = 'Nenhum sprite configurado para esta pose.';
+                }
+
+                let selectedFrame = sprite && pose.frame
+                    ? (sprite[pose.frame] ?? sprite.startFrame)
+                    : null;
+
+                // Sem jump próprio, o fallback aquático é sempre idle #0.
+                if (pose.aquatic && pose.state === 'jump' && !sprites.jump) {
+                    selectedFrame = sprite.startFrame;
+                }
+
+                // Phaser Texture.get usa o primeiro frame quando setTexture recebe
+                // um índice inexistente. Replica isso nos cards aquáticos para mostrar
+                // o resultado real do jogo (hoje ocorre no fall do Guitarrista).
+                if (pose.aquatic && selectedFrame !== null && selectedFrame >= sprite.sheetFrameCount) {
+                    note += ` O frame configurado #${selectedFrame} não existe; o Phaser exibe #${sprite.startFrame}.`;
+                    selectedFrame = sprite.startFrame;
+                }
+
+                return { sprite, flipped, status, note, selectedFrame };
+            }
+            function applyFrame(element, sprite, frame) {
+                const columns = sprite.sheetColumns || 1;
+                const column = frame % columns;
+                const row = Math.floor(frame / columns);
+                element.style.backgroundImage = cssUrl(sprite.file);
+                element.style.backgroundPosition = `${-column * sprite.frameWidth}px ${-row * sprite.frameHeight}px`;
+                element.style.backgroundRepeat = 'no-repeat';
+            }
+
+            function loadSheetGeometry(characters) {
+                const sprites = [...new Set(
+                    characters.flatMap(character => Object.values(character.sprites).filter(Boolean))
+                )];
+
+                return Promise.all(sprites.map(sprite => new Promise(resolve => {
+                    const image = new Image();
+                    image.onload = () => {
+                        sprite.sheetColumns = Math.max(1, Math.floor(image.naturalWidth / sprite.frameWidth));
+                        resolve();
+                    };
+                    image.onerror = () => {
+                        sprite.sheetColumns = 1;
+                        resolve();
+                    };
+                    image.src = sprite.file;
+                })));
+            }
+
+            function makeFrames(sprite, flipped, selectedFrame) {
+                const frames = document.createElement('div');
+                frames.className = 'frames';
+                const list = selectedFrame === null ? range(sprite) : [selectedFrame];
+
+                list.forEach(frameNumber => {
+                    const cell = document.createElement('div');
+                    cell.className = 'frame';
+                    const image = document.createElement('span');
+                    image.className = `frame-sprite${flipped ? ' flipped' : ''}`;
+                    applyFrame(image, sprite, frameNumber);
+                    const label = document.createElement('small');
+                    label.textContent = `#${frameNumber}`;
+                    cell.append(image, label);
+                    frames.append(cell);
+                });
+                return frames;
+            }
+
+            function makePose(character, pose) {
+                const resolved = resolvePose(character, pose);
+                const card = document.createElement('article');
+                card.className = `pose${resolved.status === 'missing' ? ' missing-card' : ''}${pose.aquatic ? ' aquatic-card' : ''}`;
+
+                const title = document.createElement('div');
+                title.className = 'pose-title';
+                title.innerHTML = `<h3>${pose.label}</h3><span class="badge ${resolved.status}">${
+                    resolved.status === 'own' ? 'próprio'
+                        : resolved.status === 'derived' ? 'espelhado'
+                        : resolved.status === 'fallback-status' ? 'fallback atual'
+                        : 'faltando'
+                }</span>`;
+
+                const stage = document.createElement('div');
+                stage.className = 'stage';
+
+                if (!resolved.sprite) {
+                    stage.innerHTML = '<div class="placeholder" aria-label="Sprite faltando">?</div>';
+                } else {
+                    const preview = document.createElement('span');
+                    preview.className = `sprite${resolved.flipped ? ' flipped' : ''}`;
+                    const firstFrame = resolved.selectedFrame ?? resolved.sprite.startFrame;
+                    applyFrame(preview, resolved.sprite, firstFrame);
+                    stage.append(preview);
+
+                    if (resolved.selectedFrame === null && resolved.sprite.endFrame > resolved.sprite.startFrame) {
+                        animations.push({
+                            element: preview,
+                            sprite: resolved.sprite,
+                            frames: range(resolved.sprite),
+                            frameDuration: 1000 / resolved.sprite.frameRate,
+                            lastFrame: -1
+                        });
+                    }
+                }
+
+                const fallback = document.createElement('p');
+                fallback.className = 'fallback';
+                fallback.textContent = resolved.note || 'Pose fornecida por spritesheet próprio.';
+
+                const file = document.createElement('div');
+                file.className = 'file';
+                file.textContent = resolved.sprite
+                    ? `${resolved.sprite.file} · ${resolved.sprite.frameWidth}×${resolved.sprite.frameHeight}px · ${resolved.sprite.frameRate} fps`
+                    : 'Arquivo ainda não criado/configurado';
+
+                card.append(title, stage, fallback, file);
+
+                if (resolved.sprite) {
+                    const framesTitle = document.createElement('div');
+                    framesTitle.className = 'frames-title';
+                    framesTitle.textContent = resolved.selectedFrame === null ? 'Todos os frames' : 'Frame usado pelo jogo';
+                    card.append(framesTitle, makeFrames(resolved.sprite, resolved.flipped, resolved.selectedFrame));
+                }
+
+                return card;
+            }
+
+            function renderCharacter(character) {
+                const section = document.createElement('section');
+                section.className = 'character';
+                const unlock = character.unlockedByDefault
+                    ? 'Disponível desde o início'
+                    : `Desbloqueado no Mundo ${character.unlockedByWorld}`;
+
+                section.innerHTML = `
+                    <div class="character-head">
+                        <h2>${character.name}</h2>
+                        <span class="instrument">${character.instrument}</span>
+                        <span class="unlock">${unlock}</span>
+                    </div>
+                `;
+
+                const groundTitle = document.createElement('div');
+                groundTitle.className = 'pose-group-title';
+                groundTitle.textContent = 'Poses gerais / ambiente terrestre';
+
+                const groundPoses = document.createElement('div');
+                groundPoses.className = 'poses';
+                GROUND_POSES.forEach(pose => groundPoses.append(makePose(character, pose)));
+
+                const waterTitle = document.createElement('div');
+                waterTitle.className = 'pose-group-title water';
+                waterTitle.textContent = 'Ambiente de água — sprites terrestres reutilizados atualmente';
+
+                const waterPoses = document.createElement('div');
+                waterPoses.className = 'poses water-poses';
+                WATER_POSES.forEach(pose => waterPoses.append(makePose(character, pose)));
+
+                section.append(groundTitle, groundPoses, waterTitle, waterPoses);
+
+                const missing = GROUND_POSES
+                    .filter(pose => resolvePose(character, pose).status === 'missing')
+                    .map(pose => pose.label);
+                const notes = document.createElement('div');
+                notes.className = 'notes';
+                notes.innerHTML = missing.length
+                    ? `<strong>Pendências:</strong> ${missing.join(', ')}.`
+                    : '<strong>Conjunto completo:</strong> todas as poses previstas têm representação própria ou derivada.';
+                section.append(notes);
+                root.append(section);
+            }
+
+            if (!globalThis.GameConfig?.CHARACTERS) {
+                root.innerHTML = '<p class="error">Não foi possível carregar GameConfig.CHARACTERS.</p>';
+                return;
+            }
+
+            function animate(time) {
+                animations.forEach(animation => {
+                    const index = Math.floor(time / animation.frameDuration) % animation.frames.length;
+                    if (index !== animation.lastFrame) {
+                        applyFrame(animation.element, animation.sprite, animation.frames[index]);
+                        animation.lastFrame = index;
+                    }
+                });
+                requestAnimationFrame(animate);
+            }
+            loadSheetGeometry(GameConfig.CHARACTERS).then(() => {
+                GameConfig.CHARACTERS.forEach(renderCharacter);
+                requestAnimationFrame(animate);
+            });
+        })();
+    </script>
+</body>
+</html>

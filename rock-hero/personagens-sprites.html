@@ -275,6 +275,10 @@
                 { length: sprite.endFrame - sprite.startFrame + 1 },
                 (_, index) => sprite.startFrame + index
             );
+            const missingFrames = sprite => range(sprite).filter(frame => frame >= sprite.sheetFrameCount);
+            // generateFrameNumbers() ignora índices que o PNG não tem, então a animação
+            // do jogo roda apenas com os frames listados aqui.
+            const playableFrames = sprite => range(sprite).filter(frame => frame < sprite.sheetFrameCount);
 
             function resolvePose(character, pose) {
                 const sprites = character.sprites;
@@ -329,19 +333,24 @@
                     : null;
 
                 // Sem jump próprio, o fallback aquático é sempre idle #0.
-                if (pose.aquatic && pose.state === 'jump' && !sprites.jump) {
+                if (sprite && pose.aquatic && pose.state === 'jump' && !sprites.jump) {
                     selectedFrame = sprite.startFrame;
                 }
 
-                // Phaser Texture.get usa o primeiro frame quando setTexture recebe
-                // um índice inexistente. Replica isso nos cards aquáticos para mostrar
-                // o resultado real do jogo (hoje ocorre no fall do Guitarrista).
-                if (pose.aquatic && selectedFrame !== null && selectedFrame >= sprite.sheetFrameCount) {
-                    note += ` O frame configurado #${selectedFrame} não existe; o Phaser exibe #${sprite.startFrame}.`;
+                if (sprite && selectedFrame !== null && selectedFrame >= sprite.sheetFrameCount) {
+                    // setTexture com índice inexistente cai no primeiro frame da textura.
+                    note += ` O GameConfig aponta o frame #${selectedFrame}, que não existe no PNG, então o jogo acaba exibindo o #${sprite.startFrame}.`;
                     selectedFrame = sprite.startFrame;
+                    status = 'fallback-status';
+                } else if (sprite && selectedFrame === null) {
+                    const ausentes = missingFrames(sprite);
+                    if (ausentes.length) {
+                        note += ` O GameConfig declara ${ausentes.map(frame => `#${frame}`).join(' e ')},`
+                            + ` que não existem no PNG; o Phaser descarta esses índices e anima só até #${sprite.sheetFrameCount - 1}.`;
+                    }
                 }
 
-                return { sprite, flipped, status, note, selectedFrame };
+                return { sprite, flipped, status, note: note.trim(), selectedFrame };
             }
             function applyFrame(element, sprite, frame) {
                 const columns = sprite.sheetColumns || 1;
@@ -360,11 +369,15 @@
                 return Promise.all(sprites.map(sprite => new Promise(resolve => {
                     const image = new Image();
                     image.onload = () => {
-                        sprite.sheetColumns = Math.max(1, Math.floor(image.naturalWidth / sprite.frameWidth));
+                        const columns = Math.max(1, Math.floor(image.naturalWidth / sprite.frameWidth));
+                        const rows = Math.max(1, Math.floor(image.naturalHeight / sprite.frameHeight));
+                        sprite.sheetColumns = columns;
+                        sprite.sheetFrameCount = columns * rows;
                         resolve();
                     };
                     image.onerror = () => {
                         sprite.sheetColumns = 1;
+                        sprite.sheetFrameCount = sprite.endFrame + 1;
                         resolve();
                     };
                     image.src = sprite.file;
@@ -374,7 +387,7 @@
             function makeFrames(sprite, flipped, selectedFrame) {
                 const frames = document.createElement('div');
                 frames.className = 'frames';
-                const list = selectedFrame === null ? range(sprite) : [selectedFrame];
+                const list = selectedFrame === null ? playableFrames(sprite) : [selectedFrame];
 
                 list.forEach(frameNumber => {
                     const cell = document.createElement('div');
@@ -416,11 +429,12 @@
                     applyFrame(preview, resolved.sprite, firstFrame);
                     stage.append(preview);
 
-                    if (resolved.selectedFrame === null && resolved.sprite.endFrame > resolved.sprite.startFrame) {
+                    const playable = playableFrames(resolved.sprite);
+                    if (resolved.selectedFrame === null && playable.length > 1) {
                         animations.push({
                             element: preview,
                             sprite: resolved.sprite,
-                            frames: range(resolved.sprite),
+                            frames: playable,
                             frameDuration: 1000 / resolved.sprite.frameRate,
                             lastFrame: -1
                         });
@@ -485,11 +499,18 @@
                 const missing = GROUND_POSES
                     .filter(pose => resolvePose(character, pose).status === 'missing')
                     .map(pose => pose.label);
+                const broken = [...new Set(Object.values(character.sprites).filter(Boolean))]
+                    .filter(sprite => missingFrames(sprite).length)
+                    .map(sprite => `<code>${sprite.key}</code> declara até #${sprite.endFrame}, mas o PNG só vai até #${sprite.sheetFrameCount - 1}`);
+
                 const notes = document.createElement('div');
                 notes.className = 'notes';
                 notes.innerHTML = missing.length
                     ? `<strong>Pendências:</strong> ${missing.join(', ')}.`
                     : '<strong>Conjunto completo:</strong> todas as poses previstas têm representação própria ou derivada.';
+                if (broken.length) {
+                    notes.innerHTML += `<br><strong>GameConfig fora de sincronia:</strong> ${broken.join('; ')}.`;
+                }
                 section.append(notes);
                 root.append(section);
             }

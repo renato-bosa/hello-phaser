@@ -188,8 +188,8 @@
             "scale": 0.29390625,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1170.441254651781,
-                "y": 508.6656034024456
+                "x": 1172.1424774056352,
+                "y": 506.96438064859115
             }
         },
         "assets/map-19.json#1up": {
@@ -274,8 +274,8 @@
             "scale": 0.5,
             "selectedLayer": 6,
             "viewCenter": {
-                "x": 836,
-                "y": 833
+                "x": 837,
+                "y": 834
             }
         },
         "assets/map-23-catedral-do-eco.json#1up-animated-4fps": {
@@ -375,8 +375,8 @@
             "scale": 0.33,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1600,
-                "y": 543.939393939394
+                "x": 1601.5151515151513,
+                "y": 545.4545454545455
             }
         },
         "assets/map-24-cisternas.json#1up-animated-4fps": {
@@ -702,6 +702,9 @@
         "dev-resources/map-12.tmx#bricks-purple2": {
             "scaleInDock": 1
         },
+        "dev-resources/map-12.tmx#cavalo_marinho_boss-3_64x64_6fps": {
+            "scaleInEditor": 1
+        },
         "dev-resources/map-12.tmx#fg_dec_ocean_random_frame": {
             "scaleInDock": 1
         },
@@ -760,7 +763,7 @@
             "scale": 1.045,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 319.1387559808613,
+                "x": 319.6172248803828,
                 "y": 176.07655502392345
             }
         },
@@ -807,7 +810,7 @@
             "scale": 0.423046875,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 320.2954755309326,
+                "x": 319.1135734072022,
                 "y": 174.92151431209606
             }
         },
@@ -854,7 +857,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 319.5,
+                "x": 320,
                 "y": 175
             }
         },
@@ -905,7 +908,7 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 399,
+                "x": 398,
                 "y": 1672
             }
         },
@@ -989,7 +992,7 @@
             "scale": 0.33,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1683.3333333333335,
+                "x": 1684.848484848485,
                 "y": 1112.121212121212
             }
         },
@@ -1097,7 +1100,7 @@
             "scale": 0.25,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1018,
+                "x": 1016,
                 "y": 644
             }
         },
@@ -1198,7 +1201,7 @@
             "scale": 0.33,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1122.7272727272727,
+                "x": 1124.242424242424,
                 "y": 287.8787878787879
             }
         },
@@ -2958,22 +2961,22 @@
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map-13.tmx",
+        "dev-resources/map-14.tmx",
+        "dev-resources/map-15.tmx",
+        "dev-resources/map-16.tmx",
+        "dev-resources/map-17.tmx",
+        "dev-resources/map-18.tmx",
+        "dev-resources/map-19.tmx",
         "assets/map-19.json",
         "assets/map-24-cisternas.json",
         "assets/map-23-catedral-do-eco.json",
         "assets/map-11.json",
-        "assets/map-25-carrilhao.json",
-        "assets/map-18.tmj",
-        "dev-resources/map-chefe2.tmx",
-        "dev-resources/map-chefe-mundo1.tmx",
-        "dev-resources/map-7--planicie.tmx",
-        "dev-resources/map-17.tmx",
-        "dev-resources/map-18.tmx",
-        "dev-resources/map-19.tmx"
+        "assets/map-25-carrilhao.json"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
-        "height": 32,
-        "width": 32
+        "height": 64,
+        "width": 64
     }
 }

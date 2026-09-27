@@ -2363,6 +2363,15 @@
         "dev-resources/map-9.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-boss3.tmx#bricks-purple2": {
+            "scaleInEditor": 1
+        },
+        "dev-resources/map-boss3.tmx#green-bricks": {
+            "scaleInEditor": 1
+        },
+        "dev-resources/map-boss3.tmx#red-bricks": {
+            "scaleInEditor": 1
+        },
         "dev-resources/map-chefe-mundo1.tmx": {
             "scale": 0.5,
             "selectedLayer": 4,

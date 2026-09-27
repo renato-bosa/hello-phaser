@@ -99,7 +99,18 @@
          "draworder":"topdown",
          "id":10,
          "name":"water-zone",
-         "objects":[],
+         "objects":[
+                {
+                 "height":640,
+                 "id":187,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":736,
+                 "x":0,
+                 "y":0
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -358,7 +369,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":187,
+ "nextobjectid":189,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -654,6 +665,16 @@
          "spacing":0,
          "tilecount":1,
          "tileheight":32,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }],
          "tilewidth":32
         }, 
         {
@@ -664,6 +685,12 @@
          "imagewidth":32,
          "margin":0,
          "name":"bricks-purple2",
+         "properties":[
+                {
+                 "name":"collider",
+                 "type":"bool",
+                 "value":true
+                }],
          "spacing":0,
          "tilecount":1,
          "tileheight":32,
@@ -706,6 +733,16 @@
          "spacing":0,
          "tilecount":1,
          "tileheight":32,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"collider",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }],
          "tilewidth":32
         }, 
         {

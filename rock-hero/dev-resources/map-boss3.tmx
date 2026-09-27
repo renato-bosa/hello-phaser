@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="23" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="187">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="23" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="189">
  <editorsettings>
-  <export format="json"/>
+  <export target="../assets/map-boss3.json" format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="grass" tilewidth="32" tileheight="32" tilecount="1" columns="1">
   <image source="../assets/spritesheets/grass.png" width="32" height="32"/>
@@ -92,8 +92,16 @@
  </tileset>
  <tileset firstgid="31" name="green-bricks" tilewidth="32" tileheight="32" tilecount="1" columns="1">
   <image source="../assets/spritesheets/green-bricks.png" width="32" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="32" name="bricks-purple2" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <properties>
+   <property name="collider" type="bool" value="true"/>
+  </properties>
   <image source="../assets/spritesheets/bricks-purple2.png" width="32" height="32"/>
  </tileset>
  <tileset firstgid="33" name="gray-bricks" tilewidth="32" tileheight="32" tilecount="1" columns="1">
@@ -104,6 +112,11 @@
  </tileset>
  <tileset firstgid="35" name="red-bricks" tilewidth="32" tileheight="32" tilecount="1" columns="1">
   <image source="../assets/spritesheets/red-bricks.png" width="32" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="collider" type="bool" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="36" name="sapo-tomate-6fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
   <image source="../assets/spritesheets/sapo-tomate-6fps.png" width="64" height="96"/>
@@ -219,7 +232,9 @@
 32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,32,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="10" name="water-zone"/>
+ <objectgroup id="10" name="water-zone">
+  <object id="187" x="0" y="0" width="736" height="640"/>
+ </objectgroup>
  <objectgroup id="8" name="objects">
   <object id="140" gid="71" x="512" y="608" width="32" height="32"/>
   <object id="141" gid="71" x="544" y="640" width="32" height="32"/>

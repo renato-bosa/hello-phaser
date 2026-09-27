@@ -37,7 +37,7 @@
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 59, 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -69,7 +69,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 35, 35, 35, 0, 0, 32, 32, 32, 32,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 0, 0, 35, 0, 0, 0, 0, 32, 32, 32,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32,
-            0, 0, 0, 0, 0, 0, 32, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,
+            0, 0, 0, 0, 0, 32, 32, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 85, 85, 85,
@@ -227,8 +227,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":224,
-                 "y":128
+                 "x":416,
+                 "y":544
                 }, 
                 {
                  "gid":84,
@@ -361,6 +361,79 @@
                  "width":32,
                  "x":352,
                  "y":608
+                }, 
+                {
+                 "gid":84,
+                 "height":32,
+                 "id":189,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":160,
+                 "y":512
+                }, 
+                {
+                 "gid":84,
+                 "height":32,
+                 "id":190,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":224,
+                 "y":512
+                }, 
+                {
+                 "gid":84,
+                 "height":32,
+                 "id":191,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":96,
+                 "y":576
+                },
+            
+                {
+                 "gid":84,
+                 "height":32,
+                 "id":192,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":288,
+                 "y":576
+                }, 
+                {
+                 "gid":86,
+                 "height":32,
+                 "id":193,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":192,
+                 "y":128
+                }, 
+                {
+                 "gid":102,
+                 "height":32,
+                 "id":194,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":192,
+                 "y":128
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -369,7 +442,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":189,
+ "nextobjectid":195,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -949,6 +1022,32 @@
                          "value":true
                         }]
                 }],
+         "tilewidth":32
+        }, 
+        {
+         "columns":4,
+         "firstgid":86,
+         "image":"spritesheets\/prisao-fechada-10fps.png",
+         "imageheight":128,
+         "imagewidth":128,
+         "margin":0,
+         "name":"prisao-fechada-10fps",
+         "spacing":0,
+         "tilecount":16,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":2,
+         "firstgid":102,
+         "image":"spritesheets\/Guitarrista-parado-2-animado3-6fps.png",
+         "imageheight":96,
+         "imagewidth":64,
+         "margin":0,
+         "name":"Guitarrista-parado-2-animado3-6fps",
+         "spacing":0,
+         "tilecount":6,
+         "tileheight":32,
          "tilewidth":32
         }],
  "tilewidth":32,

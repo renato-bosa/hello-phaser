@@ -476,13 +476,16 @@ class GameScene extends Phaser.Scene {
         const gidToTilesetName = {};
         map.tilesets.forEach(ts => {
             for (let i = 0; i < ts.total; i++) {
-                gidToTilesetName[ts.firstgid + i] = ts.name.toLowerCase();
+                // Nome original: é a chave da textura carregada. A comparação
+                // abaixo usa a versão em minúsculas.
+                gidToTilesetName[ts.firstgid + i] = ts.name;
             }
         });
 
         objectsLayer.objects.forEach(obj => {
             const type = obj.properties?.find(p => p.name === 'type')?.value;
-            const tilesetName = gidToTilesetName[obj.gid] || '';
+            const textureKey = gidToTilesetName[obj.gid] || '';
+            const tilesetName = textureKey.toLowerCase();
             const transform = this._extractTilesetTransform(obj);
             const placement = this._getTileObjectPlacement(obj, map);
 
@@ -504,7 +507,7 @@ class GameScene extends Phaser.Scene {
                     x: placement.x,
                     y: placement.y,
                     height: placement.height,
-                    textureKey: tilesetName,
+                    textureKey,
                     transform
                 };
             }
@@ -515,12 +518,12 @@ class GameScene extends Phaser.Scene {
                     x: placement.x,
                     y: placement.y,
                     height: placement.height,
-                    textureKey: tilesetName,
+                    textureKey,
                     transform
                 };
             }
             else if (tilesetName.includes('buraco-topeirudo') || tilesetName.includes('buraco-toupeirudo')) {
-                const hole = this.add.image(placement.x, placement.y, tilesetName)
+                const hole = this.add.image(placement.x, placement.y, textureKey)
                     .setDepth(GC.DEPTH.PLAYER - 3);
                 if (transform) {
                     hole.setFlipX(!!transform.flipX);
@@ -618,10 +621,10 @@ class GameScene extends Phaser.Scene {
             else if (type === '1up' || type === 'extra_life' ||
                      tilesetName.includes('1up') || tilesetName.includes('nota') ||
                      tilesetName.includes('extra-life') || tilesetName.includes('extra_life')) {
-                extraLives.push({ x: placement.x, y: placement.y, textureKey: tilesetName, transform });
+                extraLives.push({ x: placement.x, y: placement.y, textureKey, transform });
             }
             else if (type === 'mushroom' || tilesetName.includes('mushroom') || tilesetName.includes('cogumelo')) {
-                mushrooms.push({ x: placement.x, y: placement.y, textureKey: tilesetName, transform });
+                mushrooms.push({ x: placement.x, y: placement.y, textureKey, transform });
             }
             else if (type === 'toupeira-chefe' || tilesetName.includes('toupeiroudo') ||
                      tilesetName.includes('toupeira-chefe')) {
@@ -641,7 +644,7 @@ class GameScene extends Phaser.Scene {
                     width: placement.width,
                     height: placement.height,
                     type: 'toupeira',
-                    holeTexture: tilesetName,
+                    holeTexture: textureKey,
                     transform
                 });
             }
@@ -672,7 +675,7 @@ class GameScene extends Phaser.Scene {
                     y: obj.y - h / 2,
                     width: w,
                     height: h,
-                    textureKey: tilesetName,
+                    textureKey,
                     verticalBlocks: objProps['vertical-move_downward_in_blocks'] || 0,
                     horizontalBlocks: objProps['horizontal-move_right_in_blocks'] || 0,
                     transform

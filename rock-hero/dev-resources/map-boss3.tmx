@@ -250,9 +250,21 @@
   <object id="187" x="0" y="0" width="736" height="640"/>
  </objectgroup>
  <objectgroup id="8" name="objects">
-  <object id="140" gid="71" x="512" y="608" width="32" height="32"/>
-  <object id="141" gid="71" x="544" y="640" width="32" height="32"/>
-  <object id="142" gid="71" x="576" y="608" width="32" height="32"/>
+  <object id="140" gid="71" x="512" y="608" width="32" height="32">
+   <properties>
+    <property name="bubble-interval_in_seconds" type="float" value="1"/>
+   </properties>
+  </object>
+  <object id="141" gid="71" x="544" y="640" width="32" height="32">
+   <properties>
+    <property name="bubble-interval_in_seconds" type="float" value="1"/>
+   </properties>
+  </object>
+  <object id="142" gid="71" x="576" y="608" width="32" height="32">
+   <properties>
+    <property name="bubble-interval_in_seconds" type="float" value="1"/>
+   </properties>
+  </object>
   <object id="143" gid="77" x="640" y="480" width="64" height="64"/>
   <object id="144" gid="4" x="96" y="96" width="32" height="32"/>
   <object id="172" gid="48" x="448" y="224" width="32" height="32"/>

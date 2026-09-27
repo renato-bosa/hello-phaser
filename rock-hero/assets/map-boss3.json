@@ -127,6 +127,12 @@
                  "height":32,
                  "id":140,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"bubble-interval_in_seconds",
+                         "type":"float",
+                         "value":1
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -139,6 +145,12 @@
                  "height":32,
                  "id":141,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"bubble-interval_in_seconds",
+                         "type":"float",
+                         "value":1
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -151,6 +163,12 @@
                  "height":32,
                  "id":142,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"bubble-interval_in_seconds",
+                         "type":"float",
+                         "value":1
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,

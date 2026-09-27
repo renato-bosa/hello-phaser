@@ -28,7 +28,7 @@ class EnemyManager {
             } else if (e.type === 'cavalo-marinho-chefe') {
                 this._createCavaloMarinhoChefe(e.x, e.y);
             } else if (e.type === 'dragao-marinho') {
-                this._createDragaoMarinho(e.x, e.y);
+                this._createDragaoMarinho(e);
             } else if (e.type === 'boneco') {
                 this._createBoneco(e);
             } else if (e.type === 'toupeira') {
@@ -669,10 +669,12 @@ class EnemyManager {
         });
     }
 
-    _createDragaoMarinho(x, y) {
+    _createDragaoMarinho(data) {
         const scene = this.scene;
         const cfg = GC.ENEMY.DRAGAO_MARINHO;
-        const dragon = scene.physics.add.sprite(x, y, 'dragao-marinho');
+        const dragon = scene.physics.add.sprite(data.x, data.y, 'dragao-marinho');
+        const interval = data.bubbleIntervalSec > 0 ? data.bubbleIntervalSec : cfg.BUBBLE_INTERVAL_SEC;
+        dragon.bubbleIntervalSec = interval;
 
         // Mesma ordem do cavalo-marinho: o grupo reaplica allowGravity ao adicionar.
         this.enemies.add(dragon);
@@ -693,6 +695,8 @@ class EnemyManager {
             });
         }
         dragon.anims.play('dragao-marinho-idle', true);
+        const baseCycle = (cfg.FRAME_END + 1) / cfg.ANIM_FPS;
+        dragon.anims.timeScale = baseCycle / interval;
 
         dragon.on('animationupdate', (anim, frame) => {
             if (anim.key !== 'dragao-marinho-idle') return;
@@ -897,7 +901,7 @@ class EnemyManager {
         if (!dragon.active) return;
         const cfg = GC.ENEMY.DRAGAO_MARINHO;
         const muzzle = this._dragaoMarinhoMuzzle(dragon);
-        this._spawnBubble(muzzle.x, muzzle.y, 0, -GC.BUBBLE.SPEED, 0, cfg.BUBBLE_ALPHA);
+        this._spawnBubble(muzzle.x, muzzle.y, 0, -GC.BUBBLE.SPEED, 0, cfg.BUBBLE_ALPHA, true);
     }
 
     /**
@@ -908,18 +912,18 @@ class EnemyManager {
     _prefillDragaoMarinhoColumn(dragon) {
         const cfg = GC.ENEMY.DRAGAO_MARINHO;
         const muzzle = this._dragaoMarinhoMuzzle(dragon);
-        const period = (cfg.FRAME_END + 1) / cfg.ANIM_FPS;
+        const period = dragon.bubbleIntervalSec;
         const spacing = GC.BUBBLE.SPEED * period;
         if (spacing <= 0) return;
 
-        const firstEmitDelay = cfg.BUBBLE_FRAME_INDEX / cfg.ANIM_FPS;
+        const firstEmitDelay = (cfg.BUBBLE_FRAME_INDEX / (cfg.FRAME_END + 1)) * period;
         const topLimit = this._bubbleCeilingY(muzzle.x, muzzle.y) + GC.BUBBLE.BODY_RADIUS + 2;
         const maxBubbles = 64;
 
         for (let i = 0; i < maxBubbles; i++) {
             const y = muzzle.y - (spacing - GC.BUBBLE.SPEED * firstEmitDelay) - i * spacing;
             if (y < topLimit) break;
-            this._spawnBubble(muzzle.x, y, 0, -GC.BUBBLE.SPEED, 0, cfg.BUBBLE_ALPHA);
+            this._spawnBubble(muzzle.x, y, 0, -GC.BUBBLE.SPEED, 0, cfg.BUBBLE_ALPHA, true);
         }
     }
 
@@ -937,9 +941,10 @@ class EnemyManager {
         return mapTop;
     }
 
-    _spawnBubble(x, y, velocityX, velocityY, lifetimeMs, alpha = 1) {
+    _spawnBubble(x, y, velocityX, velocityY, lifetimeMs, alpha = 1, burstAtWaterEdge = false) {
         const bubble = this.bubbles.create(x, y, 'seahorse-bubble');
         bubble.setAlpha(alpha);
+        bubble.burstAtWaterEdge = burstAtWaterEdge;
         bubble.body.allowGravity = false;
         bubble.body.setCircle(GC.BUBBLE.BODY_RADIUS,
             GC.BUBBLE.SIZE / 2 - GC.BUBBLE.BODY_RADIUS,
@@ -951,6 +956,65 @@ class EnemyManager {
                 if (bubble && bubble.active) bubble.destroy();
             });
         }
+    }
+
+    /**
+     * Bolha do dragão estoura só quando alguma parte dela toca fora d'água.
+     * Emendas entre water-zones continuam água: a cobertura é a união delas.
+     * Cavalo-marinho e chefe não usam essa regra.
+     */
+    _burstDragonBubblesAtWaterEdge() {
+        const zones = this.scene.waterZones;
+        if (!this.bubbles || !zones || zones.length === 0) return;
+
+        const rects = [];
+        for (let i = 0; i < zones.length; i++) {
+            const rect = zones[i].getBounds();
+            rects.push({ left: rect.x, top: rect.y, right: rect.right, bottom: rect.bottom });
+        }
+
+        this.bubbles.children.iterate(bubble => {
+            if (!bubble?.active || !bubble.burstAtWaterEdge || !bubble.body) return;
+            const body = bubble.body;
+            const touchesDry = this._rectTouchesNonWater({
+                left: body.left,
+                top: body.top,
+                right: body.right,
+                bottom: body.bottom
+            }, rects);
+            if (touchesDry) this.handleBubbleHitTile(bubble);
+        });
+    }
+
+    /** True se sobra algum pedaço do retângulo depois de recortar todas as zonas. */
+    _rectTouchesNonWater(rect, zones) {
+        let fragments = [rect];
+        for (let i = 0; i < zones.length; i++) {
+            const next = [];
+            for (let f = 0; f < fragments.length; f++) {
+                const parts = this._subtractRect(fragments[f], zones[i]);
+                for (let p = 0; p < parts.length; p++) next.push(parts[p]);
+            }
+            fragments = next;
+            if (fragments.length === 0) return false;
+        }
+        return true;
+    }
+
+    /** Retângulo `a` menos a interseção com `b`, em até 4 pedaços. */
+    _subtractRect(a, b) {
+        const ix = Math.max(a.left, b.left);
+        const iy = Math.max(a.top, b.top);
+        const ir = Math.min(a.right, b.right);
+        const ib = Math.min(a.bottom, b.bottom);
+        if (ix >= ir || iy >= ib) return [a];
+
+        const parts = [];
+        if (a.left < ix) parts.push({ left: a.left, top: a.top, right: ix, bottom: a.bottom });
+        if (ir < a.right) parts.push({ left: ir, top: a.top, right: a.right, bottom: a.bottom });
+        if (a.top < iy) parts.push({ left: ix, top: a.top, right: ir, bottom: iy });
+        if (ib < a.bottom) parts.push({ left: ix, top: ib, right: ir, bottom: a.bottom });
+        return parts;
     }
 
     _cullBubblesOutsideMap() {
@@ -980,6 +1044,7 @@ class EnemyManager {
     update(currentTime) {
         if (!this.enemies) return;
 
+        this._burstDragonBubblesAtWaterEdge();
         this._cullBubblesOutsideMap();
 
         const player = this.scene.playerController.player;

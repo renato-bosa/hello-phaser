@@ -1,7 +1,7 @@
 /**
  * HUDManager - Interface de gameplay
  * Responsável por: timer, melhor tempo, contador de estrelas, corações, vidas,
- * indicador de vento, debug velocity
+ * indicador de vento, itens na mão, debug velocity
  */
 class HUDManager {
     constructor(scene) {
@@ -10,6 +10,8 @@ class HUDManager {
         this.bestTimeText = null;
         this.starHUD = null;
         this.starText = null;
+        this.heldContainer = null;
+        this._heldSignature = '';
         this.debugVelocityText = null;
         this.heartTexts = [];
         this.livesText = null;
@@ -57,6 +59,7 @@ class HUDManager {
         this._createHeartsDisplay();
         this._createLivesDisplay();
         this._createWindIndicator();
+        this._createHeldItems();
 
         if (scene.physics.world.drawDebug) {
             this.debugVelocityText = scene.add.text(0, 0, '', {
@@ -192,6 +195,128 @@ class HUDManager {
             stroke: '#000000',
             strokeThickness: 2
         }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(GC.DEPTH.HUD).setAlpha(0.8);
+    }
+
+    /**
+     * Quadradinhos dos itens na mão (pedra, chave). Sem item, não desenha caixa vazia.
+     * Fica abaixo do contador de estrelas quando a fase tem um.
+     */
+    _createHeldItems() {
+        const scene = this.scene;
+        const y = this.starHUD ? 40 : 8;
+        this.heldContainer = scene.add.container(10, y)
+            .setScrollFactor(0)
+            .setDepth(GC.DEPTH.HUD);
+    }
+
+    updateHeldItems() {
+        const items = this._heldItemTextures();
+        const signature = items.join('|');
+        if (signature === this._heldSignature) return;
+        this._heldSignature = signature;
+        this._renderHeldItems(items);
+    }
+
+    _heldItemTextures() {
+        const scene = this.scene;
+        const items = [];
+
+        if (scene.slingshotManager?.hasStone && scene.textures.exists('pedra-estilingue')) {
+            items.push('pedra-estilingue');
+        }
+
+        const holdingKey = scene.hasPrisonKey
+            && scene.prisonState !== 'opening'
+            && scene.prisonState !== 'open';
+        if (holdingKey) {
+            const worldId = GameData.LEVELS[scene.currentLevel]?.world || 1;
+            const keyTexture = scene.textures.exists(`prison-key-w${worldId}`)
+                ? `prison-key-w${worldId}`
+                : 'prison-key-w1';
+            if (scene.textures.exists(keyTexture)) items.push(keyTexture);
+        }
+
+        return items;
+    }
+
+    _renderHeldItems(items) {
+        this.heldContainer.removeAll(true);
+        const slot = 28;
+        const gap = 4;
+        const pad = 4;
+        items.forEach((textureKey, i) => {
+            const x = i * (slot + gap);
+            const bg = this.scene.add.rectangle(x, 0, slot, slot, 0x000000, 0.55)
+                .setOrigin(0, 0)
+                .setStrokeStyle(2, 0xffffff, 0.9);
+            const icon = this.scene.add.image(0, 0, textureKey).setOrigin(0.5);
+            const max = slot - pad * 2;
+            const metrics = this._opaqueMetrics(textureKey);
+            const scale = Math.min(max / metrics.bw, max / metrics.bh);
+            icon.setScale(scale);
+            // O desenho da chave fica no rodapé do frame 32×32. Centraliza o
+            // miolo opaco, não o quadro inteiro, para não cortar embaixo.
+            icon.setPosition(
+                x + slot / 2 - metrics.ox * scale,
+                slot / 2 - metrics.oy * scale
+            );
+            this.heldContainer.add([bg, icon]);
+        });
+    }
+
+    /** Centro e tamanho dos pixels visíveis, em relação ao centro do frame. */
+    _opaqueMetrics(textureKey) {
+        if (!this._opaqueMetricsCache) this._opaqueMetricsCache = {};
+        if (this._opaqueMetricsCache[textureKey]) return this._opaqueMetricsCache[textureKey];
+
+        const src = this.scene.textures.get(textureKey).getSourceImage();
+        const w = src.width;
+        const h = src.height;
+        const fallback = { ox: 0, oy: 0, bw: w || 1, bh: h || 1 };
+        if (!w || !h) {
+            this._opaqueMetricsCache[textureKey] = fallback;
+            return fallback;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(src, 0, 0);
+        let pixels;
+        try {
+            pixels = ctx.getImageData(0, 0, w, h).data;
+        } catch (e) {
+            this._opaqueMetricsCache[textureKey] = fallback;
+            return fallback;
+        }
+
+        let minX = w;
+        let minY = h;
+        let maxX = -1;
+        let maxY = -1;
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                if (pixels[(y * w + x) * 4 + 3] <= 20) continue;
+                if (x < minX) minX = x;
+                if (y < minY) minY = y;
+                if (x > maxX) maxX = x;
+                if (y > maxY) maxY = y;
+            }
+        }
+        if (maxX < 0) {
+            this._opaqueMetricsCache[textureKey] = fallback;
+            return fallback;
+        }
+
+        const metrics = {
+            ox: (minX + maxX) / 2 - w / 2,
+            oy: (minY + maxY) / 2 - h / 2,
+            bw: maxX - minX + 1,
+            bh: maxY - minY + 1
+        };
+        this._opaqueMetricsCache[textureKey] = metrics;
+        return metrics;
     }
 
     updateHearts(current) {

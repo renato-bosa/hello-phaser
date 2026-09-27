@@ -214,6 +214,6 @@
   <object id="84" gid="41" x="736" y="544" width="32" height="32"/>
   <object id="85" gid="47" x="288" y="544" width="32" height="32"/>
   <object id="87" gid="35" x="448" y="576" width="32" height="32"/>
-  <object id="88" gid="59" x="192" y="576" width="32" height="32"/>
+  <object id="88" gid="59" x="160" y="576" width="32" height="32"/>
  </objectgroup>
 </map>

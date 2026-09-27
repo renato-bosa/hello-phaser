@@ -231,7 +231,10 @@ const GC = {
             HITS_TO_DEFEAT: 5,
             KEY_TRAVEL_MS: 6000,
         },
-        // Mesmo corpo e ritmo do cavalo-marinho; a bolha sobe em vez de ir para a frente.
+        // Mesmo corpo do cavalo-marinho; a bolha sobe em vez de ir para a frente.
+        // O ciclo base da animação é 1s (6 frames a 6 fps). O intervalo real das
+        // bolhas é BUBBLE_INTERVAL_SEC, salvo se o objeto tiver
+        // bubble-interval_in_seconds. A animação desacelera para acompanhar.
         DRAGAO_MARINHO: {
             BODY_WIDTH: 22,
             BODY_HEIGHT: 30,
@@ -243,6 +246,7 @@ const GC = {
             MUZZLE_OFFSET_X: 8,
             MUZZLE_OFFSET_Y: -14,
             BUBBLE_ALPHA: 0.8,
+            BUBBLE_INTERVAL_SEC: 2,
         },
         BONECO: {
             SCALE: 2,               // mesmo sprite 32×32, só ampliado na tela

@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-12.tmx",
+    "activeFile": "dev-resources/map-10.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         ".",
@@ -529,7 +529,7 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 535.3333333333333,
+                "x": 394,
                 "y": 390.6666666666667
             }
         },
@@ -604,8 +604,8 @@
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 581,
-                "y": 212
+                "x": 800,
+                "y": 335
             }
         },
         "dev-resources/map-11.tmx#abstract-blue": {
@@ -670,8 +670,8 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 467.3333333333333,
-                "y": 789.3333333333333
+                "x": 702,
+                "y": 270.6666666666667
             }
         },
         "dev-resources/map-12.tmx#1up": {
@@ -2325,8 +2325,8 @@
             "scale": 1.004921875,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 319.92536733265956,
-                "y": 175.13799269221798
+                "x": 335.34945191634927,
+                "y": 240.31718883619686
             }
         },
         "dev-resources/map-9.tmx#abstract-blue": {
@@ -3080,8 +3080,7 @@
     "openFiles": [
         "dev-resources/map-9.tmx",
         "dev-resources/map-11.tmx",
-        "dev-resources/map-10.tmx",
-        "dev-resources/map-12.tmx"
+        "dev-resources/map-10.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",

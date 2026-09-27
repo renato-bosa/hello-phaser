@@ -586,12 +586,17 @@ class GameScene extends Phaser.Scene {
             }
             else if (type === 'dragao-marinho' || type === 'dragao_marinho' || type === 'dragao' ||
                      tilesetName.includes('dragao') || tilesetName.includes('dragão')) {
+                let bubbleIntervalSec = GC.ENEMY.DRAGAO_MARINHO.BUBBLE_INTERVAL_SEC;
+                const intervalProp = obj.properties?.find(p => p.name === 'bubble-interval_in_seconds');
+                const intervalRaw = Number(intervalProp?.value);
+                if (intervalRaw > 0) bubbleIntervalSec = intervalRaw;
                 enemies.push({
                     x: placement.x,
                     y: placement.y,
                     width: placement.width,
                     height: placement.height,
-                    type: 'dragao-marinho'
+                    type: 'dragao-marinho',
+                    bubbleIntervalSec
                 });
             }
             else if (type === 'seahorse' ||
@@ -1980,6 +1985,7 @@ class GameScene extends Phaser.Scene {
             this._updateAutoScroll(delta);
         }
         this.hudManager.updateWindIndicator();
+        this.hudManager.updateHeldItems();
         this.hudManager.updateDebugVelocity();
         this.enemyManager.update(this.time.now);
         this.effectsManager.update(this.time.now);

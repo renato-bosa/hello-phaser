@@ -3,12 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "assets/map-25-carrilhao.json",
+    "activeFile": "dev-resources/map-12.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "dev-resources",
         ".",
-        "assets"
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -524,13 +523,13 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
-            "selectedLayer": 1,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 383.3333333333333,
+                "x": 535.3333333333333,
                 "y": 390.6666666666667
             }
         },
@@ -553,6 +552,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-10.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-10.tmx#dragao_marinho_6fps": {
             "scaleInDock": 1
         },
         "dev-resources/map-10.tmx#fg_dec_ocean_random_frame": {
@@ -596,8 +598,8 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.5,
             "selectedLayer": 2,
@@ -662,14 +664,14 @@
         },
         "dev-resources/map-12.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 467.3333333333333,
-                "y": 565.3333333333333
+                "y": 789.3333333333333
             }
         },
         "dev-resources/map-12.tmx#1up": {
@@ -704,6 +706,9 @@
         },
         "dev-resources/map-12.tmx#cavalo_marinho_boss-3_64x64_6fps": {
             "scaleInEditor": 1
+        },
+        "dev-resources/map-12.tmx#dragao_marinho_6fps": {
+            "scaleInDock": 1
         },
         "dev-resources/map-12.tmx#fg_dec_ocean_random_frame": {
             "scaleInDock": 1
@@ -2363,17 +2368,126 @@
         "dev-resources/map-9.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-boss3.tmx": {
+            "expandedObjectLayers": [
+                10,
+                8
+            ],
+            "scale": 0.75,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 312.66666666666663,
+                "y": 325.33333333333326
+            }
+        },
+        "dev-resources/map-boss3.tmx#1up": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#Guitarrista-parado-2-animado3-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#bricks": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-boss3.tmx#bricks-purple2": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "dev-resources/map-boss3.tmx#cavalo_marinho_boss-3_64x64_6fps": {
+            "scaleInDock": 1
         },
         "dev-resources/map-boss3.tmx#dark-bricks": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "dev-resources/map-boss3.tmx#dragao_marinho_6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#estilingue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#fg_dec_ocean_random_frame": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#gray-bricks": {
+            "scaleInDock": 1
         },
         "dev-resources/map-boss3.tmx#green-bricks": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "dev-resources/map-boss3.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#pedra-estilingue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#prisao-fechada-10fps": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-boss3.tmx#red-bricks": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "dev-resources/map-boss3.tmx#red-heart": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#yellow-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-boss3.tmx#yellow-star-animated": {
+            "scaleInDock": 1
         },
         "dev-resources/map-chefe-mundo1.tmx": {
             "scale": 0.5,
@@ -2964,27 +3078,26 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "assets/map-19.json",
-        "assets/map-24-cisternas.json",
-        "assets/map-23-catedral-do-eco.json",
-        "assets/map-25-carrilhao.json",
-        "assets/map-11.json"
+        "dev-resources/map-9.tmx",
+        "dev-resources/map-11.tmx",
+        "dev-resources/map-10.tmx",
+        "dev-resources/map-12.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map-9.tmx",
+        "dev-resources/map-11.tmx",
+        "dev-resources/map-10.tmx",
+        "dev-resources/map-12.tmx",
+        "dev-resources/map-boss3.tmx",
         "dev-resources/map-13.tmx",
         "dev-resources/map-14.tmx",
         "dev-resources/map-15.tmx",
         "dev-resources/map-16.tmx",
         "dev-resources/map-17.tmx",
         "dev-resources/map-18.tmx",
-        "dev-resources/map-19.tmx",
-        "assets/map-19.json",
-        "assets/map-24-cisternas.json",
-        "assets/map-23-catedral-do-eco.json",
-        "assets/map-11.json",
-        "assets/map-25-carrilhao.json"
+        "dev-resources/map-19.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

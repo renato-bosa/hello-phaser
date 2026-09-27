@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="140">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="145">
  <editorsettings>
   <export target="../assets/map-12.json" format="json"/>
  </editorsettings>
@@ -134,6 +134,9 @@
  </tileset>
  <tileset firstgid="65" name="1up-animated-4fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
   <image source="../assets/spritesheets/1up-animated-4fps.png" width="64" height="96"/>
+ </tileset>
+ <tileset firstgid="71" name="dragao_marinho_6fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/dragao_marinho_6fps.png" width="64" height="96"/>
  </tileset>
  <layer id="5" name="bg" width="32" height="32">
   <data encoding="csv">
@@ -307,5 +310,10 @@
   <object id="136" gid="59" x="256" y="160" width="32" height="32"/>
   <object id="138" gid="59" x="328" y="288" width="32" height="32"/>
   <object id="139" gid="65" x="288" y="544" width="32" height="32"/>
+  <object id="140" gid="71" x="384" y="896" width="32" height="32"/>
+  <object id="141" gid="71" x="192" y="576" width="32" height="32"/>
+  <object id="142" gid="71" x="384" y="320" width="32" height="32"/>
+  <object id="143" gid="71" x="832" y="608" width="32" height="32"/>
+  <object id="144" gid="71" x="832" y="1024" width="32" height="32"/>
  </objectgroup>
 </map>

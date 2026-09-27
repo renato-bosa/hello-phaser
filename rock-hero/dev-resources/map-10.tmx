@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="29" height="19" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="88">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="29" height="19" tilewidth="32" tileheight="32" infinite="0" nextlayerid="11" nextobjectid="89">
  <editorsettings>
   <export target="../assets/map-10.json" format="json"/>
  </editorsettings>
@@ -114,6 +114,9 @@
  <tileset firstgid="53" name="fg_dec_ocean_random_frame" tilewidth="32" tileheight="32" tilecount="6" columns="2">
   <image source="../assets/spritesheets/fg_dec_ocean_random_frame.png" width="64" height="96"/>
  </tileset>
+ <tileset firstgid="59" name="dragao_marinho_6fps" tilewidth="32" tileheight="32" tilecount="6" columns="2">
+  <image source="../assets/spritesheets/dragao_marinho_6fps.png" width="64" height="96"/>
+ </tileset>
  <layer id="5" name="bg" width="29" height="19">
   <data encoding="csv">
 19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,30,30,30,30,30,30,30,30,30,
@@ -211,5 +214,6 @@
   <object id="84" gid="41" x="736" y="544" width="32" height="32"/>
   <object id="85" gid="47" x="288" y="544" width="32" height="32"/>
   <object id="87" gid="35" x="448" y="576" width="32" height="32"/>
+  <object id="88" gid="59" x="192" y="576" width="32" height="32"/>
  </objectgroup>
 </map>

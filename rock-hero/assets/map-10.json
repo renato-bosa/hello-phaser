@@ -320,6 +320,18 @@
                  "width":32,
                  "x":448,
                  "y":576
+                }, 
+                {
+                 "gid":59,
+                 "height":32,
+                 "id":88,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":192,
+                 "y":576
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -328,7 +340,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":88,
+ "nextobjectid":89,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -712,6 +724,19 @@
          "imagewidth":64,
          "margin":0,
          "name":"fg_dec_ocean_random_frame",
+         "spacing":0,
+         "tilecount":6,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":2,
+         "firstgid":59,
+         "image":"spritesheets\/dragao_marinho_6fps.png",
+         "imageheight":96,
+         "imagewidth":64,
+         "margin":0,
+         "name":"dragao_marinho_6fps",
          "spacing":0,
          "tilecount":6,
          "tileheight":32,

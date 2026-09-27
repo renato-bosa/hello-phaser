@@ -229,7 +229,6 @@ const GC = {
             VERTICAL_SPEED: 60,
             BUBBLE_LIFETIME_MS: 6000,
             HITS_TO_DEFEAT: 5,
-            KEY_SPEED: 120,
             KEY_TRAVEL_MS: 6000,
         },
         // Mesmo corpo e ritmo do cavalo-marinho; a bolha sobe em vez de ir para a frente.
@@ -243,6 +242,7 @@ const GC = {
             BUBBLE_FRAME_INDEX: 3,
             MUZZLE_OFFSET_X: 8,
             MUZZLE_OFFSET_Y: -14,
+            BUBBLE_ALPHA: 0.8,
         },
         BONECO: {
             SCALE: 2,               // mesmo sprite 32×32, só ampliado na tela

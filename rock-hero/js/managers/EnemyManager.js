@@ -812,7 +812,7 @@ class EnemyManager {
         this.scene.spitPrisonKey(
             enemy.x + dir * cfg.MUZZLE_OFFSET_X,
             enemy.y + cfg.MUZZLE_OFFSET_Y,
-            dir * cfg.KEY_SPEED,
+            dir * GC.BUBBLE.SPEED,
             0
         );
 
@@ -895,8 +895,9 @@ class EnemyManager {
 
     _spawnDragaoMarinhoBubble(dragon) {
         if (!dragon.active) return;
+        const cfg = GC.ENEMY.DRAGAO_MARINHO;
         const muzzle = this._dragaoMarinhoMuzzle(dragon);
-        this._spawnBubble(muzzle.x, muzzle.y, 0, -GC.BUBBLE.SPEED, 0);
+        this._spawnBubble(muzzle.x, muzzle.y, 0, -GC.BUBBLE.SPEED, 0, cfg.BUBBLE_ALPHA);
     }
 
     /**
@@ -918,7 +919,7 @@ class EnemyManager {
         for (let i = 0; i < maxBubbles; i++) {
             const y = muzzle.y - (spacing - GC.BUBBLE.SPEED * firstEmitDelay) - i * spacing;
             if (y < topLimit) break;
-            this._spawnBubble(muzzle.x, y, 0, -GC.BUBBLE.SPEED, 0);
+            this._spawnBubble(muzzle.x, y, 0, -GC.BUBBLE.SPEED, 0, cfg.BUBBLE_ALPHA);
         }
     }
 
@@ -936,8 +937,9 @@ class EnemyManager {
         return mapTop;
     }
 
-    _spawnBubble(x, y, velocityX, velocityY, lifetimeMs) {
+    _spawnBubble(x, y, velocityX, velocityY, lifetimeMs, alpha = 1) {
         const bubble = this.bubbles.create(x, y, 'seahorse-bubble');
+        bubble.setAlpha(alpha);
         bubble.body.allowGravity = false;
         bubble.body.setCircle(GC.BUBBLE.BODY_RADIUS,
             GC.BUBBLE.SIZE / 2 - GC.BUBBLE.BODY_RADIUS,

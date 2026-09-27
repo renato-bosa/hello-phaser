@@ -1,5 +1,5 @@
 /**
- * EnemyManager - Gerencia inimigos (sapos, seahorse, boneco, toupeira)
+ * EnemyManager - Gerencia inimigos (sapos, seahorse, dragao-marinho, boneco, toupeira)
  * Responsável por: criação, patrulha, pulo, colisão e morte de inimigos
  * Sapos: tomate (patrulha larga), roxo (patrulha curta + salto médio), verde (parado + salto alto)
  */
@@ -25,6 +25,10 @@ class EnemyManager {
                 this._createSapo(e.x, e.y);
             } else if (e.type === 'seahorse') {
                 this._createSeahorse(e.x, e.y);
+            } else if (e.type === 'cavalo-marinho-chefe') {
+                this._createCavaloMarinhoChefe(e.x, e.y);
+            } else if (e.type === 'dragao-marinho') {
+                this._createDragaoMarinho(e.x, e.y);
             } else if (e.type === 'boneco') {
                 this._createBoneco(e);
             } else if (e.type === 'toupeira') {
@@ -621,6 +625,87 @@ class EnemyManager {
         });
     }
 
+    _createCavaloMarinhoChefe(x, y) {
+        const scene = this.scene;
+        const cfg = GC.ENEMY.CAVALO_MARINHO_CHEFE;
+        const boss = scene.physics.add.sprite(x, y, 'cavalo-marinho-chefe');
+
+        // O grupo reaplica allowGravity ao adicionar; configurar o corpo depois.
+        this.enemies.add(boss);
+
+        boss.body.setSize(cfg.BODY_WIDTH, cfg.BODY_HEIGHT);
+        boss.body.setOffset(cfg.BODY_OFFSET_X, cfg.BODY_OFFSET_Y);
+        boss.body.allowGravity = false;
+        boss.body.immovable = true;
+
+        boss.patrolData = {
+            type: 'cavalo-marinho-chefe',
+            state: 'patrol',
+            hitsTaken: 0,
+            direction: -1,
+            speed: cfg.VERTICAL_SPEED
+        };
+        boss.setVelocityY(-cfg.VERTICAL_SPEED);
+
+        if (!scene.anims.exists('cavalo-marinho-chefe-idle')) {
+            scene.anims.create({
+                key: 'cavalo-marinho-chefe-idle',
+                frames: scene.anims.generateFrameNumbers('cavalo-marinho-chefe', {
+                    start: 0,
+                    end: cfg.FRAME_END
+                }),
+                frameRate: cfg.ANIM_FPS,
+                repeat: -1
+            });
+        }
+        boss.anims.play('cavalo-marinho-chefe-idle', true);
+
+        boss.on('animationupdate', (anim, frame) => {
+            if (anim.key !== 'cavalo-marinho-chefe-idle') return;
+            if (boss.patrolData.state === 'dying') return;
+            if (frame.index === cfg.BUBBLE_FRAME_INDEX) {
+                this._spawnCavaloMarinhoChefeBubble(boss);
+            }
+        });
+    }
+
+    _createDragaoMarinho(x, y) {
+        const scene = this.scene;
+        const cfg = GC.ENEMY.DRAGAO_MARINHO;
+        const dragon = scene.physics.add.sprite(x, y, 'dragao-marinho');
+
+        // Mesma ordem do cavalo-marinho: o grupo reaplica allowGravity ao adicionar.
+        this.enemies.add(dragon);
+
+        dragon.body.setSize(cfg.BODY_WIDTH, cfg.BODY_HEIGHT);
+        dragon.body.setOffset(cfg.BODY_OFFSET_X, cfg.BODY_OFFSET_Y);
+        dragon.body.allowGravity = false;
+        dragon.body.immovable = true;
+
+        dragon.patrolData = { type: 'dragao-marinho' };
+
+        if (!scene.anims.exists('dragao-marinho-idle')) {
+            scene.anims.create({
+                key: 'dragao-marinho-idle',
+                frames: scene.anims.generateFrameNumbers('dragao-marinho', { start: 0, end: cfg.FRAME_END }),
+                frameRate: cfg.ANIM_FPS,
+                repeat: -1
+            });
+        }
+        dragon.anims.play('dragao-marinho-idle', true);
+
+        dragon.on('animationupdate', (anim, frame) => {
+            if (anim.key !== 'dragao-marinho-idle') return;
+            if (frame.index === cfg.BUBBLE_FRAME_INDEX) {
+                this._spawnDragaoMarinhoBubble(dragon);
+            }
+        });
+
+        if (GameData.isFeatureEnabled('dragaoColunaInicial')) {
+            this._prefillDragaoMarinhoColumn(dragon);
+        }
+    }
+
     /**
      * Boneco de posto: patrulha 1 bloco ± spawn; 2 stomps para matar
      * (1º → vulnerável 1s com frames 1–2 e patrulha pausada; 2º → morte).
@@ -683,23 +768,198 @@ class EnemyManager {
         this.enemies.add(boneco);
     }
 
+    _updateCavaloMarinhoChefe(enemy, data, player) {
+        if (data.state === 'dying') return;
+        if (player && player.active) {
+            enemy.setFlipX(player.x > enemy.x);
+        }
+        if (enemy.body.blocked.up) data.direction = 1;
+        else if (enemy.body.blocked.down) data.direction = -1;
+        enemy.setVelocity(0, data.speed * data.direction);
+    }
+
+    hitCavaloMarinhoChefe(enemy) {
+        const data = enemy.patrolData;
+        const cfg = GC.ENEMY.CAVALO_MARINHO_CHEFE;
+        if (!data || data.state === 'dying') return;
+
+        data.hitsTaken += 1;
+        SoundManager.play('damage');
+        if (data.hitsTaken >= cfg.HITS_TO_DEFEAT) {
+            this._killCavaloMarinhoChefe(enemy);
+            return;
+        }
+
+        enemy.setTintFill(0xffffff);
+        this.scene.time.delayedCall(90, () => {
+            if (enemy.active && data.state !== 'dying') enemy.clearTint();
+        });
+    }
+
+    _killCavaloMarinhoChefe(enemy) {
+        const data = enemy.patrolData;
+        const cfg = GC.ENEMY.CAVALO_MARINHO_CHEFE;
+        if (!data || data.state === 'dying') return;
+
+        data.state = 'dying';
+        this.scene.slingshotManager?.onBossDefeated();
+        enemy.body.enable = false;
+        enemy.setVelocity(0, 0);
+        enemy.anims.pause();
+        enemy.clearTint();
+
+        const dir = enemy.flipX ? 1 : -1;
+        this.scene.spitPrisonKey(
+            enemy.x + dir * cfg.MUZZLE_OFFSET_X,
+            enemy.y + cfg.MUZZLE_OFFSET_Y,
+            dir * cfg.KEY_SPEED,
+            0
+        );
+
+        this.scene.tweens.add({
+            targets: enemy,
+            scaleX: { from: 1.05, to: 1.35 },
+            scaleY: { from: 0.95, to: 0.7 },
+            alpha: { from: 1, to: 0.65 },
+            duration: 180,
+            yoyo: true,
+            repeat: 1,
+            ease: 'Sine.easeInOut',
+            onUpdate: tween => {
+                enemy.setTintFill(tween.totalProgress > 0.45 ? 0xffffff : 0xffcc66);
+            },
+            onComplete: () => this._explodeCavaloMarinhoChefe(enemy)
+        });
+    }
+
+    _explodeCavaloMarinhoChefe(enemy) {
+        if (!enemy.active) return;
+        const effects = this.scene.effectsManager;
+        const x = enemy.x;
+        const y = enemy.y;
+
+        effects.createEnemyPopBurst(x, y, 2);
+        effects.createEnemyPopBurst(x - 18, y - 12, 2);
+        effects.createEnemyPopBurst(x + 18, y - 12, 2);
+        effects.createEnemyPopBurst(x, y + 16, 2);
+        SoundManager.play('enemyPop');
+        this.scene.cameras.main.shake(520, 0.007);
+
+        enemy.clearTint();
+        this.scene.tweens.add({
+            targets: enemy,
+            scaleX: enemy.scaleX * 1.8,
+            scaleY: enemy.scaleY * 1.8,
+            alpha: 0,
+            duration: 420,
+            ease: 'Cubic.easeOut',
+            onComplete: () => enemy.destroy()
+        });
+    }
+
+    _spawnCavaloMarinhoChefeBubble(boss) {
+        if (!boss.active) return;
+        const cfg = GC.ENEMY.CAVALO_MARINHO_CHEFE;
+        const dir = boss.flipX ? 1 : -1;
+        this._spawnBubble(
+            boss.x + dir * cfg.MUZZLE_OFFSET_X,
+            boss.y + cfg.MUZZLE_OFFSET_Y,
+            dir * GC.BUBBLE.SPEED,
+            0,
+            cfg.BUBBLE_LIFETIME_MS
+        );
+    }
+
     _spawnSeahorseBubble(seahorse) {
         if (!seahorse.active) return;
         const cfg = GC.ENEMY.SEAHORSE;
         const facingLeft = !seahorse.flipX;
         const dir = facingLeft ? -1 : 1;
-        const x = seahorse.x + dir * cfg.MUZZLE_OFFSET_X;
-        const y = seahorse.y + cfg.MUZZLE_OFFSET_Y;
+        this._spawnBubble(
+            seahorse.x + dir * cfg.MUZZLE_OFFSET_X,
+            seahorse.y + cfg.MUZZLE_OFFSET_Y,
+            dir * GC.BUBBLE.SPEED,
+            0,
+            GC.BUBBLE.LIFETIME_MS
+        );
+    }
 
+    _dragaoMarinhoMuzzle(dragon) {
+        const cfg = GC.ENEMY.DRAGAO_MARINHO;
+        const dir = dragon.flipX ? 1 : -1;
+        return {
+            x: dragon.x + dir * cfg.MUZZLE_OFFSET_X,
+            y: dragon.y + cfg.MUZZLE_OFFSET_Y
+        };
+    }
+
+    _spawnDragaoMarinhoBubble(dragon) {
+        if (!dragon.active) return;
+        const muzzle = this._dragaoMarinhoMuzzle(dragon);
+        this._spawnBubble(muzzle.x, muzzle.y, 0, -GC.BUBBLE.SPEED, 0);
+    }
+
+    /**
+     * Coluna já no espaçamento do fluxo normal, da boca até o teto.
+     * A mais baixa fica a meio ciclo acima da boca, para a primeira bolha
+     * da animação encaixar no mesmo ritmo. Só roda com dragaoColunaInicial.
+     */
+    _prefillDragaoMarinhoColumn(dragon) {
+        const cfg = GC.ENEMY.DRAGAO_MARINHO;
+        const muzzle = this._dragaoMarinhoMuzzle(dragon);
+        const period = (cfg.FRAME_END + 1) / cfg.ANIM_FPS;
+        const spacing = GC.BUBBLE.SPEED * period;
+        if (spacing <= 0) return;
+
+        const firstEmitDelay = cfg.BUBBLE_FRAME_INDEX / cfg.ANIM_FPS;
+        const topLimit = this._bubbleCeilingY(muzzle.x, muzzle.y) + GC.BUBBLE.BODY_RADIUS + 2;
+        const maxBubbles = 64;
+
+        for (let i = 0; i < maxBubbles; i++) {
+            const y = muzzle.y - (spacing - GC.BUBBLE.SPEED * firstEmitDelay) - i * spacing;
+            if (y < topLimit) break;
+            this._spawnBubble(muzzle.x, y, 0, -GC.BUBBLE.SPEED, 0);
+        }
+    }
+
+    _bubbleCeilingY(x, fromY) {
+        const solids = this.scene.solidsLayer;
+        const mapTop = this.scene.physics.world.bounds.y;
+        if (!solids) return mapTop;
+
+        for (let y = fromY; y >= mapTop; y -= 8) {
+            const tile = solids.getTileAtWorldXY(x, y, true);
+            if (tile && tile.index > 0 && tile.collides) {
+                return solids.tileToWorldY(tile.y + 1);
+            }
+        }
+        return mapTop;
+    }
+
+    _spawnBubble(x, y, velocityX, velocityY, lifetimeMs) {
         const bubble = this.bubbles.create(x, y, 'seahorse-bubble');
         bubble.body.allowGravity = false;
         bubble.body.setCircle(GC.BUBBLE.BODY_RADIUS,
             GC.BUBBLE.SIZE / 2 - GC.BUBBLE.BODY_RADIUS,
             GC.BUBBLE.SIZE / 2 - GC.BUBBLE.BODY_RADIUS);
-        bubble.setVelocityX(dir * GC.BUBBLE.SPEED);
+        bubble.setVelocity(velocityX, velocityY);
 
-        this.scene.time.delayedCall(GC.BUBBLE.LIFETIME_MS, () => {
-            if (bubble && bubble.active) bubble.destroy();
+        if (lifetimeMs > 0) {
+            this.scene.time.delayedCall(lifetimeMs, () => {
+                if (bubble && bubble.active) bubble.destroy();
+            });
+        }
+    }
+
+    _cullBubblesOutsideMap() {
+        if (!this.bubbles) return;
+        const bounds = this.scene.physics.world.bounds;
+        this.bubbles.children.iterate(bubble => {
+            if (!bubble || !bubble.active || !bubble.body) return;
+            const body = bubble.body;
+            const outside = body.right < bounds.x || body.left > bounds.right ||
+                body.bottom < bounds.y || body.top > bounds.bottom;
+            if (outside) bubble.destroy();
         });
     }
 
@@ -717,6 +977,8 @@ class EnemyManager {
 
     update(currentTime) {
         if (!this.enemies) return;
+
+        this._cullBubblesOutsideMap();
 
         const player = this.scene.playerController.player;
 
@@ -750,8 +1012,13 @@ class EnemyManager {
                 return;
             }
 
-            // Cavalo marinho: fica parado, vira pra direção do player e cospe bolhas
-            if (data.type === 'seahorse') {
+            if (data.type === 'cavalo-marinho-chefe') {
+                this._updateCavaloMarinhoChefe(enemy, data, player);
+                return;
+            }
+
+            // Cavalo e dragão marinho: parados, viram para o player e cospem bolhas.
+            if (data.type === 'seahorse' || data.type === 'dragao-marinho') {
                 if (player && player.active) {
                     enemy.setFlipX(player.x > enemy.x);
                 }
@@ -1155,7 +1422,9 @@ class EnemyManager {
             if (bossState === 'crushed') return;
         }
 
-        const isStompable = enemyType !== 'seahorse';
+        const isStompable = enemyType !== 'seahorse' &&
+            enemyType !== 'dragao-marinho' &&
+            enemyType !== 'cavalo-marinho-chefe';
 
         if (isStompable) {
             const playerBottom = player.body.bottom;

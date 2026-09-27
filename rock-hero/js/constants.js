@@ -215,6 +215,35 @@ const GC = {
             MUZZLE_OFFSET_X: 12,
             MUZZLE_OFFSET_Y: -4,
         },
+        // 64×64. Sobe e desce no vão até encostar nos tiles e cospe bolha na horizontal.
+        CAVALO_MARINHO_CHEFE: {
+            BODY_WIDTH: 48,
+            BODY_HEIGHT: 64,
+            BODY_OFFSET_X: 8,
+            BODY_OFFSET_Y: 0,
+            ANIM_FPS: 6,
+            FRAME_END: 5,
+            BUBBLE_FRAME_INDEX: 3,
+            MUZZLE_OFFSET_X: 22,
+            MUZZLE_OFFSET_Y: -12,
+            VERTICAL_SPEED: 60,
+            BUBBLE_LIFETIME_MS: 6000,
+            HITS_TO_DEFEAT: 5,
+            KEY_SPEED: 120,
+            KEY_TRAVEL_MS: 6000,
+        },
+        // Mesmo corpo e ritmo do cavalo-marinho; a bolha sobe em vez de ir para a frente.
+        DRAGAO_MARINHO: {
+            BODY_WIDTH: 22,
+            BODY_HEIGHT: 30,
+            BODY_OFFSET_X: 5,
+            BODY_OFFSET_Y: 1,
+            ANIM_FPS: 6,
+            FRAME_END: 5,
+            BUBBLE_FRAME_INDEX: 3,
+            MUZZLE_OFFSET_X: 8,
+            MUZZLE_OFFSET_Y: -14,
+        },
         BONECO: {
             SCALE: 2,               // mesmo sprite 32×32, só ampliado na tela
             PATROL_DISTANCE: 32,    // 1 bloco para cada lado
@@ -439,6 +468,14 @@ const GC = {
 
     LIVES: {
         INITIAL: 5,
+    },
+
+    SLINGSHOT: {
+        AIM_CENTER_DEG: -15,
+        AIM_AMPLITUDE_DEG: 40,
+        AIM_PERIOD_MS: 2000,
+        AIM_LENGTH: 88,
+        STONE_SPEED: 260,
     },
 
     DEPTH: {

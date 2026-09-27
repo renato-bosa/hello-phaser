@@ -272,7 +272,7 @@ const GameConfig = {
             id: 3,
             name: 'Mundo 3',
             subtitle: 'O Resgate do Guitarrista',
-            levels: [10, 11, 12, 13, 14], // map10, map11, map12, map16, map17
+            levels: [10, 11, 12, 13, 14, 25], // map10 … map17 + chefe do Mundo 3
             rescuedCharacter: 'guitarrista',
             celebrationMessage: 'Você resgatou o Guitarrista!',
             // Visual no WorldMap (tema aquático)
@@ -454,7 +454,7 @@ const GameConfig = {
             connectsTo: [21]
         },
         // ==================== MUNDO 3 ====================
-        // map-10 → map-11 → map-12 → map-16 → map-17
+        // map-10 → map-11 → map-12 → map-16 → map-17 → chefe
         {
             key: 'map10',
             file: 'assets/map-10.json',
@@ -472,7 +472,7 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 195, y: 185 },
+            mapPosition: { x: 180, y: 185 },
             connectsTo: [12]
         },
         {
@@ -482,7 +482,7 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 305, y: 215 },
+            mapPosition: { x: 265, y: 215 },
             connectsTo: [13]
         },
         {
@@ -492,7 +492,7 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 415, y: 185 },
+            mapPosition: { x: 355, y: 185 },
             connectsTo: [14]
         },
         {
@@ -502,8 +502,8 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 3,
-            mapPosition: { x: 515, y: 210 },
-            connectsTo: []
+            mapPosition: { x: 440, y: 210 },
+            connectsTo: [25]
         },
         // ==================== MUNDO 4 — Mecânicas Experimentais ====================
         // map-18 → map-19 → map-20 → map-21 → map-22
@@ -609,6 +609,18 @@ const GameConfig = {
             world: 5,
             mapPosition: { x: 510, y: 240 },
             connectsTo: []
+        },
+        {
+            key: 'map-chefe-mundo3',
+            file: 'assets/map-boss3.json',
+            name: 'Chefe do Mundo 3',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 3,
+            mapPosition: { x: 525, y: 180 },
+            connectsTo: [],
+            // Coluna do dragão e estilingue só nesta fase.
+            features: { dragaoColunaInicial: true, estilingue: true }
         }
     ],
 

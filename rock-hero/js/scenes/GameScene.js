@@ -51,8 +51,11 @@ class GameScene extends Phaser.Scene {
         this._loadSheetIfMissing('sapo-chefe-laranja', 'assets/spritesheets/sapo-chefe-laranja-64x64-6fps.png', 64, 64);
         this._loadImageIfMissing('prison-key-w1', 'assets/spritesheets/key-w1.png');
         this._loadImageIfMissing('prison-key-w2', 'assets/spritesheets/key-w2.png');
+        this._loadImageIfMissing('prison-key-w3', 'assets/spritesheets/key-w3.png');
         this._loadSheetIfMissing('prison-open-w1', 'assets/spritesheets/prisao-aberta-frames.png', 32, 32);
         this._loadSheetIfMissing('seahorse', 'assets/spritesheets/Cavalo marinho.png', 32, 32);
+        this._loadSheetIfMissing('cavalo-marinho-chefe', 'assets/spritesheets/cavalo_marinho_boss-3_64x64_6fps.png', 64, 64);
+        this._loadSheetIfMissing('dragao-marinho', 'assets/spritesheets/dragao_marinho_6fps.png', 32, 32);
         this._loadSheetIfMissing('boneco', 'assets/spritesheets/Boneco-14fps.png', 32, 32);
         this._loadSheetIfMissing('toupeira-walk', 'assets/spritesheets/toupeira-6fps.png', 32, 32);
         this._loadSheetIfMissing('toupeiroudo-64x64-6fps', 'assets/spritesheets/toupeiroudo-64x64-6fps.png', 64, 64);
@@ -261,6 +264,10 @@ class GameScene extends Phaser.Scene {
 
         this.playerController.create();
         this.enemyManager.create(this._enemyData);
+        if (GameData.isFeatureEnabled('estilingue') && this._slingshotData && this._stoneSpawns.length) {
+            this.slingshotManager = new SlingshotManager(this);
+            this.slingshotManager.create(this._slingshotData, this._stoneSpawns);
+        }
         this._createStarAnimations();
         this.hudManager.create();
         this.hudManager.showLevelName(levelConfig.name);
@@ -461,6 +468,8 @@ class GameScene extends Phaser.Scene {
         const mushrooms = [];
         const movingPlatforms = [];
         const moleHoles = [];
+        this._slingshotData = null;
+        this._stoneSpawns = [];
         let prisonPosition = null;
         let prisonerObject = null;
 
@@ -560,6 +569,28 @@ class GameScene extends Phaser.Scene {
                     type: sapoType
                 });
             }
+            else if (type === 'cavalo-marinho-chefe' ||
+                     tilesetName.includes('cavalo_marinho_boss') ||
+                     tilesetName.includes('cavalo-marinho-boss') ||
+                     tilesetName.includes('seahorse-boss')) {
+                enemies.push({
+                    x: placement.x,
+                    y: placement.y,
+                    width: placement.width,
+                    height: placement.height,
+                    type: 'cavalo-marinho-chefe'
+                });
+            }
+            else if (type === 'dragao-marinho' || type === 'dragao_marinho' || type === 'dragao' ||
+                     tilesetName.includes('dragao') || tilesetName.includes('dragão')) {
+                enemies.push({
+                    x: placement.x,
+                    y: placement.y,
+                    width: placement.width,
+                    height: placement.height,
+                    type: 'dragao-marinho'
+                });
+            }
             else if (type === 'seahorse' ||
                      tilesetName.includes('cavalo marinho') || tilesetName.includes('cavalo-marinho') ||
                      tilesetName.includes('seahorse')) {
@@ -613,6 +644,18 @@ class GameScene extends Phaser.Scene {
                     holeTexture: tilesetName,
                     transform
                 });
+            }
+            else if (GameData.isFeatureEnabled('estilingue') &&
+                     (tilesetName.includes('pedra-estilingue') || tilesetName.includes('pedra_estilingue'))) {
+                this._stoneSpawns.push({ x: placement.x, y: placement.y });
+            }
+            else if (GameData.isFeatureEnabled('estilingue') &&
+                     tilesetName.includes('estilingue') && !tilesetName.includes('pedra')) {
+                this._slingshotData = {
+                    x: placement.x,
+                    y: placement.y,
+                    transform
+                };
             }
             else if (tilesetName.includes('plataforma-deslisante') || tilesetName.includes('plataforma-deslizante') ||
                      tilesetName.includes('plataforma-movel')) {
@@ -829,6 +872,64 @@ class GameScene extends Phaser.Scene {
             this.rescuedPrisoner = prisoner;
             return;
         }
+    }
+
+    /**
+     * Chave cuspida pelo cavalo-marinho chefe. Anda até bater num sólido,
+     * sair do mapa, ou completar o tempo, e então fica no lugar para coleta.
+     */
+    spitPrisonKey(x, y, velocityX, velocityY) {
+        if (this.prisonKey || this.hasPrisonKey) return;
+        const worldId = GameData.LEVELS[this.currentLevel]?.world || 1;
+        const keyTexture = this.textures.exists(`prison-key-w${worldId}`)
+            ? `prison-key-w${worldId}`
+            : 'prison-key-w1';
+        const travelMs = GC.ENEMY.CAVALO_MARINHO_CHEFE.KEY_TRAVEL_MS;
+
+        this.prisonKey = this.physics.add.sprite(x, y, keyTexture);
+        this.prisonKey.body.allowGravity = false;
+        this.prisonKey.setDepth(GC.DEPTH.PLAYER + 1);
+        this.prisonKey.setVelocity(velocityX, velocityY);
+        this.prisonKey.spitMoving = true;
+        this.prisonKey.spitUntil = this.time.now + travelMs;
+
+        this.physics.add.collider(this.prisonKey, this.solidsLayer, () => this._settlePrisonKey());
+        this.physics.add.overlap(this.playerController.player, this.prisonKey,
+            () => this.collectPrisonKey(), null, this);
+    }
+
+    _updateSpitKey() {
+        const key = this.prisonKey;
+        if (!key?.active || !key.spitMoving) return;
+        const bounds = this.physics.world.bounds;
+        const body = key.body;
+        const outside = body.right < bounds.x || body.left > bounds.right ||
+            body.bottom < bounds.y || body.top > bounds.bottom;
+        if (outside || this.time.now >= key.spitUntil) this._settlePrisonKey();
+    }
+
+    _settlePrisonKey() {
+        const key = this.prisonKey;
+        if (!key?.active || !key.spitMoving) return;
+        key.spitMoving = false;
+        key.setVelocity(0, 0);
+        key.body.allowGravity = false;
+        key.body.moves = false;
+
+        const bounds = this.physics.world.bounds;
+        const margin = 16;
+        key.x = Phaser.Math.Clamp(key.x, bounds.x + margin, bounds.right - margin);
+        key.y = Phaser.Math.Clamp(key.y, bounds.y + margin, bounds.bottom - margin);
+
+        const restY = key.y;
+        this.tweens.add({
+            targets: key,
+            y: restY - 6,
+            duration: 700,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
     }
 
     spawnPrisonKey(x, y) {
@@ -1863,7 +1964,12 @@ class GameScene extends Phaser.Scene {
         if (this.windSystem) {
             this.windSystem.update(this.time.now);
         }
+        if (this.slingshotManager) {
+            this.suppressJump = this.slingshotManager.consumeFireInput();
+        }
         this.playerController.update(delta);
+        if (this.slingshotManager) this.slingshotManager.update();
+        this._updateSpitKey();
         // Plataforma móvel: carrega o jogador depois do input (senão velocity.x é sobrescrito)
         this._applyMovingPlatformCarry();
         // Auto-scroll roda APÓS o playerController para sobrescrever o input com o empurrão

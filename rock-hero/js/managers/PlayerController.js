@@ -141,8 +141,13 @@ class PlayerController {
         // Modelo: chão/coyote e double-jump são ramos exclusivos (if/else if).
         // Um único jumpJustPressed nunca pode consumir os dois no mesmo frame —
         // o bug antigo fazia o coyote jump gastar o double-jump imediatamente.
-        const jumpJustPressed = Phaser.Input.Keyboard.JustDown(scene.spaceKey) ||
+        let jumpJustPressed = Phaser.Input.Keyboard.JustDown(scene.spaceKey) ||
                                 scene.virtualControls.jumpJustPressed;
+        if (scene.suppressJump) {
+            scene.suppressJump = false;
+            jumpJustPressed = false;
+            this.jumpBufferTime = 0;
+        }
         const jumpHeld = scene.spaceKey.isDown || scene.virtualControls.jumpHeld;
 
         if (scene.virtualControls.jumpJustPressed) {

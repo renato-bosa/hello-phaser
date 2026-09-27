@@ -473,8 +473,8 @@ const GC = {
     SLINGSHOT: {
         AIM_CENTER_DEG: -15,
         AIM_AMPLITUDE_DEG: 40,
-        AIM_PERIOD_MS: 2000,
-        AIM_LENGTH: 88,
+        AIM_PERIOD_MS: 2667,
+        AIM_LENGTH: 200,
         STONE_SPEED: 260,
     },
 

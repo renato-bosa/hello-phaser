@@ -3,11 +3,12 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-10.tmx",
+    "activeFile": "dev-resources/map-23.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        ".",
-        "dev-resources"
+        "dev-resources",
+        "assets",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -33,7 +34,7 @@
             "scale": 0.41146874999999994,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 650.1101237943344,
+                "x": 676.8436242120455,
                 "y": 335.3839143312828
             }
         },
@@ -65,6 +66,9 @@
             "scaleInDock": 1
         },
         "assets/map-11.json#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "assets/map-11.json#green-bricks": {
             "scaleInDock": 1
         },
         "assets/map-11.json#green-flag": {
@@ -523,8 +527,8 @@
         },
         "dev-resources/map-10.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.75,
             "selectedLayer": 4,
@@ -598,14 +602,14 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 800,
-                "y": 335
+                "x": 609,
+                "y": 334
             }
         },
         "dev-resources/map-11.tmx#abstract-blue": {
@@ -633,6 +637,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-11.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-11.tmx#green-bricks": {
             "scaleInDock": 1
         },
         "dev-resources/map-11.tmx#green-flag": {
@@ -664,14 +671,14 @@
         },
         "dev-resources/map-12.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
                 "x": 702,
-                "y": 270.6666666666667
+                "y": 693.3333333333333
             }
         },
         "dev-resources/map-12.tmx#1up": {
@@ -768,7 +775,7 @@
             "scale": 1.045,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 319.6172248803828,
+                "x": 320.0956937799043,
                 "y": 176.07655502392345
             }
         },
@@ -815,7 +822,7 @@
             "scale": 0.423046875,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 319.1135734072022,
+                "x": 317.93167128347187,
                 "y": 174.92151431209606
             }
         },
@@ -862,7 +869,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 320,
+                "x": 319.5,
                 "y": 175
             }
         },
@@ -913,7 +920,7 @@
             "scale": 0.5,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 398,
+                "x": 397,
                 "y": 1672
             }
         },
@@ -997,7 +1004,7 @@
             "scale": 0.33,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1684.848484848485,
+                "x": 1686.3636363636365,
                 "y": 1112.121212121212
             }
         },
@@ -1105,7 +1112,7 @@
             "scale": 0.25,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1016,
+                "x": 1014,
                 "y": 644
             }
         },
@@ -1206,7 +1213,7 @@
             "scale": 0.33,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1124.242424242424,
+                "x": 1122.7272727272727,
                 "y": 287.8787878787879
             }
         },
@@ -1479,13 +1486,13 @@
         },
         "dev-resources/map-21-nuvens.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1120,
+                "x": 1120.6666666666665,
                 "y": 286.6666666666667
             }
         },
@@ -1587,7 +1594,7 @@
             "scale": 0.33,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 713.6363636363636,
+                "x": 713.6363636363637,
                 "y": 548.4848484848485
             }
         },
@@ -1688,6 +1695,116 @@
             "scaleInDock": 1
         },
         "dev-resources/map-22-octopus.tmx#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 594,
+                "y": 440
+            }
+        },
+        "dev-resources/map-23.tmx#1up": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#Areia": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#Boneco-14fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#agua": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#black": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#ceu-azul-medio": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#fg_dec_grass_random_frame_grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#grama noturna": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#grass": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#green-bricks": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#green-flag": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#nuvem-continuacao": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#nuvem-sorriso": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#nuvemzita": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#octopus": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#starry-red-sky": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#yellow-star-animated": {
             "scaleInDock": 1
         },
         "dev-resources/map-3--desafio do luigi.tmx": {
@@ -2325,8 +2442,8 @@
             "scale": 1.004921875,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 335.34945191634927,
-                "y": 240.31718883619686
+                "x": 335.8470030319521,
+                "y": 239.81963772059402
             }
         },
         "dev-resources/map-9.tmx#abstract-blue": {
@@ -3078,25 +3195,25 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-9.tmx",
-        "dev-resources/map-11.tmx",
-        "dev-resources/map-10.tmx"
+        "dev-resources/map-21-nuvens.tmx",
+        "dev-resources/map-22-octopus.tmx",
+        "dev-resources/map-23.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map-21-nuvens.tmx",
+        "dev-resources/map-22-octopus.tmx",
+        "dev-resources/map-23.tmx",
+        "dev-resources/map-5--caverna.tmx",
+        "dev-resources/map-6--caverna2.tmx",
+        "dev-resources/map-7--planicie.tmx",
+        "dev-resources/map-8--o-resgate-do-baixista.tmx",
         "dev-resources/map-9.tmx",
         "dev-resources/map-11.tmx",
+        "assets/map-11.json",
         "dev-resources/map-10.tmx",
-        "dev-resources/map-12.tmx",
-        "dev-resources/map-boss3.tmx",
-        "dev-resources/map-13.tmx",
-        "dev-resources/map-14.tmx",
-        "dev-resources/map-15.tmx",
-        "dev-resources/map-16.tmx",
-        "dev-resources/map-17.tmx",
-        "dev-resources/map-18.tmx",
-        "dev-resources/map-19.tmx"
+        "dev-resources/map2-0.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

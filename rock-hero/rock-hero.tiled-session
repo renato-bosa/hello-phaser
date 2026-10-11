@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "assets/map-18.tmj",
+    "activeFile": "dev-resources/map-11.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         ".",
@@ -524,6 +524,119 @@
         "assets/map-25-carrilhao.json#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "assets/map-7--planicie.json": {
+            "expandedObjectLayers": [
+                8
+            ],
+            "scale": 0.5,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 1590,
+                "y": 484
+            }
+        },
+        "assets/map-7--planicie.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#agua": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#ceu-azul": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#ceu-azul-medio": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#cristal das notas de som": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#fg_dec_grass_random_frame_grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#grass-floating-platform-edges": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#grass-floating-platform-middle": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#lava": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#lava-roxa": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#lava-roxa-profunda-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#pedra": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#pedra-dark": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#red-heart": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#starry-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#terra": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#terra-escura": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#toupeira4": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-7--planicie.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "assets/map-8.json": {
             "scale": 0.23495535714285715,
             "selectedLayer": 0,
@@ -966,13 +1079,13 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 610,
+                "x": 498,
                 "y": 334
             }
         },
@@ -1470,14 +1583,14 @@
         },
         "dev-resources/map-18.tmx": {
             "expandedObjectLayers": [
-                10,
-                8
+                8,
+                10
             ],
-            "scale": 0.25,
-            "selectedLayer": 1,
+            "scale": 0.33,
+            "selectedLayer": 6,
             "viewCenter": {
-                "x": 1012,
-                "y": 644
+                "x": 2166.666666666667,
+                "y": 578.7878787878788
             }
         },
         "dev-resources/map-18.tmx#1up": {
@@ -1538,7 +1651,8 @@
             "scaleInDock": 1
         },
         "dev-resources/map-18.tmx#lava-laranja-cachoeira-5fps": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "dev-resources/map-18.tmx#lava-roxa-animated": {
             "scaleInDock": 1
@@ -2706,14 +2820,14 @@
         },
         "dev-resources/map-7--planicie.tmx": {
             "expandedObjectLayers": [
-                11,
-                8
+                8,
+                11
             ],
-            "scale": 2,
-            "selectedLayer": 2,
+            "scale": 0.75,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 874.5,
-                "y": 611.5
+                "x": 1836,
+                "y": 609.3333333333333
             }
         },
         "dev-resources/map-7--planicie.tmx#abstract-blue": {
@@ -2738,6 +2852,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-7--planicie.tmx#cristal das notas de som": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-7--planicie.tmx#fg_dec_grass_random_frame_grass": {
             "scaleInDock": 1
         },
         "dev-resources/map-7--planicie.tmx#grama noturna": {
@@ -3690,24 +3807,24 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "assets/map-19.json",
-        "assets/map-18.tmj"
+        "dev-resources/map-18.tmx",
+        "dev-resources/map-11.tmx"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map-18.tmx",
+        "dev-resources/map-11.tmx",
+        "assets/map-7--planicie.json",
+        "dev-resources/map-7--planicie.tmx",
         "assets/map-19.json",
         "assets/map-18.tmj",
         "assets/map-8.json",
         "assets/map9.json",
         "assets/map-boss3.json",
         "assets/map-chefe-mundo1.json",
-        "dev-resources/map-18.tmx",
         "dev-resources/map-19.tmx",
-        "dev-resources/map2-0.tmx",
-        "dev-resources/map-ultima-mundo1.tmx",
-        "dev-resources/map-chefe-mundo1.tmx",
-        "dev-resources/map-chefe2.tmx"
+        "dev-resources/map2-0.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

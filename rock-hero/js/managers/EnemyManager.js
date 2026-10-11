@@ -1499,7 +1499,9 @@ class EnemyManager {
         if (isStompable) {
             const playerBottom = player.body.bottom;
             const enemyCenter = enemy.body.center.y;
-            const isStomping = player.body.velocity.y > 0 &&
+            // Velocidade relativa: um sapo pulando contra os pés do jogador no
+            // ápice do pulo também é pisada, mesmo sem o jogador estar caindo.
+            const isStomping = player.body.velocity.y > enemy.body.velocity.y &&
                                playerBottom <= enemyCenter + GC.PLAYER.STOMP_TOLERANCE;
 
             if (isStomping) {

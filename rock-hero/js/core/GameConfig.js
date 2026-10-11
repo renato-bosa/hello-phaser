@@ -297,7 +297,7 @@ const GameConfig = {
             id: 5,
             name: 'Mundo 5',
             subtitle: 'Ecos da Catedral',
-            levels: [22, 23, 24], // Catedral do Eco … Carrilhão de Ferro
+            levels: [22, 23, 24, 26], // Catedral do Eco … Mapa 23
             rescuedCharacter: 'vocalista',
             celebrationMessage: 'O eco responde!',
             theme: 'special',
@@ -587,7 +587,7 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 5,
-            mapPosition: { x: 150, y: 235 },
+            mapPosition: { x: 100, y: 220 },
             connectsTo: [23]
         },
         {
@@ -597,7 +597,7 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 5,
-            mapPosition: { x: 330, y: 190 },
+            mapPosition: { x: 230, y: 175 },
             connectsTo: [24]
         },
         {
@@ -607,8 +607,8 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 5,
-            mapPosition: { x: 510, y: 240 },
-            connectsTo: []
+            mapPosition: { x: 370, y: 230 },
+            connectsTo: [26]
         },
         {
             key: 'map-chefe-mundo3',
@@ -621,6 +621,16 @@ const GameConfig = {
             connectsTo: [],
             // Coluna do dragão e estilingue só nesta fase.
             features: { dragaoColunaInicial: true, estilingue: true }
+        },
+        {
+            key: 'map-23',
+            file: 'assets/map-23.json',
+            name: 'Mapa 23',
+            zoom: 0.9,
+            roundPixels: false,
+            world: 5,
+            mapPosition: { x: 510, y: 185 },
+            connectsTo: []
         }
     ],
 

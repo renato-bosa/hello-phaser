@@ -6,9 +6,9 @@
     "activeFile": "dev-resources/map-23.tmx",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
+        ".",
         "dev-resources",
-        "assets",
-        "."
+        "assets"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -1492,8 +1492,8 @@
             "scale": 0.75,
             "selectedLayer": 4,
             "viewCenter": {
-                "x": 1120.6666666666665,
-                "y": 286.6666666666667
+                "x": 1140,
+                "y": 375.33333333333326
             }
         },
         "dev-resources/map-21-nuvens.tmx#1up": {
@@ -1594,8 +1594,8 @@
             "scale": 0.33,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 713.6363636363637,
-                "y": 548.4848484848485
+                "x": 639.3939393939395,
+                "y": 480.30303030303037
             }
         },
         "dev-resources/map-22-octopus.tmx#1up": {
@@ -1699,10 +1699,10 @@
         },
         "dev-resources/map-23.tmx": {
             "scale": 0.5,
-            "selectedLayer": 2,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 594,
-                "y": 440
+                "x": 719,
+                "y": 526
             }
         },
         "dev-resources/map-23.tmx#1up": {
@@ -1744,6 +1744,9 @@
         "dev-resources/map-23.tmx#dark-bricks-fuzzy-shades-melted": {
             "scaleInDock": 1
         },
+        "dev-resources/map-23.tmx#dragao_marinho_6fps": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-23.tmx#fg_dec_grass_random_frame_grass": {
             "scaleInDock": 1
         },
@@ -1771,6 +1774,9 @@
         "dev-resources/map-23.tmx#lava-roxa-animated": {
             "scaleInDock": 1
         },
+        "dev-resources/map-23.tmx#lava-roxa-profunda-6fps": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-23.tmx#mushroom-purple": {
             "scaleInDock": 1
         },
@@ -1786,6 +1792,9 @@
         "dev-resources/map-23.tmx#octopus": {
             "scaleInDock": 1
         },
+        "dev-resources/map-23.tmx#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
         "dev-resources/map-23.tmx#sapo-tomate-6fps": {
             "scaleInDock": 1
         },
@@ -1799,6 +1808,9 @@
             "scaleInDock": 1
         },
         "dev-resources/map-23.tmx#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "dev-resources/map-23.tmx#toupeira4": {
             "scaleInDock": 1
         },
         "dev-resources/map-23.tmx#trampoline-thick": {

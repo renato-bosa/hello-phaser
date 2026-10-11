@@ -3,9 +3,10 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "dev-resources/map-11.tmx",
+    "activeFile": "assets/map-24.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
+        "assets",
         ".",
         "dev-resources"
     ],
@@ -448,7 +449,7 @@
             "scale": 0.33,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 1601.5151515151513,
+                "x": 1603.030303030303,
                 "y": 545.4545454545455
             }
         },
@@ -519,6 +520,116 @@
             "scaleInDock": 1
         },
         "assets/map-24-cisternas.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json": {
+            "scale": 0.31477272727272726,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 835.5234657039712,
+                "y": 470.1805054151625
+            }
+        },
+        "assets/map-24.json#1up": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#Areia": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#Boneco-14fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#agua": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#ceu-azul-medio": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#fg_dec_grass_random_frame_grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#nuvem-continuacao": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#nuvem-sorriso": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#nuvemzita": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#octopus": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#starry-red-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-24.json#yellow-star-animated": {
             "scaleInDock": 1
         },
         "assets/map-25-carrilhao.json": {
@@ -2528,11 +2639,11 @@
             "scaleInDock": 1
         },
         "dev-resources/map-24.tmx": {
-            "scale": 0.31,
-            "selectedLayer": 0,
+            "scale": 1,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 835.483870967742,
-                "y": 470.967741935484
+                "x": 505,
+                "y": 355
             }
         },
         "dev-resources/map-24.tmx#1up": {
@@ -4037,12 +4148,14 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "dev-resources/map-18.tmx",
-        "dev-resources/map-11.tmx"
+        "assets/map-24.json"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "assets/map-24.json",
+        "dev-resources/map-24.tmx",
+        "assets/map-24-cisternas.json",
         "dev-resources/map-11.tmx",
         "dev-resources/map-13.tmx",
         "dev-resources/map0-1.tmx",
@@ -4051,10 +4164,7 @@
         "assets/map-11.json",
         "assets/map-10.json",
         "assets/map0-1.json",
-        "dev-resources/map-24.tmx",
-        "dev-resources/map.tmx",
-        "dev-resources/map-14.tmx",
-        "dev-resources/map-15.tmx"
+        "dev-resources/map.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

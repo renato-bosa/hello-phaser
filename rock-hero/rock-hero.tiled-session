@@ -4043,6 +4043,8 @@
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "dev-resources/map-11.tmx",
+        "dev-resources/map-13.tmx",
         "dev-resources/map0-1.tmx",
         "assets/map0-00.json",
         "assets/map0-0.json",
@@ -4050,8 +4052,6 @@
         "assets/map-10.json",
         "assets/map0-1.json",
         "dev-resources/map-24.tmx",
-        "dev-resources/map-13.tmx",
-        "dev-resources/map-11.tmx",
         "dev-resources/map.tmx",
         "dev-resources/map-14.tmx",
         "dev-resources/map-15.tmx"

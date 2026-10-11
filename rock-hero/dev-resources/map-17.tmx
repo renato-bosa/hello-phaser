@@ -496,6 +496,5 @@
   <object id="224" gid="82" x="288" y="1056" width="32" height="32"/>
   <object id="225" gid="82" x="32" y="1056" width="32" height="32"/>
   <object id="227" gid="32" x="960" y="1088" width="32" height="32"/>
-  <object id="228" gid="76" x="1792" y="768" width="32" height="32"/>
  </objectgroup>
 </map>

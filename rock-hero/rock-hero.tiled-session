@@ -30,11 +30,11 @@
             "expandedObjectLayers": [
                 8
             ],
-            "scale": 0.41146874999999994,
+            "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 676.8436242120455,
-                "y": 335.3839143312828
+                "x": 1074,
+                "y": 336
             }
         },
         "assets/map-11.json#abstract-blue": {
@@ -955,6 +955,115 @@
         "assets/map-chefe-mundo1.json#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "assets/map0-0.json": {
+            "scale": 0.8223437499999999,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 319.81759452783587,
+                "y": 176.32528975869275
+            }
+        },
+        "assets/map0-0.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map0-0.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map0-0.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map0-0.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map0-0.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map0-0.json#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "assets/map0-0.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map0-0.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map0-0.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map0-0.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map0-0.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json": {
+            "scale": 0.31477272727272726,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 803.7545126353791,
+                "y": 374.87364620938627
+            }
+        },
+        "assets/map0-1.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#abstract-spread-blue-blinking-green-8fps": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#abstract-spread-blue-blinking-red-8fps": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#abstract-spread-blue-blinking-yellow-8fps": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#fg_dec_grass_random_frame_grass": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#grass-semi-dark": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map0-1.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "assets/map9.json": {
             "scale": 0.8223437499999999,
             "selectedLayer": 0,
@@ -1079,13 +1188,13 @@
         },
         "dev-resources/map-11.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 498,
+                "x": 1066,
                 "y": 334
             }
         },
@@ -1583,14 +1692,14 @@
         },
         "dev-resources/map-18.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.33,
             "selectedLayer": 6,
             "viewCenter": {
-                "x": 2166.666666666667,
-                "y": 578.7878787878788
+                "x": 1166.6666666666665,
+                "y": 837.8787878787879
             }
         },
         "dev-resources/map-18.tmx#1up": {

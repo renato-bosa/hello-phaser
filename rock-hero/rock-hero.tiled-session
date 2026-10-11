@@ -1486,8 +1486,8 @@
         },
         "dev-resources/map-21-nuvens.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.75,
             "selectedLayer": 4,
@@ -1588,8 +1588,8 @@
         },
         "dev-resources/map-22-octopus.tmx": {
             "expandedObjectLayers": [
-                8,
-                10
+                10,
+                8
             ],
             "scale": 0.33,
             "selectedLayer": 5,

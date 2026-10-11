@@ -256,6 +256,9 @@ const GC = {
             FRAME_END: 6,           // frames 0–6 preenchidos no sheet
             VULNERABLE_FRAMES: { start: 1, end: 2 },
             VULNERABLE_MS: 1000,
+            // Após a 1ª pisada o corpo segue ativo; o quique leva alguns frames
+            // para tirar o jogador da sobreposição, e esse contato não pode ferir.
+            STOMP_GRACE_MS: 100,
             // Estouro na 2ª pisada
             POP_DURATION_MS: 180,
             POP_GLOW_RADIUS: 10,

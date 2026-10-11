@@ -159,7 +159,7 @@
  <imagelayer id="11" name="bg_image_static" opacity="0.5" tintcolor="#ff7b7b">
   <image source="../assets/spritesheets/level-backgrounds/background1.png" width="1672" height="941"/>
  </imagelayer>
- <layer id="3" name="bg" width="40" height="29" opacity="0.5">
+ <layer id="3" name="bg" width="40" height="29" opacity="0.3">
   <data encoding="csv">
 85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,
 85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,

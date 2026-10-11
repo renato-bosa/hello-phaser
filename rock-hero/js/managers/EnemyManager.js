@@ -737,6 +737,7 @@ class EnemyManager {
             type: 'boneco',
             state: 'normal',
             vulnerableUntil: 0,
+            stompGraceUntil: 0,
             startX: data.x,
             leftLimit: data.x - cfg.PATROL_DISTANCE,
             rightLimit: data.x + cfg.PATROL_DISTANCE,
@@ -1489,6 +1490,8 @@ class EnemyManager {
             if (bossState === 'crushed') return;
         }
 
+        if (enemyType === 'boneco' && this.scene.time.now < enemy.patrolData.stompGraceUntil) return;
+
         const isStompable = enemyType !== 'seahorse' &&
             enemyType !== 'dragao-marinho' &&
             enemyType !== 'cavalo-marinho-chefe';
@@ -1714,6 +1717,7 @@ class EnemyManager {
 
         data.state = 'vulnerable';
         data.vulnerableUntil = this.scene.time.now + GC.ENEMY.BONECO.VULNERABLE_MS;
+        data.stompGraceUntil = this.scene.time.now + GC.ENEMY.BONECO.STOMP_GRACE_MS;
         enemy.setVelocityX(0);
         enemy.anims.play('boneco-vulnerable', true);
         SoundManager.play('damage');

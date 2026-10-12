@@ -436,18 +436,6 @@
                  "y":832
                 }, 
                 {
-                 "gid":42,
-                 "height":32,
-                 "id":320,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":1376,
-                 "y":608
-                }, 
-                {
                  "gid":36,
                  "height":32,
                  "id":321,
@@ -576,8 +564,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":1408,
-                 "y":832
+                 "x":1376,
+                 "y":608
                 }, 
                 {
                  "gid":91,
@@ -818,8 +806,7 @@
                  "width":32,
                  "x":0,
                  "y":864
-                },
-            
+                }, 
                 {
                  "gid":115,
                  "height":32,
@@ -831,6 +818,31 @@
                  "width":32,
                  "x":352,
                  "y":768
+                },
+            
+                {
+                 "gid":116,
+                 "height":32,
+                 "id":367,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":1376,
+                 "y":832
+                }, 
+                {
+                 "gid":20,
+                 "height":32,
+                 "id":368,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":1472,
+                 "y":704
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -839,7 +851,7 @@
          "y":0
         }],
  "nextlayerid":12,
- "nextobjectid":367,
+ "nextobjectid":369,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1511,6 +1523,19 @@
          "name":"sneaker-power",
          "spacing":0,
          "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":2,
+         "firstgid":116,
+         "image":"spritesheets\/sapo-amarelo-6fps.png",
+         "imageheight":96,
+         "imagewidth":64,
+         "margin":0,
+         "name":"sapo-amarelo-6fps",
+         "spacing":0,
+         "tilecount":6,
          "tileheight":32,
          "tilewidth":32
         }],

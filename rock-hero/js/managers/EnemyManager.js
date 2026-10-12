@@ -1,7 +1,8 @@
 /**
  * EnemyManager - Gerencia inimigos (sapos, seahorse, dragao-marinho, boneco, toupeira)
  * Responsável por: criação, patrulha, pulo, colisão e morte de inimigos
- * Sapos: tomate (patrulha larga), roxo (patrulha curta + salto médio), verde (parado + salto alto)
+ * Sapos: tomate (patrulha larga), roxo (patrulha curta + salto médio), verde (parado + salto alto),
+ *        amarelo (patrulha curta + língua)
  */
 class EnemyManager {
     constructor(scene) {
@@ -19,6 +20,8 @@ class EnemyManager {
                 this._createSapoVerde(e.x, e.y);
             } else if (e.type === 'sapo-roxo') {
                 this._createSapoRoxo(e.x, e.y);
+            } else if (e.type === 'sapo-amarelo') {
+                this._createSapoAmarelo(e.x, e.y);
             } else if (e.type === 'sapo-chefe-laranja') {
                 this._createSapoChefeLaranja(e.x, e.y);
             } else if (e.type === 'sapo') {
@@ -499,6 +502,30 @@ class EnemyManager {
             cfg: GC.ENEMY.SAPO_ROXO,
             type: 'sapo-roxo'
         });
+    }
+
+    _createSapoAmarelo(x, y) {
+        // Criada antes do sprite para ficar atrás dele na mesma profundidade.
+        const tongue = this.scene.add.graphics();
+        const sapo = this._createSapoPatrol(x, y, {
+            texture: 'sapo-amarelo',
+            animKey: 'sapo-amarelo-walk',
+            cfg: GC.ENEMY.SAPO_AMARELO,
+            type: 'sapo-amarelo'
+        });
+        tongue.setDepth(sapo.depth);
+        Object.assign(sapo.patrolData, {
+            state: 'patrol',
+            stateStartedAt: 0,
+            cooldownUntil: 0,
+            nextFlashAt: 0,
+            flashOn: false,
+            tongueDir: 1,
+            tongueReach: 0,
+            tongueLength: 0,
+            tongue
+        });
+        sapo.once('destroy', () => tongue.destroy());
     }
 
     _createSapoChefeLaranja(x, y) {
@@ -1115,6 +1142,11 @@ class EnemyManager {
                 return;
             }
 
+            if (data.type === 'sapo-amarelo') {
+                this._updateSapoAmarelo(enemy, data, player, currentTime, onGround);
+                return;
+            }
+
             // Sapo roxo: patrulha, pula e evita beiradas.
             if (data.type === 'sapo-roxo') {
                 this._updatePatrol(enemy, data, onGround, {
@@ -1267,6 +1299,135 @@ class EnemyManager {
         if (!data.electricGraphics) return;
         data.electricGraphics.destroy();
         data.electricGraphics = null;
+    }
+
+    /**
+     * Sapo amarelo: patrol → windup (pisca, parado) → tongue (estica, segura,
+     * recolhe) → patrol com cooldown. Depois do aviso o ataque segue mesmo que
+     * o jogador saia do alcance.
+     */
+    _updateSapoAmarelo(enemy, data, player, currentTime, onGround) {
+        const cfg = GC.ENEMY.SAPO_AMARELO;
+
+        if (!enemy.body.enable) {
+            data.tongue.clear();
+            return;
+        }
+
+        if (data.state === 'patrol') {
+            this._updatePatrol(enemy, data, onGround, { avoidLedges: true });
+            if (!onGround || currentTime < data.cooldownUntil || !player?.active) return;
+
+            const dir = player.x < enemy.x ? -1 : 1;
+            const reach = this._getSapoTongueReach(enemy, dir);
+            if (!this._isPlayerInTongueRange(enemy, player, dir, reach)) return;
+
+            data.state = 'windup';
+            data.stateStartedAt = currentTime;
+            data.tongueDir = dir;
+            data.tongueReach = reach;
+            data.nextFlashAt = 0;
+            data.flashOn = false;
+            enemy.setVelocityX(0);
+            enemy.setFlipX(dir === -1);
+            enemy.anims.pause();
+            return;
+        }
+
+        enemy.setVelocityX(0);
+        const elapsed = currentTime - data.stateStartedAt;
+
+        if (data.state === 'windup') {
+            if (currentTime >= data.nextFlashAt) {
+                data.flashOn = !data.flashOn;
+                if (data.flashOn) enemy.setTintFill(cfg.WINDUP_TINT);
+                else enemy.clearTint();
+                data.nextFlashAt = currentTime + cfg.FLASH_INTERVAL_MS;
+            }
+            if (elapsed >= cfg.WINDUP_MS) {
+                enemy.clearTint();
+                data.flashOn = false;
+                data.state = 'tongue';
+                data.stateStartedAt = currentTime;
+            }
+            return;
+        }
+
+        const holdEnd = cfg.EXTEND_MS + cfg.HOLD_MS;
+        if (elapsed >= holdEnd + cfg.RETRACT_MS) {
+            data.tongue.clear();
+            data.tongueLength = 0;
+            data.state = 'patrol';
+            data.cooldownUntil = currentTime + cfg.COOLDOWN_MS;
+            enemy.anims.resume();
+            enemy.setVelocityX(data.speed * data.direction);
+            enemy.setFlipX(data.direction === -1);
+            return;
+        }
+
+        let extension;
+        if (elapsed < cfg.EXTEND_MS) extension = elapsed / cfg.EXTEND_MS;
+        else if (elapsed < holdEnd) extension = 1;
+        else extension = 1 - (elapsed - holdEnd) / cfg.RETRACT_MS;
+        data.tongueLength = data.tongueReach * extension;
+
+        this._drawSapoTongue(enemy, data);
+        if (player?.active && this._tongueHitsPlayer(enemy, data, player)) {
+            this._damagePlayer();
+        }
+    }
+
+    _getSapoMouth(enemy, dir) {
+        const cfg = GC.ENEMY.SAPO_AMARELO;
+        return {
+            x: enemy.x + dir * cfg.MOUTH_OFFSET_X,
+            y: enemy.y + cfg.MOUTH_OFFSET_Y
+        };
+    }
+
+    /** Alcance livre da língua (px a partir da boca), parando no primeiro sólido. */
+    _getSapoTongueReach(enemy, dir) {
+        const cfg = GC.ENEMY.SAPO_AMARELO;
+        const mouth = this._getSapoMouth(enemy, dir);
+        for (let d = cfg.LOS_STEP_PX; d <= cfg.TONGUE_RANGE; d += cfg.LOS_STEP_PX) {
+            if (this._probeSolidAt(mouth.x + dir * d, mouth.y)) return d - cfg.LOS_STEP_PX;
+        }
+        return cfg.TONGUE_RANGE;
+    }
+
+    _isPlayerInTongueRange(enemy, player, dir, reach) {
+        const cfg = GC.ENEMY.SAPO_AMARELO;
+        const pb = player.body;
+        if (Math.abs(pb.center.y - enemy.body.center.y) > cfg.TRIGGER_HEIGHT) return false;
+
+        const mouth = this._getSapoMouth(enemy, dir);
+        const gap = dir > 0 ? pb.left - mouth.x : mouth.x - pb.right;
+        return gap >= 0 && gap <= reach;
+    }
+
+    _tongueHitsPlayer(enemy, data, player) {
+        const r = GC.ENEMY.SAPO_AMARELO.TONGUE_TIP_RADIUS;
+        const mouth = this._getSapoMouth(enemy, data.tongueDir);
+        const tipX = mouth.x + data.tongueDir * data.tongueLength;
+        const pb = player.body;
+        return Math.max(mouth.x, tipX) + r >= pb.left &&
+               Math.min(mouth.x, tipX) - r <= pb.right &&
+               mouth.y + r >= pb.top &&
+               mouth.y - r <= pb.bottom;
+    }
+
+    _drawSapoTongue(enemy, data) {
+        const cfg = GC.ENEMY.SAPO_AMARELO;
+        const g = data.tongue;
+        g.clear();
+        if (data.tongueLength <= 0) return;
+
+        const mouth = this._getSapoMouth(enemy, data.tongueDir);
+        const tipX = mouth.x + data.tongueDir * data.tongueLength;
+        g.lineStyle(cfg.TONGUE_THICKNESS, cfg.TONGUE_COLOR, 1);
+        g.lineBetween(mouth.x, mouth.y, tipX, mouth.y);
+        g.fillStyle(cfg.TONGUE_TIP_COLOR, 1);
+        g.fillCircle(tipX, mouth.y, cfg.TONGUE_TIP_RADIUS);
     }
 
     /**

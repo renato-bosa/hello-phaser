@@ -96,6 +96,29 @@ const GC = {
             JUMP_FORCE: -210,
             ANIM_FPS: 6,
         },
+        // Patrulha curta sem pulos. Ao ver o jogador na mesma altura, pisca
+        // (aviso) e estica a língua. A língua fere, mas não pode ser pisada.
+        SAPO_AMARELO: {
+            PATROL_DISTANCE: 32,
+            SPEED: 40,
+            ANIM_FPS: 6,
+            TONGUE_RANGE: 96,           // 3 blocos a partir da boca
+            TRIGGER_HEIGHT: 24,         // diferença vertical máx. entre os centros
+            WINDUP_MS: 400,
+            EXTEND_MS: 120,
+            HOLD_MS: 150,
+            RETRACT_MS: 200,
+            COOLDOWN_MS: 1200,
+            FLASH_INTERVAL_MS: 80,
+            WINDUP_TINT: 0xffffff,
+            MOUTH_OFFSET_X: 10,
+            MOUTH_OFFSET_Y: 4,
+            TONGUE_THICKNESS: 6,
+            TONGUE_COLOR: 0xff5c8a,
+            TONGUE_TIP_COLOR: 0xd62f63,
+            TONGUE_TIP_RADIUS: 5,
+            LOS_STEP_PX: 8,
+        },
         // Chefe do Mundo 1: mesma patrulha do sapo roxo, em sprite 64x64.
         SAPO_CHEFE_LARANJA: {
             PATROL_DISTANCE: 64,

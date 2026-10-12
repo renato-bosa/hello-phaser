@@ -48,6 +48,7 @@ class GameScene extends Phaser.Scene {
         this._loadSheetIfMissing('sapo-tomate', 'assets/spritesheets/sapo-tomate-6fps.png', 32, 32);
         this._loadSheetIfMissing('sapo-verde', 'assets/spritesheets/sapo-verde-6fps.png', 32, 32);
         this._loadSheetIfMissing('sapo-roxo', 'assets/spritesheets/sapo-roxo-6fps.png', 32, 32);
+        this._loadSheetIfMissing('sapo-amarelo', 'assets/spritesheets/sapo-amarelo-6fps.png', 32, 32);
         this._loadSheetIfMissing('sapo-chefe-laranja', 'assets/spritesheets/sapo-chefe-laranja-64x64-6fps.png', 64, 64);
         this._loadImageIfMissing('prison-key-w1', 'assets/spritesheets/key-w1.png');
         this._loadImageIfMissing('prison-key-w2', 'assets/spritesheets/key-w2.png');
@@ -567,6 +568,8 @@ class GameScene extends Phaser.Scene {
                     sapoType = 'sapo-verde';
                 } else if (type === 'sapo-roxo' || tilesetName.includes('sapo-roxo') || tilesetName.includes('roxo')) {
                     sapoType = 'sapo-roxo';
+                } else if (type === 'sapo-amarelo' || tilesetName.includes('amarelo')) {
+                    sapoType = 'sapo-amarelo';
                 }
                 // Inimigos com patrulha/AI ignoram transform — `flipX` é controlado pelo EnemyManager em runtime.
                 enemies.push({

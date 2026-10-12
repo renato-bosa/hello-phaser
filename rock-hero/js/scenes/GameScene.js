@@ -298,12 +298,17 @@ class GameScene extends Phaser.Scene {
         this.map = map;
 
         const allTilesets = [];
-        const addedNames = new Set();
 
-        map.tilesets.forEach((ts, index) => {
-            addedNames.add(ts.name);
-            const tileset = map.addTilesetImage(ts.name, ts.name, undefined, undefined, undefined, undefined, ts.firstgid);
-            if (tileset) allTilesets.push(tileset);
+        // addTilesetImage busca o tileset pelo nome e só acha o primeiro; colar
+        // tiles de outro mapa no Tiled cria tilesets homônimos, e os seguintes
+        // ficariam sem imagem (tiles invisíveis). Por isso a imagem vai direto em cada um.
+        map.tilesets.forEach(ts => {
+            if (!this.textures.exists(ts.name)) {
+                console.warn(`Tileset "${ts.name}" sem textura carregada`);
+                return;
+            }
+            ts.setImage(this.textures.get(ts.name));
+            allTilesets.push(ts);
         });
 
         // Image Layers do Tiled (atrás das tile layers)

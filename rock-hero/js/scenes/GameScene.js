@@ -2198,6 +2198,7 @@ class GameScene extends Phaser.Scene {
             repeat: 1,
             ease: 'Sine.easeInOut',
             onComplete: () => {
+                if (!heart.active) return;
                 heart.setText('💔');
                 this.tweens.add({
                     targets: heart,
@@ -2275,6 +2276,7 @@ class GameScene extends Phaser.Scene {
             delay: 600,
             ease: 'Back.easeOut',
             onComplete: () => {
+                if (!counterText.active) return;
                 // "-1" subindo do contador
                 const minusOne = this.add.text(counterText.x - counterText.width / 2, counterY - 8, '-1', {
                     fontSize: '14px', fontFamily: FONT, color: '#ff4466',
@@ -2297,10 +2299,13 @@ class GameScene extends Phaser.Scene {
                     yoyo: true,
                     ease: 'Sine.easeInOut',
                     onStart: () => {
+                        if (!counterText.active) return;
                         counterText.setText(`x${remainingLives}`);
                         counterText.setColor('#ff4466');
                     },
-                    onComplete: () => counterText.setColor('#ffffff')
+                    onComplete: () => {
+                        if (counterText.active) counterText.setColor('#ffffff');
+                    }
                 });
 
                 // Nota balança junto, como se "ressoasse"
@@ -2316,8 +2321,14 @@ class GameScene extends Phaser.Scene {
 
         const elements = [overlay, heart, title, subLabel, counterText, note];
 
+        // Pular destrói os textos enquanto as animações acima ainda rodam, e o
+        // Phaser processa no mesmo quadro tweens criados durante ele. Por isso
+        // todo setText/setColor desta tela confere `active`: Text destruído
+        // lança "Cannot read properties of null (reading 'cut')".
+        let dismissed = false;
         const dismiss = () => {
-            if (!overlay.active) return;
+            if (dismissed || !overlay.active) return;
+            dismissed = true;
             this.tweens.add({
                 targets: elements,
                 alpha: 0,

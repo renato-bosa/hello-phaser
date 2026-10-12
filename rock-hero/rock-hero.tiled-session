@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "assets/map-24.json",
+    "activeFile": "assets/map-3--desafio do luigi.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "assets",
@@ -834,6 +834,131 @@
         "assets/map-25-carrilhao.json#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "assets/map-3--desafio do luigi.json": {
+            "expandedObjectLayers": [
+                8
+            ],
+            "scale": 1,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 2230.5,
+                "y": 703
+            }
+        },
+        "assets/map-3--desafio do luigi.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#bricks-purple": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#bricks-purple2": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#dark-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#dark-bricks-fuzzy": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#dark-bricks-fuzzy-shades": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#dark-bricks-super-fuzzy": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#grass-floating-platform-edges": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#grass-floating-platform-middle": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#lava": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#lava-laranja-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#lava-laranja-profunda-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#lava-roxa": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#red-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#red-heart": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#sapo-amarelo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#sneaker-power": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#starry-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#yellow-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-3--desafio do luigi.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "assets/map-7--planicie.json": {
             "expandedObjectLayers": [
                 8
@@ -1422,6 +1547,101 @@
             "scaleInDock": 1
         },
         "assets/map0-1.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json": {
+            "expandedObjectLayers": [
+                8
+            ],
+            "scale": 0.5,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 625,
+                "y": 490
+            }
+        },
+        "assets/map2-0.json#1up": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#abstract-spread-blue-blinking-green-8fps": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#abstract-spread-blue-blinking-red-8fps": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#abstract-spread-blue-blinking-yellow-8fps": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#bricks-purple2": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#fg_dec_grass_random_frame_grass": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#grass-floating-platform-edges": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#grass-floating-platform-middle": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#grass-semi-dark": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#red-heart": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map2-0.json#yellow-star-animated": {
             "scaleInDock": 1
         },
         "assets/map9.json": {
@@ -4276,11 +4496,13 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "assets/map-24.json"
+        "assets/map-3--desafio do luigi.json"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "assets/map-3--desafio do luigi.json",
+        "assets/map2-0.json",
         "assets/map0-1.json",
         "assets/map0-00.json",
         "assets/map0-0.json",
@@ -4290,9 +4512,7 @@
         "assets/map-24-cisternas.json",
         "dev-resources/map-11.tmx",
         "dev-resources/map-13.tmx",
-        "dev-resources/map0-1.tmx",
-        "assets/map-11.json",
-        "assets/map-10.json"
+        "dev-resources/map0-1.tmx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

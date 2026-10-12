@@ -442,6 +442,134 @@
         "assets/map-23-catedral-do-eco.json#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "assets/map-23.json": {
+            "scale": 1,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 1438,
+                "y": 795
+            }
+        },
+        "assets/map-23.json#1up": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#Areia": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#Boneco-14fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#agua": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#ceu-azul-medio": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#dragao_marinho_6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#fg_dec_grass_random_frame_grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#lava-roxa-profunda-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#nuvem-continuacao": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#nuvem-sorriso": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#nuvemzita": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#octopus": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#sapo-amarelo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#sneaker-power": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#starry-red-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#toupeira4": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-23.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "assets/map-24-cisternas.json": {
             "expandedObjectLayers": [
                 5
@@ -4153,18 +4281,18 @@
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "assets/map0-1.json",
+        "assets/map0-00.json",
+        "assets/map0-0.json",
         "assets/map-24.json",
+        "assets/map-23.json",
         "dev-resources/map-24.tmx",
         "assets/map-24-cisternas.json",
         "dev-resources/map-11.tmx",
         "dev-resources/map-13.tmx",
         "dev-resources/map0-1.tmx",
-        "assets/map0-00.json",
-        "assets/map0-0.json",
         "assets/map-11.json",
-        "assets/map-10.json",
-        "assets/map0-1.json",
-        "dev-resources/map.tmx"
+        "assets/map-10.json"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

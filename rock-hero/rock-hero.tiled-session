@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "assets/map-chefe-mundo1.json",
+    "activeFile": "assets/map-5--caverna.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "assets",
@@ -959,6 +959,173 @@
         "assets/map-3--desafio do luigi.json#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "assets/map-5--caverna.json": {
+            "scale": 0.75,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 1488.6666666666665,
+                "y": 561.3333333333333
+            }
+        },
+        "assets/map-5--caverna.json#1up": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#cristal das notas de som": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#grass-floating-platform-edges": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#grass-floating-platform-middle": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#lava": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#lava-laranja-6fps": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "assets/map-5--caverna.json#lava-laranja-profunda-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#lava-roxa": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#pedra": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#starry-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#toupeira4": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj": {
+            "scale": 0.29930840163934425,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 977.252888318357,
+                "y": 400.92426187419767
+            }
+        },
+        "assets/map-5--caverna.tmj#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#black": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#cristal das notas de som": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#grass-floating-platform-edges": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#grass-floating-platform-middle": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#lava": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#lava-roxa": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#pedra": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#starry-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-5--caverna.tmj#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "assets/map-7--planicie.json": {
             "expandedObjectLayers": [
                 8
@@ -1294,9 +1461,9 @@
         },
         "assets/map-chefe-mundo1.json": {
             "scale": 2,
-            "selectedLayer": 2,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 224.75,
+                "x": 774.25,
                 "y": 295
             }
         },
@@ -4497,11 +4664,13 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "assets/map-chefe-mundo1.json"
+        "assets/map-5--caverna.json"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "assets/map-5--caverna.json",
+        "assets/map-5--caverna.tmj",
         "assets/map-chefe-mundo1.json",
         "assets/map-3--desafio do luigi.json",
         "assets/map2-0.json",
@@ -4511,9 +4680,7 @@
         "assets/map-24.json",
         "assets/map-23.json",
         "dev-resources/map-24.tmx",
-        "assets/map-24-cisternas.json",
-        "dev-resources/map-11.tmx",
-        "dev-resources/map-13.tmx"
+        "assets/map-24-cisternas.json"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

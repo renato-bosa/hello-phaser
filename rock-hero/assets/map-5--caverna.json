@@ -499,8 +499,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":1056,
-                 "y":576
+                 "x":864,
+                 "y":768
                 }, 
                 {
                  "gid":63,
@@ -511,7 +511,7 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":512,
+                 "x":416,
                  "y":768
                 }, 
                 {
@@ -523,8 +523,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":1504,
-                 "y":288
+                 "x":1216,
+                 "y":448
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1058,6 +1058,16 @@
          "spacing":0,
          "tilecount":4,
          "tileheight":32,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"jumpback_to_checkpoint",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }],
          "tilewidth":32
         }],
  "tilewidth":32,

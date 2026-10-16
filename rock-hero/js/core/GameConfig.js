@@ -208,7 +208,7 @@ const GameConfig = {
                     key: 'guitarrista-showcase',
                     file: 'assets/spritesheets/Guitarrista-parado-2-animado3-6fps.png',
                     frameWidth: 32, frameHeight: 32,
-                    startFrame: 0, endFrame: 4,
+                    startFrame: 0, endFrame: 5,
                     frameRate: 6
                 },
                 walk: {

@@ -6,9 +6,9 @@
     "activeFile": "assets/map-3--desafio do luigi.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
+        "dev-resources",
         "assets",
-        ".",
-        "dev-resources"
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -839,10 +839,10 @@
                 8
             ],
             "scale": 1,
-            "selectedLayer": 2,
+            "selectedLayer": 4,
             "viewCenter": {
                 "x": 2230.5,
-                "y": 703
+                "y": 648
             }
         },
         "assets/map-3--desafio do luigi.json#abstract-blue": {

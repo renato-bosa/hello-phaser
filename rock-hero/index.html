@@ -50,6 +50,62 @@
             /* box-shadow: 0 0 30px rgba(233, 69, 96, 0.3); */
         }
 
+        /* Botão sobreposto ao jogo, inclusive em tela cheia e no mobile. */
+        #fullscreen-toggle {
+            position: fixed;
+            top: max(12px, env(safe-area-inset-top));
+            right: max(12px, env(safe-area-inset-right));
+            z-index: 1100;
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            color: #ffffff;
+            background: rgba(15, 20, 40, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 10px;
+            opacity: 0.8;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            transition: opacity 0.15s, background 0.15s;
+        }
+
+        #fullscreen-toggle[hidden] {
+            display: none;
+        }
+
+        #fullscreen-toggle:hover,
+        #fullscreen-toggle:focus-visible {
+            opacity: 1;
+            background: rgba(15, 20, 40, 0.9);
+        }
+
+        #fullscreen-toggle:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 2px;
+        }
+
+        #fullscreen-toggle svg {
+            width: 21px;
+            height: 21px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        #fullscreen-toggle .icon-exit,
+        #fullscreen-toggle[aria-pressed="true"] .icon-enter {
+            display: none;
+        }
+
+        #fullscreen-toggle[aria-pressed="true"] .icon-exit {
+            display: block;
+        }
+
         /* === CONTROLES MOBILE === */
         #mobile-controls {
             display: none; /* Escondido por padrão, JS mostra em dispositivos touch */
@@ -181,6 +237,17 @@
     
     <div id="game-container"></div>
 
+    <!-- A página inteira entra em tela cheia para incluir também os controles mobile. -->
+    <button id="fullscreen-toggle" type="button" title="Tela cheia (F)"
+            aria-label="Entrar em tela cheia" aria-pressed="false">
+        <svg class="icon-enter" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/>
+        </svg>
+        <svg class="icon-exit" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5"/>
+        </svg>
+    </button>
+
     <!-- Controles Mobile (HTML sobreposto ao canvas) -->
     <div id="mobile-controls">
         <!-- D-Pad: Esquerda e Direita -->
@@ -253,6 +320,61 @@
         ].forEach(src => {
             document.write(`<script src="${src}?v=${window.GAME_VERSION}"><\/script>`);
         });
+    </script>
+
+    <!-- Tela cheia: botão e atalho F, sem alterar a resolução lógica do Phaser. -->
+    <script>
+        (function initFullscreenToggle() {
+            const button = document.getElementById('fullscreen-toggle');
+            const fullscreenRoot = document.documentElement;
+
+            // Safari/iOS e outros navegadores podem não oferecer Fullscreen API.
+            if (!fullscreenRoot.requestFullscreen || !document.exitFullscreen ||
+                document.fullscreenEnabled === false) {
+                button.hidden = true;
+                return;
+            }
+
+            async function toggleFullscreen() {
+                try {
+                    if (document.fullscreenElement) {
+                        await document.exitFullscreen();
+                    } else {
+                        await fullscreenRoot.requestFullscreen();
+                    }
+                } catch (error) {
+                    console.warn('Não foi possível alterar o modo de tela cheia:', error);
+                }
+            }
+
+            function syncFullscreenState() {
+                const active = Boolean(document.fullscreenElement);
+                button.setAttribute('aria-pressed', String(active));
+                button.setAttribute('aria-label', active ? 'Sair da tela cheia' : 'Entrar em tela cheia');
+                button.title = active ? 'Sair da tela cheia (F)' : 'Tela cheia (F)';
+
+                // Preserva FIT/CENTER_BOTH após a mudança da área visível.
+                requestAnimationFrame(() => {
+                    if (typeof game !== 'undefined') {
+                        game.scale.refresh();
+                    }
+                });
+            }
+
+            button.addEventListener('click', toggleFullscreen);
+            document.addEventListener('fullscreenchange', syncFullscreenState);
+
+            document.addEventListener('keydown', (event) => {
+                if (event.code !== 'KeyF' || event.repeat || event.altKey ||
+                    event.ctrlKey || event.metaKey ||
+                    event.target?.closest?.('input, textarea, select, [contenteditable]')) {
+                    return;
+                }
+
+                event.preventDefault();
+                toggleFullscreen();
+            });
+        })();
     </script>
 
     <!-- Mobile Controls Script -->

@@ -323,12 +323,6 @@
          "imagewidth":64,
          "margin":0,
          "name":"lava-roxa-animated",
-         "properties":[
-                {
-                 "name":"jumpback_to_checkpoint",
-                 "type":"bool",
-                 "value":true
-                }],
          "spacing":0,
          "tilecount":4,
          "tileheight":32,

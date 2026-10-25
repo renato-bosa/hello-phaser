@@ -3,13 +3,13 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "assets/off/map-24.json",
+    "activeFile": "assets/map-4-6_chefe.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
-        "assets",
-        ".",
         "dev-resources",
-        "assets/off"
+        "assets/off",
+        "assets",
+        "."
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -960,6 +960,128 @@
         "assets/map-3--desafio do luigi.json#yellow-star-animated": {
             "scaleInDock": 1
         },
+        "assets/map-4-6_chefe.json": {
+            "scale": 0.43749999999999994,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 740.5714285714287,
+                "y": 278.85714285714295
+            }
+        },
+        "assets/map-4-6_chefe.json#1up": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#Areia": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#Boneco-14fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#agua": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#bob com linguinha de fora": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#ceu-azul-medio": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#fg_dec_grass_random_frame_grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#mao": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#nuvem-continuacao": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#nuvem-sorriso": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#nuvemzita": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#octopus": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#puppet": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#starry-red-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#terra": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-4-6_chefe.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
         "assets/map-5--caverna.json": {
             "scale": 0.75,
             "selectedLayer": 4,
@@ -1125,6 +1247,134 @@
             "scaleInDock": 1
         },
         "assets/map-5--caverna.tmj#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json": {
+            "scale": 0.43749999999999994,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 836.5714285714287,
+                "y": 470.85714285714295
+            }
+        },
+        "assets/map-5-4.json#1up": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#Areia": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#Boneco-14fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#Cavalo marinho": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#abstract-smooth-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#agua": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#ceu-azul-medio": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#dark-bricks-fuzzy-shades-melted": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#dragao_marinho_6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#fg_dec_grass_random_frame_grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#grass-with-barrier": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#gray-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#lava-roxa-profunda-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#nuvem-continuacao": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#nuvem-sorriso": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#nuvemzita": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#octopus": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#sapo-amarelo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#sneaker-power": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#starry-red-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#toupeira4": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-5-4.json#yellow-star-animated": {
             "scaleInDock": 1
         },
         "assets/map-7--planicie.json": {
@@ -5133,11 +5383,14 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "assets/off/map-24.json"
+        "assets/map-5-4.json",
+        "assets/map-4-6_chefe.json"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "assets/map-5-4.json",
+        "assets/map-4-6_chefe.json",
         "assets/off/map-24.json",
         "assets/off/map9.json",
         "assets/off/map-5--caverna.tmj",
@@ -5147,9 +5400,7 @@
         "assets/map0-00.json",
         "assets/map0-0.json",
         "assets/map-boss3.json",
-        "assets/map-5--caverna.json",
-        "assets/map-5--caverna.tmj",
-        "assets/map-chefe-mundo1.json"
+        "assets/map-5--caverna.json"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

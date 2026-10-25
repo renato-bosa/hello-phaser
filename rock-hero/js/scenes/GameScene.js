@@ -1564,7 +1564,12 @@ class GameScene extends Phaser.Scene {
         const roundPixels = levelConfig.roundPixels ?? GameData.DEFAULTS.roundPixels;
 
         this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-        this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+        // Mapa menor que a área visível (ex.: arena de chefe): o Phaser o
+        // encostaria à esquerda/topo; a folga nos bounds da câmera o centraliza.
+        const cam = this.cameras.main;
+        const padX = Math.max(0, (cam.width / zoom - map.widthInPixels) / 2);
+        const padY = Math.max(0, (cam.height / zoom - map.heightInPixels) / 2);
+        cam.setBounds(-padX, -padY, map.widthInPixels + padX * 2, map.heightInPixels + padY * 2);
         this.cameras.main.setZoom(zoom);
         this.cameras.main.setRoundPixels(roundPixels);
 

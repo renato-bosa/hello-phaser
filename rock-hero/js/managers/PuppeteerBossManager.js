@@ -181,6 +181,12 @@ class PuppeteerBossManager {
         player.setFlipX(true);
         player.setVelocityX(-GC.PUPPETEER_BOSS.RUN_OUT_SPEED);
         if (player.body.blocked.down) player.anims.play('walk', true);
+        // Além da borda do mapa não há chão, mas a câmera centralizada ainda
+        // mostra uma faixa: segue correndo reto em vez de despencar.
+        if (player.x < 0 && player.body.allowGravity) {
+            player.body.allowGravity = false;
+            player.setVelocityY(0);
+        }
 
         if (player.getBounds().right < scene.cameras.main.worldView.x) {
             this._bringBob();

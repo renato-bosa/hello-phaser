@@ -6,10 +6,10 @@
     "activeFile": "assets/map-4-6_chefe.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
+        ".",
         "dev-resources",
-        "assets/off",
         "assets",
-        "."
+        "assets/off"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -961,11 +961,11 @@
             "scaleInDock": 1
         },
         "assets/map-4-6_chefe.json": {
-            "scale": 0.43749999999999994,
+            "scale": 0.75,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 740.5714285714287,
-                "y": 278.85714285714295
+                "x": 450.66666666666663,
+                "y": 217.3333333333333
             }
         },
         "assets/map-4-6_chefe.json#1up": {
@@ -1253,8 +1253,8 @@
             "scale": 0.43749999999999994,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 836.5714285714287,
-                "y": 470.85714285714295
+                "x": 870.8571428571429,
+                "y": 618.2857142857143
             }
         },
         "assets/map-5-4.json#1up": {

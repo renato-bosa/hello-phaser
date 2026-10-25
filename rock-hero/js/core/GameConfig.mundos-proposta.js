@@ -358,8 +358,7 @@ GameConfigVariants.proposta = {
             key: 'map-chefe-mundo4',
             file: 'assets/map-4-6_chefe.json',
             name: 'Chefe do Mundo 4',
-            // Arena inteira visível: as mãos ficam no topo e o tiro do Bob é vertical.
-            zoom: 0.7333, // 352 / 480: altura da arena (15 blocos) cabe inteira
+            zoom: 0.8, // 640 / 800: largura da arena preenche a tela; a altura rola
             roundPixels: false,
             world: 4,
             mapPosition: { x: 525, y: 175 },

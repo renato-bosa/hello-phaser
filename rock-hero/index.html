@@ -526,7 +526,10 @@
 
             // Touch End/Cancel global - desativa o controle REAL do toque (não o do elemento original)
             document.addEventListener('touchend', (e) => {
-                e.preventDefault();
+                // Cancelar o touchend suprime o click; o botão de tela cheia depende dele.
+                if (!e.target.closest?.('#fullscreen-toggle')) {
+                    e.preventDefault();
+                }
                 for (let touch of e.changedTouches) {
                     releaseTouch(touch.identifier);
                 }

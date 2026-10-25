@@ -327,33 +327,31 @@ class PuppeteerBossManager {
             if (hand.alive) hand.sprite.clearTint();
         });
 
-        if (hand.hp <= 0) this._destroyHand(hand);
+        if (hand.hp <= 0) this._defeatHand(hand);
     }
 
-    _destroyHand(hand) {
+    _defeatHand(hand) {
         const scene = this.scene;
+        const cfg = GC.PUPPETEER_BOSS;
         const sprite = hand.sprite;
         hand.alive = false;
         hand.sway.stop();
         sprite.body.enable = false;
-        sprite.clearTint();
+        sprite.setTint(cfg.HAND_DEFEATED_TINT);
 
         scene.effectsManager.createEnemyPopBurst(sprite.x, sprite.y, 1.5);
         SoundManager.play('enemyPop');
         scene.cameras.main.shake(200, 0.006);
 
-        const origin = { x: sprite.x, y: sprite.y };
         scene.tweens.add({
             targets: sprite,
-            y: sprite.y + 80,
-            angle: 40,
-            alpha: 0,
-            duration: 700,
-            ease: 'Quad.easeIn',
-            onComplete: () => sprite.destroy()
+            y: sprite.y + cfg.HAND_DEFEATED_DROP_PX,
+            angle: sprite.flipX ? -cfg.HAND_DEFEATED_ANGLE : cfg.HAND_DEFEATED_ANGLE,
+            duration: cfg.HAND_DEFEATED_MS,
+            ease: 'Back.easeOut'
         });
 
-        if (this.hands.every(h => !h.alive)) this._onDefeated(origin);
+        if (this.hands.every(h => !h.alive)) this._onDefeated({ x: sprite.x, y: sprite.y });
     }
 
     _onDefeated(origin) {

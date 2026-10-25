@@ -213,8 +213,10 @@ class EnemyManager {
         puppet.setVelocity(vx, vy);
         puppet.anims.play('puppet-dance');
 
+        this._puppetSeq = (this._puppetSeq || 0) + 1;
         puppet.patrolData = {
             type: 'puppet',
+            id: this._puppetSeq,
             state: 'falling',
             speed,
             direction: vx < 0 ? -1 : 1,
@@ -262,7 +264,38 @@ class EnemyManager {
             if (!puppet.body.enable) return;
         }
         if (!player || !player.active) return;
+
+        // Fila: quem vem atrás espera o da frente abrir espaço. Colisão física
+        // entre eles deixaria um boneco pousar na cabeça do outro.
+        if (onGround) {
+            const cfg = GC.PUPPETEER_BOSS;
+            const dir = player.x < puppet.x ? -1 : 1;
+            const gap = this._puppetGapAhead(puppet, data, dir);
+            if (gap < cfg.PUPPET_MIN_GAP_PX) {
+                puppet.setFlipX(dir === -1);
+                const backOff = gap < cfg.PUPPET_MIN_GAP_PX / 2;
+                puppet.setVelocityX(backOff ? -dir * data.speed * cfg.PUPPET_BACK_OFF_FACTOR : 0);
+                return;
+            }
+        }
+
         this._updateGroundChase(puppet, data, player, currentTime, onGround);
+    }
+
+    /** Distância (centro a centro) até o boneco mais próximo à frente, no chão. */
+    _puppetGapAhead(puppet, data, dir) {
+        let gap = Infinity;
+        this.enemies.getChildren().forEach(other => {
+            if (other === puppet || !other.active || !other.body?.enable) return;
+            const otherData = other.patrolData;
+            if (otherData?.type !== 'puppet' || otherData.state !== 'chasing') return;
+            if (Math.abs(other.y - puppet.y) > GC.PUPPETEER_BOSS.PUPPET_SAME_ROW_PX) return;
+            const dx = (other.x - puppet.x) * dir;
+            // Empate exato: o mais antigo lidera, para os dois não pararem juntos.
+            const ahead = dx > 0 || (dx === 0 && otherData.id < data.id);
+            if (ahead && dx < gap) gap = dx;
+        });
+        return gap;
     }
 
     _createToupeiraChefe(spawn) {

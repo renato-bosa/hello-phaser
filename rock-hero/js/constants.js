@@ -511,7 +511,7 @@ const GC = {
     // Chefe do Mundo 4: mãos de marionetista lançam bonecos; após
     // KILLS_TO_SWAP pisões o herói sai e o Bob entra atirando para cima.
     PUPPETEER_BOSS: {
-        SPAWN_INTERVAL_MS: 1500,
+        SPAWN_INTERVAL_MS: 1200,
         FIRST_SPAWN_DELAY_MS: 1200,
         MAX_ALIVE: 5,
         KILLS_TO_SWAP: 15,
@@ -519,6 +519,11 @@ const GC = {
         HAND_SWAY_PX: 6,
         HAND_SWAY_MS: 1400,
         HAND_HIT_FLASH_MS: 80,
+        // Mão derrotada continua na tela (é o mesmo marionetista): escurece e cai um pouco.
+        HAND_DEFEATED_TINT: 0x55556a,
+        HAND_DEFEATED_DROP_PX: 14,
+        HAND_DEFEATED_ANGLE: 18,
+        HAND_DEFEATED_MS: 500,
         HAND_BAR_WIDTH: 44,
         HAND_BAR_HEIGHT: 5,
         HAND_BAR_GAP: 6,
@@ -531,6 +536,9 @@ const GC = {
         PUPPET_BODY_HEIGHT: 24,
         PUPPET_BODY_OFFSET_X: 7,
         PUPPET_BODY_OFFSET_Y: 8,
+        PUPPET_MIN_GAP_PX: 30,        // centro a centro (largura do desenho); abaixo da metade, recua
+        PUPPET_BACK_OFF_FACTOR: 0.5,
+        PUPPET_SAME_ROW_PX: 16,       // diferença de altura para contar como mesma fila
         PUPPET_FALL_GRAVITY_Y: -400,  // fase do Bob: somada à gravidade do mundo (800)
         PUPPET_VANISH_MS: 180,
         RUN_OUT_SPEED: 280,

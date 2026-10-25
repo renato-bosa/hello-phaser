@@ -531,8 +531,12 @@ const GC = {
         HAND_BAR_WIDTH: 44,
         HAND_BAR_HEIGHT: 5,
         HAND_BAR_GAP: 6,
-        LAUNCH_VX_MAX: 110,
-        LAUNCH_VY: -120,
+        // Ângulo em graus (0 = direita, 90 = baixo). -60..240 cobre tudo exceto
+        // o cone de 60° para cima, onde o boneco só bateria no teto da arena.
+        LAUNCH_ANGLE_MIN_DEG: -60,
+        LAUNCH_ANGLE_MAX_DEG: 240,
+        LAUNCH_SPEED_MIN: 60,
+        LAUNCH_SPEED_MAX: 220,
         PUPPET_SPEED: 70,
         PUPPET_SPEED_JITTER: 0.3,     // ±30%: perseguidores com a mesma velocidade se empilham
         PUPPET_ANIM_FPS: 10,

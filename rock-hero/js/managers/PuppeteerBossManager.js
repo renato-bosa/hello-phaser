@@ -125,13 +125,17 @@ class PuppeteerBossManager {
     _launchFrom(hand) {
         const cfg = GC.PUPPETEER_BOSS;
         const sprite = hand.sprite;
-        const vx = Phaser.Math.Between(-cfg.LAUNCH_VX_MAX, cfg.LAUNCH_VX_MAX);
+        const angle = Phaser.Math.DegToRad(
+            Phaser.Math.FloatBetween(cfg.LAUNCH_ANGLE_MIN_DEG, cfg.LAUNCH_ANGLE_MAX_DEG)
+        );
+        const launchSpeed = Phaser.Math.FloatBetween(cfg.LAUNCH_SPEED_MIN, cfg.LAUNCH_SPEED_MAX);
         const jitter = Phaser.Math.FloatBetween(-cfg.PUPPET_SPEED_JITTER, cfg.PUPPET_SPEED_JITTER);
         const gravityY = this.phase === 'bob' ? cfg.PUPPET_FALL_GRAVITY_Y : 0;
 
         this.scene.enemyManager.spawnPuppet(
             sprite.x, sprite.y + sprite.displayHeight / 2,
-            vx, cfg.LAUNCH_VY, cfg.PUPPET_SPEED * (1 + jitter), gravityY
+            Math.cos(angle) * launchSpeed, Math.sin(angle) * launchSpeed,
+            cfg.PUPPET_SPEED * (1 + jitter), gravityY
         );
 
         this.scene.tweens.add({

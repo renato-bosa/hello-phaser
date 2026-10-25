@@ -63,6 +63,13 @@ class GameScene extends Phaser.Scene {
         this._loadImageIfMissing('red-heart', 'assets/spritesheets/red-heart.png');
         this._loadImageIfMissing('sneaker-power', 'assets/spritesheets/sneaker-power.png');
 
+        // O auto-loader carrega `puppet` como imagem única (nome sem -Nfps).
+        if (level?.features?.puppeteerBoss) {
+            this._loadSheetIfMissing('puppet-sheet', 'assets/spritesheets/puppet.png', 32, 32);
+            this._loadImageIfMissing('puppeteer-hand', 'assets/spritesheets/mao.png');
+            this._loadImageIfMissing('puppeteer-bob', 'assets/spritesheets/bob com linguinha de fora.png');
+        }
+
         // Trilha — só faixas ainda ausentes no cache
         MusicManager.preload(this);
     }
@@ -268,6 +275,11 @@ class GameScene extends Phaser.Scene {
         if (GameData.isFeatureEnabled('estilingue') && this._slingshotData && this._stoneSpawns.length) {
             this.slingshotManager = new SlingshotManager(this);
             this.slingshotManager.create(this._slingshotData, this._stoneSpawns);
+        }
+        this.puppeteerBoss = null;
+        if (GameData.isFeatureEnabled('puppeteerBoss') && this._puppeteerHands.length) {
+            this.puppeteerBoss = new PuppeteerBossManager(this);
+            this.puppeteerBoss.create(this._puppeteerHands);
         }
         this._createStarAnimations();
         this.hudManager.create();
@@ -476,6 +488,7 @@ class GameScene extends Phaser.Scene {
         const moleHoles = [];
         this._slingshotData = null;
         this._stoneSpawns = [];
+        this._puppeteerHands = [];
         let prisonPosition = null;
         let prisonerObject = null;
 
@@ -658,6 +671,16 @@ class GameScene extends Phaser.Scene {
                     height: placement.height,
                     type: 'toupeira',
                     holeTexture: textureKey,
+                    transform
+                });
+            }
+            else if (GameData.isFeatureEnabled('puppeteerBoss') &&
+                     (type === 'puppeteer-hand' || tilesetName === 'mao')) {
+                this._puppeteerHands.push({
+                    x: placement.x,
+                    y: placement.y,
+                    width: placement.width,
+                    height: placement.height,
                     transform
                 });
             }
@@ -1799,7 +1822,9 @@ class GameScene extends Phaser.Scene {
             (p, t) => this.playerController.handleTrampolineCollision(p, t), null, this);
         this.physics.add.overlap(player, this.stars, this.collectStar, null, this);
 
-        if (this.enemyManager.enemies && this.enemyManager.enemies.children.size > 0) {
+        // O chefe do Mundo 4 começa sem inimigos: os bonecos nascem depois.
+        if (this.enemyManager.enemies &&
+            (this.enemyManager.enemies.children.size > 0 || this.puppeteerBoss)) {
             this.physics.add.collider(this.enemyManager.enemies, this.solidsLayer);
             this.physics.add.overlap(player, this.enemyManager.enemies,
                 (p, e) => this.enemyManager.handleCollision(p, e), null, this);
@@ -1995,6 +2020,7 @@ class GameScene extends Phaser.Scene {
         this.hudManager.updateWindIndicator();
         this.hudManager.updateHeldItems();
         this.hudManager.updateDebugVelocity();
+        if (this.puppeteerBoss) this.puppeteerBoss.update(this.time.now);
         this.enemyManager.update(this.time.now);
         this.effectsManager.update(this.time.now);
     }

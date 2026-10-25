@@ -34,6 +34,11 @@ class PlayerController {
         this.hearts = GC.HEARTS.MAX;
         this.isInvincible = false;
         this.invincibleUntil = 0;
+
+        // Chefe do Mundo 4: substitui o controle de plataforma (corrida de saída
+        // e nave do Bob). A piscada de invencibilidade continua rodando.
+        this.controlOverride = null;
+        this.respawnOnDamage = true;
     }
 
     create() {
@@ -85,6 +90,11 @@ class PlayerController {
             } else {
                 this.player.setAlpha(Math.sin(currentTime * 0.015) > 0 ? 1 : 0.3);
             }
+        }
+
+        if (this.controlOverride) {
+            this.controlOverride(delta);
+            return;
         }
 
         // --- Detecção de água ---
@@ -470,7 +480,7 @@ class PlayerController {
         this.isInvincible = true;
         this.invincibleUntil = this.scene.time.now + GC.HEARTS.INVINCIBILITY_MS;
 
-        this.respawnAtCheckpoint();
+        if (this.respawnOnDamage) this.respawnAtCheckpoint();
     }
 
     respawnAtCheckpoint() {

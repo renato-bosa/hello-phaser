@@ -148,19 +148,24 @@ class EnemyManager {
             return;
         }
 
-        const desiredDirection = player.x < mole.x ? -1 : 1;
+        this._updateGroundChase(mole, data, player, currentTime, onGround);
+    }
+
+    /** Persegue o jogador pelo chão (toupeira e boneco do chefe do Mundo 4). */
+    _updateGroundChase(enemy, data, player, currentTime, onGround) {
+        const desiredDirection = player.x < enemy.x ? -1 : 1;
         data.direction = desiredDirection;
-        mole.setFlipX(desiredDirection === -1);
+        enemy.setFlipX(desiredDirection === -1);
 
         if (onGround) {
             const blockedAhead = desiredDirection > 0
-                ? mole.body.blocked.right
-                : mole.body.blocked.left;
+                ? enemy.body.blocked.right
+                : enemy.body.blocked.left;
             const terrainCfg = GC.ENEMY.TOUPEIRA;
-            const terrain = this._analyzeToupeiraTerrainAhead(mole, desiredDirection, blockedAhead, terrainCfg);
+            const terrain = this._analyzeToupeiraTerrainAhead(enemy, desiredDirection, blockedAhead, terrainCfg);
 
             if (terrain.kind === 'deep_hole') {
-                mole.setVelocityX(0);
+                enemy.setVelocityX(0);
                 return;
             }
 
@@ -170,14 +175,94 @@ class EnemyManager {
                     ?? (tileSize * terrain.stepTiles + terrainCfg.STEP_JUMP_MARGIN_PX);
                 const cooldown = terrainCfg.STEP_JUMP_COOLDOWN_MS;
                 if (currentTime - data.lastStepJumpAt >= cooldown) {
-                    mole.setVelocityY(this._computeStepJumpForce(jumpHeight));
+                    enemy.setVelocityY(this._computeStepJumpForce(jumpHeight));
                     data.lastStepJumpAt = currentTime;
                 }
             }
             // shallow_hole e clear: segue andando (cai ou continua reto).
         }
 
-        mole.setVelocityX(data.speed * desiredDirection);
+        enemy.setVelocityX(data.speed * desiredDirection);
+    }
+
+    /**
+     * Boneco do chefe do Mundo 4: sai da mão em queda livre e, ao tocar o
+     * chão, persegue como a toupeira. `gravityY` soma-se à gravidade do mundo.
+     */
+    spawnPuppet(x, y, vx, vy, speed, gravityY = 0) {
+        const scene = this.scene;
+        const cfg = GC.PUPPETEER_BOSS;
+        if (!scene.anims.exists('puppet-dance')) {
+            scene.anims.create({
+                key: 'puppet-dance',
+                frames: scene.anims.generateFrameNumbers('puppet-sheet', { start: 0, end: 6 }),
+                frameRate: cfg.PUPPET_ANIM_FPS,
+                repeat: -1
+            });
+        }
+
+        const puppet = scene.physics.add.sprite(x, y, 'puppet-sheet', 0);
+        // O grupo reaplica seus defaults (velocidade, gravidade, bounds) no add;
+        // por isso a configuração do corpo vem depois.
+        this.enemies.add(puppet);
+        puppet.setDepth(GC.DEPTH.PLAYER - 1);
+        puppet.body.setSize(cfg.PUPPET_BODY_WIDTH, cfg.PUPPET_BODY_HEIGHT);
+        puppet.body.setOffset(cfg.PUPPET_BODY_OFFSET_X, cfg.PUPPET_BODY_OFFSET_Y);
+        puppet.body.setCollideWorldBounds(true);
+        puppet.body.setGravityY(gravityY);
+        puppet.setVelocity(vx, vy);
+        puppet.anims.play('puppet-dance');
+
+        puppet.patrolData = {
+            type: 'puppet',
+            state: 'falling',
+            speed,
+            direction: vx < 0 ? -1 : 1,
+            lastStepJumpAt: 0
+        };
+        return puppet;
+    }
+
+    vanishPuppet(puppet) {
+        if (!puppet?.active || !puppet.body.enable) return;
+        puppet.body.enable = false;
+        puppet.patrolData.state = 'vanishing';
+        this.scene.effectsManager.createEnemyPopBurst(puppet.x, puppet.y, 0.6);
+        this.scene.tweens.add({
+            targets: puppet,
+            scaleX: puppet.scaleX * 1.4,
+            scaleY: puppet.scaleY * 1.4,
+            alpha: 0,
+            duration: GC.PUPPETEER_BOSS.PUPPET_VANISH_MS,
+            ease: 'Cubic.easeOut',
+            onComplete: () => puppet.destroy()
+        });
+    }
+
+    countAlivePuppets() {
+        if (!this.enemies) return 0;
+        return this.enemies.getChildren().filter(e =>
+            e.active && e.body?.enable && e.patrolData?.type === 'puppet'
+        ).length;
+    }
+
+    vanishAllPuppets() {
+        if (!this.enemies) return;
+        this.enemies.getChildren()
+            .filter(e => e.patrolData?.type === 'puppet')
+            .forEach(e => this.vanishPuppet(e));
+    }
+
+    _updatePuppet(puppet, data, player, currentTime, onGround) {
+        if (!puppet.body.enable) return;
+        if (data.state === 'falling') {
+            if (!onGround) return;
+            data.state = 'chasing';
+            this.scene.puppeteerBoss?.onPuppetLanded(puppet);
+            if (!puppet.body.enable) return;
+        }
+        if (!player || !player.active) return;
+        this._updateGroundChase(puppet, data, player, currentTime, onGround);
     }
 
     _createToupeiraChefe(spawn) {
@@ -1094,6 +1179,11 @@ class EnemyManager {
                 return;
             }
 
+            if (data.type === 'puppet') {
+                this._updatePuppet(enemy, data, player, currentTime, onGround);
+                return;
+            }
+
             if (data.type === 'sapo-verde') {
                 if (onGround && currentTime - data.lastJumpTime >= data.jumpInterval) {
                     enemy.setVelocityY(data.jumpForce);
@@ -1628,6 +1718,12 @@ class EnemyManager {
         const enemyType = enemy.patrolData?.type;
         if (enemyType === 'toupeira' && enemy.patrolData.state !== 'chasing') return;
 
+        // Na nave do Bob não há pisão: qualquer contato com boneco machuca.
+        if (enemyType === 'puppet' && this.scene.puppeteerBoss?.isBobPhase()) {
+            this._damagePlayer();
+            return;
+        }
+
         if (enemyType === 'toupeira-chefe') {
             const bossState = enemy.patrolData.state;
             // Fuga / buraco / emergência: invulnerável e inofensivo.
@@ -1925,5 +2021,10 @@ class EnemyManager {
 
         enemy.body.enable = false;
         SoundManager.play('damage');
+
+        if (enemy.patrolData?.type === 'puppet') {
+            enemy.patrolData.state = 'vanishing';
+            this.scene.puppeteerBoss?.onPuppetStomped();
+        }
     }
 }

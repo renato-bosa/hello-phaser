@@ -219,6 +219,16 @@ const SoundManager = {
             decay: 0.36,
             slide: -1100
         },
+        // Tiro do Bob (chefe do Mundo 4): curto, toca várias vezes por segundo
+        shoot: {
+            type: 'square',
+            frequency: 1200,
+            duration: 0.08,
+            volume: 0.18,
+            attack: 0.002,
+            decay: 0.07,
+            slide: -700
+        },
         death: {
             type: 'square',
             frequency: 300,

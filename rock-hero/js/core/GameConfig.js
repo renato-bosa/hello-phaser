@@ -285,7 +285,7 @@ const GameConfig = {
             id: 4,
             name: 'Mundo 4',
             subtitle: 'Mecânicas Experimentais',
-            levels: [15, 16, 17, 18, 19], // map18 … map22
+            levels: [15, 16, 17, 18, 19, 27], // map18 … map22 + chefe
             rescuedCharacter: 'vocalista',
             celebrationMessage: 'Mecânicas dominadas!',
             theme: 'special',
@@ -506,7 +506,7 @@ const GameConfig = {
             connectsTo: [25]
         },
         // ==================== MUNDO 4 — Mecânicas Experimentais ====================
-        // map-4-1 … map-4-5
+        // map-4-1 … map-4-5 (o chefe, map-4-6, fica no fim da lista)
         {
             key: 'map18',
             file: 'assets/map-4-1.json',
@@ -524,7 +524,7 @@ const GameConfig = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 200, y: 170 },
+            mapPosition: { x: 180, y: 170 },
             connectsTo: [17],
             features: { upsideDown: true, wind: true }
         },
@@ -535,7 +535,7 @@ const GameConfig = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 305, y: 215 },
+            mapPosition: { x: 265, y: 215 },
             connectsTo: [18],
             features: { autoScroll: true }
         },
@@ -546,7 +546,7 @@ const GameConfig = {
             zoom: 1.0,
             roundPixels: true,
             world: 4,
-            mapPosition: { x: 415, y: 165 },
+            mapPosition: { x: 355, y: 165 },
             connectsTo: [19],
             features: { wind: true }
         },
@@ -557,8 +557,8 @@ const GameConfig = {
             zoom: 0.9,
             roundPixels: false,
             world: 4,
-            mapPosition: { x: 520, y: 210 },
-            connectsTo: []
+            mapPosition: { x: 440, y: 210 },
+            connectsTo: [27]
         },
         {
             key: 'map-chefe-mundo1',
@@ -631,6 +631,18 @@ const GameConfig = {
             world: 5,
             mapPosition: { x: 510, y: 185 },
             connectsTo: []
+        },
+        {
+            key: 'map-chefe-mundo4',
+            file: 'assets/map-4-6_chefe.json',
+            name: 'Chefe do Mundo 4',
+            // Arena inteira visível: as mãos ficam no topo e o tiro do Bob é vertical.
+            zoom: 0.6875,
+            roundPixels: false,
+            world: 4,
+            mapPosition: { x: 525, y: 175 },
+            connectsTo: [],
+            features: { puppeteerBoss: true }
         }
     ],
 

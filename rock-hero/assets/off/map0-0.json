@@ -1,73 +1,70 @@
 { "compressionlevel":-1,
- "height":12,
+ "height":11,
  "infinite":false,
  "layers":[
         {
-         "data":[19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
-            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
-         "height":12,
+         "data":[19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19,
+            19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19, 19],
+         "height":11,
          "id":5,
          "name":"bg",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
-         "width":21,
+         "width":20,
          "x":0,
          "y":0
         }, 
         {
-         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 15, 0, 0, 0, 0, 0, 15, 15, 15,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         "height":12,
+         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 0, 0, 15, 15, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":11,
          "id":9,
          "name":"bg_decoration",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
-         "width":21,
+         "width":20,
          "x":0,
          "y":0
         }, 
         {
-         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 13, 9, 9, 9, 2147483661, 1, 1, 1, 13, 9, 9, 9],
-         "height":12,
+         "data":[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2,
+            2, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13, 9, 9, 2147483661, 1, 13, 9, 9, 2],
+         "height":11,
          "id":3,
          "name":"solids",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
-         "width":21,
+         "width":20,
          "x":0,
          "y":0
         }, 
@@ -91,8 +88,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":64,
-                 "y":352
+                 "x":96,
+                 "y":320
                 }, 
                 {
                  "gid":8,
@@ -109,7 +106,7 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":288,
+                 "x":480,
                  "y":128
                 }, 
                 {
@@ -121,8 +118,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":64,
-                 "y":256
+                 "x":96,
+                 "y":96
                 }, 
                 {
                  "gid":20,
@@ -133,8 +130,20 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":352,
-                 "y":224
+                 "x":192,
+                 "y":160
+                }, 
+                {
+                 "gid":20,
+                 "height":32,
+                 "id":11,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":480,
+                 "y":320
                 }, 
                 {
                  "gid":20,
@@ -145,32 +154,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":608,
-                 "y":256
-                }, 
-                {
-                 "gid":20,
-                 "height":32,
-                 "id":13,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
                  "x":352,
-                 "y":128
-                }, 
-                {
-                 "gid":20,
-                 "height":32,
-                 "id":14,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":512,
-                 "y":192
+                 "y":96
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -179,7 +164,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":15,
+ "nextobjectid":14,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -188,7 +173,7 @@
         {
          "columns":1,
          "firstgid":1,
-         "image":"spritesheets\/grass.png",
+         "image":"..\/spritesheets\/grass.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -211,7 +196,7 @@
         {
          "columns":1,
          "firstgid":2,
-         "image":"spritesheets\/bricks.png",
+         "image":"..\/spritesheets\/bricks.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -234,7 +219,7 @@
         {
          "columns":1,
          "firstgid":3,
-         "image":"spritesheets\/black.png",
+         "image":"..\/spritesheets\/black.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -247,7 +232,7 @@
         {
          "columns":2,
          "firstgid":4,
-         "image":"spritesheets\/still-hero (2).png",
+         "image":"..\/spritesheets\/still-hero (2).png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -260,7 +245,7 @@
         {
          "columns":1,
          "firstgid":8,
-         "image":"spritesheets\/green-flag.png",
+         "image":"..\/spritesheets\/green-flag.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -273,7 +258,7 @@
         {
          "columns":2,
          "firstgid":9,
-         "image":"spritesheets\/lava-roxa-animated.png",
+         "image":"..\/spritesheets\/lava-roxa-animated.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -360,7 +345,7 @@
         {
          "columns":1,
          "firstgid":13,
-         "image":"spritesheets\/grass-with-barrier.png",
+         "image":"..\/spritesheets\/grass-with-barrier.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -389,7 +374,7 @@
         {
          "columns":1,
          "firstgid":14,
-         "image":"spritesheets\/abstract-blue.png",
+         "image":"..\/spritesheets\/abstract-blue.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -402,7 +387,7 @@
         {
          "columns":2,
          "firstgid":15,
-         "image":"spritesheets\/lava-bubbles-4fps.png",
+         "image":"..\/spritesheets\/lava-bubbles-4fps.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -415,7 +400,7 @@
         {
          "columns":1,
          "firstgid":19,
-         "image":"spritesheets\/abstract-smooth-blue.png",
+         "image":"..\/spritesheets\/abstract-smooth-blue.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -428,7 +413,7 @@
         {
          "columns":3,
          "firstgid":20,
-         "image":"spritesheets\/yellow-star-animated.png",
+         "image":"..\/spritesheets\/yellow-star-animated.png",
          "imageheight":96,
          "imagewidth":96,
          "margin":0,
@@ -437,85 +422,9 @@
          "tilecount":9,
          "tileheight":32,
          "tilewidth":32
-        }, 
-        {
-         "columns":4,
-         "firstgid":29,
-         "image":"spritesheets\/abstract-spread-blue-blinking-green-8fps.png",
-         "imageheight":128,
-         "imagewidth":128,
-         "margin":0,
-         "name":"abstract-spread-blue-blinking-green-8fps",
-         "spacing":0,
-         "tilecount":16,
-         "tileheight":32,
-         "tiles":[
-                {
-                 "id":0,
-                 "properties":[
-                        {
-                         "name":"fps",
-                         "type":"int",
-                         "value":8
-                        }, 
-                        {
-                         "name":"frames_random",
-                         "type":"int",
-                         "value":10
-                        }]
-                }],
-         "tilewidth":32
-        }, 
-        {
-         "columns":3,
-         "firstgid":45,
-         "image":"spritesheets\/abstract-spread-blue-blinking-red-8fps.png",
-         "imageheight":128,
-         "imagewidth":96,
-         "margin":0,
-         "name":"abstract-spread-blue-blinking-red-8fps",
-         "properties":[
-                {
-                 "name":"fps",
-                 "type":"int",
-                 "value":8
-                }, 
-                {
-                 "name":"frames_random",
-                 "type":"int",
-                 "value":10
-                }],
-         "spacing":0,
-         "tilecount":12,
-         "tileheight":32,
-         "tilewidth":32
-        }, 
-        {
-         "columns":3,
-         "firstgid":57,
-         "image":"spritesheets\/abstract-spread-blue-blinking-yellow-8fps.png",
-         "imageheight":128,
-         "imagewidth":96,
-         "margin":0,
-         "name":"abstract-spread-blue-blinking-yellow-8fps",
-         "properties":[
-                {
-                 "name":"fps",
-                 "type":"int",
-                 "value":8
-                }, 
-                {
-                 "name":"frames_random",
-                 "type":"int",
-                 "value":10
-                }],
-         "spacing":0,
-         "tilecount":12,
-         "tileheight":32,
-         "tilewidth":32
         }],
  "tilewidth":32,
  "type":"map",
  "version":"1.10",
- "width":21
+ "width":20
 }

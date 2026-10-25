@@ -31,10 +31,10 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 0, 0, 15, 15, 0,
+            0, 0, 0, 0, 0, 0, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 0,
+            0, 0, 0, 0, 0, 0, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 0,
+            0, 0, 0, 0, 0, 0, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 0,
+            0, 0, 0, 0, 0, 0, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":11,
          "id":9,
@@ -49,14 +49,14 @@
         {
          "data":[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
             2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 2,
             2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            2, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 2,
-            2, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 29, 29, 29, 2,
+            2, 0, 0, 0, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 29, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 0, 29, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+            2, 0, 0, 29, 29, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
             2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13, 9, 9, 2147483661, 1, 13, 9, 9, 2],
          "height":11,
          "id":3,
@@ -65,6 +65,28 @@
          "type":"tilelayer",
          "visible":true,
          "width":20,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":10,
+         "name":"water-zone",
+         "objects":[
+                {
+                 "height":128,
+                 "id":72,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":416,
+                 "x":192,
+                 "y":192
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -88,7 +110,7 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":96,
+                 "x":64,
                  "y":320
                 }, 
                 {
@@ -106,8 +128,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":480,
-                 "y":128
+                 "x":576,
+                 "y":160
                 }, 
                 {
                  "gid":20,
@@ -118,7 +140,7 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":96,
+                 "x":256,
                  "y":96
                 }, 
                 {
@@ -130,20 +152,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":192,
-                 "y":160
-                }, 
-                {
-                 "gid":20,
-                 "height":32,
-                 "id":11,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":32,
-                 "x":480,
-                 "y":320
+                 "x":320,
+                 "y":64
                 }, 
                 {
                  "gid":20,
@@ -154,8 +164,20 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":352,
+                 "x":416,
                  "y":96
+                }, 
+                {
+                 "gid":20,
+                 "height":32,
+                 "id":73,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":480,
+                 "y":320
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -163,8 +185,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":10,
- "nextobjectid":14,
+ "nextlayerid":11,
+ "nextobjectid":74,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -173,7 +195,7 @@
         {
          "columns":1,
          "firstgid":1,
-         "image":"spritesheets\/grass.png",
+         "image":"..\/spritesheets\/grass.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -196,7 +218,7 @@
         {
          "columns":1,
          "firstgid":2,
-         "image":"spritesheets\/bricks.png",
+         "image":"..\/spritesheets\/bricks.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -219,7 +241,7 @@
         {
          "columns":1,
          "firstgid":3,
-         "image":"spritesheets\/black.png",
+         "image":"..\/spritesheets\/black.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -232,7 +254,7 @@
         {
          "columns":2,
          "firstgid":4,
-         "image":"spritesheets\/still-hero (2).png",
+         "image":"..\/spritesheets\/still-hero (2).png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -245,7 +267,7 @@
         {
          "columns":1,
          "firstgid":8,
-         "image":"spritesheets\/green-flag.png",
+         "image":"..\/spritesheets\/green-flag.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -258,7 +280,7 @@
         {
          "columns":2,
          "firstgid":9,
-         "image":"spritesheets\/lava-roxa-animated.png",
+         "image":"..\/spritesheets\/lava-roxa-animated.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -345,7 +367,7 @@
         {
          "columns":1,
          "firstgid":13,
-         "image":"spritesheets\/grass-with-barrier.png",
+         "image":"..\/spritesheets\/grass-with-barrier.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -374,7 +396,7 @@
         {
          "columns":1,
          "firstgid":14,
-         "image":"spritesheets\/abstract-blue.png",
+         "image":"..\/spritesheets\/abstract-blue.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -387,7 +409,7 @@
         {
          "columns":2,
          "firstgid":15,
-         "image":"spritesheets\/lava-bubbles-4fps.png",
+         "image":"..\/spritesheets\/lava-bubbles-4fps.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -400,7 +422,7 @@
         {
          "columns":1,
          "firstgid":19,
-         "image":"spritesheets\/abstract-smooth-blue.png",
+         "image":"..\/spritesheets\/abstract-smooth-blue.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -413,13 +435,39 @@
         {
          "columns":3,
          "firstgid":20,
-         "image":"spritesheets\/yellow-star-animated.png",
+         "image":"..\/spritesheets\/yellow-star-animated.png",
          "imageheight":96,
          "imagewidth":96,
          "margin":0,
          "name":"yellow-star-animated",
          "spacing":0,
          "tilecount":9,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":29,
+         "image":"..\/spritesheets\/blue-bricks2.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"blue-bricks2",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":30,
+         "image":"..\/spritesheets\/agua.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"agua",
+         "spacing":0,
+         "tilecount":1,
          "tileheight":32,
          "tilewidth":32
         }],

@@ -350,10 +350,10 @@ const GameConfig = {
     // Ordem alinhada a rock-hero-mundos-proposta2.json
     LEVELS: [
         // ==================== MUNDO 1 ====================
-        // map0-1 → map2-0 → map-3 → map-ultima-mundo1 → map-4
+        // map-1-1 … map-1-5 (chefe map-1-6 mais abaixo)
         {
             key: 'map0-1',
-            file: 'assets/map0-1.json',
+            file: 'assets/map-1-1.json',
             name: 'Descobrindo o mundo',
             zoom: 1.0,
             roundPixels: true,
@@ -363,7 +363,7 @@ const GameConfig = {
         },
         {
             key: 'map2-0',
-            file: 'assets/map2-0.json',
+            file: 'assets/map-1-2.json',
             name: 'Seguindo em frente',
             zoom: 0.9,
             roundPixels: false,
@@ -373,7 +373,7 @@ const GameConfig = {
         },
         {
             key: 'map3',
-            file: 'assets/map-3--desafio do luigi.json',
+            file: 'assets/map-1-3_desafio do luigi.json',
             name: 'Sapos e lava',
             zoom: 0.9,
             roundPixels: false,
@@ -383,7 +383,7 @@ const GameConfig = {
         },
         {
             key: 'map-ultima-mundo1',
-            file: 'assets/map-ultima-mundo1.json',
+            file: 'assets/map-1-4_ultima.json',
             name: 'O Último Desafio',
             zoom: 0.9,
             roundPixels: false,
@@ -393,7 +393,7 @@ const GameConfig = {
         },
         {
             key: 'map4',
-            file: 'assets/map-4--big-jumps.json',
+            file: 'assets/map-1-5_big-jumps.json',
             name: 'Os Pulos Maiores',
             zoom: 0.9,
             roundPixels: false,
@@ -402,10 +402,10 @@ const GameConfig = {
             connectsTo: [20]
         },
         // ==================== MUNDO 2 ====================
-        // map-5 → map-6 → map-2 → map-8 → map-7
+        // map-2-1 … map-2-5 (chefe map-2-6 mais abaixo)
         {
             key: 'map5',
-            file: 'assets/map-5--caverna.json',
+            file: 'assets/map-2-1_caverna.json',
             name: 'Cristais Fascinantes',
             zoom: 0.9,
             roundPixels: false,
@@ -415,7 +415,7 @@ const GameConfig = {
         },
         {
             key: 'map6',
-            file: 'assets/map-6--caverna2.json',
+            file: 'assets/map-2-2_caverna2.json',
             name: 'Ative o turbo!',
             zoom: 0.9,
             roundPixels: false,
@@ -425,7 +425,7 @@ const GameConfig = {
         },
         {
             key: 'map2',
-            file: 'assets/map-2--expansion and speed.json',
+            file: 'assets/map-2-3_expansion and speed.json',
             name: 'Pulos decisivos',
             zoom: 0.9,
             roundPixels: false,
@@ -435,7 +435,7 @@ const GameConfig = {
         },
         {
             key: 'map8',
-            file: 'assets/map-8.json',
+            file: 'assets/map-2-4.json',
             name: 'Simples',
             zoom: 0.9,
             roundPixels: false,
@@ -445,7 +445,7 @@ const GameConfig = {
         },
         {
             key: 'map7',
-            file: 'assets/map-7--planicie.json',
+            file: 'assets/map-2-5_planicie.json',
             name: 'Caos de anfíbios',
             zoom: 0.9,
             roundPixels: false,
@@ -454,10 +454,10 @@ const GameConfig = {
             connectsTo: [21]
         },
         // ==================== MUNDO 3 ====================
-        // map-10 → map-11 → map-12 → map-16 → map-17 → chefe
+        // map-3-1 … map-3-5 (chefe map-3-6 mais abaixo)
         {
             key: 'map10',
-            file: 'assets/map-10.json',
+            file: 'assets/map-3-1.json',
             name: 'Ruínas Submersas',
             zoom: 0.9,
             roundPixels: false,
@@ -467,7 +467,7 @@ const GameConfig = {
         },
         {
             key: 'map11',
-            file: 'assets/map-11.json',
+            file: 'assets/map-3-2.json',
             name: 'Labirinto de Lava',
             zoom: 0.9,
             roundPixels: false,
@@ -477,7 +477,7 @@ const GameConfig = {
         },
         {
             key: 'map12',
-            file: 'assets/map-12.json',
+            file: 'assets/map-3-3.json',
             name: 'Abismo Submerso',
             zoom: 0.9,
             roundPixels: false,
@@ -487,7 +487,7 @@ const GameConfig = {
         },
         {
             key: 'map16',
-            file: 'assets/map-16.json',
+            file: 'assets/map-3-4.json',
             name: 'Ascensão Abissal',
             zoom: 0.9,
             roundPixels: false,
@@ -497,7 +497,7 @@ const GameConfig = {
         },
         {
             key: 'map17',
-            file: 'assets/map-17.json',
+            file: 'assets/map-3-5.json',
             name: 'Areia e Profundezas',
             zoom: 0.9,
             roundPixels: false,
@@ -506,10 +506,10 @@ const GameConfig = {
             connectsTo: [25]
         },
         // ==================== MUNDO 4 — Mecânicas Experimentais ====================
-        // map-18 → map-19 → map-20 → map-21 → map-22
+        // map-4-1 … map-4-5
         {
             key: 'map18',
-            file: 'assets/map-18.json',
+            file: 'assets/map-4-1.json',
             name: 'Abismo Final',
             zoom: 0.9,
             roundPixels: false,
@@ -519,7 +519,7 @@ const GameConfig = {
         },
         {
             key: 'map19',
-            file: 'assets/map-19.json',
+            file: 'assets/map-4-2.json',
             name: 'Ponta-Cabeça',
             zoom: 1.0,
             roundPixels: true,
@@ -530,7 +530,7 @@ const GameConfig = {
         },
         {
             key: 'map20',
-            file: 'assets/map-20-auto-rolagem.json',
+            file: 'assets/map-4-3_auto-rolagem.json',
             name: 'Sem Parar!',
             zoom: 1.0,
             roundPixels: true,
@@ -541,7 +541,7 @@ const GameConfig = {
         },
         {
             key: 'map21',
-            file: 'assets/map-21-nuvens.json',
+            file: 'assets/map-4-4_nuvens.json',
             name: 'Entre Nuvens',
             zoom: 1.0,
             roundPixels: true,
@@ -552,7 +552,7 @@ const GameConfig = {
         },
         {
             key: 'map22',
-            file: 'assets/map-22-octopus.json',
+            file: 'assets/map-4-5_octopus.json',
             name: 'Mar do Polvo',
             zoom: 0.9,
             roundPixels: false,
@@ -562,7 +562,7 @@ const GameConfig = {
         },
         {
             key: 'map-chefe-mundo1',
-            file: 'assets/map-chefe-mundo1.json',
+            file: 'assets/map-1-6_chefe.json',
             name: 'Chefe do Mundo 1',
             zoom: 0.9,
             roundPixels: false,
@@ -572,7 +572,7 @@ const GameConfig = {
         },
         {
             key: 'map-chefe-mundo2',
-            file: 'assets/map-chefe-mundo2.json',
+            file: 'assets/map-2-6_chefe.json',
             name: 'Chefe do Mundo 2',
             zoom: 0.9,
             roundPixels: false,
@@ -582,7 +582,7 @@ const GameConfig = {
         },
         {
             key: 'map23',
-            file: 'assets/map-23-catedral-do-eco.json',
+            file: 'assets/map-5-1_catedral-do-eco.json',
             name: 'Catedral do Eco',
             zoom: 0.9,
             roundPixels: false,
@@ -592,7 +592,7 @@ const GameConfig = {
         },
         {
             key: 'map24',
-            file: 'assets/map-24-cisternas.json',
+            file: 'assets/map-5-2_cisternas.json',
             name: 'Cisternas do Órgão',
             zoom: 0.9,
             roundPixels: false,
@@ -602,7 +602,7 @@ const GameConfig = {
         },
         {
             key: 'map25',
-            file: 'assets/map-25-carrilhao.json',
+            file: 'assets/map-5-3_carrilhao.json',
             name: 'Carrilhão de Ferro',
             zoom: 0.9,
             roundPixels: false,
@@ -612,7 +612,7 @@ const GameConfig = {
         },
         {
             key: 'map-chefe-mundo3',
-            file: 'assets/map-boss3.json',
+            file: 'assets/map-3-6_boss.json',
             name: 'Chefe do Mundo 3',
             zoom: 0.9,
             roundPixels: false,
@@ -624,7 +624,7 @@ const GameConfig = {
         },
         {
             key: 'map-23',
-            file: 'assets/map-23.json',
+            file: 'assets/map-5-4.json',
             name: 'Mapa 23',
             zoom: 0.9,
             roundPixels: false,

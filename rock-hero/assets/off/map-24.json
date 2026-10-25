@@ -4,7 +4,7 @@
  "layers":[
         {
          "id":11,
-         "image":"spritesheets\/level-backgrounds\/background1.png",
+         "image":"..\/spritesheets\/level-backgrounds\/background1.png",
          "imageheight":941,
          "imagewidth":1672,
          "name":"bg_image_static",
@@ -167,7 +167,7 @@
         {
          "columns":1,
          "firstgid":1,
-         "image":"spritesheets\/grass.png",
+         "image":"..\/spritesheets\/grass.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -190,7 +190,7 @@
         {
          "columns":1,
          "firstgid":2,
-         "image":"spritesheets\/bricks.png",
+         "image":"..\/spritesheets\/bricks.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -213,7 +213,7 @@
         {
          "columns":1,
          "firstgid":3,
-         "image":"spritesheets\/black.png",
+         "image":"..\/spritesheets\/black.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -226,7 +226,7 @@
         {
          "columns":2,
          "firstgid":4,
-         "image":"spritesheets\/still-hero (2).png",
+         "image":"..\/spritesheets\/still-hero (2).png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -239,7 +239,7 @@
         {
          "columns":1,
          "firstgid":8,
-         "image":"spritesheets\/green-flag.png",
+         "image":"..\/spritesheets\/green-flag.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -252,7 +252,7 @@
         {
          "columns":2,
          "firstgid":9,
-         "image":"spritesheets\/lava-roxa-animated.png",
+         "image":"..\/spritesheets\/lava-roxa-animated.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -339,7 +339,7 @@
         {
          "columns":1,
          "firstgid":13,
-         "image":"spritesheets\/grass-with-barrier.png",
+         "image":"..\/spritesheets\/grass-with-barrier.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -368,7 +368,7 @@
         {
          "columns":1,
          "firstgid":14,
-         "image":"spritesheets\/abstract-blue.png",
+         "image":"..\/spritesheets\/abstract-blue.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -381,7 +381,7 @@
         {
          "columns":2,
          "firstgid":15,
-         "image":"spritesheets\/lava-bubbles-4fps.png",
+         "image":"..\/spritesheets\/lava-bubbles-4fps.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -394,7 +394,7 @@
         {
          "columns":1,
          "firstgid":19,
-         "image":"spritesheets\/abstract-smooth-blue.png",
+         "image":"..\/spritesheets\/abstract-smooth-blue.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -407,7 +407,7 @@
         {
          "columns":3,
          "firstgid":20,
-         "image":"spritesheets\/yellow-star-animated.png",
+         "image":"..\/spritesheets\/yellow-star-animated.png",
          "imageheight":96,
          "imagewidth":96,
          "margin":0,
@@ -420,7 +420,7 @@
         {
          "columns":1,
          "firstgid":29,
-         "image":"spritesheets\/blue-bricks2.png",
+         "image":"..\/spritesheets\/blue-bricks2.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -433,7 +433,7 @@
         {
          "columns":1,
          "firstgid":30,
-         "image":"spritesheets\/agua.png",
+         "image":"..\/spritesheets\/agua.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -446,7 +446,7 @@
         {
          "columns":1,
          "firstgid":31,
-         "image":"spritesheets\/dark-bricks-fuzzy-shades-melted.png",
+         "image":"..\/spritesheets\/dark-bricks-fuzzy-shades-melted.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -459,7 +459,7 @@
         {
          "columns":1,
          "firstgid":32,
-         "image":"spritesheets\/trampoline-thick.png",
+         "image":"..\/spritesheets\/trampoline-thick.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -472,7 +472,7 @@
         {
          "columns":1,
          "firstgid":33,
-         "image":"spritesheets\/grama noturna.png",
+         "image":"..\/spritesheets\/grama noturna.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -485,7 +485,7 @@
         {
          "columns":1,
          "firstgid":34,
-         "image":"spritesheets\/gray-bricks.png",
+         "image":"..\/spritesheets\/gray-bricks.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -498,7 +498,7 @@
         {
          "columns":1,
          "firstgid":35,
-         "image":"spritesheets\/green-bricks.png",
+         "image":"..\/spritesheets\/green-bricks.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -511,7 +511,7 @@
         {
          "columns":2,
          "firstgid":36,
-         "image":"spritesheets\/sapo-verde-6fps.png",
+         "image":"..\/spritesheets\/sapo-verde-6fps.png",
          "imageheight":96,
          "imagewidth":64,
          "margin":0,
@@ -524,7 +524,7 @@
         {
          "columns":2,
          "firstgid":42,
-         "image":"spritesheets\/sapo-tomate-6fps.png",
+         "image":"..\/spritesheets\/sapo-tomate-6fps.png",
          "imageheight":96,
          "imagewidth":64,
          "margin":0,
@@ -537,7 +537,7 @@
         {
          "columns":1,
          "firstgid":48,
-         "image":"spritesheets\/mushroom-purple.png",
+         "image":"..\/spritesheets\/mushroom-purple.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -550,7 +550,7 @@
         {
          "columns":1,
          "firstgid":49,
-         "image":"spritesheets\/1up.png",
+         "image":"..\/spritesheets\/1up.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -563,7 +563,7 @@
         {
          "columns":2,
          "firstgid":50,
-         "image":"spritesheets\/1up-animated-4fps.png",
+         "image":"..\/spritesheets\/1up-animated-4fps.png",
          "imageheight":96,
          "imagewidth":64,
          "margin":0,
@@ -576,7 +576,7 @@
         {
          "columns":1,
          "firstgid":56,
-         "image":"spritesheets\/Areia.png",
+         "image":"..\/spritesheets\/Areia.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -589,7 +589,7 @@
         {
          "columns":2,
          "firstgid":57,
-         "image":"spritesheets\/Cavalo marinho.png",
+         "image":"..\/spritesheets\/Cavalo marinho.png",
          "imageheight":96,
          "imagewidth":64,
          "margin":0,
@@ -602,7 +602,7 @@
         {
          "columns":1,
          "firstgid":63,
-         "image":"spritesheets\/nuvem-continuacao.png",
+         "image":"..\/spritesheets\/nuvem-continuacao.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -615,7 +615,7 @@
         {
          "columns":1,
          "firstgid":64,
-         "image":"spritesheets\/nuvem-sorriso.png",
+         "image":"..\/spritesheets\/nuvem-sorriso.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -628,7 +628,7 @@
         {
          "columns":1,
          "firstgid":65,
-         "image":"spritesheets\/nuvemzita.png",
+         "image":"..\/spritesheets\/nuvemzita.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -641,7 +641,7 @@
         {
          "columns":1,
          "firstgid":66,
-         "image":"spritesheets\/ceu-azul-medio.png",
+         "image":"..\/spritesheets\/ceu-azul-medio.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -654,7 +654,7 @@
         {
          "columns":1,
          "firstgid":67,
-         "image":"spritesheets\/setas-velocidade.png",
+         "image":"..\/spritesheets\/setas-velocidade.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -667,7 +667,7 @@
         {
          "columns":2,
          "firstgid":68,
-         "image":"spritesheets\/fg_dec_grass_random_frame_grass.png",
+         "image":"..\/spritesheets\/fg_dec_grass_random_frame_grass.png",
          "imageheight":96,
          "imagewidth":64,
          "margin":0,
@@ -680,7 +680,7 @@
         {
          "columns":3,
          "firstgid":74,
-         "image":"spritesheets\/Boneco-14fps.png",
+         "image":"..\/spritesheets\/Boneco-14fps.png",
          "imageheight":96,
          "imagewidth":96,
          "margin":0,
@@ -693,7 +693,7 @@
         {
          "columns":1,
          "firstgid":83,
-         "image":"spritesheets\/octopus.png",
+         "image":"..\/spritesheets\/octopus.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -706,7 +706,7 @@
         {
          "columns":1,
          "firstgid":84,
-         "image":"spritesheets\/green-flag.png",
+         "image":"..\/spritesheets\/green-flag.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
@@ -719,7 +719,7 @@
         {
          "columns":1,
          "firstgid":85,
-         "image":"spritesheets\/starry-red-sky.png",
+         "image":"..\/spritesheets\/starry-red-sky.png",
          "imageheight":32,
          "imagewidth":32,
          "margin":0,

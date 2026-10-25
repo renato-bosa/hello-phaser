@@ -524,6 +524,10 @@ const GC = {
         HAND_DEFEATED_DROP_PX: 14,
         HAND_DEFEATED_ANGLE: 18,
         HAND_DEFEATED_MS: 500,
+        // Queda final das duas mãos (some enquanto cai); termina antes do DEFEAT_DELAY_MS.
+        HAND_FALL_PX: 80,
+        HAND_FALL_ANGLE: 40,
+        HAND_FALL_MS: 700,
         HAND_BAR_WIDTH: 44,
         HAND_BAR_HEIGHT: 5,
         HAND_BAR_GAP: 6,

@@ -343,20 +343,42 @@ class PuppeteerBossManager {
         SoundManager.play('enemyPop');
         scene.cameras.main.shake(200, 0.006);
 
-        scene.tweens.add({
+        if (this.hands.every(h => !h.alive)) {
+            this._onDefeated({ x: sprite.x, y: sprite.y });
+            return;
+        }
+
+        hand.droop = scene.tweens.add({
             targets: sprite,
             y: sprite.y + cfg.HAND_DEFEATED_DROP_PX,
             angle: sprite.flipX ? -cfg.HAND_DEFEATED_ANGLE : cfg.HAND_DEFEATED_ANGLE,
             duration: cfg.HAND_DEFEATED_MS,
             ease: 'Back.easeOut'
         });
+    }
 
-        if (this.hands.every(h => !h.alive)) this._onDefeated({ x: sprite.x, y: sprite.y });
+    /** Com as duas mãos derrotadas, o marionetista inteiro despenca e some. */
+    _dropAllHands() {
+        const cfg = GC.PUPPETEER_BOSS;
+        this.hands.forEach(hand => {
+            const sprite = hand.sprite;
+            if (hand.droop) hand.droop.stop();
+            this.scene.tweens.add({
+                targets: sprite,
+                y: sprite.y + cfg.HAND_FALL_PX,
+                angle: sprite.flipX ? -cfg.HAND_FALL_ANGLE : cfg.HAND_FALL_ANGLE,
+                alpha: 0,
+                duration: cfg.HAND_FALL_MS,
+                ease: 'Quad.easeIn',
+                onComplete: () => sprite.destroy()
+            });
+        });
     }
 
     _onDefeated(origin) {
         const scene = this.scene;
         this.phase = 'defeated';
+        this._dropAllHands();
         scene.enemyManager.vanishAllPuppets();
         // Chamado de dentro do overlap mão×tiros: esvaziar o grupo agora
         // destruiria corpos que a física ainda vai percorrer neste passo.

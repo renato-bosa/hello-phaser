@@ -3,12 +3,13 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "assets/map-5--caverna.json",
+    "activeFile": "assets/off/map-24.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "assets",
+        ".",
         "dev-resources",
-        "."
+        "assets/off"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {
@@ -2026,11 +2027,11 @@
             "scaleInDock": 1
         },
         "assets/off/map-24.json": {
-            "scale": 0.31647727272727266,
-            "selectedLayer": 0,
+            "scale": 0.75,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 835.7630161579893,
-                "y": 470.8078994614005
+                "x": 463.99999999999994,
+                "y": 233.3333333333333
             }
         },
         "assets/off/map-24.json#1up": {
@@ -2061,6 +2062,9 @@
             "scaleInDock": 1
         },
         "assets/off/map-24.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/off/map-24.json#bob com linguinha de fora": {
             "scaleInDock": 1
         },
         "assets/off/map-24.json#bricks": {
@@ -2099,6 +2103,9 @@
         "assets/off/map-24.json#lava-roxa-animated": {
             "scaleInDock": 1
         },
+        "assets/off/map-24.json#mao": {
+            "scaleInDock": 1
+        },
         "assets/off/map-24.json#mushroom-purple": {
             "scaleInDock": 1
         },
@@ -2114,6 +2121,9 @@
         "assets/off/map-24.json#octopus": {
             "scaleInDock": 1
         },
+        "assets/off/map-24.json#puppet": {
+            "scaleInDock": 1
+        },
         "assets/off/map-24.json#sapo-tomate-6fps": {
             "scaleInDock": 1
         },
@@ -2127,6 +2137,9 @@
             "scaleInDock": 1
         },
         "assets/off/map-24.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/off/map-24.json#terra": {
             "scaleInDock": 1
         },
         "assets/off/map-24.json#trampoline-thick": {
@@ -5120,7 +5133,7 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "assets/map-5--caverna.json"
+        "assets/off/map-24.json"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",

@@ -6,10 +6,10 @@
     "activeFile": "assets/map-4-6_chefe.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
+        "assets/off",
         ".",
-        "dev-resources",
         "assets",
-        "assets/off"
+        "dev-resources"
     ],
     "file.lastUsedOpenFilter": "Todos os Ficheiros (*)",
     "fileStates": {

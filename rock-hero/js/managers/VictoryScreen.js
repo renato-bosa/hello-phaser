@@ -448,7 +448,8 @@ class VictoryScreen {
 
             const cutsceneByWorld = {
                 1: 'world1Complete',
-                2: 'world2Complete'
+                2: 'world2Complete',
+                3: 'world3Complete'
             };
             const cutsceneId = cutsceneByWorld[world.id];
 

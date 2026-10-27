@@ -70,7 +70,7 @@ GameConfigVariants.proposta = {
             theme: 'special',
             bgColor: 0x0a0618,
             pathColor: 0xaa66cc,
-            bgImage: 'assets/spritesheets/worldmap-backgrounds/world4.png'
+            bgImage: 'assets/spritesheets/worldmap-backgrounds/world5.png'
         }
     ],
 

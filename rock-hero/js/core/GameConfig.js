@@ -635,7 +635,7 @@ const GameConfig = {
         {
             key: 'map-chefe-mundo4',
             file: 'assets/map-4-6_chefe.json',
-            name: 'Chefe do Mundo 4',
+            name: 'Chefe Final',
             zoom: 0.8, // 640 / 800: largura da arena preenche a tela; a altura rola
             roundPixels: false,
             world: 4,

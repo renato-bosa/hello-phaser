@@ -511,7 +511,7 @@ const GC = {
     // Chefe do Mundo 4: mãos de marionetista lançam bonecos; após
     // KILLS_TO_SWAP pisões o herói sai e o Bob entra atirando para cima.
     PUPPETEER_BOSS: {
-        // Intervalo entre lançamentos aleatórios; um mirado ocorre na metade.
+        // Ciclo das duas mãos; lançamentos a cada metade (600 ms), alternando o tipo por mão.
         SPAWN_INTERVAL_MS: 1200,
         FIRST_SPAWN_DELAY_MS: 1200,
         MAX_ALIVE: 5,

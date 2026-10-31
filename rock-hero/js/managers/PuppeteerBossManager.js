@@ -15,7 +15,6 @@ class PuppeteerBossManager {
         this.hands = [];
         this.kills = 0;
         this.nextSpawnAt = 0;
-        this.nextLaunchAimed = false;
         this.nextHandIndex = 0;
         this.bullets = null;
         this.lastShotAt = -Infinity;
@@ -45,7 +44,7 @@ class PuppeteerBossManager {
                 repeat: -1,
                 delay: i * cfg.HAND_SWAY_MS / 2
             });
-            this.hands.push({ sprite, sway, hp: cfg.HAND_HEALTH, alive: true });
+            this.hands.push({ sprite, sway, hp: cfg.HAND_HEALTH, alive: true, nextLaunchAimed: false });
         });
 
         const bobHeight = scene.textures.getFrame('puppeteer-bob')?.height || 32;
@@ -104,14 +103,14 @@ class PuppeteerBossManager {
         if (now < this.nextSpawnAt) return;
 
         const cfg = GC.PUPPETEER_BOSS;
-        // Intercala um lançamento mirado entre os lançamentos aleatórios.
+        // Cadência global de 600 ms; cada mão alterna seu próprio tipo de lançamento.
         this.nextSpawnAt = now + cfg.SPAWN_INTERVAL_MS / 2;
         if (this.scene.enemyManager.countAlivePuppets() >= cfg.MAX_ALIVE) return;
 
         const hand = this._nextLaunchingHand();
         if (hand) {
-            this._launchFrom(hand, this.nextLaunchAimed);
-            this.nextLaunchAimed = !this.nextLaunchAimed;
+            this._launchFrom(hand, hand.nextLaunchAimed);
+            hand.nextLaunchAimed = !hand.nextLaunchAimed;
         }
     }
 
@@ -241,7 +240,7 @@ class PuppeteerBossManager {
         const scene = this.scene;
         const pc = scene.playerController;
         this.phase = 'bob';
-        this.nextLaunchAimed = false;
+        this.hands.forEach(hand => { hand.nextLaunchAimed = false; });
 
         pc.player.setCollideWorldBounds(true);
         scene.currentCheckpoint = { x: pc.player.x, y: this.hoverY };

@@ -1,15 +1,16 @@
 /**
- * Apresentação HTML dos textos de vitória. Os Text objects e seus tweens
+ * Apresentação HTML dos textos de overlays. Os Text objects e seus tweens
  * continuam pertencendo à cena; o DOM apenas projeta o resultado visual.
- * Não altera câmera, canvas, input, progresso ou relógio do jogo.
+ * Botões encaminham eventos aos mesmos Text objects, sem duplicar suas ações.
+ * Não altera câmera, canvas, progresso ou relógio do jogo.
  */
-class VictoryTextLayer {
-    constructor(scene) {
+class OverlayTextLayer {
+    constructor(scene, className, role = 'status') {
         this.scene = scene;
         this.items = new Map();
         this.root = document.createElement('div');
-        this.root.className = 'victory-text-layer';
-        this.root.setAttribute('role', 'status');
+        this.root.className = `overlay-text-layer ${className}`;
+        this.root.setAttribute('role', role);
         Object.assign(this.root.style, {
             position: 'fixed', overflow: 'hidden', pointerEvents: 'none',
             userSelect: 'none', zIndex: '20'
@@ -21,17 +22,41 @@ class VictoryTextLayer {
     }
 
     add(text) {
-        const element = document.createElement('span');
+        const interactive = Boolean(text.input?.enabled);
+        const element = document.createElement(interactive ? 'button' : 'span');
         Object.assign(element.style, {
             position: 'absolute', whiteSpace: 'pre', lineHeight: '1.2',
             pointerEvents: 'none', paintOrder: 'stroke fill', opacity: '0'
         });
+        if (interactive) {
+            element.type = 'button';
+            // Setas/Enter continuam sendo controlados pelo menu no Phaser.
+            element.tabIndex = -1;
+            Object.assign(element.style, {
+                pointerEvents: 'auto', cursor: 'pointer', appearance: 'none',
+                background: 'none', border: '0', padding: '0', margin: '0'
+            });
+            const canInteract = () => text.active && text.input?.enabled
+                && this.scene?.input.enabled && this.scene.sys.isActive();
+            element.addEventListener('pointerenter', () => {
+                if (canInteract()) text.emit('pointerover');
+            });
+            element.addEventListener('pointerleave', () => {
+                if (canInteract()) text.emit('pointerout');
+            });
+            element.addEventListener('pointerdown', event => {
+                if (!canInteract()) return;
+                event.preventDefault();
+                event.stopPropagation();
+                text.emit('pointerdown');
+            });
+        }
         this.root.appendChild(element);
         const onDestroy = () => {
             element.remove();
             this.items.delete(text);
         };
-        this.items.set(text, { element, onDestroy, visible: text.visible });
+        this.items.set(text, { element, onDestroy, visible: text.visible, interactive });
         text.once('destroy', onDestroy);
         // O objeto segue ativo para os tweens, mas não duplica o texto no canvas.
         text.setVisible(false);
@@ -57,7 +82,7 @@ class VictoryTextLayer {
         const displayY = rect.height / gameSize.height;
         const matrix = camera.matrix;
 
-        this.items.forEach(({ element }, text) => {
+        this.items.forEach(({ element, interactive }, text) => {
             const x = text.x - camera.scrollX * text.scrollFactorX;
             const y = text.y - camera.scrollY * text.scrollFactorY;
             const px = (matrix.a * x + matrix.c * y + matrix.e) * displayX;
@@ -72,6 +97,7 @@ class VictoryTextLayer {
             if (element.textContent !== text.text) element.textContent = text.text;
             Object.assign(element.style, {
                 visibility: 'visible', left: `${px}px`, top: `${py}px`,
+                pointerEvents: interactive && text.input?.enabled && scene.input.enabled ? 'auto' : 'none',
                 // Fonte no tamanho final em CSS, sem ampliar um bitmap de baixa resolução.
                 fontSize: `${parseFloat(style.fontSize) * sy}px`,
                 fontFamily: style.fontFamily, color: style.color,

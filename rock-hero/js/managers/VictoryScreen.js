@@ -121,7 +121,7 @@ class VictoryScreen {
 
     _showVictoryOverlay(finalTime, result) {
         const scene = this.scene;
-        this.textLayer = new VictoryTextLayer(scene);
+        this.textLayer = new OverlayTextLayer(scene, 'victory-text-layer');
         const centerX = scene.cameras.main.centerX;
         const centerY = scene.cameras.main.centerY;
         const currentWorld = GameData.getWorldForLevel(scene.currentLevel);

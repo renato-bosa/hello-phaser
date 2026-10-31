@@ -8,16 +8,22 @@ class PauseMenu {
         this.selectedIndex = 0;
         this.buttons = [];
         this.keyListeners = [];
+        this.textLayer = null;
+        scene.events.once('shutdown', this.destroy, this);
+        scene.events.once('destroy', this.destroy, this);
     }
 
     show() {
         const scene = this.scene;
+        if (scene.currentView === 'paused') return;
         scene.currentView = 'paused';
         GameData.saveProgress(scene.currentLevel, scene.playerName);
 
         scene.physics.pause();
         scene.pausedAtTime = scene.time.now;
         MusicManager.pause();
+        this.textLayer = new OverlayTextLayer(scene, 'pause-text-layer', 'group');
+        this.textLayer.root.setAttribute('aria-label', 'Menu de pausa');
 
         const centerX = scene.cameras.main.centerX;
         const centerY = scene.cameras.main.centerY;
@@ -31,6 +37,7 @@ class PauseMenu {
             stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
         scene.overlayElements.push(title);
+        this.textLayer.add(title);
 
         this.selectedIndex = 0;
         this.buttons = [];
@@ -73,6 +80,7 @@ class PauseMenu {
 
             this.buttons.push(btn);
             scene.overlayElements.push(btn);
+            this.textLayer.add(btn);
         });
 
         const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -83,6 +91,7 @@ class PauseMenu {
             fontSize: '10px', fontFamily: 'Arial', color: '#888888'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
         scene.overlayElements.push(instructions);
+        this.textLayer.add(instructions);
 
         this._updateStyles();
         this._setupControls();
@@ -237,6 +246,10 @@ class PauseMenu {
     }
 
     _clearOverlay() {
+        if (this.textLayer) {
+            this.textLayer.destroy();
+            this.textLayer = null;
+        }
         this.scene.overlayElements.forEach(el => {
             if (el && el.destroy) el.destroy();
         });
@@ -248,5 +261,15 @@ class PauseMenu {
             if (key && key.destroy) key.destroy();
         });
         this.keyListeners = [];
+    }
+
+    destroy() {
+        if (this.textLayer) {
+            this.textLayer.destroy();
+            this.textLayer = null;
+        }
+        this.clearListeners();
+        this.scene.events.off('shutdown', this.destroy, this);
+        this.scene.events.off('destroy', this.destroy, this);
     }
 }

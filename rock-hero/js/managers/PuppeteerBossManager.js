@@ -132,15 +132,19 @@ class PuppeteerBossManager {
         const spawnX = sprite.x;
         const spawnY = sprite.y + sprite.displayHeight / 2;
         const player = this.scene.playerController.player;
-        // Mira na posição atual, sem perseguir o jogador durante o voo.
-        const angle = aimed
-            ? Math.atan2(player.y - spawnY, player.x - spawnX)
+        const randomAngle = aimed
+            ? 0
             : Phaser.Math.DegToRad(
                 Phaser.Math.FloatBetween(cfg.LAUNCH_ANGLE_MIN_DEG, cfg.LAUNCH_ANGLE_MAX_DEG)
             );
         const launchSpeed = Phaser.Math.FloatBetween(cfg.LAUNCH_SPEED_MIN, cfg.LAUNCH_SPEED_MAX);
         const jitter = Phaser.Math.FloatBetween(-cfg.PUPPET_SPEED_JITTER, cfg.PUPPET_SPEED_JITTER);
         const gravityY = this.phase === 'bob' ? cfg.PUPPET_FALL_GRAVITY_Y : 0;
+        // Compensa a gravidade mirando na posição atual, sem seguir o jogador no voo.
+        const angle = aimed
+            ? this._getAimedLaunchAngle(player.x - spawnX, player.y - spawnY,
+                launchSpeed, this.scene.physics.world.gravity.y + gravityY)
+            : randomAngle;
 
         this.scene.enemyManager.spawnPuppet(
             spawnX, spawnY,
@@ -159,6 +163,28 @@ class PuppeteerBossManager {
             yoyo: true,
             onComplete: () => sprite.setAngle(0)
         });
+    }
+
+    /** Mira balística com velocidade fixa; Y positivo aponta para baixo. */
+    _getAimedLaunchAngle(dx, dy, speed, gravity) {
+        const distanceSq = dx * dx + dy * dy;
+        if (gravity <= 0 || distanceSq < 0.000001) return Math.atan2(dy, dx);
+
+        const speedSq = speed * speed;
+        const term = speedSq + gravity * dy;
+        const discriminant = term * term - gravity * gravity * distanceSq;
+
+        if (term > 0 && discriminant >= 0) {
+            // Solução de menor tempo de voo: evita o arco alto quando ambos acertam.
+            // Forma racionalizada para não subtrair números quase iguais.
+            const flightTimeSq = 2 * distanceSq / (term + Math.sqrt(discriminant));
+            return Math.atan2(dy - 0.5 * gravity * flightTimeSq, dx);
+        }
+
+        // Velocidade insuficiente: maximiza o alcance na altura do alvo.
+        // Se nem a altura for alcançável, lança para cima até a altura máxima.
+        const horizontal = Math.sqrt(Math.max(0, speedSq + 2 * gravity * dy));
+        return Math.atan2(-speed, Math.sign(dx) * horizontal);
     }
 
     _updateCounter() {

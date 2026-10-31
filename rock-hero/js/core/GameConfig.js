@@ -322,27 +322,28 @@ const GameConfig = {
         { key: 'theme7', file: 'assets/mp3/theme7.mp3', title: 'Theme 7' },
         { key: 'theme8', file: 'assets/mp3/theme8.mp3', title: 'Theme 8' },
         { key: 'theme9', file: 'assets/mp3/theme9.mp3', title: 'Theme 9' },
-        { key: 'theme10', file: 'assets/mp3/theme10.mp3', title: 'Theme 10' }
+        { key: 'theme10', file: 'assets/mp3/theme10.mp3', title: 'Theme 10' },
+        { key: 'boss-fight', file: 'assets/mp3/boss-fight.mp3', title: 'Boss Fight' }
     ],
 
-    // Roteamento de trilha por contexto. Vazio hoje = sorteio em toda a pool
-    // global. No futuro, popule `byLevel` ou `byWorld` para direcionar faixas
-    // específicas. Cada valor pode ser uma string (uma faixa) ou array de
-    // strings (pool restrita). Resolução: byLevel > byWorld > default > global.
-    //
-    // Exemplos futuros:
-    //   MUSIC: {
-    //       gameplay: {
-    //           byLevel: { 0: 'rock-theme1', 14: ['boss1', 'boss2'] },
-    //           byWorld: { 2: ['theme2', 'theme3'], 3: 'theme4' },
-    //           default: null
-    //       }
-    //   }
+    // Roteamento de trilha por contexto. Chefes usam a faixa exclusiva;
+    // demais fases sorteiam apenas as faixas da pool padrão abaixo.
+    // Cada valor pode ser uma string (uma faixa) ou array de strings (pool).
+    // Resolução: byLevel > byWorld > default > global.
+    // Os índices dos chefes são os mesmos nas duas ordens de fases atuais.
     MUSIC: {
         gameplay: {
-            byLevel: {},
+            byLevel: {
+                20: 'boss-fight', // map-1-6_chefe
+                21: 'boss-fight', // map-2-6_chefe
+                25: 'boss-fight', // map-3-6_boss
+                27: 'boss-fight'  // map-4-6_chefe
+            },
             byWorld: {},
-            default: null
+            default: [
+                'rock-theme1', 'theme2', 'theme3', 'theme4', 'theme5',
+                'theme6', 'theme7', 'theme8', 'theme9', 'theme10'
+            ]
         }
     },
 

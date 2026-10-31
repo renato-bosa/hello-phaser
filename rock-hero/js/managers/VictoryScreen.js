@@ -6,6 +6,10 @@ class VictoryScreen {
     constructor(scene) {
         this.scene = scene;
         this.starsWarningActive = false;
+        this.textLayer = null;
+        this.continueCleanup = null;
+        scene.events.once('shutdown', this.destroy, this);
+        scene.events.once('destroy', this.destroy, this);
     }
 
     reachGoal(celebrationOrigin = null) {
@@ -117,6 +121,7 @@ class VictoryScreen {
 
     _showVictoryOverlay(finalTime, result) {
         const scene = this.scene;
+        this.textLayer = new VictoryTextLayer(scene);
         const centerX = scene.cameras.main.centerX;
         const centerY = scene.cameras.main.centerY;
         const currentWorld = GameData.getWorldForLevel(scene.currentLevel);
@@ -418,15 +423,11 @@ class VictoryScreen {
             continueText: `${continueLabel} para ver a recompensa!`,
             continueY: centerY + 100,
             extra: () => {
-                const worldText = scene.add.text(
+                const worldText = this._addOverlayText(
                     centerX, centerY + 58,
                     `🌟 ${world.name.toUpperCase()} COMPLETO! 🌟`,
-                    {
-                        fontSize: '18px', fontFamily: 'Arial', color: '#ffd700',
-                        stroke: '#000000', strokeThickness: 3
-                    }
-                ).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
-                scene.overlayElements.push(worldText);
+                    '18px', '#ffd700', 3
+                );
                 this._popIn(worldText, 280);
                 scene.tweens.add({
                     targets: worldText,
@@ -575,23 +576,48 @@ class VictoryScreen {
             stroke: '#000000', strokeThickness: strokeThickness
         }).setOrigin(0.5).setScrollFactor(0).setDepth(GC.DEPTH.OVERLAY_TEXT);
         this.scene.overlayElements.push(text);
+        if (this.textLayer) this.textLayer.add(text);
         return text;
     }
 
     _bindContinueInput(handler) {
         const scene = this.scene;
-        scene.input.keyboard.once('keydown-SPACE', handler);
-        scene.input.keyboard.once('keydown-ENTER', handler);
+        if (this.continueCleanup) this.continueCleanup();
+        let continued = false;
+        const continueOnce = () => {
+            if (continued) return;
+            continued = true;
+            this.continueCleanup();
+            handler();
+        };
+        scene.input.keyboard.once('keydown-SPACE', continueOnce);
+        scene.input.keyboard.once('keydown-ENTER', continueOnce);
 
-        scene.time.addEvent({
+        const timer = scene.time.addEvent({
             delay: 100,
             loop: true,
             callback: () => {
                 if (scene.virtualControls.jumpJustPressed) {
                     scene.virtualControls.jumpJustPressed = false;
-                    handler();
+                    continueOnce();
                 }
             }
         });
+        this.continueCleanup = () => {
+            scene.input.keyboard.off('keydown-SPACE', continueOnce);
+            scene.input.keyboard.off('keydown-ENTER', continueOnce);
+            timer.remove(false);
+            this.continueCleanup = null;
+        };
+    }
+
+    destroy() {
+        if (this.continueCleanup) this.continueCleanup();
+        if (this.textLayer) {
+            this.textLayer.destroy();
+            this.textLayer = null;
+        }
+        this.scene.events.off('shutdown', this.destroy, this);
+        this.scene.events.off('destroy', this.destroy, this);
     }
 }

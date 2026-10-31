@@ -367,6 +367,7 @@ class GameScene extends Phaser.Scene {
         if (fgDecoLayer) {
             this.fgDecorationLayer = map.createLayer('fg_decoration', allTilesets);
             this.fgDecorationLayer.setDepth(GC.DEPTH.FG_DECORATION);
+            this._applyTiledLayerAppearance(map, this.fgDecorationLayer);
             this.setupRandomFrameTiles(map, this.fgDecorationLayer);
             this.setupAutoTileAnimations(map, this.fgDecorationLayer);
         }
@@ -379,6 +380,27 @@ class GameScene extends Phaser.Scene {
 
         this.parseMapObjects(map);
         this.setupCamera(map, levelConfig);
+    }
+
+    /** Aplica propriedades visuais que o parser de tile layers do Phaser não importa. */
+    _applyTiledLayerAppearance(map, layer) {
+        const mapKey = map.key || GameData.LEVELS[this.currentLevel]?.key;
+        const rawLayers = this.cache.tilemap.get(mapKey)?.data?.layers || [];
+        const config = rawLayers.find(l => l.type === 'tilelayer' && l.name === layer.layer.name);
+        if (!config) return;
+
+        layer.setScrollFactor(config.parallaxx ?? 1, config.parallaxy ?? 1);
+
+        // O parser já aplica offset, opacity e visible; não duplicar esses efeitos.
+        // Tiled aceita #RRGGBB e #AARRGGBB. Preto (0) também é uma cor válida.
+        const hex = config.tintcolor?.match(/^#([\da-f]{6}|[\da-f]{8})$/i)?.[1];
+        if (!hex) return;
+        const tint = parseInt(hex.slice(-6), 16);
+        const alpha = hex.length === 8 ? parseInt(hex.slice(0, 2), 16) / 255 : 1;
+        layer.setAlpha(layer.layer.alpha * alpha);
+        layer.forEachTile(tile => {
+            if (tile && tile.index >= 0) tile.tint = tint;
+        });
     }
 
     /**

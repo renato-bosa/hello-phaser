@@ -2108,7 +2108,7 @@ class GameScene extends Phaser.Scene {
     // ==================== COLISÕES ====================
 
     handleTileCollision(player, tile) {
-        if (tile.properties?.jump_back_to_checkpoint) {
+        if (tile.properties?.jump_back_to_checkpoint || tile.properties?.jumpback_to_checkpoint) {
             this.playerController.takeDamage();
         }
     }

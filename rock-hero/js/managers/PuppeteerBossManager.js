@@ -148,6 +148,10 @@ class PuppeteerBossManager {
             cfg.PUPPET_SPEED * (1 + jitter), gravityY
         );
 
+        this._flashHand(hand,
+            aimed ? cfg.HAND_AIMED_LAUNCH_TINT : cfg.HAND_RANDOM_LAUNCH_TINT,
+            cfg.HAND_LAUNCH_FLASH_MS);
+
         this.scene.tweens.add({
             targets: sprite,
             angle: { from: -8, to: 8 },
@@ -336,6 +340,18 @@ class PuppeteerBossManager {
 
     // ==================== MÃOS ====================
 
+    _flashHand(hand, color, duration) {
+        const flashId = (hand.flashId || 0) + 1;
+        hand.flashId = flashId;
+        hand.sprite.setTintFill(color);
+        this.scene.time.delayedCall(duration, () => {
+            // Uma piscada antiga não deve apagar uma mais recente ou a cor de derrota.
+            if (hand.alive && hand.sprite.active && hand.flashId === flashId) {
+                hand.sprite.clearTint();
+            }
+        });
+    }
+
     _onBulletHitHand(hand, bullet) {
         if (!bullet.active || !hand.alive || this.phase !== 'bob') return;
         const cfg = GC.PUPPETEER_BOSS;
@@ -343,10 +359,7 @@ class PuppeteerBossManager {
 
         hand.hp--;
         SoundManager.play('damage');
-        hand.sprite.setTintFill(0xffffff);
-        this.scene.time.delayedCall(cfg.HAND_HIT_FLASH_MS, () => {
-            if (hand.alive) hand.sprite.clearTint();
-        });
+        this._flashHand(hand, 0xffffff, cfg.HAND_HIT_FLASH_MS);
 
         if (hand.hp <= 0) this._defeatHand(hand);
     }

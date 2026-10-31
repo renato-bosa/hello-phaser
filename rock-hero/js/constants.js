@@ -520,6 +520,9 @@ const GC = {
         HAND_SWAY_PX: 6,
         HAND_SWAY_MS: 1400,
         HAND_HIT_FLASH_MS: 80,
+        HAND_LAUNCH_FLASH_MS: 140,
+        HAND_RANDOM_LAUNCH_TINT: 0xaa44ff,
+        HAND_AIMED_LAUNCH_TINT: 0xff3333,
         // Mão derrotada continua na tela (é o mesmo marionetista): escurece e cai um pouco.
         HAND_DEFEATED_TINT: 0x55556a,
         HAND_DEFEATED_DROP_PX: 14,

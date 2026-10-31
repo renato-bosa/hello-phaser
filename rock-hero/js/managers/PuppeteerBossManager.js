@@ -15,6 +15,7 @@ class PuppeteerBossManager {
         this.hands = [];
         this.kills = 0;
         this.nextSpawnAt = 0;
+        this.nextLaunchAimed = false;
         this.nextHandIndex = 0;
         this.bullets = null;
         this.lastShotAt = -Infinity;
@@ -103,11 +104,15 @@ class PuppeteerBossManager {
         if (now < this.nextSpawnAt) return;
 
         const cfg = GC.PUPPETEER_BOSS;
-        this.nextSpawnAt = now + cfg.SPAWN_INTERVAL_MS;
+        // Intercala um lançamento mirado entre os lançamentos aleatórios.
+        this.nextSpawnAt = now + cfg.SPAWN_INTERVAL_MS / 2;
         if (this.scene.enemyManager.countAlivePuppets() >= cfg.MAX_ALIVE) return;
 
         const hand = this._nextLaunchingHand();
-        if (hand) this._launchFrom(hand);
+        if (hand) {
+            this._launchFrom(hand, this.nextLaunchAimed);
+            this.nextLaunchAimed = !this.nextLaunchAimed;
+        }
     }
 
     _nextLaunchingHand() {
@@ -122,18 +127,24 @@ class PuppeteerBossManager {
         return null;
     }
 
-    _launchFrom(hand) {
+    _launchFrom(hand, aimed = false) {
         const cfg = GC.PUPPETEER_BOSS;
         const sprite = hand.sprite;
-        const angle = Phaser.Math.DegToRad(
-            Phaser.Math.FloatBetween(cfg.LAUNCH_ANGLE_MIN_DEG, cfg.LAUNCH_ANGLE_MAX_DEG)
-        );
+        const spawnX = sprite.x;
+        const spawnY = sprite.y + sprite.displayHeight / 2;
+        const player = this.scene.playerController.player;
+        // Mira na posição atual, sem perseguir o jogador durante o voo.
+        const angle = aimed
+            ? Math.atan2(player.y - spawnY, player.x - spawnX)
+            : Phaser.Math.DegToRad(
+                Phaser.Math.FloatBetween(cfg.LAUNCH_ANGLE_MIN_DEG, cfg.LAUNCH_ANGLE_MAX_DEG)
+            );
         const launchSpeed = Phaser.Math.FloatBetween(cfg.LAUNCH_SPEED_MIN, cfg.LAUNCH_SPEED_MAX);
         const jitter = Phaser.Math.FloatBetween(-cfg.PUPPET_SPEED_JITTER, cfg.PUPPET_SPEED_JITTER);
         const gravityY = this.phase === 'bob' ? cfg.PUPPET_FALL_GRAVITY_Y : 0;
 
         this.scene.enemyManager.spawnPuppet(
-            sprite.x, sprite.y + sprite.displayHeight / 2,
+            spawnX, spawnY,
             Math.cos(angle) * launchSpeed, Math.sin(angle) * launchSpeed,
             cfg.PUPPET_SPEED * (1 + jitter), gravityY
         );
@@ -230,6 +241,7 @@ class PuppeteerBossManager {
         const scene = this.scene;
         const pc = scene.playerController;
         this.phase = 'bob';
+        this.nextLaunchAimed = false;
 
         pc.player.setCollideWorldBounds(true);
         scene.currentCheckpoint = { x: pc.player.x, y: this.hoverY };

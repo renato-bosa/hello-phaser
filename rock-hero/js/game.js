@@ -74,8 +74,8 @@ const config = {
         forceSetTimeOut: false
     },
     
-    // Ordem: MenuScene primeiro (cena inicial)
-    scene: [MenuScene, SlotSelectScene, CutsceneScene, WorldMapScene, CharacterSelectScene, GameScene, WorldCompleteScene],
+    // MenuScene é a tela inicial; MusicPreloadScene permanece ativa em paralelo.
+    scene: [MenuScene, MusicPreloadScene, SlotSelectScene, CutsceneScene, WorldMapScene, CharacterSelectScene, GameScene, WorldCompleteScene],
     
     // Callbacks para debug de FPS
     callbacks: {

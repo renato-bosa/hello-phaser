@@ -6,6 +6,8 @@
  * tudo dirigido por dados de config.
  *
  * Comportamento (definido em GameConfig.CUTSCENES[id]):
+ * - Aguarda imagens e uma faixa da própria trilha; as demais músicas continuam
+ *   em segundo plano. Com música desligada, aguarda apenas as imagens.
  * - Cada frame fica bloqueado por `unlockMs` ms (4s default).
  * - Após `unlockMs`, surge prompt "▶ Pressione O para continuar".
  * - Avanço manual via O / Enter / Space / Click / → (sem auto-advance).
@@ -62,6 +64,10 @@ class CutsceneScene extends Phaser.Scene {
         this.isTransitioning = false;
         this.currentImage = null;
         this.previousImage = null;
+        this._cutsceneStarted = false;
+        this._waitingForMusic = false;
+        this._musicWaitFailed = false;
+        this.virtualControls = null;
     }
 
     preload() {
@@ -73,8 +79,6 @@ class CutsceneScene extends Phaser.Scene {
                 this.load.image(key, GameState.assetUrl(frame.file));
             }
         });
-
-        MusicManager.preload(this);
     }
 
     create() {
@@ -90,6 +94,92 @@ class CutsceneScene extends Phaser.Scene {
         // Fundo (letterbox)
         this.add.rectangle(cam.centerX, cam.centerY, cam.width, cam.height, bgColor);
 
+        this.virtualControls = GameState.getVirtualControls();
+        this._waitForMusic();
+    }
+
+    _waitForMusic() {
+        const music = this.config.music;
+        this._musicKeys = (Array.isArray(music) ? music : [music]).filter(Boolean);
+        if (this._isMusicReady()) {
+            this._startCutscene();
+            return;
+        }
+
+        this._waitingForMusic = true;
+        const cam = this.cameras.main;
+        this._musicLoadingText = this.add.text(cam.centerX, cam.centerY, 'Carregando música…', {
+            fontFamily: 'Arial', fontSize: this.font(14), color: '#ffffff', align: 'center'
+        }).setOrigin(0.5);
+
+        this.cache.audio.events.on('add', this._onMusicAvailable, this);
+        this._musicWaitLoader = this.scene.get('MusicPreloadScene').load;
+        this._musicWaitLoader.on('loaderror', this._onMusicLoadError, this);
+        this._musicWaitLoader.on('complete', this._onMusicLoadComplete, this);
+        this.events.once('shutdown', this._clearMusicWait, this);
+        this.events.once('destroy', this._clearMusicWait, this);
+        this.input.on('pointerdown', this._retryMusicWait, this);
+        this.input.keyboard.on('keydown-ENTER', this._retryMusicWait, this);
+        MusicManager.preload();
+    }
+
+    _isMusicReady() {
+        return !MusicManager.isEnabled() || this._musicKeys.length === 0 ||
+            this._musicKeys.some(key => this.cache.audio.exists(key));
+    }
+
+    _onMusicAvailable() {
+        if (this._waitingForMusic && this._isMusicReady()) this._startCutscene();
+    }
+
+    _onMusicLoadError(file) {
+        if (this._musicKeys.includes(file.key)) this._showMusicRetry();
+    }
+
+    _onMusicLoadComplete() {
+        if (this._isMusicReady()) this._onMusicAvailable();
+        else this._showMusicRetry();
+    }
+
+    _showMusicRetry() {
+        if (!this._waitingForMusic) return;
+        this._musicWaitFailed = true;
+        this._musicLoadingText.setText('Não foi possível carregar a música.\nToque ou pressione Enter para tentar novamente.');
+    }
+
+    _retryMusicWait() {
+        if (!this._waitingForMusic || !this._musicWaitFailed) return;
+        this._musicWaitFailed = false;
+        this._musicLoadingText.setText('Carregando música…');
+        MusicManager.preload();
+        this._onMusicAvailable();
+    }
+
+    _clearMusicWait() {
+        this._waitingForMusic = false;
+        this._musicWaitFailed = false;
+        this.cache.audio.events.off('add', this._onMusicAvailable, this);
+        if (this._musicWaitLoader) {
+            this._musicWaitLoader.off('loaderror', this._onMusicLoadError, this);
+            this._musicWaitLoader.off('complete', this._onMusicLoadComplete, this);
+            this._musicWaitLoader = null;
+        }
+        this.events.off('shutdown', this._clearMusicWait, this);
+        this.events.off('destroy', this._clearMusicWait, this);
+        this.input.off('pointerdown', this._retryMusicWait, this);
+        this.input.keyboard.off('keydown-ENTER', this._retryMusicWait, this);
+        if (this._musicLoadingText) {
+            this._musicLoadingText.destroy();
+            this._musicLoadingText = null;
+        }
+    }
+
+    _startCutscene() {
+        if (this._cutsceneStarted) return;
+        this._cutsceneStarted = true;
+        this._clearMusicWait();
+        const cam = this.cameras.main;
+
         // Container que vai segurar as imagens (facilita troca/crossfade)
         this.frameContainer = this.add.container(cam.centerX, cam.centerY);
 
@@ -101,8 +191,6 @@ class CutsceneScene extends Phaser.Scene {
 
         // Listeners de input — só pra avanço manual
         this._setupControls();
-
-        this.virtualControls = GameState.getVirtualControls();
 
         MusicManager.startCutscene(this, this.cutsceneId);
 
@@ -116,7 +204,8 @@ class CutsceneScene extends Phaser.Scene {
         // Avanço via overlay mobile (botão O)
         if (this.virtualControls.jumpJustPressed) {
             this.virtualControls.jumpJustPressed = false;
-            this._tryAdvance();
+            if (this._waitingForMusic) this._retryMusicWait();
+            else this._tryAdvance();
         }
     }
 

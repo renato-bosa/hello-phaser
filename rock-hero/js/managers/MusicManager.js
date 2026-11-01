@@ -5,6 +5,8 @@
  * usamos o subsistema Phaser Sound para reproduzir arquivos MP3 completos.
  *
  * Modelo atual (v1 — foco em gameplay):
+ *   - MusicPreloadScene baixa as faixas em segundo plano desde a abertura.
+ *     Menus e fases não aguardam os MP3s; cutscenes aguardam apenas sua trilha.
  *   - Cada entrada em fase sorteia uma faixa da pool elegível e toca.
  *   - Quando a faixa se aproxima do fim, cross-fade com a próxima (a antiga
  *     desce, a nova sobe, sobrepostas durante `crossfadeDurationMs`).
@@ -26,7 +28,7 @@
  *   ?crossfadeMs=1500   → duração do cross-fade em ms (default 2000, 0 desliga)
  *
  * Uso típico:
- *   scene.preload():  MusicManager.preload(scene)
+ *   MusicPreloadScene.create(): MusicManager.initializeBackgroundLoader(scene)
  *   scene.create():   MusicManager.startGameplay(scene, levelIndex)
  *                     MusicManager.startCutscene(scene, cutsceneId)
  *   scene.shutdown(): MusicManager.stop()
@@ -74,23 +76,84 @@ const MusicManager = {
     // próxima. Ver setEnabled().
     _suspendedContext: null,
 
+    // Loader de uma cena persistente, separado da cena que reproduz a faixa.
+    // O download continua mesmo quando menu, cutscene ou gameplay encerram.
+    _loaderScene: null,
+    _pendingTracks: new Set(),
+    _paused: false,
+    _pendingUnlock: null,
+
     // ==================== API PÚBLICA ====================
 
     /**
-     * Registra faixas no cache de áudio do Phaser. Chamar em preload().
-     * Idempotente: só carrega faixas ainda não presentes.
+     * Inicializa o loader que vive durante toda a sessão do jogo.
      */
-    preload(scene) {
+    initializeBackgroundLoader(scene) {
+        this._loaderScene = scene;
+        // Deixa espaço para sprites, mapas e imagens das cutscenes.
+        scene.load.maxParallelDownloads = 2;
+        scene.load.on('filecomplete', this._onTrackLoaded, this);
+        scene.load.on('complete', this._onBackgroundLoadComplete, this);
+        scene.load.on('loaderror', this._onTrackLoadError, this);
+        scene.events.once('shutdown', this._releaseBackgroundLoader, this);
+        scene.events.once('destroy', this._releaseBackgroundLoader, this);
+        this.preload();
+    },
+
+    /**
+     * Enfileira apenas faixas ausentes, sem duplicar downloads em andamento.
+     * Não usa o loader das telas. Cada tela decide se precisa aguardar a trilha.
+     */
+    preload() {
         this._ensureInit();
-        if (!this.enabled) return;
+        const scene = this._loaderScene;
+        if (!this.enabled || !scene) return;
 
         const tracks = (GameConfig && GameConfig.MUSIC_TRACKS) || [];
+        let queued = false;
         tracks.forEach(t => {
             if (!t || !t.key || !t.file) return;
-            if (!scene.cache.audio.exists(t.key)) {
+            if (!scene.cache.audio.exists(t.key) && !this._pendingTracks.has(t.key)) {
+                this._pendingTracks.add(t.key);
                 scene.load.audio(t.key, GameData.assetUrl(t.file));
+                queued = true;
             }
         });
+        if (queued && !scene.load.isLoading()) scene.load.start();
+    },
+
+    _onTrackLoaded(key, type) {
+        if (type !== 'audio') return;
+        this._pendingTracks.delete(key);
+        // Uma faixa que terminou tarde só pode iniciar no contexto atual.
+        // Pausa, música desligada e saída da cena continuam sendo respeitadas.
+        if (this.scene?.sys.isActive() && !this.currentSound && this.currentPool.includes(key)) {
+            this._playRandom();
+        }
+    },
+
+    _onBackgroundLoadComplete() {
+        // Inclui falhas de download/decodificação: uma próxima entrada em
+        // cena ou ativação da música pode tentar novamente, sem loop de retry.
+        this._pendingTracks.clear();
+    },
+
+    _onTrackLoadError(file) {
+        // Permite retentar esta faixa sem aguardar os demais downloads.
+        this._pendingTracks.delete(file.key);
+        console.warn(`MusicManager: falha ao carregar '${file.key}'. É possível tentar novamente.`);
+    },
+
+    _releaseBackgroundLoader() {
+        const scene = this._loaderScene;
+        if (!scene) return;
+        scene.load.off('filecomplete', this._onTrackLoaded, this);
+        scene.load.off('complete', this._onBackgroundLoadComplete, this);
+        scene.load.off('loaderror', this._onTrackLoadError, this);
+        scene.events.off('shutdown', this._releaseBackgroundLoader, this);
+        scene.events.off('destroy', this._releaseBackgroundLoader, this);
+        this._pendingTracks.clear();
+        this._loaderScene = null;
     },
 
     /**
@@ -99,6 +162,7 @@ const MusicManager = {
      */
     startGameplay(scene, levelIndex) {
         this._ensureInit();
+        this.stop();
         if (!this.enabled) {
             // Guarda o contexto mesmo desligado: se o jogador religar a música
             // no menu de pausa desta fase, setEnabled() sabe o que tocar.
@@ -112,6 +176,8 @@ const MusicManager = {
         this.contextType = 'gameplay';
         this.contextData = { levelIndex };
         this.currentPool = this._resolveGameplayPool(levelIndex);
+        this._paused = scene.currentView === 'paused';
+        this.preload();
 
         // Auto-cleanup: quando a cena for encerrada (por scene.start em outra
         // cena, restart, etc.) o Phaser emite 'shutdown'. Amarrar aqui garante
@@ -126,12 +192,6 @@ const MusicManager = {
             return;
         }
 
-        // Alerta amigável se algum item da pool não tem áudio no cache.
-        const missing = this.currentPool.filter(k => !scene.cache.audio.exists(k));
-        if (missing.length > 0) {
-            console.warn(`MusicManager: pool tem faixas sem áudio no cache: [${missing.join(', ')}]. Verifique MUSIC_TRACKS.`);
-        }
-
         this._playRandom();
     },
 
@@ -141,6 +201,7 @@ const MusicManager = {
      */
     startCutscene(scene, cutsceneId) {
         this._ensureInit();
+        this.stop();
         if (!this.enabled) {
             console.warn(`MusicManager: startCutscene(${cutsceneId}) ignorado — enabled=false.`);
             return;
@@ -155,16 +216,12 @@ const MusicManager = {
         this.contextType = 'cutscene';
         this.contextData = { cutsceneId };
         this.currentPool = Array.isArray(music) ? music.slice() : [music];
+        this.preload();
 
         scene.events.once('shutdown', this._onSceneShutdown, this);
         scene.events.once('destroy', this._onSceneShutdown, this);
 
         if (this.currentPool.length === 0) return;
-
-        const missing = this.currentPool.filter(k => !scene.cache.audio.exists(k));
-        if (missing.length > 0) {
-            console.warn(`MusicManager: cutscene pool sem áudio no cache: [${missing.join(', ')}].`);
-        }
 
         this._playRandom();
     },
@@ -181,6 +238,7 @@ const MusicManager = {
             this.scene.events.off('shutdown', this._onSceneShutdown, this);
             this.scene.events.off('destroy', this._onSceneShutdown, this);
         }
+        this._clearPendingUnlock();
         this._cancelScheduledCrossfade();
         this._destroyAllActiveSounds();
         this.currentSound = null;
@@ -189,6 +247,7 @@ const MusicManager = {
         this.contextType = null;
         this.contextData = null;
         this.scene = null;
+        this._paused = false;
     },
 
     /**
@@ -202,6 +261,7 @@ const MusicManager = {
 
     /** Pausa TODOS sounds ativos (inclusive durante crossfade) + o timer. */
     pause() {
+        this._paused = true;
         this._activeSounds.forEach(s => {
             if (s && s.isPlaying) s.pause();
         });
@@ -212,12 +272,15 @@ const MusicManager = {
 
     /** Retoma TODOS sounds ativos (inclusive durante crossfade) + o timer. */
     resume() {
+        this._paused = false;
         this._activeSounds.forEach(s => {
             if (s && s.isPaused) s.resume();
+            else if (s && s === this.currentSound && !s.isPlaying) this._startSound(s, this.currentKey);
         });
         if (this._scheduledCrossfadeTimer) {
             this._scheduledCrossfadeTimer.paused = false;
         }
+        if (!this.currentSound) this._playRandom();
     },
 
     setVolume(v) {
@@ -252,6 +315,7 @@ const MusicManager = {
         }
 
         this.enabled = true;
+        this.preload();
 
         const suspended = this._suspendedContext;
         this._suspendedContext = null;
@@ -344,7 +408,8 @@ const MusicManager = {
      * devolvido (repete).
      */
     _pickNext() {
-        const pool = this.currentPool;
+        // Enquanto o download continua, sorteia apenas entre faixas prontas.
+        const pool = this.currentPool.filter(key => this.scene?.cache.audio.exists(key));
         if (!pool || pool.length === 0) return null;
         if (pool.length === 1) return pool[0];
 
@@ -366,6 +431,7 @@ const MusicManager = {
     },
 
     _playRandom() {
+        if (!this.enabled || this._paused || !this.scene) return;
         const key = this._pickNext();
         if (!key) return;
         this._playKey(key);
@@ -513,6 +579,8 @@ const MusicManager = {
      * unlock (primeira interação do usuário — clique, tecla, toque).
      */
     _startSound(sound, key) {
+        if (!this.enabled || this._paused || this.currentSound !== sound) return;
+        this._clearPendingUnlock();
         const scene = this.scene;
         const soundManager = scene.sound;
 
@@ -539,8 +607,9 @@ const MusicManager = {
             `ctxState=${soundManager.context?.state}). Toque/clique/tecla vai iniciar.`
         );
 
-        soundManager.once('unlocked', () => {
-            if (this.currentSound !== sound) return;
+        const onUnlock = () => {
+            this._pendingUnlock = null;
+            if (this.currentSound !== sound || !this.enabled || this._paused) return;
             try {
                 sound.play();
                 console.log(`♫ MusicManager: '${key}' iniciou após unlock`);
@@ -548,7 +617,16 @@ const MusicManager = {
             } catch (e) {
                 console.warn('MusicManager: falha ao retentar após unlock', e);
             }
-        });
+        };
+        this._pendingUnlock = { soundManager, sound, onUnlock };
+        soundManager.once('unlocked', onUnlock);
+    },
+
+    _clearPendingUnlock() {
+        const pending = this._pendingUnlock;
+        if (!pending) return;
+        pending.soundManager.off('unlocked', pending.onUnlock);
+        this._pendingUnlock = null;
     },
 
     /**
@@ -565,6 +643,7 @@ const MusicManager = {
     /** Destrói um sound específico, mata tweens e remove de `_activeSounds`. */
     _destroySound(sound) {
         if (!sound) return;
+        if (this._pendingUnlock?.sound === sound) this._clearPendingUnlock();
         this._removeFromActive(sound);
         if (this.scene && this.scene.tweens) {
             try { this.scene.tweens.killTweensOf(sound); } catch (e) {}

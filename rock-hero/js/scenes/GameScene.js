@@ -69,9 +69,6 @@ class GameScene extends Phaser.Scene {
             this._loadImageIfMissing('puppeteer-hand', 'assets/spritesheets/mao.png');
             this._loadImageIfMissing('puppeteer-bob', 'assets/spritesheets/bob com linguinha de fora.png');
         }
-
-        // Trilha — só faixas ainda ausentes no cache
-        MusicManager.preload(this);
     }
 
     _loadImageIfMissing(key, path) {

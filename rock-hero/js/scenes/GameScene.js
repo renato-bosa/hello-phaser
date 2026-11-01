@@ -22,6 +22,16 @@ class GameScene extends Phaser.Scene {
 
         GameData.state.currentLevel = this.currentLevel;
         GameData.state.playerName = this.playerName;
+        this.currentView = 'loading';
+        this._gameplayCreated = false;
+        this._waitingForMusic = false;
+        this._startingMusic = false;
+        this._musicWaitFailed = false;
+        this._initialMusicKey = MusicManager.pickGameplayTrack(this.currentLevel);
+        this.levelStartTime = null;
+        this.elapsedTime = 0;
+        this.keyListeners = [];
+        MusicManager.preload(this._initialMusicKey);
     }
 
     preload() {
@@ -244,6 +254,111 @@ class GameScene extends Phaser.Scene {
         // Garante limpeza se o 'complete' do loader não disparou (cache quente / 0 arquivos)
         this._destroyLoadingBar();
 
+        this._waitingForMusic = true;
+        this.virtualControls = GameData.getVirtualControls();
+        const cam = this.cameras.main;
+        this._musicLoadingText = this.add.text(cam.centerX, cam.centerY, 'Carregando música…', {
+            fontFamily: 'Arial', fontSize: '14px', color: '#ffffff', align: 'center'
+        }).setOrigin(0.5);
+        this.cache.audio.events.on('add', this._tryStartGameplay, this);
+        this._musicWaitLoader = this.scene.get('MusicPreloadScene').load;
+        this._musicWaitLoader.on('loaderror', this._onGameplayMusicError, this);
+        this._musicWaitLoader.on('complete', this._onGameplayMusicLoadComplete, this);
+        this.events.once('shutdown', this._clearGameplayMusicWait, this);
+        this.events.once('destroy', this._clearGameplayMusicWait, this);
+        this.input.on('pointerdown', this._retryGameplayMusic, this);
+        this.input.keyboard.on('keydown-ENTER', this._retryGameplayMusic, this);
+        MusicManager.preload(this._initialMusicKey);
+        this._tryStartGameplay();
+    }
+
+    _tryStartGameplay() {
+        if (!this._waitingForMusic || this._gameplayCreated) return;
+        if (!MusicManager.isEnabled()) {
+            MusicManager.startGameplay(this, this.currentLevel);
+            this._createGameplay();
+            return;
+        }
+
+        // Cobre a ativação da música enquanto os assets da fase carregavam.
+        if (!this._initialMusicKey) {
+            this._initialMusicKey = MusicManager.pickGameplayTrack(this.currentLevel);
+            if (!this._initialMusicKey) {
+                this._showGameplayMusicRetry();
+                return;
+            }
+            MusicManager.preload(this._initialMusicKey);
+        }
+        if (!this.cache.audio.exists(this._initialMusicKey)) return;
+        if (!this._startingMusic) {
+            this._startingMusic = true;
+            MusicManager.startGameplay(this, this.currentLevel, this._initialMusicKey);
+        }
+
+        const sound = MusicManager.currentSound;
+        const context = this.sound.context;
+        if (sound?.isPlaying && !this.sound.locked && (!context || context.state === 'running')) {
+            this._createGameplay();
+        } else {
+            this._musicLoadingText.setText('Toque ou pressione Enter para iniciar com música.');
+        }
+    }
+
+    _onGameplayMusicError(file) {
+        if (file.key === this._initialMusicKey) this._showGameplayMusicRetry();
+    }
+
+    _onGameplayMusicLoadComplete() {
+        this._tryStartGameplay();
+        if (this._waitingForMusic && !this.cache.audio.exists(this._initialMusicKey)) {
+            this._showGameplayMusicRetry();
+        }
+    }
+
+    _showGameplayMusicRetry() {
+        if (!this._waitingForMusic) return;
+        this._musicWaitFailed = true;
+        this._musicLoadingText.setText('Não foi possível carregar a música.\nToque ou pressione Enter para tentar novamente.');
+    }
+
+    _retryGameplayMusic() {
+        if (!this._waitingForMusic) return;
+        if (this._musicWaitFailed) {
+            this._musicWaitFailed = false;
+            this._musicLoadingText.setText('Carregando música…');
+            // Mantém o sorteio original, inclusive após uma falha de download.
+            MusicManager.preload(this._initialMusicKey);
+        }
+        // O browser pode exigir um gesto mesmo com o MP3 já decodificado.
+        if (this.sound.context?.state === 'suspended') {
+            this.sound.context.resume().catch(() => {});
+        }
+        if (this._startingMusic && !MusicManager.currentSound?.isPlaying) MusicManager.resume();
+        this._tryStartGameplay();
+    }
+
+    _clearGameplayMusicWait() {
+        this._waitingForMusic = false;
+        this.cache.audio.events.off('add', this._tryStartGameplay, this);
+        if (this._musicWaitLoader) {
+            this._musicWaitLoader.off('loaderror', this._onGameplayMusicError, this);
+            this._musicWaitLoader.off('complete', this._onGameplayMusicLoadComplete, this);
+            this._musicWaitLoader = null;
+        }
+        this.events.off('shutdown', this._clearGameplayMusicWait, this);
+        this.events.off('destroy', this._clearGameplayMusicWait, this);
+        this.input.off('pointerdown', this._retryGameplayMusic, this);
+        this.input.keyboard.off('keydown-ENTER', this._retryGameplayMusic, this);
+        if (this._musicLoadingText) {
+            this._musicLoadingText.destroy();
+            this._musicLoadingText = null;
+        }
+    }
+
+    _createGameplay() {
+        if (this._gameplayCreated) return;
+        this._gameplayCreated = true;
+        this._clearGameplayMusicWait();
         this.currentView = 'countdown';
         this.hasWon = false;
         this.overlayElements = [];
@@ -294,10 +409,7 @@ class GameScene extends Phaser.Scene {
             this.currentView = 'gameplay';
         }
 
-        // Trilha sonora — sorteia e toca uma faixa; se ela terminar antes do
-        // fim da fase, o MusicManager encadeia automaticamente. Paramos em
-        // `shutdown()`, cobrindo saídas por vitória, morte, game over e pause.
-        MusicManager.startGameplay(this, this.currentLevel);
+        // A faixa de entrada já está tocando; o MusicManager cuida das próximas.
     }
 
     // ==================== MAPA ====================
@@ -2009,6 +2121,14 @@ class GameScene extends Phaser.Scene {
     // ==================== UPDATE ====================
 
     update(time, delta) {
+        if (this._waitingForMusic) {
+            if (this.virtualControls.jumpJustPressed) {
+                this.virtualControls.jumpJustPressed = false;
+                this._retryGameplayMusic();
+            }
+            this._tryStartGameplay();
+            return;
+        }
         if (this.currentView !== 'gameplay' || this.hasWon) {
             if (this.currentView === 'paused') {
                 this.pauseMenu.handleInput();

@@ -6,7 +6,8 @@
  *
  * Modelo atual (v1 — foco em gameplay):
  *   - MusicPreloadScene baixa as faixas em segundo plano desde a abertura.
- *     Menus e fases não aguardam os MP3s; cutscenes aguardam apenas sua trilha.
+ *     Menus não aguardam os MP3s; fases aguardam a faixa sorteada e cutscenes,
+ *     sua própria trilha.
  *   - Cada entrada em fase sorteia uma faixa da pool elegível e toca.
  *   - Quando a faixa se aproxima do fim, cross-fade com a próxima (a antiga
  *     desce, a nova sobe, sobrepostas durante `crossfadeDurationMs`).
@@ -104,7 +105,7 @@ const MusicManager = {
      * Enfileira apenas faixas ausentes, sem duplicar downloads em andamento.
      * Não usa o loader das telas. Cada tela decide se precisa aguardar a trilha.
      */
-    preload() {
+    preload(priorityKey = null) {
         this._ensureInit();
         const scene = this._loaderScene;
         if (!this.enabled || !scene) return;
@@ -119,6 +120,11 @@ const MusicManager = {
                 queued = true;
             }
         });
+        // Prioriza a faixa necessária sem cancelar downloads já em andamento.
+        if (priorityKey) {
+            scene.load.list.entries.sort((a, b) =>
+                Number(b.key === priorityKey) - Number(a.key === priorityKey));
+        }
         if (queued && !scene.load.isLoading()) scene.load.start();
     },
 
@@ -157,10 +163,19 @@ const MusicManager = {
     },
 
     /**
-     * Inicia BGM para uma fase. Sorteia da pool elegível e toca.
+     * Escolhe a faixa de entrada considerando toda a pool, sem filtrar cache.
+     * O caller guarda esta key até o download e a reprodução estarem prontos.
+     */
+    pickGameplayTrack(levelIndex) {
+        this._ensureInit();
+        return this.enabled ? this._pickFromPool(this._resolveGameplayPool(levelIndex)) : null;
+    },
+
+    /**
+     * Inicia BGM para uma fase, usando a faixa de entrada já sorteada, se dada.
      * Se a faixa terminar antes da fase, sorteia outra automaticamente.
      */
-    startGameplay(scene, levelIndex) {
+    startGameplay(scene, levelIndex, initialKey = null) {
         this._ensureInit();
         this.stop();
         if (!this.enabled) {
@@ -192,7 +207,8 @@ const MusicManager = {
             return;
         }
 
-        this._playRandom();
+        if (initialKey) this._playKey(initialKey);
+        else this._playRandom();
     },
 
     /**
@@ -408,8 +424,12 @@ const MusicManager = {
      * devolvido (repete).
      */
     _pickNext() {
-        // Enquanto o download continua, sorteia apenas entre faixas prontas.
-        const pool = this.currentPool.filter(key => this.scene?.cache.audio.exists(key));
+        // Trocas durante a reprodução usam o cache para manter o crossfade.
+        // A entrada da fase usa pickGameplayTrack(), com a pool completa.
+        return this._pickFromPool(this.currentPool.filter(key => this.scene?.cache.audio.exists(key)));
+    },
+
+    _pickFromPool(pool) {
         if (!pool || pool.length === 0) return null;
         if (pool.length === 1) return pool[0];
 

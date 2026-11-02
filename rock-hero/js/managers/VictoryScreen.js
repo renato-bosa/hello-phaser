@@ -455,9 +455,14 @@ class VictoryScreen {
             const cutsceneByWorld = {
                 1: 'world1Complete',
                 2: 'world2Complete',
-                3: 'world3Complete'
+                3: 'world3Complete',
+                4: 'world4Complete',
+                // Saves antigos podem chegar à última fase sem todos os resgates.
+                5: GameData.BOB_FAMILY.every(f => GameData.getRescuedFamily().includes(f.id))
+                    ? 'world5Complete' : null
             };
             const cutsceneId = cutsceneByWorld[world.id];
+            worldCompleteData.endingShown = cutsceneId === 'world5Complete';
 
             if (cutsceneId) {
                 scene.scene.start('CutsceneScene', {

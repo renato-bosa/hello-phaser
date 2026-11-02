@@ -1,0 +1,176 @@
+{
+  "generationMode": "built-in image_gen",
+  "description": "Prompts das imagens finais das cutscenes dos mundos 3, 4 e 5 de The Lost Band. Caminhos relativos a rock-hero/.",
+  "artifacts": [
+    {
+      "file": "assets/spritesheets/cutscenes/world3-return-5.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/cut-scene4-5-de-5.png"
+          ],
+          "prompt": "Use case: identity-preserve / text-localization. Edit target: the attached existing cutscene frame from our pixel-art game The Lost Band. Create the next narrative beat of the SAME scene, preserving its exact pixel-art aesthetic, 4:3 landscape composition, underwater purple ruins, gold-bordered navy dialogue panel, and identities and clothes of ALL FIVE characters: blond vocalist with black T-shirt and microphone, red-haired guitarist with green shirt and red guitar, brown-haired drummer with blue shirt and drum kit, dark-skinned bassist with green/white shirt and black bass, and small friendly orange octopus Bob with tiny multicolored crest. Do not add or remove characters. Change the vocalist's expression from celebrating to thoughtful, lowering his raised arm, and have his friends listening; instruments remain. Preserve the scene as a single full-screen game cutscene, NOT a multi-panel comic. Top-left gold label must say exactly 'MUNDO 3'. Change top-right frame counter to exactly '5/7'. In the bottom dialogue panel replace ALL existing text with speaker in gold 'Vocalista' and white dialogue, exactly: 'Só falta descobrir como voltar para casa...' Keep the same highly readable pixel font and generous margins as the reference. No extra text or watermarks. Output a polished 4:3 landscape PNG suitable for the game."
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world3-return-6.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world3-return-5.png"
+          ],
+          "prompt": "Use case: illustration-story, a single full-screen 4:3 pixel-art cutscene frame for The Lost Band, NOT a comic sheet. Preserve the reference's gold-edged navy bottom dialogue box, readable pixel font, small gold top-left chapter plaque and top-right counter. Preserve all character identities exactly: blond vocalist black shirt microphone; red-haired guitarist green shirt red guitar; brown-haired drummer blue shirt; dark-skinned bassist green-and-white shirt black bass; small orange octopus Bob with tiny colorful crest. No extra characters, no photorealism, no watermark. Render ALL specified Portuguese text verbatim with accents and generous margins. Edit the reference into the next moment in the same underwater purple ruins. Bob steps forward and raises one tentacle to point toward a distant passage, explaining a plan confidently. All four musicians listen with hopeful expressions. Keep their instruments, and retain the overall scene framing. Chapter 'MUNDO 3', counter '6/7'. Speaker 'Bob'. Dialogue exactly: 'Eu conheço um portal! Mas o marionetista está com a chave.' Use two lines if needed."
+        },
+        {
+          "references": [
+            "resultado da etapa anterior"
+          ],
+          "prompt": "Use case: precise-object-edit. Change ONLY the small glowing blue active portal doorway in the distant upper-right background of this reference. Replace it with an ordinary dark open stone passage with a winding stone stairway leading onward, no magical light, no vortex. Preserve EVERYTHING else exactly: all FIVE characters and poses, pixel art, colors, underwater ruins, instruments, gold UI borders, chapter MUNDO 3, counter 6/7, speaker Bob, and Portuguese dialogue 'Eu conheço um portal! Mas o marionetista está com a chave.' Do not change any text or foreground. Single 4:3 landscape frame."
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world3-return-7.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world3-return-5.png"
+          ],
+          "prompt": "Use case: illustration-story, a single full-screen 4:3 pixel-art cutscene frame for The Lost Band, NOT a comic sheet. Preserve the reference's gold-edged navy bottom dialogue box, readable pixel font, small gold top-left chapter plaque and top-right counter. Preserve all character identities exactly: blond vocalist black shirt microphone; red-haired guitarist green shirt red guitar; brown-haired drummer blue shirt; dark-skinned bassist green-and-white shirt black bass; small orange octopus Bob with tiny colorful crest. No extra characters, no photorealism, no watermark. Render ALL specified Portuguese text verbatim with accents and generous margins. Edit the reference into the last moment of this underwater purple ruins scene. All four musicians and Bob stand together ready to set off; the smiling blue-shirted drummer raises one drumstick forward decisively. All the others look determined, including cheerful Bob. Keep recognisable instrument props and identities. Chapter 'MUNDO 3', counter '7/7'. Speaker 'Baterista'. Dialogue exactly: 'Então vamos buscar essa chave!'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world4-key-1.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world3-return-5.png",
+            "assets/spritesheets/mao.png",
+            "assets/spritesheets/key-do portal.png",
+            "assets/spritesheets/worldmap-backgrounds/world4.png"
+          ],
+          "prompt": "Use case: illustration-story, a single full-screen 4:3 pixel-art cutscene frame for The Lost Band, NOT a comic sheet. Preserve the reference's gold-edged navy bottom dialogue box, readable pixel font, small gold top-left chapter plaque and top-right counter. Preserve all character identities exactly: blond vocalist black shirt microphone; red-haired guitarist green shirt red guitar; brown-haired drummer blue shirt; dark-skinned bassist green-and-white shirt black bass; small orange octopus Bob with tiny colorful crest. No extra characters, no photorealism, no watermark. Render ALL specified Portuguese text verbatim with accents and generous margins. Create the aftermath of the world 4 boss by transforming the environment of reference 1 into a dark purple clockwork floating arena, inspired by the mechanical fantasy towers in reference 4. Reference 1 defines the FIVE friendly characters and cutscene style/UI, not the underwater location. Reference 2 defines the boss: TWO enormous spectral skeletal marionettist hands with dangling puppet strings; show them dissolving into harmless violet sparks above the arena, no body or humanoid villain. A single small purple key matching reference 3 falls glowing between them. Below, the four musicians and orange Bob look up, relieved and victorious. No gore. Keep every character visibly separate. Chapter 'MUNDO 4', counter '1/5'. Speaker 'Narrador'. Dialogue exactly: 'As mãos do marionetista desapareceram... e deixaram uma chave!'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world4-key-2.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world4-key-1.png"
+          ],
+          "prompt": "Use case: illustration-story. Single full-screen 4:3 landscape pixel-art cutscene frame for The Lost Band, never a comic sheet. Keep reference character identities, saturated pixel art, small gold top plaques and gold-bordered dark navy bottom dialogue box. Render specified Portuguese speaker and dialogue VERBATIM in readable pixel font, with accents and generous padding; wrap at natural phrases into two lines when needed. Four human musicians: blond vocalist black shirt microphone, red-haired guitarist green shirt red guitar, brown-haired drummer blue shirt red drum kit, dark-skinned bassist green-and-white shirt black bass. Bob is the friendly small orange octopus with tiny rainbow crest. No extra human characters, no watermark. Edit this moment: keep the SAME mechanical floating purple arena and the four musicians plus Bob. The skeletal hands and their strings have disappeared completely. The bassist holds the small purple portal key up proudly while the others celebrate. Keep his black bass slung across his body. Chapter 'MUNDO 4', counter '2/5'. Speaker 'Baixista'. Dialogue: 'Conseguimos! Agora podemos voltar!'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world4-key-3.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world4-key-1.png"
+          ],
+          "prompt": "Use case: illustration-story. Single full-screen 4:3 landscape pixel-art cutscene frame for The Lost Band, never a comic sheet. Keep reference character identities, saturated pixel art, small gold top plaques and gold-bordered dark navy bottom dialogue box. Render specified Portuguese speaker and dialogue VERBATIM in readable pixel font, with accents and generous padding; wrap at natural phrases into two lines when needed. Four human musicians: blond vocalist black shirt microphone, red-haired guitarist green shirt red guitar, brown-haired drummer blue shirt red drum kit, dark-skinned bassist green-and-white shirt black bass. Bob is the friendly small orange octopus with tiny rainbow crest. No extra human characters, no watermark. Edit this moment: keep the SAME mechanical purple floating arena and four musicians plus Bob. The boss hands and strings have disappeared completely; the bassist now holds the purple key. Bob is closer to the group, looking thoughtful and raising a tentacle to gently interrupt their celebration; musicians listen. Chapter 'MUNDO 4', counter '3/5'. Speaker 'Bob'. Dialogue in TWO readable lines: 'Ainda falta uma coisa... O portal só desperta com a música da minha família.'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world4-key-4.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world4-key-1.png"
+          ],
+          "prompt": "Use case: illustration-story. Single full-screen 4:3 landscape pixel-art cutscene frame for The Lost Band, never a comic sheet. Keep reference character identities, saturated pixel art, small gold top plaques and gold-bordered dark navy bottom dialogue box. Render specified Portuguese speaker and dialogue VERBATIM in readable pixel font, with accents and generous padding; wrap at natural phrases into two lines when needed. Four human musicians: blond vocalist black shirt microphone, red-haired guitarist green shirt red guitar, brown-haired drummer blue shirt red drum kit, dark-skinned bassist green-and-white shirt black bass. Bob is the friendly small orange octopus with tiny rainbow crest. No extra human characters, no watermark. Edit this moment: same mechanical purple floating arena, no remaining boss hands or strings. The four musicians listen to orange Bob as he points toward a distant gothic cathedral on a floating island; this is the next destination. Bob looks worried but hopeful. The bassist carries the small purple portal key. Chapter 'MUNDO 4', counter '4/5'. Speaker 'Bob'. Dialogue: 'Meus irmãos e minha irmã estão perdidos na região da catedral.'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world5-home-1.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world3-return-5.png",
+            "assets/spritesheets/irmao do bob 1.png",
+            "assets/spritesheets/irmao do bob 2.png",
+            "assets/spritesheets/irma do bob.png",
+            "assets/spritesheets/irmauzinho do bob.png"
+          ],
+          "prompt": "Use case: illustration-story. Single full-screen 4:3 landscape pixel-art cutscene frame for The Lost Band, never a comic sheet. Keep reference character identities, saturated pixel art, small gold top plaques and gold-bordered dark navy bottom dialogue box. Render specified Portuguese speaker and dialogue VERBATIM in readable pixel font, with accents and generous padding; wrap at natural phrases into two lines when needed. Four human musicians: blond vocalist black shirt microphone, red-haired guitarist green shirt red guitar, brown-haired drummer blue shirt red drum kit, dark-skinned bassist green-and-white shirt black bass. Bob is the friendly small orange octopus with tiny rainbow crest. No extra human characters, no watermark. Create the final family reunion BEFORE opening the portal. Image 1 supplies the FOUR musicians, orange Bob, and art/UI style, not the location. Images 2,3,4,5 are FOUR additional family designs: faithfully adapt these tiny sprites into cutscene pixel art, retaining the brown brother's broad yellow hat and dark outfit, red brother with green curved head decorations, yellow sister with pink bow/hair decorations, and smaller green little brother. Show EXACTLY NINE characters, ALL clearly separate: four humans and FIVE octopus-family characters (orange Bob plus the four relatives). Musicians stand left, family right, on a broad stone terrace near a gothic cathedral, with a large ancient stone portal arch in the background center, purple gem at arch apex, DARK INACTIVE interior: no vortex or active light. Magical starry violet sky, floating crystal islands and waterfalls in distance. Bob proudly introduces his family with open tentacles. Happy relieved reunion. Chapter 'MUNDO 5', counter '1/6'. Speaker 'Bob'. Dialogue in TWO readable lines: 'Agora estamos todos juntos! Vamos abrir o caminho de volta para vocês.'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world4-key-5.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world4-key-3.png"
+          ],
+          "prompt": "Use case: illustration-story. Single full-screen 4:3 landscape pixel-art cutscene frame for The Lost Band, never a comic sheet. Keep reference character identities, saturated pixel art, small gold top plaques and gold-bordered dark navy bottom dialogue box. Render specified Portuguese speaker and dialogue VERBATIM in readable pixel font, with accents and generous padding; wrap at natural phrases into two lines when needed. Four human musicians: blond vocalist black shirt microphone, red-haired guitarist green shirt red guitar, brown-haired drummer blue shirt red drum kit, dark-skinned bassist green-and-white shirt black bass. Bob is the friendly small orange octopus with tiny rainbow crest. No extra human characters, no watermark. Continue the SAME purple clockwork arena scene. No hands or puppet strings remain. The vocalist has approached Bob and kneels beside him, reassuring him warmly with one hand on his shoulder. All FOUR musicians remain visible, smiling supportively, with their same clothes and instruments; bassist keeps the small purple key. Bob smiles with renewed hope. Chapter 'MUNDO 4', counter '5/5'. Speaker 'Vocalista'. Dialogue in TWO large readable lines: 'Você ajudou a reunir a nossa banda. Agora vamos reunir a sua família!'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world5-home-5.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/cut-scene1-abertura-1-6.png",
+            "assets/spritesheets/cutscenes/world3-return-5.png"
+          ],
+          "prompt": "Use case: illustration-story. Single full-screen 4:3 landscape pixel-art cutscene frame for The Lost Band, never a comic sheet. Keep reference character identities, saturated pixel art, small gold top plaques and gold-bordered dark navy bottom dialogue box. Render specified Portuguese speaker and dialogue VERBATIM in readable pixel font, with accents and generous padding; wrap at natural phrases into two lines when needed. Four human musicians: blond vocalist black shirt microphone, red-haired guitarist green shirt red guitar, brown-haired drummer blue shirt red drum kit, dark-skinned bassist green-and-white shirt black bass. Bob is the friendly small orange octopus with tiny rainbow crest. No extra human characters, no watermark. Create the homecoming to the ORIGINAL rehearsal room in reference 1: warm brick walls, wooden floor and rug, hanging lamp, speakers and posters, exact same FOUR musicians' identities and instruments. A glowing purple swirling doorway is fading behind them as they have just returned home; all FOUR people are fully visible, looking relieved and amazed, guitar and bass carried, drum kit already beside the drummer. NO Bob or relatives in this frame: they stayed on the other side. No extra people. The band's rehearsal room should recognisably mirror the opening, not a new place. Chapter 'MUNDO 5', counter '5/6'. Speaker 'Narrador'. Dialogue: 'A banda atravessou o portal e finalmente voltou para casa.'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world5-home-6.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/cut-scene1-abertura-1-6.png",
+            "assets/spritesheets/cutscenes/world3-return-5.png"
+          ],
+          "prompt": "Use case: illustration-story. Single full-screen 4:3 landscape pixel-art cutscene frame for The Lost Band, never a comic sheet. Keep reference character identities, saturated pixel art, small gold top plaques and gold-bordered dark navy bottom dialogue box. Render specified Portuguese speaker and dialogue VERBATIM in readable pixel font, with accents and generous padding; wrap at natural phrases into two lines when needed. Four human musicians: blond vocalist black shirt microphone, red-haired guitarist green shirt red guitar, brown-haired drummer blue shirt red drum kit, dark-skinned bassist green-and-white shirt black bass. Bob is the friendly small orange octopus with tiny rainbow crest. No extra human characters, no watermark. Create the FINAL shot, back in the SAME warm rehearsal room from reference 1, mirror the opening composition: FOUR musicians only, blond vocalist front with microphone, red-haired guitarist left, blue-shirt drummer center behind red kit, dark-skinned bassist right. All wear the same original clothes. No Bob or relatives, no portal, no monsters: the adventure is over. Everyone smiles and laughs, the drummer raises his sticks playfully as they get ready to resume their rehearsal. Keep all instruments and four musicians visible. Chapter 'MUNDO 5', counter '6/6'. Speaker 'Baterista'. Dialogue exactly: 'Então... de onde a gente parou?'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world5-home-2.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world5-home-1.png",
+            "assets/spritesheets/key-do portal.png"
+          ],
+          "prompt": "Use case: illustration-story. Single full-screen 4:3 landscape pixel-art cutscene frame for The Lost Band, never a comic sheet. Keep reference character identities, saturated pixel art, small gold top plaques and gold-bordered dark navy bottom dialogue box. Render specified Portuguese speaker and dialogue VERBATIM in readable pixel font, with accents and generous padding; wrap at natural phrases into two lines when needed. Four human musicians: blond vocalist black shirt microphone, red-haired guitarist green shirt red guitar, brown-haired drummer blue shirt red drum kit, dark-skinned bassist green-and-white shirt black bass. Bob is the friendly small orange octopus with tiny rainbow crest. No extra human characters, no watermark. Maintain the SAME cathedral terrace, stone arch, violet starry sky, FOUR human musicians and FIVE distinct octopus-family characters from image 1, with identical costumes, colors and head decorations: orange Bob rainbow crest, brown brother yellow broad hat/dark vest, red brother green curved horns, yellow sister pink bow, tiny green brother gray triangular hat. Keep EXACTLY NINE characters, fully separate, no duplicates, missing relatives or extra characters. The dark-skinned bassist has approached the stone arch and carefully inserts the small PURPLE key from reference 2 into a keyhole in the arch's side pillar. The key and his hand are visible; his bass stays slung on a strap. All eight others watch hopefully from the terrace. Fine violet lines begin illuminating the arch's outline and apex gemstone, but the portal interior is still dark and closed, no vortex yet. Chapter 'MUNDO 5', counter '2/6'. Speaker 'Narrador'. Dialogue: 'A chave iluminou o portal. Agora faltava a música da família de Bob.'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world5-home-3.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world5-home-1.png"
+          ],
+          "prompt": "Use case: illustration-story. Single full-screen 4:3 landscape pixel-art cutscene frame for The Lost Band, never a comic sheet. Keep reference character identities, saturated pixel art, small gold top plaques and gold-bordered dark navy bottom dialogue box. Render specified Portuguese speaker and dialogue VERBATIM in readable pixel font, with accents and generous padding; wrap at natural phrases into two lines when needed. Four human musicians: blond vocalist black shirt microphone, red-haired guitarist green shirt red guitar, brown-haired drummer blue shirt red drum kit, dark-skinned bassist green-and-white shirt black bass. Bob is the friendly small orange octopus with tiny rainbow crest. No extra human characters, no watermark. Maintain the SAME cathedral terrace, stone arch, violet starry sky, FOUR human musicians and FIVE distinct octopus-family characters from image 1, with identical costumes, colors and head decorations: orange Bob rainbow crest, brown brother yellow broad hat/dark vest, red brother green curved horns, yellow sister pink bow, tiny green brother gray triangular hat. Keep EXACTLY NINE characters, fully separate, no duplicates, missing relatives or extra characters. Now the reunited family plays a joyful melody together: Bob plays a small rainbow xylophone, brown brother strums a small guitar, red brother shakes tambourine, yellow sister plays a small flute, little green brother rings a small bell. The four human musicians accompany them with their ORIGINAL instruments (microphone, red electric guitar, red drums, black bass). Bright musical notes flow toward the arch, activating a beautiful purple swirling portal. Keep the scene readable and identities exact, every family member visible with one instrument. Chapter 'MUNDO 5', counter '3/6'. Speaker 'Narrador'. Dialogue in TWO lines: 'Com a família reunida e a banda tocando junto, o portal despertou!'"
+        }
+      ]
+    },
+    {
+      "file": "assets/spritesheets/cutscenes/world5-home-4.png",
+      "steps": [
+        {
+          "references": [
+            "assets/spritesheets/cutscenes/world5-home-1.png"
+          ],
+          "prompt": "Use case: illustration-story. Single full-screen 4:3 landscape pixel-art cutscene frame for The Lost Band, never a comic sheet. Keep reference character identities, saturated pixel art, small gold top plaques and gold-bordered dark navy bottom dialogue box. Render specified Portuguese speaker and dialogue VERBATIM in readable pixel font, with accents and generous padding; wrap at natural phrases into two lines when needed. Four human musicians: blond vocalist black shirt microphone, red-haired guitarist green shirt red guitar, brown-haired drummer blue shirt red drum kit, dark-skinned bassist green-and-white shirt black bass. Bob is the friendly small orange octopus with tiny rainbow crest. No extra human characters, no watermark. Maintain the SAME cathedral terrace, stone arch, violet starry sky, FOUR human musicians and FIVE distinct octopus-family characters from image 1, with identical costumes, colors and head decorations: orange Bob rainbow crest, brown brother yellow broad hat/dark vest, red brother green curved horns, yellow sister pink bow, tiny green brother gray triangular hat. Keep EXACTLY NINE characters, fully separate, no duplicates, missing relatives or extra characters. The purple portal behind the friends is now OPEN, glowing warmly. The blond vocalist kneels and exchanges a friendly handshake with orange Bob's tentacle at the center of the group; the other three musicians and all four relatives smile and wave goodbye. Their faces show gratitude, warm friendship, a touching farewell. Keep everyone visible. No one has crossed yet. Chapter 'MUNDO 5', counter '4/6'. Bottom speaker heading in gold: 'Despedida'. Under it, TWO separate white lines of dialogue, exactly: 'Vocalista: Obrigado por nos ajudar a voltar!' and 'Bob: Obrigado por trazerem minha família de volta!' Make the font readable, both lines entirely inside the navy panel with generous margins."
+        }
+      ]
+    }
+  ]
+}

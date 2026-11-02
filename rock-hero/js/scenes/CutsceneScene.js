@@ -267,7 +267,7 @@ class CutsceneScene extends Phaser.Scene {
         }
 
         const key = this._frameKey(idx);
-        const newImage = this._createImageFitted(key);
+        const newImage = this._createImageFitted(key, idx);
         newImage.setAlpha(0);
         this.frameContainer.add(newImage);
 
@@ -321,7 +321,7 @@ class CutsceneScene extends Phaser.Scene {
      * Cria a imagem escalada para caber no canvas mantendo aspect ratio.
      * Usa filtro LINEAR (cutscenes são imagens pré-renderizadas, não pixel art).
      */
-    _createImageFitted(textureKey) {
+    _createImageFitted(textureKey, frameIndex) {
         const cam = this.cameras.main;
 
         if (this.textures.exists(textureKey)) {
@@ -336,6 +336,23 @@ class CutsceneScene extends Phaser.Scene {
         // Escala para caber preservando aspect ratio (letterbox)
         const scale = Math.min(cam.width / texW, cam.height / texH);
         img.setScale(scale);
+
+        // Conserva a arte original quando uma sequência ganha novos quadros.
+        // Só recobre o contador antigo, que está embutido no PNG (layout 4:3).
+        if (this.config.frames[frameIndex]?.updateCounter) {
+            const frame = this.add.container(0, 0, [img]);
+            const w = img.displayWidth;
+            const h = img.displayHeight;
+            const x = w * 0.428;
+            const y = -h * 0.448;
+            const plaque = this.add.rectangle(x, y, w * 0.092, h * 0.043, 0x000000);
+            const counter = this.add.text(x, y, `${frameIndex + 1}/${this.config.frames.length}`, {
+                fontFamily: '"Press Start 2P", monospace', fontSize: `${w * 0.026}px`,
+                color: '#f6d55c', stroke: '#392908', strokeThickness: Math.max(1, w * 0.001)
+            }).setOrigin(0.5);
+            frame.add([plaque, counter]);
+            return frame;
+        }
 
         return img;
     }

@@ -292,10 +292,10 @@ const GameConfig = {
         {
             id: 4,
             name: 'Mundo 4',
-            subtitle: 'Mecânicas Experimentais',
+            subtitle: 'A Chave do Portal',
             levels: [15, 16, 17, 18, 19, 27], // map18 … map22 + chefe
-            rescuedCharacter: 'vocalista',
-            celebrationMessage: 'Mecânicas dominadas!',
+            completionType: 'portalKey',
+            celebrationMessage: 'A chave do portal está com a banda!',
             theme: 'special',
             bgColor: 0x1a0a2e,
             pathColor: 0x8844aa,
@@ -709,11 +709,40 @@ const GameConfig = {
         },
         world3Complete: {
             frames: [
-                { file: 'assets/spritesheets/cutscenes/cut-scene4-1-de-5.png' },
-                { file: 'assets/spritesheets/cutscenes/cut-scene4-2-de-5.png' },
-                { file: 'assets/spritesheets/cutscenes/cut-scene4-3-de-5.png' },
-                { file: 'assets/spritesheets/cutscenes/cut-scene4-4-de-5.png' },
-                { file: 'assets/spritesheets/cutscenes/cut-scene4-5-de-5.png' }
+                { file: 'assets/spritesheets/cutscenes/cut-scene4-1-de-5.png', updateCounter: true },
+                { file: 'assets/spritesheets/cutscenes/cut-scene4-2-de-5.png', updateCounter: true },
+                { file: 'assets/spritesheets/cutscenes/cut-scene4-3-de-5.png', updateCounter: true },
+                { file: 'assets/spritesheets/cutscenes/cut-scene4-4-de-5.png', updateCounter: true },
+                { file: 'assets/spritesheets/cutscenes/world3-return-5.png' },
+                { file: 'assets/spritesheets/cutscenes/world3-return-6.png' },
+                { file: 'assets/spritesheets/cutscenes/world3-return-7.png' }
+            ],
+            unlockMs: 1000,
+            fadeMs: 600,
+            bgColor: 0x000000,
+            music: 'rock-theme1'
+        },
+        world4Complete: {
+            frames: [
+                { file: 'assets/spritesheets/cutscenes/world4-key-1.png' },
+                { file: 'assets/spritesheets/cutscenes/world4-key-2.png' },
+                { file: 'assets/spritesheets/cutscenes/world4-key-3.png' },
+                { file: 'assets/spritesheets/cutscenes/world4-key-4.png' },
+                { file: 'assets/spritesheets/cutscenes/world4-key-5.png' }
+            ],
+            unlockMs: 1000,
+            fadeMs: 600,
+            bgColor: 0x000000,
+            music: 'rock-theme1'
+        },
+        world5Complete: {
+            frames: [
+                { file: 'assets/spritesheets/cutscenes/world5-home-1.png' },
+                { file: 'assets/spritesheets/cutscenes/world5-home-2.png' },
+                { file: 'assets/spritesheets/cutscenes/world5-home-3.png' },
+                { file: 'assets/spritesheets/cutscenes/world5-home-4.png' },
+                { file: 'assets/spritesheets/cutscenes/world5-home-5.png' },
+                { file: 'assets/spritesheets/cutscenes/world5-home-6.png' }
             ],
             unlockMs: 1000,
             fadeMs: 600,

@@ -51,10 +51,10 @@ GameConfigVariants.proposta = {
         {
             id: 4,
             name: 'Mundo 4',
-            subtitle: 'Mecânicas Experimentais',
+            subtitle: 'A Chave do Portal',
             levels: [15, 16, 17, 18, 19, 27], // map18 … map22 + chefe
-            rescuedCharacter: 'vocalista',
-            celebrationMessage: 'Mecânicas dominadas!',
+            completionType: 'portalKey',
+            celebrationMessage: 'A chave do portal está com a banda!',
             theme: 'special',
             bgColor: 0x1a0a2e,
             pathColor: 0x8844aa,

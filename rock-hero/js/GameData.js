@@ -66,6 +66,7 @@ const GameData = {
     // ==================== PERSONAGENS ====================
     // Delega para GameConfig.CHARACTERS
     get CHARACTERS() { return GameConfig.CHARACTERS; },
+    get BOB_FAMILY() { return GameConfig.BOB_FAMILY; },
 
     // ==================== MUNDOS ====================
     // Delega para GameConfig.WORLDS
@@ -175,7 +176,10 @@ const GameData = {
     },
 
     loadPlayerName()                { return ProgressTracker.loadPlayerName(this.getActiveSlot()); },
-    markLevelComplete(levelIndex)   { ProgressTracker.markLevelComplete(this.getActiveSlot(), levelIndex); },
+    markLevelComplete(levelIndex, rescuedFamily = []) {
+        ProgressTracker.markLevelComplete(this.getActiveSlot(), levelIndex, rescuedFamily);
+    },
+    getRescuedFamily()              { return ProgressTracker.getRescuedFamily(this.getActiveSlot()); },
     getCompletedLevels()            { return ProgressTracker.getCompletedLevels(this.getActiveSlot()); },
     isLevelComplete(levelIndex)     { return ProgressTracker.isLevelComplete(this.getActiveSlot(), levelIndex); },
     isLevelUnlocked(levelIndex)     { return ProgressTracker.isLevelUnlocked(this.getActiveSlot(), levelIndex); },

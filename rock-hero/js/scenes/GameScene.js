@@ -40,6 +40,9 @@ class GameScene extends Phaser.Scene {
 
         // Só o mapa da fase atual (tilesets / image layers entram via auto-loader)
         const level = GameData.LEVELS[this.currentLevel];
+        if (GameData.BOB_FAMILY.some(f => f.world === level?.world)) {
+            BobFamilyManager.preload(this);
+        }
         if (level) {
             if (this.cache.tilemap.exists(level.key)) {
                 this._enqueueMapDependencies(level.key);
@@ -395,6 +398,8 @@ class GameScene extends Phaser.Scene {
         }
         this._createStarAnimations();
         this.hudManager.create();
+        this.familyManager = new BobFamilyManager(this);
+        this.familyManager.create(this._familySpawns);
         this.hudManager.showLevelName(levelConfig.name);
         this.setupControls();
         this.setupPhysics();
@@ -620,6 +625,7 @@ class GameScene extends Phaser.Scene {
         this._slingshotData = null;
         this._stoneSpawns = [];
         this._puppeteerHands = [];
+        this._familySpawns = [];
         let prisonPosition = null;
         let prisonerObject = null;
 
@@ -638,6 +644,12 @@ class GameScene extends Phaser.Scene {
             const tilesetName = textureKey.toLowerCase();
             const transform = this._extractTilesetTransform(obj);
             const placement = this._getTileObjectPlacement(obj, map);
+
+            const family = GameData.BOB_FAMILY.find(f => f.texture.toLowerCase() === tilesetName);
+            if (family) {
+                this._familySpawns.push({ id: family.id, textureKey, ...placement, transform });
+                return;
+            }
 
             if (type === 'player_spawn' || type === 'player-spawn' ||
                 tilesetName.includes('still-hero') || tilesetName.includes('still hero')) {

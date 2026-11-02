@@ -168,6 +168,30 @@ class HUDManager {
         }
     }
 
+    createFamilyDisplay(foundIds) {
+        const scene = this.scene;
+        this.familyHUD = scene.add.container(16, 64).setScrollFactor(0).setDepth(GC.DEPTH.HUD);
+        this.familyPortraits = GameData.BOB_FAMILY.map((family, index) => {
+            const portrait = scene.add.image(index * 24 + 10, 0, family.texture).setScale(0.65);
+            this.familyHUD.add(portrait);
+            return { id: family.id, portrait };
+        });
+        this.familyText = scene.add.text(0, 16, '', {
+            fontFamily: 'Arial', fontSize: '12px', color: '#ffe78a',
+            stroke: '#000000', strokeThickness: 3
+        });
+        this.familyHUD.add(this.familyText);
+        this.updateFamilyDisplay(foundIds);
+    }
+
+    updateFamilyDisplay(foundIds) {
+        this.familyPortraits?.forEach(({ id, portrait }) => {
+            if (foundIds.includes(id)) portrait.clearTint().setAlpha(1);
+            else portrait.setTintFill(0x333344).setAlpha(0.8);
+        });
+        this.familyText?.setText(`Família: ${foundIds.length}/${GameData.BOB_FAMILY.length}`);
+    }
+
     _createHeartsDisplay() {
         const scene = this.scene;
         const cam = scene.cameras.main;

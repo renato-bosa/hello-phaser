@@ -16,6 +16,11 @@ class VictoryScreen {
         const scene = this.scene;
         if (scene.hasWon) return;
 
+        if (scene.familyManager?.hasMissingRescues()) {
+            scene.familyManager.warnMissingRescue();
+            return;
+        }
+
         if (scene.totalStars > 0 && scene.starsCollected < scene.totalStars) {
             this._showStarsWarning();
             return;
@@ -31,7 +36,7 @@ class VictoryScreen {
 
         const finalTime = scene.elapsedTime;
 
-        GameData.markLevelComplete(scene.currentLevel);
+        GameData.markLevelComplete(scene.currentLevel, scene.familyManager?.getPendingIds() || []);
         const result = GameData.saveRecord(scene.currentLevel, finalTime, scene.playerName);
 
         if (result.isRecord) {

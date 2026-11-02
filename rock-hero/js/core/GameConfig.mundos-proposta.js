@@ -63,10 +63,10 @@ GameConfigVariants.proposta = {
         {
             id: 5,
             name: 'Mundo 5',
-            subtitle: 'Ecos da Catedral',
+            subtitle: 'O Reencontro da Família do Bob',
             levels: [22, 23, 24, 26], // Catedral do Eco … Mapa 23
-            rescuedCharacter: 'vocalista',
-            celebrationMessage: 'O eco responde!',
+            completionType: 'family',
+            celebrationMessage: 'A família do Bob está reunida!',
             theme: 'special',
             bgColor: 0x0a0618,
             pathColor: 0xaa66cc,

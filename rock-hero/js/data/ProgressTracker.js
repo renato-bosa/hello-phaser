@@ -46,7 +46,7 @@ const ProgressTracker = {
 
     // ==================== LEVELS ====================
 
-    markLevelComplete(slotId, levelIndex) {
+    markLevelComplete(slotId, levelIndex, rescuedFamily = []) {
         if (!slotId) return;
         const slot = SaveManager.getSlot(slotId);
         if (!slot) return;
@@ -56,8 +56,22 @@ const ProgressTracker = {
         if (!slot.completedLevels.includes(levelIndex)) {
             slot.completedLevels.push(levelIndex);
             slot.completedLevels.sort((a, b) => a - b);
-            SaveManager.saveSlot(slotId, slot);
         }
+
+        // Fase e resgates são confirmados juntos; tocar no familiar não grava o save.
+        const worldId = GameConfig.LEVELS[levelIndex]?.world;
+        const validIds = new Set(GameConfig.BOB_FAMILY.filter(f => f.world === worldId).map(f => f.id));
+        slot.rescuedFamily = [...new Set([
+            ...(slot.rescuedFamily || []),
+            ...rescuedFamily.filter(id => validIds.has(id))
+        ])];
+        SaveManager.saveSlot(slotId, slot);
+    },
+
+    getRescuedFamily(slotId) {
+        const saved = slotId ? SaveManager.getSlot(slotId)?.rescuedFamily : null;
+        // Saves anteriores à missão começam sem resgates, mesmo com fases completas.
+        return GameConfig.BOB_FAMILY.filter(f => saved?.includes(f.id)).map(f => f.id);
     },
 
     /**
@@ -133,6 +147,7 @@ const ProgressTracker = {
             slot.completedLevels = [];
             slot.completedWorlds = [];
             slot.unlockedCharacters = ['vocalista'];
+            slot.rescuedFamily = [];
             slot.selectedCharacter = 'vocalista';
             slot.mapPosition = { worldId: 1, levelIndex: 0 };
             slot.bestTimes = {};
@@ -224,6 +239,8 @@ const ProgressTracker = {
         const worldLevelSet = new Set(world.levels);
         slot.completedLevels = (slot.completedLevels || []).filter(l => !worldLevelSet.has(l));
         slot.completedWorlds = (slot.completedWorlds || []).filter(w => w !== worldId);
+        const familyIds = new Set(GameConfig.BOB_FAMILY.filter(f => f.world === worldId).map(f => f.id));
+        slot.rescuedFamily = (slot.rescuedFamily || []).filter(id => !familyIds.has(id));
         slot.mapPosition = { worldId, levelIndex: world.levels[0] };
         slot.lives = GC.LIVES.INITIAL;
 

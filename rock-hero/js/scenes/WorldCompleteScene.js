@@ -14,9 +14,16 @@ class WorldCompleteScene extends Phaser.Scene {
         this.worldData = data.world;
         this.playerName = data.playerName || 'Anônimo';
         this.totalTime = data.totalTime || 0;
+        this.isFamilyWorld = this.worldData.completionType === 'family';
+        this.rescuedFamily = GameData.getRescuedFamily();
+        this.familyComplete = this.rescuedFamily.length === GameData.BOB_FAMILY.length;
     }
 
     preload() {
+        if (this.isFamilyWorld) {
+            BobFamilyManager.preload(this);
+            return;
+        }
         // Carrega sprites do personagem resgatado (definição centralizada em GameData)
         GameData.loadCharacterSprites(this, this.worldData.rescuedCharacter);
     }
@@ -39,10 +46,12 @@ class WorldCompleteScene extends Phaser.Scene {
         this.createTitle(centerX, centerY);
 
         // Personagem resgatado com animação
-        this.createRescuedCharacter(centerX, centerY);
-
-        // Mensagem de resgate
-        this.createRescueMessage(centerX, centerY);
+        if (this.isFamilyWorld) {
+            this.createFamilyReunion(centerX);
+        } else {
+            this.createRescuedCharacter(centerX, centerY);
+            this.createRescueMessage(centerX, centerY);
+        }
 
         // Estatísticas
         this.createStats(centerX, centerY);
@@ -258,6 +267,35 @@ class WorldCompleteScene extends Phaser.Scene {
         });
     }
 
+    createFamilyReunion(centerX) {
+        const { height } = this.cameras.main;
+        this.add.text(centerX, height * 0.20,
+            this.familyComplete ? this.worldData.celebrationMessage : 'O reencontro continua!', {
+                fontFamily: 'Arial', fontSize: '20px', color: '#4ecdc4'
+            }).setOrigin(0.5);
+
+        const members = [{ texture: 'family-bob', found: true }, ...GameData.BOB_FAMILY.map(f => ({
+            texture: f.texture, found: this.rescuedFamily.includes(f.id)
+        }))];
+        members.forEach((member, index) => {
+            const sprite = this.add.image(centerX + (index - (members.length - 1) / 2) * 72,
+                height * 0.42, member.texture).setScale(2);
+            if (!member.found) sprite.setTintFill(0x333344);
+            else this.tweens.add({ targets: sprite, y: sprite.y - 8, duration: 350,
+                delay: index * 100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+        });
+        this.add.text(centerX, height * 0.62,
+            `Familiares resgatados: ${this.rescuedFamily.length}/${GameData.BOB_FAMILY.length}`, {
+                fontFamily: 'Arial', fontSize: '18px', color: '#ffe78a'
+            }).setOrigin(0.5);
+        this.add.text(centerX, height * 0.72,
+            this.familyComplete ? 'Juntos, podemos reabrir o portal para a banda voltar para casa!'
+                : 'Volte às fases para encontrar os familiares que ainda faltam.', {
+                fontFamily: 'Arial', fontSize: '14px', color: '#ffffff',
+                align: 'center', wordWrap: { width: 570 }
+            }).setOrigin(0.5);
+    }
+
     createRescueMessage(centerX, centerY) {
         const { height } = this.cameras.main;
         
@@ -387,6 +425,13 @@ class WorldCompleteScene extends Phaser.Scene {
     }
 
     continue() {
+        if (this.isFamilyWorld) {
+            if (this.familyComplete) GameData.markWorldComplete(this.worldData.id);
+            const levelIndex = this.worldData.levels[this.familyComplete ? this.worldData.levels.length - 1 : 0];
+            GameData.saveMapPosition(this.worldData.id, levelIndex, 'worldComplete:family');
+            this.scene.start('WorldMapScene', {});
+            return;
+        }
         // Marca o mundo como completo e desbloqueia o personagem
         GameData.markWorldComplete(this.worldData.id);
         GameData.unlockCharacter(this.worldData.rescuedCharacter);

@@ -36,6 +36,7 @@ const SaveManager = {
             completedLevels: [],
             completedWorlds: [],
             unlockedCharacters: ['vocalista'],
+            rescuedFamily: [],
             selectedCharacter: 'vocalista',
             mapPosition: { worldId: 1, levelIndex: 0 },
             bestTimes: {},

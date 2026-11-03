@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "assets/map-3-3.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "assets",
@@ -1421,7 +1421,7 @@
             "scale": 0.5978448275862068,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 463.3309300648883,
+                "x": 462.4945926459986,
                 "y": 304.4268204758472
             }
         },
@@ -1492,7 +1492,7 @@
             "scale": 0.34675,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 798.846431146359,
+                "x": 797.4044700793079,
                 "y": 337.4188896899783
             }
         },
@@ -1564,9 +1564,9 @@
         },
         "assets/map-3-3.json": {
             "scale": 0.541796875,
-            "selectedLayer": 0,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 511.26171593366985,
+                "x": 510.33886085075704,
                 "y": 511.2617159336698
             }
         },
@@ -7170,22 +7170,25 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
+        "assets/map-3-1.json",
+        "assets/map-3-2.json",
+        "assets/map-3-3.json"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "assets/map-3-1.json",
+        "assets/map-3-2.json",
+        "assets/map-3-3.json",
         "assets/map-5-3_carrilhao.json",
         "assets/map-5-4.json",
         "assets/map-2-1_caverna.json",
         "assets/map-5-1_catedral-do-eco.json",
         "assets/map-4-5_octopus.json",
-        "assets/map-3-1.json",
         "assets/map-3-5.json",
         "assets/map-4-3_auto-rolagem.json",
         "assets/map-2-3_expansion and speed.json",
-        "assets/map-4-1.json",
-        "assets/map-3-3.json",
-        "assets/map-3-2.json"
+        "assets/map-4-1.json"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

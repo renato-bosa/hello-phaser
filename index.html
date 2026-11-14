@@ -117,6 +117,17 @@
             box-shadow: 0 8px 30px rgba(52, 152, 219, 0.4);
         }
 
+        .neon-rush .game-icon {
+            background: linear-gradient(135deg, #00f5a0 0%, #00d9f5 50%, #9b5cff 100%);
+            box-shadow: 0 8px 30px rgba(0, 217, 245, 0.4);
+        }
+
+        .bg-decoration.three {
+            background: #00d9f5;
+            top: 40%;
+            left: -120px;
+        }
+
         .game-icon::after {
             content: '';
             position: absolute;
@@ -219,6 +230,7 @@
 <body>
     <div class="bg-decoration one"></div>
     <div class="bg-decoration two"></div>
+    <div class="bg-decoration three"></div>
 
     <h1>🎮 Fun Games</h1>
     <p class="subtitle">Olá!<br>Fizemos estes jogos usando ferramentas como o Tiled e o Phaser 3.<br>Escolha um deles e divirta-se!</p>
@@ -247,6 +259,21 @@
                 <b>Status:</b> Primeira versão<br>
                 Um pinguim está perdido e precisa encontrar o seu caminho! 
                 Explore cenários desenhados à mão nesta pequena fase de teste.
+            </p>
+            <div class="play-hint">
+                <span>Jogar</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </div>
+        </a>
+
+        <a href="https://renato-bosa.github.io/hello-babylon/" class="game-card neon-rush" target="_blank" rel="noopener noreferrer">
+            <div class="game-icon">🏎️</div>
+            <h2 class="game-title">Neon Rush</h2>
+            <p class="game-description">
+                <b>Status:</b> Em desenvolvimento<br>
+                Uma corrida futurista em pistas neon! Acelere, ultrapasse os rivais, colete moedas e equipe novos carros na garagem.
             </p>
             <div class="play-hint">
                 <span>Jogar</span>

@@ -72,6 +72,7 @@ const MusicManager = {
     // sobre TODOS os sounds ativos, não apenas o "atual".
     _activeSounds: [],
     _scheduledCrossfadeTimer: null,   // TimerEvent que dispara o crossfade
+    _timingScene: null,   // Relógio/tweens persistentes para a música da UI
 
     // Contexto de gameplay preservado enquanto a música está desligada, para
     // que religar pelo menu volte a tocar a fase atual em vez de esperar a
@@ -217,6 +218,14 @@ const MusicManager = {
      */
     startUi(scene) {
         this._ensureInit();
+        // Uma troca de mundo pode recriar o mapa preservando o áudio global.
+        // Reassocia o shutdown, sem chamar play() nem alterar a posição da faixa.
+        if (this.enabled && this.contextType === 'ui' && this.scene === scene) {
+            scene.events.off('shutdown', this._onSceneShutdown, this);
+            scene.events.once('shutdown', this._onSceneShutdown, this);
+            if (!this.currentSound) this._playRandom();
+            return;
+        }
         this.stop();
         if (!this.enabled) {
             this._suspendedContext = { type: 'ui', scene };
@@ -228,6 +237,9 @@ const MusicManager = {
         this.scene = scene;
         this.contextType = 'ui';
         this.contextData = null;
+        // O mapa reinicia ao trocar de mundo; seu relógio e suas tweens são
+        // descartados. A cena de música permanece ativa durante a transição.
+        this._timingScene = this._loaderScene || scene;
         this.currentPool = this._resolveUiPool();
         this._paused = false;
         this.preload();
@@ -241,6 +253,16 @@ const MusicManager = {
         }
 
         this._playRandom();
+    },
+
+    /** Recria uma tela de UI sem interromper a trilha que ela já está tocando. */
+    restartUiScene(scene, data = {}) {
+        if (this.contextType === 'ui' && this.scene === scene) {
+            // Ignora somente este shutdown. O destroy continua encerrando o
+            // áudio, e startUi() volta a registrar o shutdown no novo mapa.
+            scene.events.off('shutdown', this._onSceneShutdown, this);
+        }
+        scene.scene.restart(data);
     },
 
     /**
@@ -295,6 +317,7 @@ const MusicManager = {
         this.contextType = null;
         this.contextData = null;
         this.scene = null;
+        this._timingScene = null;
         this._paused = false;
     },
 
@@ -568,7 +591,8 @@ const MusicManager = {
         const startDelay = durationMs - this.crossfadeDurationMs;
         if (startDelay <= 0) return;
 
-        this._scheduledCrossfadeTimer = this.scene.time.delayedCall(startDelay, () => {
+        const timingScene = this._timingScene || this.scene;
+        this._scheduledCrossfadeTimer = timingScene.time.delayedCall(startDelay, () => {
             this._scheduledCrossfadeTimer = null;
             // Só faz sentido crossfadar se este sound ainda é o "current".
             if (this.currentSound !== sound) return;
@@ -620,9 +644,10 @@ const MusicManager = {
         // natural que fade linear. Alternativas se quiser um S mais/menos
         // pronunciado: 'Cubic.easeInOut' (moderado), 'Quart.easeInOut' (forte).
         const ease = 'Sine.easeInOut';
+        const timingScene = this._timingScene || scene;
 
         // Fade-out da antiga: quando termina, destrói.
-        scene.tweens.add({
+        timingScene.tweens.add({
             targets: oldSound,
             volume: 0,
             duration: this.crossfadeDurationMs,
@@ -631,7 +656,7 @@ const MusicManager = {
         });
 
         // Fade-in da nova até o volume alvo.
-        scene.tweens.add({
+        timingScene.tweens.add({
             targets: newSound,
             volume: this.volume,
             duration: this.crossfadeDurationMs,
@@ -714,8 +739,9 @@ const MusicManager = {
         if (!sound) return;
         if (this._pendingUnlock?.sound === sound) this._clearPendingUnlock();
         this._removeFromActive(sound);
-        if (this.scene && this.scene.tweens) {
-            try { this.scene.tweens.killTweensOf(sound); } catch (e) {}
+        const timingScene = this._timingScene || this.scene;
+        if (timingScene && timingScene.tweens) {
+            try { timingScene.tweens.killTweensOf(sound); } catch (e) {}
         }
         try { sound.off('complete'); } catch (e) {}
         try { sound.stop(); } catch (e) {}

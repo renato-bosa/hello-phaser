@@ -1430,7 +1430,7 @@ class WorldMapScene extends Phaser.Scene {
             const firstLevel = targetWorld.levels[0];
             GameData.saveMapPosition(targetWorld.id, firstLevel, 'worldMap.portalTransition');
             
-            this.scene.start('WorldMapScene', {});
+            MusicManager.restartUiScene(this);
         });
     }
 

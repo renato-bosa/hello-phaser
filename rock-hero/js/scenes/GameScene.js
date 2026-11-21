@@ -79,7 +79,7 @@ class GameScene extends Phaser.Scene {
         // O auto-loader carrega `puppet` como imagem única (nome sem -Nfps).
         if (level?.features?.puppeteerBoss) {
             this._loadSheetIfMissing('puppet-sheet', 'assets/spritesheets/puppet.png', 32, 32);
-            this._loadImageIfMissing('puppeteer-hand', 'assets/spritesheets/mao.png');
+            this._loadImageIfMissing('puppeteer-hand-markers', 'assets/spritesheets/mao-pontos.png');
             this._loadImageIfMissing('puppeteer-bob', 'assets/spritesheets/bob com linguinha de fora.png');
         }
     }

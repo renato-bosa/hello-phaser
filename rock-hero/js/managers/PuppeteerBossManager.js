@@ -21,12 +21,15 @@ class PuppeteerBossManager {
         this.hoverY = 0;
         this.counterText = null;
         this.handBars = null;
+        this.handStrings = null;
+        this.stringAnchors = [];
     }
 
     create(handSpawns) {
         const scene = this.scene;
         const cfg = GC.PUPPETEER_BOSS;
         const bounds = scene.physics.world.bounds;
+        this._prepareHandTexture();
 
         handSpawns.forEach((spawn, i) => {
             const sprite = scene.physics.add.image(spawn.x, spawn.y, 'puppeteer-hand');
@@ -46,6 +49,15 @@ class PuppeteerBossManager {
             });
             this.hands.push({ sprite, sway, hp: cfg.HAND_HEALTH, alive: true, nextLaunchAimed: false });
         });
+
+        // Mesma profundidade, criado depois das mãos: os fios passam sobre os
+        // dedos como no desenho original, mas não herdam sua rotação.
+        this.handStrings = scene.add.graphics().setDepth(GC.DEPTH.PLAYER + 1);
+        this._drawHandStrings();
+        // Atualiza após as tweens, inclusive no countdown e na queda final.
+        scene.events.on('postupdate', this._drawHandStrings, this);
+        scene.events.once('shutdown', this.destroy, this);
+        scene.events.once('destroy', this.destroy, this);
 
         const bobHeight = scene.textures.getFrame('puppeteer-bob')?.height || 32;
         const tileHeight = scene.solidsLayer?.tilemap?.tileHeight || 32;
@@ -366,6 +378,76 @@ class PuppeteerBossManager {
 
     // ==================== MÃOS ====================
 
+    _prepareHandTexture() {
+        const textures = this.scene.textures;
+        if (textures.exists('puppeteer-hand')) {
+            this.stringAnchors = textures.get('puppeteer-hand').customData.stringAnchors;
+            return;
+        }
+
+        const source = textures.get('puppeteer-hand-markers').getSourceImage();
+        const texture = textures.createCanvas('puppeteer-hand', source.width, source.height);
+        const ctx = texture.context;
+        ctx.drawImage(source, 0, 0);
+        const pixels = ctx.getImageData(0, 0, source.width, source.height);
+        const marker = GC.PUPPETEER_BOSS.HAND_STRING_MARKER_COLOR;
+        const anchors = [];
+        for (let y = 0; y < source.height; y++) {
+            for (let x = 0; x < source.width; x++) {
+                const offset = (y * source.width + x) * 4;
+                const color = (pixels.data[offset] << 16) |
+                    (pixels.data[offset + 1] << 8) | pixels.data[offset + 2];
+                if (!pixels.data[offset + 3] || color !== marker) continue;
+                // No original, cada fio ia do dedo até a borda inferior do sprite.
+                anchors.push({ x: x + 0.5, y: y + 0.5, length: source.height - y });
+                pixels.data[offset + 3] = 0;
+            }
+        }
+        ctx.putImageData(pixels, 0, 0);
+        texture.refresh();
+        texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+        // A textura limpa e os pontos são reutilizados nas próximas entradas.
+        texture.customData.stringAnchors = anchors;
+        this.stringAnchors = anchors;
+    }
+
+    _drawHandStrings() {
+        const g = this.handStrings;
+        if (!g) return;
+        g.clear();
+        const cfg = GC.PUPPETEER_BOSS;
+        this.hands.forEach(({ sprite }) => {
+            if (!sprite.active || !sprite.visible || sprite.alpha <= 0) return;
+            const cos = Math.cos(sprite.rotation);
+            const sin = Math.sin(sprite.rotation);
+            const width = cfg.HAND_STRING_WIDTH * Math.abs(sprite.scaleX);
+            const pixelHeight = Math.abs(sprite.scaleY);
+            g.fillStyle(this._handStringColor(sprite), sprite.alpha);
+            this.stringAnchors.forEach(anchor => {
+                // Espelhamento no espaço do sprite, depois origem, escala e rotação.
+                const localX = ((sprite.flipX ? sprite.width - anchor.x : anchor.x) -
+                    sprite.displayOriginX) * sprite.scaleX;
+                const localY = ((sprite.flipY ? sprite.height - anchor.y : anchor.y) -
+                    sprite.displayOriginY) * sprite.scaleY;
+                const x = sprite.x + localX * cos - localY * sin;
+                const y = sprite.y + localX * sin + localY * cos;
+                // Só o ponto de partida gira. O fio permanece vertical no mundo.
+                g.fillRect(x - width / 2, y - pixelHeight / 2, width, anchor.length * pixelHeight);
+            });
+        });
+    }
+
+    _handStringColor(sprite) {
+        if (sprite.tintFill) return sprite.tintTopLeft;
+        const color = GC.PUPPETEER_BOSS.HAND_STRING_COLOR;
+        const tint = sprite.tintTopLeft;
+        // Preserva também o escurecimento da mão derrotada (setTint).
+        const r = Math.round(((color >> 16) & 255) * ((tint >> 16) & 255) / 255);
+        const g = Math.round(((color >> 8) & 255) * ((tint >> 8) & 255) / 255);
+        const b = Math.round((color & 255) * (tint & 255) / 255);
+        return (r << 16) | (g << 8) | b;
+    }
+
     _flashHand(hand, color, duration) {
         const flashId = (hand.flashId || 0) + 1;
         hand.flashId = flashId;
@@ -476,6 +558,14 @@ class PuppeteerBossManager {
     }
 
     // ==================== UTIL ====================
+
+    destroy() {
+        this.scene.events.off('postupdate', this._drawHandStrings, this);
+        this.scene.events.off('shutdown', this.destroy, this);
+        this.scene.events.off('destroy', this.destroy, this);
+        if (this.handStrings) this.handStrings.destroy();
+        this.handStrings = null;
+    }
 
     _findFloorY(x) {
         const layer = this.scene.solidsLayer;

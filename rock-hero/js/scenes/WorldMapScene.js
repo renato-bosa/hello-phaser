@@ -103,7 +103,7 @@ class WorldMapScene extends Phaser.Scene {
         // Todos os nós navegáveis (fases + portais)
         this.allNodes = [];
 
-        // Estado da cena: 'map' (navegação normal) ou 'ranking' (overlay de tempos aberto).
+        // Estado: 'map', 'ranking' ou 'transition' (comandos bloqueados).
         // Gates de input em setupControls()/update() consultam este flag.
         this.currentView = 'map';
         this.rankingOverlayElements = [];
@@ -812,7 +812,7 @@ class WorldMapScene extends Phaser.Scene {
      *   - Toque nos dots de página (pula direto para o mundo)
      */
     showRanking() {
-        if (this.currentView === 'ranking') return;
+        if (this.currentView !== 'map') return;
         this.currentView = 'ranking';
         this.rankingOverlayElements = [];
         this.rankingWorldElements = [];
@@ -1206,12 +1206,10 @@ class WorldMapScene extends Phaser.Scene {
         // Navegação: no mapa muda o nó selecionado; no overlay de tempos, troca
         // o mundo exibido no carrossel.
         this.input.keyboard.on('keydown-LEFT', () => {
-            if (this.currentView === 'map') this.navigateNode(-1);
-            else if (this.currentView === 'ranking') this._navigateRankingWorld(-1);
+            this._navigateWithInterval(-1);
         });
         this.input.keyboard.on('keydown-RIGHT', () => {
-            if (this.currentView === 'map') this.navigateNode(1);
-            else if (this.currentView === 'ranking') this._navigateRankingWorld(1);
+            this._navigateWithInterval(1);
         });
 
         // Selecionar
@@ -1237,14 +1235,17 @@ class WorldMapScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-ESC', () => {
             if (this.currentView === 'ranking') {
                 this.closeRankingOverlay();
-            } else {
+            } else if (this.currentView === 'map') {
                 this.backToMenu();
             }
         });
 
         // Suporte a controles virtuais (mobile)
         this.virtualControls = GameData.getVirtualControls();
-        this.lastNavTime = 0;
+        // Descarta toques feitos enquanto a nova cena ainda estava carregando.
+        this.virtualControls.jumpJustPressed = false;
+        this.virtualControls.backJustPressed = false;
+        this.lastNavTime = -Infinity;
     }
 
     update(time) {
@@ -1261,35 +1262,29 @@ class WorldMapScene extends Phaser.Scene {
             this.virtualControls.backJustPressed = false;
             if (this.currentView === 'ranking') {
                 this.closeRankingOverlay();
-            } else {
+            } else if (this.currentView === 'map') {
                 this.backToMenu();
             }
         }
 
-        // Navegação com throttle. No mapa move o cursor entre nós; no overlay
-        // de tempos, o D-Pad ← / → troca o mundo do carrossel.
-        if (time - this.lastNavTime > 200) {
-            if (this.currentView === 'map') {
-                if (this.virtualControls.left) {
-                    this.navigateNode(-1);
-                    this.lastNavTime = time;
-                } else if (this.virtualControls.right) {
-                    this.navigateNode(1);
-                    this.lastNavTime = time;
-                }
-            } else if (this.currentView === 'ranking') {
-                if (this.virtualControls.left) {
-                    this._navigateRankingWorld(-1);
-                    this.lastNavTime = time;
-                } else if (this.virtualControls.right) {
-                    this._navigateRankingWorld(1);
-                    this.lastNavTime = time;
-                }
-            }
+        // Toque e teclado compartilham o mesmo intervalo de navegação.
+        if (this.virtualControls.left) {
+            this._navigateWithInterval(-1, time);
+        } else if (this.virtualControls.right) {
+            this._navigateWithInterval(1, time);
         }
     }
 
+    _navigateWithInterval(direction, time = this.time.now) {
+        if (this.currentView !== 'map' && this.currentView !== 'ranking') return;
+        if (time - this.lastNavTime < 200) return;
+        this.lastNavTime = time;
+        if (this.currentView === 'map') this.navigateNode(direction);
+        else this._navigateRankingWorld(direction);
+    }
+
     navigateNode(direction) {
+        if (this.currentView !== 'map') return;
         let newIndex = this.currentNodeIndex + direction;
         
         // Limita aos bounds
@@ -1374,6 +1369,7 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     selectNode() {
+        if (this.currentView !== 'map') return;
         const node = this.allNodes[this.currentNodeIndex];
         if (!node) return;
         
@@ -1397,6 +1393,9 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     transitionToWorld(targetWorld) {
+        if (this.currentView !== 'map') return;
+        this.currentView = 'transition';
+
         // Efeito de transição
         const { width, height } = this.cameras.main;
         const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0)
@@ -1426,15 +1425,17 @@ class WorldMapScene extends Phaser.Scene {
         
         // Troca de cena após a animação
         this.time.delayedCall(800, () => {
-            // Define a posição inicial no novo mundo
-            const firstLevel = targetWorld.levels[0];
-            GameData.saveMapPosition(targetWorld.id, firstLevel, 'worldMap.portalTransition');
+            // Chega pela extremidade do caminho correspondente ao portal usado.
+            const returning = targetWorld.id < this.currentWorldId;
+            const arrivalLevel = targetWorld.levels[returning ? targetWorld.levels.length - 1 : 0];
+            GameData.saveMapPosition(targetWorld.id, arrivalLevel, 'worldMap.portalTransition');
             
             MusicManager.restartUiScene(this);
         });
     }
 
     openCharacterSelect() {
+        if (this.currentView !== 'map') return;
         SoundManager.play('menuSelect');
         this.scene.start('CharacterSelectScene', {
             returnTo: 'WorldMapScene',
@@ -1444,6 +1445,7 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     backToMenu() {
+        if (this.currentView !== 'map') return;
         SoundManager.play('menuBack');
         this.scene.start('MenuScene');
     }

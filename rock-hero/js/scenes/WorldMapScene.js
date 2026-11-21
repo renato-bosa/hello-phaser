@@ -1277,7 +1277,7 @@ class WorldMapScene extends Phaser.Scene {
 
     _navigateWithInterval(direction, time = this.time.now) {
         if (this.currentView !== 'map' && this.currentView !== 'ranking') return;
-        if (time - this.lastNavTime < 200) return;
+        if (time - this.lastNavTime < 100) return;
         this.lastNavTime = time;
         if (this.currentView === 'map') this.navigateNode(direction);
         else this._navigateRankingWorld(direction);

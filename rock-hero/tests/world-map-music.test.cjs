@@ -178,7 +178,7 @@ test('uma troca durante o crossfade preserva as duas faixas e conclui os fades',
         if (tween.onComplete) tween.onComplete();
     }
     assert.equal(oldSound.destroyed, true);
-    assert.equal(newSound.volume, music.volume);
+    assert.equal(newSound.volume, music.volume * 0.5);
     assert.equal(music._activeSounds.length, 1);
 });
 

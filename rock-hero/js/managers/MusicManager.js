@@ -215,8 +215,9 @@ const MusicManager = {
 
     /**
      * BGM do menu e do mapa de fases. Pool: GameConfig.MUSIC.ui.default.
+     * volumeScale ajusta esta tela sem alterar o volume geral da música.
      */
-    startUi(scene) {
+    startUi(scene, volumeScale = 1) {
         this._ensureInit();
         // Uma troca de mundo pode recriar o mapa preservando o áudio global.
         // Reassocia o shutdown, sem chamar play() nem alterar a posição da faixa.
@@ -228,7 +229,7 @@ const MusicManager = {
         }
         this.stop();
         if (!this.enabled) {
-            this._suspendedContext = { type: 'ui', scene };
+            this._suspendedContext = { type: 'ui', scene, volumeScale };
             console.warn('MusicManager: startUi() ignorado — enabled=false.');
             return;
         }
@@ -236,7 +237,7 @@ const MusicManager = {
         this._suspendedContext = null;
         this.scene = scene;
         this.contextType = 'ui';
-        this.contextData = null;
+        this.contextData = { volumeScale };
         // O mapa reinicia ao trocar de mundo; seu relógio e suas tweens são
         // descartados. A cena de música permanece ativa durante a transição.
         this._timingScene = this._loaderScene || scene;
@@ -360,8 +361,12 @@ const MusicManager = {
         // Ajusta apenas o sound "current" no volume alvo — os que estão em
         // fade-out têm suas tweens próprias e não devem ser tocados aqui.
         if (this.currentSound && this.currentSound.setVolume) {
-            this.currentSound.setVolume(clamped);
+            this.currentSound.setVolume(this._getTargetVolume());
         }
+    },
+
+    _getTargetVolume() {
+        return this.volume * (this.contextData?.volumeScale ?? 1);
     },
 
     /**
@@ -384,7 +389,10 @@ const MusicManager = {
                     levelIndex: this.contextData?.levelIndex
                 };
             } else if (this.contextType === 'ui' && this.scene) {
-                this._suspendedContext = { type: 'ui', scene: this.scene };
+                this._suspendedContext = {
+                    type: 'ui', scene: this.scene,
+                    volumeScale: this.contextData?.volumeScale
+                };
             } else {
                 this._suspendedContext = null;
             }
@@ -405,7 +413,7 @@ const MusicManager = {
         if (suspended.type === 'gameplay') {
             this.startGameplay(suspended.scene, suspended.levelIndex);
         } else if (suspended.type === 'ui') {
-            this.startUi(suspended.scene);
+            this.startUi(suspended.scene, suspended.volumeScale);
         }
     },
 
@@ -552,7 +560,7 @@ const MusicManager = {
         this._cancelScheduledCrossfade();
         this._destroyAllActiveSounds();
 
-        const sound = this._createSound(key, this.volume);
+        const sound = this._createSound(key, this._getTargetVolume());
         this.currentSound = sound;
         this.currentKey = key;
         this._recordInHistory(key);
@@ -610,7 +618,7 @@ const MusicManager = {
     /**
      * Inicia o crossfade: sorteia próxima faixa, começa em volume 0 e faz
      * duas tweens simultâneas — a antiga descendo até 0 (então destruída),
-     * a nova subindo até `this.volume`. Ambas continuam tocando durante a
+     * a nova subindo até o volume alvo do contexto. Ambas tocam durante a
      * sobreposição.
      */
     _crossfadeToNext(oldSound) {
@@ -658,7 +666,7 @@ const MusicManager = {
         // Fade-in da nova até o volume alvo.
         timingScene.tweens.add({
             targets: newSound,
-            volume: this.volume,
+            volume: this._getTargetVolume(),
             duration: this.crossfadeDurationMs,
             ease
         });
@@ -725,7 +733,7 @@ const MusicManager = {
 
     /**
      * Cria um Sound Phaser e o registra em `_activeSounds`. Volume inicial
-     * é fornecido pelo chamador (`this.volume` para faixa nova sem fade,
+     * é fornecido pelo chamador (volume alvo para faixa nova sem fade,
      * `0` para faixa entrando em crossfade).
      */
     _createSound(key, initialVolume) {

@@ -1145,7 +1145,19 @@ class GameScene extends Phaser.Scene {
 
     tryOpenPrison() {
         if (!this.hasPrisonKey || this.prisonState !== 'locked' || !this.prison) return;
+        if (this.currentView !== 'gameplay' || !this.victoryScreen.canReachGoal()) return;
+
         this.prisonState = 'opening';
+        this.currentView = 'rescuing';
+        // O resgate já começou, mas a vitória espera a animação da prisão.
+        // Bloqueia controles e colisões desde agora, inclusive se tocar no ar.
+        const pc = this.playerController;
+        pc.cancelSpeedBoost();
+        pc.freeze();
+        pc.player.body.enable = false;
+        pc.player.clearTint();
+        pc.player.setAlpha(1);
+        this.hudManager.updateHeldItems();
         this.prison.anims.stop();
         this.prison.setTexture('prison-open-w1', 0);
 
@@ -2276,6 +2288,7 @@ class GameScene extends Phaser.Scene {
 
     onPlayerDied() {
         const pc = this.playerController;
+        if (this.hasWon || this.currentView === 'rescuing' || pc.isRespawning) return;
         pc.removeSneakerPower();
         this.effectsManager.clearNeonLineTrail();
         const player = pc.player;

@@ -462,11 +462,9 @@ class PlayerController {
 
     takeDamage() {
         if (this.isRespawning || this.isInvincible) return;
-        // A fase já foi ganha: durante a celebração o update() está parado, mas
-        // a física e os colliders seguem ativos. Sem esta guarda, cair num
-        // espinho após tocar a bandeira dispararia onPlayerDied() por cima da
-        // tela de vitória.
-        if (this.scene.hasWon) return;
+        // A proteção começa ao tocar a prisão, antes da vitória. Também cobre
+        // callbacks de dano do mesmo passo da física e a celebração da bandeira.
+        if (this.scene.hasWon || this.scene.currentView === 'rescuing') return;
 
         this.hearts--;
         this.scene.hudManager.updateHearts(this.hearts);

@@ -12,19 +12,27 @@ class VictoryScreen {
         scene.events.once('destroy', this.destroy, this);
     }
 
-    reachGoal(celebrationOrigin = null) {
+    canReachGoal() {
         const scene = this.scene;
-        if (scene.hasWon) return;
+        const pc = scene.playerController;
+        if (scene.hasWon || pc.isRespawning || pc.hearts <= 0) return false;
 
         if (scene.familyManager?.hasMissingRescues()) {
             scene.familyManager.warnMissingRescue();
-            return;
+            return false;
         }
 
         if (scene.totalStars > 0 && scene.starsCollected < scene.totalStars) {
             this._showStarsWarning();
-            return;
+            return false;
         }
+
+        return true;
+    }
+
+    reachGoal(celebrationOrigin = null) {
+        if (!this.canReachGoal()) return;
+        const scene = this.scene;
 
         scene.hasWon = true;
         scene.currentView = 'victory';

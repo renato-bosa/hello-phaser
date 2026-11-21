@@ -32,6 +32,7 @@
  *   MusicPreloadScene.create(): MusicManager.initializeBackgroundLoader(scene)
  *   scene.create():   MusicManager.startGameplay(scene, levelIndex)
  *                     MusicManager.startCutscene(scene, cutsceneId)
+ *                     MusicManager.startUi(scene)  // menu / mapa de fases
  *   scene.shutdown(): MusicManager.stop()
  *   PauseMenu.show(): MusicManager.pause()
  *   PauseMenu.resume(): MusicManager.resume()
@@ -62,8 +63,8 @@ const MusicManager = {
     currentSound: null,   // Phaser.Sound.BaseSound sendo tocado a "full volume"
     currentKey: null,     // key da faixa em execução (topo de recentHistory)
     currentPool: [],      // keys elegíveis pro contexto atual
-    contextType: null,    // 'gameplay' (futuro: 'menu', 'worldMap', ...)
-    contextData: null,    // { levelIndex } etc
+    contextType: null,    // 'gameplay' | 'cutscene' | 'ui'
+    contextData: null,    // { levelIndex } / { cutsceneId } etc
     recentHistory: [],    // últimas keys tocadas, mais recente primeiro
 
     // Todos os sounds vivos gerenciados por nós (current + qualquer um em
@@ -181,7 +182,7 @@ const MusicManager = {
         if (!this.enabled) {
             // Guarda o contexto mesmo desligado: se o jogador religar a música
             // no menu de pausa desta fase, setEnabled() sabe o que tocar.
-            this._suspendedContext = { scene, levelIndex };
+            this._suspendedContext = { type: 'gameplay', scene, levelIndex };
             console.warn(`MusicManager: startGameplay(level=${levelIndex}) ignorado — enabled=false.`);
             return;
         }
@@ -209,6 +210,37 @@ const MusicManager = {
 
         if (initialKey) this._playKey(initialKey);
         else this._playRandom();
+    },
+
+    /**
+     * BGM do menu e do mapa de fases. Pool: GameConfig.MUSIC.ui.default.
+     */
+    startUi(scene) {
+        this._ensureInit();
+        this.stop();
+        if (!this.enabled) {
+            this._suspendedContext = { type: 'ui', scene };
+            console.warn('MusicManager: startUi() ignorado — enabled=false.');
+            return;
+        }
+
+        this._suspendedContext = null;
+        this.scene = scene;
+        this.contextType = 'ui';
+        this.contextData = null;
+        this.currentPool = this._resolveUiPool();
+        this._paused = false;
+        this.preload();
+
+        scene.events.once('shutdown', this._onSceneShutdown, this);
+        scene.events.once('destroy', this._onSceneShutdown, this);
+
+        if (this.currentPool.length === 0) {
+            console.warn('MusicManager: nenhuma faixa elegível para UI.');
+            return;
+        }
+
+        this._playRandom();
     },
 
     /**
@@ -322,9 +354,17 @@ const MusicManager = {
 
         if (!next) {
             // `stop()` limpa scene/contextData, então preserva antes.
-            this._suspendedContext = this.contextType === 'gameplay' && this.scene
-                ? { scene: this.scene, levelIndex: this.contextData?.levelIndex }
-                : null;
+            if (this.contextType === 'gameplay' && this.scene) {
+                this._suspendedContext = {
+                    type: 'gameplay',
+                    scene: this.scene,
+                    levelIndex: this.contextData?.levelIndex
+                };
+            } else if (this.contextType === 'ui' && this.scene) {
+                this._suspendedContext = { type: 'ui', scene: this.scene };
+            } else {
+                this._suspendedContext = null;
+            }
             this.enabled = false;
             this.stop();
             return;
@@ -338,8 +378,11 @@ const MusicManager = {
 
         // Só retoma se a cena guardada ainda estiver viva (o jogador pode ter
         // voltado ao mapa ou ao menu enquanto a música estava desligada).
-        if (suspended && suspended.scene && suspended.scene.sys && suspended.scene.sys.isActive()) {
+        if (!suspended?.scene?.sys?.isActive()) return;
+        if (suspended.type === 'gameplay') {
             this.startGameplay(suspended.scene, suspended.levelIndex);
+        } else if (suspended.type === 'ui') {
+            this.startUi(suspended.scene);
         }
     },
 
@@ -381,6 +424,12 @@ const MusicManager = {
         } catch (e) {
             // sem window / URLSearchParams (ambiente inesperado) — ignora
         }
+    },
+
+    _resolveUiPool() {
+        const config = (GameConfig && GameConfig.MUSIC && GameConfig.MUSIC.ui) || {};
+        if (config.default != null) return this._normalizePool(config.default);
+        return ['music'];
     },
 
     /**

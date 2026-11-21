@@ -130,6 +130,8 @@ class WorldMapScene extends Phaser.Scene {
         if (typeof SoundManager !== 'undefined') {
             SoundManager.play('menuNavigate');
         }
+
+        MusicManager.startUi(this);
     }
 
     createBackground(width, height) {

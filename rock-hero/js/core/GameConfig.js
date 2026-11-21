@@ -331,7 +331,8 @@ const GameConfig = {
         { key: 'theme8', file: 'assets/mp3/theme8.mp3', title: 'Theme 8' },
         { key: 'theme9', file: 'assets/mp3/theme9.mp3', title: 'Theme 9' },
         { key: 'theme10', file: 'assets/mp3/theme10.mp3', title: 'Theme 10' },
-        { key: 'boss-fight', file: 'assets/mp3/boss-fight.mp3', title: 'Boss Fight' }
+        { key: 'boss-fight', file: 'assets/mp3/boss-fight.mp3', title: 'Boss Fight' },
+        { key: 'music', file: 'assets/mp3/music.mp3', title: 'Menu' }
     ],
 
     // Roteamento de trilha por contexto. Chefes usam a faixa exclusiva;
@@ -339,6 +340,7 @@ const GameConfig = {
     // Cada valor pode ser uma string (uma faixa) ou array de strings (pool).
     // Resolução: byLevel > byWorld > default > global.
     // Os índices dos chefes são os mesmos nas duas ordens de fases atuais.
+    // `ui` toca no menu e no mapa de fases (fora da pool de gameplay).
     MUSIC: {
         gameplay: {
             byLevel: {
@@ -352,6 +354,9 @@ const GameConfig = {
                 'rock-theme1', 'theme2', 'theme3', 'theme4', 'theme5',
                 'theme6', 'theme7', 'theme8', 'theme9', 'theme10'
             ]
+        },
+        ui: {
+            default: 'music'
         }
     },
 

@@ -64,6 +64,8 @@ class MenuScene extends Phaser.Scene {
         
         // Configura controles
         this.setupControls();
+
+        MusicManager.startUi(this);
     }
 
     cleanup() {

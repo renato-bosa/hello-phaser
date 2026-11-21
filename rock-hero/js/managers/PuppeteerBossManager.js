@@ -422,7 +422,7 @@ class PuppeteerBossManager {
             const sin = Math.sin(sprite.rotation);
             const width = cfg.HAND_STRING_WIDTH * Math.abs(sprite.scaleX);
             const pixelHeight = Math.abs(sprite.scaleY);
-            g.fillStyle(this._handStringColor(sprite), sprite.alpha);
+            const color = this._handStringColor(sprite);
             this.stringAnchors.forEach(anchor => {
                 // Espelhamento no espaço do sprite, depois origem, escala e rotação.
                 const localX = ((sprite.flipX ? sprite.width - anchor.x : anchor.x) -
@@ -432,7 +432,22 @@ class PuppeteerBossManager {
                 const x = sprite.x + localX * cos - localY * sin;
                 const y = sprite.y + localX * sin + localY * cos;
                 // Só o ponto de partida gira. O fio permanece vertical no mundo.
-                g.fillRect(x - width / 2, y - pixelHeight / 2, width, anchor.length * pixelHeight);
+                const left = x - width / 2;
+                const top = y - pixelHeight / 2;
+                const length = anchor.length * pixelHeight;
+                g.fillStyle(color, sprite.alpha);
+                g.fillRect(left, top, width, length);
+
+                // Degradê apenas na extensão, em faixas de até uma unidade do
+                // mundo. Funciona tanto no renderizador Canvas quanto no WebGL.
+                const fadeLength = length * cfg.HAND_STRING_FADE_EXTENSION;
+                const steps = Math.max(2, Math.ceil(fadeLength));
+                for (let step = 0; step < steps; step++) {
+                    const start = fadeLength * step / steps;
+                    const end = fadeLength * (step + 1) / steps;
+                    g.fillStyle(color, sprite.alpha * (1 - step / (steps - 1)));
+                    g.fillRect(left, top + length + start, width, end - start);
+                }
             });
         });
     }

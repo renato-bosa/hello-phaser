@@ -522,6 +522,7 @@ const GC = {
         HAND_STRING_MARKER_COLOR: 0xb5e61d,
         HAND_STRING_COLOR: 0xc3bc8a, // Cor dos fios de mao.png.
         HAND_STRING_WIDTH: 1,      // Pixels do sprite; acompanha a escala da mão.
+        HAND_STRING_FADE_EXTENSION: 0.3, // Trecho extra de 30%, terminando transparente.
         HAND_HIT_FLASH_MS: 80,
         HAND_LAUNCH_FLASH_MS: 140,
         HAND_RANDOM_LAUNCH_TINT: 0xaa44ff,

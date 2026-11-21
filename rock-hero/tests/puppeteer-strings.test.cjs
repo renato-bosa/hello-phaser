@@ -42,10 +42,14 @@ function handStrings() {
     const manager = new Manager(scene);
     manager._prepareHandTexture();
     const graphics = {
-        rects: [], styles: [], destroyed: 0,
-        clear() { this.rects = []; this.styles = []; },
+        rects: [], styles: [], fills: [], destroyed: 0,
+        clear() { this.rects = []; this.styles = []; this.fills = []; },
         fillStyle(color, alpha) { this.styles.push({ color, alpha }); },
-        fillRect(x, y, width, height) { this.rects.push({ x, y, width, height }); },
+        fillRect(x, y, width, height) {
+            const rect = { x, y, width, height };
+            this.rects.push(rect);
+            this.fills.push({ ...rect, ...this.styles.at(-1) });
+        },
         destroy() { this.destroyed++; }
     };
     manager.handStrings = graphics;
@@ -82,17 +86,35 @@ test('marcadores viram cinco origens e somem apenas da textura exibida, preserva
     assert.equal(h.reads(), 1);
 });
 
-test('sem rotação os fios reproduzem os cinco comprimentos e a largura original na escala 2x', () => {
+test('fios preservam o trecho original e acrescentam 30% com opacidade decrescente até zero', () => {
     const { manager, graphics } = handStrings();
     manager._drawHandStrings();
-    assert.deepEqual(graphics.rects, [
+    const originals = [
         { x: 86, y: 182, width: 2, height: 50 },
         { x: 104, y: 184, width: 2, height: 48 },
         { x: 78, y: 194, width: 2, height: 38 },
         { x: 74, y: 204, width: 2, height: 28 },
         { x: 120, y: 204, width: 2, height: 28 }
-    ]);
-    assert.deepEqual(graphics.styles, [{ color: 0xc3bc8a, alpha: 1 }]);
+    ];
+    for (const original of originals) {
+        const parts = graphics.fills.filter(rect => rect.x === original.x);
+        assert.deepEqual(parts[0], { ...original, color: 0xc3bc8a, alpha: 1 });
+        const tail = parts.slice(1);
+        assert.ok(tail.length > 1);
+        assert.equal(tail[0].y, original.y + original.height);
+        assert.equal(tail[0].alpha, 1);
+        assert.equal(tail.at(-1).alpha, 0);
+        const bottom = tail.at(-1).y + tail.at(-1).height;
+        assert.ok(Math.abs(bottom - (original.y + original.height * 1.3)) < 1e-9);
+        tail.forEach((part, i) => {
+            assert.equal(part.width, original.width);
+            assert.equal(part.color, 0xc3bc8a);
+            if (i > 0) {
+                assert.ok(part.alpha < tail[i - 1].alpha);
+                assert.ok(Math.abs(part.y - tail[i - 1].y - tail[i - 1].height) < 1e-9);
+            }
+        });
+    }
 });
 
 test('origens acompanham rotação, espelhamento e deslocamento, mantendo os fios verticais', () => {
@@ -116,13 +138,17 @@ test('fios acompanham as piscadas e a derrota e são removidos ao encerrar a cen
         sprite.tintFill = true;
         sprite.tintTopLeft = tint;
         manager._drawHandStrings();
-        assert.deepEqual(graphics.styles, [{ color: tint, alpha: 1 }]);
+        assert.ok(graphics.styles.every(style => style.color === tint && style.alpha >= 0 && style.alpha <= 1));
+        assert.equal(graphics.styles[0].alpha, 1);
+        assert.equal(graphics.styles.at(-1).alpha, 0);
     }
     sprite.tintFill = false;
     sprite.tintTopLeft = 0x55556a;
     sprite.alpha = 0.5;
     manager._drawHandStrings();
-    assert.deepEqual(graphics.styles, [{ color: 0x413f39, alpha: 0.5 }]);
+    assert.ok(graphics.styles.every(style => style.color === 0x413f39 && style.alpha >= 0 && style.alpha <= 0.5));
+    assert.equal(graphics.styles[0].alpha, 0.5);
+    assert.equal(graphics.styles.at(-1).alpha, 0);
     sprite.visible = false;
     manager._drawHandStrings();
     assert.equal(graphics.rects.length, 0);

@@ -545,8 +545,13 @@ const GC = {
         LAUNCH_ANGLE_MAX_DEG: 240,
         LAUNCH_SPEED_MIN: 60,
         LAUNCH_SPEED_MAX: 220,
+        PUPPET_HEALTH: 2,           // Tiros do Bob necessários para eliminar um boneco.
         PUPPET_SPEED: 70,
         PUPPET_SPEED_JITTER: 0.3,     // ±30%: perseguidores com a mesma velocidade se empilham
+        PUPPET_CHASE_JUMP_RANGE_PX: 96,
+        PUPPET_CHASE_JUMP_MIN_HEIGHT_PX: 48,
+        PUPPET_CHASE_JUMP_MAX_HEIGHT_PX: 96,
+        PUPPET_CHASE_JUMP_COOLDOWN_MS: 900,
         PUPPET_ANIM_FPS: 10,
         PUPPET_BODY_WIDTH: 18,
         PUPPET_BODY_HEIGHT: 24,

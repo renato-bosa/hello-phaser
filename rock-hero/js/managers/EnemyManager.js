@@ -178,8 +178,10 @@ class EnemyManager {
                     enemy.setVelocityY(this._computeStepJumpForce(jumpHeight));
                     data.lastStepJumpAt = currentTime;
                 }
+            } else if (data.type === 'puppet') {
+                this._tryPuppetChaseJump(enemy, data, player, currentTime);
             }
-            // shallow_hole e clear: segue andando (cai ou continua reto).
+            // Mantém a perseguição horizontal durante o salto ou a caminhada.
         }
 
         enemy.setVelocityX(data.speed * desiredDirection);
@@ -187,7 +189,7 @@ class EnemyManager {
 
     /**
      * Boneco do chefe do Mundo 4: sai da mão em queda livre e, ao tocar o
-     * chão, persegue como a toupeira. `gravityY` soma-se à gravidade do mundo.
+     * chão, persegue e salta para alcançar o jogador. `gravityY` soma-se à gravidade do mundo.
      */
     spawnPuppet(x, y, vx, vy, speed, gravityY = 0) {
         const scene = this.scene;
@@ -217,10 +219,12 @@ class EnemyManager {
         puppet.patrolData = {
             type: 'puppet',
             id: this._puppetSeq,
+            hp: cfg.PUPPET_HEALTH,
             state: 'falling',
             speed,
             direction: vx < 0 ? -1 : 1,
-            lastStepJumpAt: 0
+            lastStepJumpAt: 0,
+            lastChaseJumpAt: -Infinity
         };
         return puppet;
     }
@@ -280,6 +284,24 @@ class EnemyManager {
         }
 
         this._updateGroundChase(puppet, data, player, currentTime, onGround);
+    }
+
+    /** Salto de aproximação após pousar; mantém a perseguição horizontal. */
+    _tryPuppetChaseJump(puppet, data, player, currentTime) {
+        if (this.scene.puppeteerBoss?.isBobPhase()) return;
+        const cfg = GC.PUPPETEER_BOSS;
+        if (currentTime - (data.lastChaseJumpAt ?? -Infinity) < cfg.PUPPET_CHASE_JUMP_COOLDOWN_MS) return;
+        const dx = player.body.center.x - puppet.body.center.x;
+        if (Math.abs(dx) > cfg.PUPPET_CHASE_JUMP_RANGE_PX) return;
+        // Se o alvo está abaixo dos pés, é melhor continuar descendo até ele.
+        if (player.body.center.y > puppet.body.bottom) return;
+
+        const rise = puppet.body.center.y - player.body.center.y;
+        const height = Math.min(cfg.PUPPET_CHASE_JUMP_MAX_HEIGHT_PX,
+            Math.max(cfg.PUPPET_CHASE_JUMP_MIN_HEIGHT_PX,
+                rise + GC.ENEMY.TOUPEIRA.STEP_JUMP_MARGIN_PX));
+        puppet.setVelocityY(this._computeStepJumpForce(height));
+        data.lastChaseJumpAt = currentTime;
     }
 
     /** Distância (centro a centro) até o boneco mais próximo à frente, no chão. */

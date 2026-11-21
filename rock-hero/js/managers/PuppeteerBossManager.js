@@ -372,6 +372,11 @@ class PuppeteerBossManager {
         if (!bullet.active || !puppet.body?.enable) return;
         if (puppet.patrolData?.type !== 'puppet') return;
         bullet.destroy();
+        puppet.patrolData.hp--;
+        if (puppet.patrolData.hp > 0) {
+            SoundManager.play('damage');
+            return;
+        }
         this.scene.enemyManager.vanishPuppet(puppet);
         SoundManager.play('enemyPop');
     }

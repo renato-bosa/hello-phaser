@@ -525,6 +525,7 @@ const GC = {
         HAND_STRING_FADE_EXTENSION: 0.3, // Trecho extra de 30%, terminando transparente.
         HAND_HIT_FLASH_MS: 80,
         HAND_LAUNCH_FLASH_MS: 140,
+        HAND_LAUNCH_FLASH_OPACITY: 0.5,
         HAND_RANDOM_LAUNCH_TINT: 0xaa44ff,
         HAND_AIMED_LAUNCH_TINT: 0xff3333,
         // Mão derrotada continua na tela (é o mesmo marionetista): escurece e cai um pouco.

@@ -166,7 +166,7 @@ class PuppeteerBossManager {
 
         this._flashHand(hand,
             aimed ? cfg.HAND_AIMED_LAUNCH_TINT : cfg.HAND_RANDOM_LAUNCH_TINT,
-            cfg.HAND_LAUNCH_FLASH_MS);
+            cfg.HAND_LAUNCH_FLASH_MS, cfg.HAND_LAUNCH_FLASH_OPACITY);
 
         this.scene.tweens.add({
             targets: sprite,
@@ -459,7 +459,7 @@ class PuppeteerBossManager {
 
     _handStringColor(sprite) {
         if (sprite.tintFill) return sprite.tintTopLeft;
-        const color = GC.PUPPETEER_BOSS.HAND_STRING_COLOR;
+        const color = sprite.texture?.customData.stringFlashColor ?? GC.PUPPETEER_BOSS.HAND_STRING_COLOR;
         const tint = sprite.tintTopLeft;
         // Preserva também o escurecimento da mão derrotada (setTint).
         const r = Math.round(((color >> 16) & 255) * ((tint >> 16) & 255) / 255);
@@ -468,13 +468,47 @@ class PuppeteerBossManager {
         return (r << 16) | (g << 8) | b;
     }
 
-    _flashHand(hand, color, duration) {
+    _getHandFlashTexture(color, opacity) {
+        const textures = this.scene.textures;
+        const key = `puppeteer-hand-flash-${color}-${opacity}`;
+        if (textures.exists(key)) return key;
+
+        // Mistura a cor sobre a mão sem reduzir sua opacidade nem apagar seus
+        // detalhes. As duas variações são geradas uma vez e ficam em cache.
+        const source = textures.get('puppeteer-hand').getSourceImage();
+        const texture = textures.createCanvas(key, source.width, source.height);
+        const ctx = texture.context;
+        ctx.drawImage(source, 0, 0);
+        ctx.globalCompositeOperation = 'source-atop';
+        ctx.globalAlpha = opacity;
+        ctx.fillStyle = `#${color.toString(16).padStart(6, '0')}`;
+        ctx.fillRect(0, 0, source.width, source.height);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 1;
+        texture.refresh();
+        texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+
+        const base = GC.PUPPETEER_BOSS.HAND_STRING_COLOR;
+        const mix = shift => Math.round(((base >> shift) & 255) * (1 - opacity) +
+            ((color >> shift) & 255) * opacity);
+        texture.customData.stringFlashColor = (mix(16) << 16) | (mix(8) << 8) | mix(0);
+        return key;
+    }
+
+    _flashHand(hand, color, duration, opacity = 1) {
         const flashId = (hand.flashId || 0) + 1;
         hand.flashId = flashId;
-        hand.sprite.setTintFill(color);
+        if (opacity < 1) {
+            hand.sprite.setTexture(this._getHandFlashTexture(color, opacity));
+            hand.sprite.clearTint();
+        } else {
+            hand.sprite.setTexture('puppeteer-hand');
+            hand.sprite.setTintFill(color);
+        }
         this.scene.time.delayedCall(duration, () => {
             // Uma piscada antiga não deve apagar uma mais recente ou a cor de derrota.
             if (hand.alive && hand.sprite.active && hand.flashId === flashId) {
+                hand.sprite.setTexture('puppeteer-hand');
                 hand.sprite.clearTint();
             }
         });
@@ -499,6 +533,7 @@ class PuppeteerBossManager {
         hand.alive = false;
         hand.sway.stop();
         sprite.body.enable = false;
+        sprite.setTexture('puppeteer-hand');
         sprite.setTint(cfg.HAND_DEFEATED_TINT);
 
         scene.effectsManager.createEnemyPopBurst(sprite.x, sprite.y, 1.5);

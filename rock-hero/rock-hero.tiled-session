@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "assets/map-3-3.json",
+    "activeFile": "assets/map-4-6_chefe.json",
     "automapping.whileDrawing": true,
     "expandedProjectPaths": [
         "assets",
@@ -797,6 +797,134 @@
             "scaleInDock": 1
         },
         "assets/map-2-3_expansion and speed.json#yellow-star-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json": {
+            "scale": 0.581689453125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 511.4412826324184,
+                "y": 240.67825065054984
+            }
+        },
+        "assets/map-2-6_chefe.json#1up-animated-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#Boneco-14fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#abstract-blue": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#baixista-parado-animado-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#black": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#blue-bricks2": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#buraco-topeirudo": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#ceu-azul": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#cristal das notas de som": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#fg_dec_grass_random_frame_grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#grama noturna": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#grass": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#grass-floating-platform-edges": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#grass-floating-platform-middle": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#green-bricks": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#green-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#lava": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#lava-bubbles-4fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#lava-roxa": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#lava-roxa-animated": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#pedra": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#prisao-fechada-10fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#red-heart": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#sapo-roxo-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#sapo-tomate-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#sapo-verde-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#setas-velocidade": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#sneaker-power": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#starry-sky": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#still-hero (2)": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#terra": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#terra-escura": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#toupeira-2frames": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#toupeira4": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#toupeiroudo-64x64-6fps": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#trampoline-thick": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#yellow-flag": {
+            "scaleInDock": 1
+        },
+        "assets/map-2-6_chefe.json#yellow-star-animated": {
             "scaleInDock": 1
         },
         "assets/map-23-catedral-do-eco.json": {
@@ -1843,9 +1971,9 @@
         },
         "assets/map-3-6_boss.json": {
             "scale": 0.7538043478260869,
-            "selectedLayer": 0,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 367.46935832732527,
+                "x": 368.13266041816877,
                 "y": 319.71160778658975
             }
         },
@@ -1919,6 +2047,9 @@
             "scaleInDock": 1
         },
         "assets/map-3-6_boss.json#mushroom-purple": {
+            "scaleInDock": 1
+        },
+        "assets/map-3-6_boss.json#octopus-animated-6fps": {
             "scaleInDock": 1
         },
         "assets/map-3-6_boss.json#pedra-estilingue": {
@@ -2332,10 +2463,13 @@
             "scaleInDock": 1
         },
         "assets/map-4-5_octopus.json": {
+            "expandedObjectLayers": [
+                8
+            ],
             "scale": 0.4334375,
-            "selectedLayer": 0,
+            "selectedLayer": 5,
             "viewCenter": {
-                "x": 639.0771449170874,
+                "x": 640.2307137707282,
                 "y": 479.8846431146359
             }
         },
@@ -2420,6 +2554,9 @@
         "assets/map-4-5_octopus.json#octopus": {
             "scaleInDock": 1
         },
+        "assets/map-4-5_octopus.json#octopus-animated-6fps": {
+            "scaleInDock": 1
+        },
         "assets/map-4-5_octopus.json#sapo-tomate-6fps": {
             "scaleInDock": 1
         },
@@ -2442,7 +2579,7 @@
             "scale": 0.75,
             "selectedLayer": 5,
             "viewCenter": {
-                "x": 740,
+                "x": 455.3333333333333,
                 "y": 245.3333333333333
             }
         },
@@ -7170,13 +7307,16 @@
     "map.tileWidth": 64,
     "map.width": 20,
     "openFiles": [
-        "assets/map-3-1.json",
-        "assets/map-3-2.json",
-        "assets/map-3-3.json"
+        "assets/map-4-5_octopus.json",
+        "assets/map-4-6_chefe.json"
     ],
     "project": "rock-hero.tiled-project",
     "property.type": "bool",
     "recentFiles": [
+        "assets/map-4-5_octopus.json",
+        "assets/map-4-6_chefe.json",
+        "assets/map-2-6_chefe.json",
+        "assets/map-3-6_boss.json",
         "assets/map-3-1.json",
         "assets/map-3-2.json",
         "assets/map-3-3.json",
@@ -7184,11 +7324,7 @@
         "assets/map-5-4.json",
         "assets/map-2-1_caverna.json",
         "assets/map-5-1_catedral-do-eco.json",
-        "assets/map-4-5_octopus.json",
-        "assets/map-3-5.json",
-        "assets/map-4-3_auto-rolagem.json",
-        "assets/map-2-3_expansion and speed.json",
-        "assets/map-4-1.json"
+        "assets/map-3-5.json"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

@@ -69,8 +69,8 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 31, 31, 35, 35, 35, 0, 0, 32, 32, 32, 32,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 31, 31, 0, 0, 35, 0, 0, 0, 0, 32, 32, 32,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32,
-            0, 0, 0, 0, 0, 32, 32, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,
+            0, 0, 0, 0, 0, 32, 32, 32, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 85, 85, 85,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 85,
@@ -438,8 +438,8 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":192,
-                 "y":128
+                 "x":224,
+                 "y":160
                 }, 
                 {
                  "gid":102,
@@ -450,8 +450,20 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":192,
-                 "y":128
+                 "x":224,
+                 "y":160
+                }, 
+                {
+                 "gid":108,
+                 "height":32,
+                 "id":195,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":256,
+                 "y":160
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -460,7 +472,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":195,
+ "nextobjectid":196,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1065,6 +1077,19 @@
          "name":"Guitarrista-parado-2-animado3-6fps",
          "spacing":0,
          "tilecount":6,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":2,
+         "firstgid":108,
+         "image":"spritesheets\/octopus-animated-6fps.png",
+         "imageheight":64,
+         "imagewidth":64,
+         "margin":0,
+         "name":"octopus-animated-6fps",
+         "spacing":0,
+         "tilecount":4,
          "tileheight":32,
          "tilewidth":32
         }],
